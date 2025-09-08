@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Fundamentals Review - MAC286</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --code-bg: #273746;
+            --nav-width: 250px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            display: flex;
+        }
+        
+        .nav-container {
+            width: var(--nav-width);
+            background: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        
+        .nav-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .nav-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .nav-header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .nav-tabs {
+            list-style: none;
+        }
+        
+        .nav-tabs li {
+            margin-bottom: 5px;
+        }
+        
+        .nav-tabs a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-tabs a:hover {
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .nav-tabs a.active {
+            background: rgba(255,255,255,0.15);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .nav-tabs i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .content-container {
+            flex: 1;
+            margin-left: var(--nav-width);
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .definition-box {
+            background-color: #e8f4fc;
+            border-left: 5px solid var(--secondary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .example-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 5px solid var(--success);
+            position: relative;
+        }
+        
+        .code-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--secondary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .code-icon:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .keyword {
+            color: #e74c3c;
+        }
+        
+        .type {
+            color: #3498db;
+        }
+        
+        .string {
+            color: #2ecc71;
+        }
+        
+        .comment {
+            color: #7f8c8d;
+        }
+        
+        .method {
+            color: #f39c12;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .explanation {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .important-note {
+            background-color: #fff3cd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 5px solid var(--warning);
+        }
+        
+        .practice-box {
+            background-color: #e6f7ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 5px solid var(--accent);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .nav-container {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .content-container {
+                margin-left: 0;
+            }
+            
+            .nav-tabs {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .nav-tabs li {
+                flex: 0 0 auto;
+                margin-bottom: 0;
+            }
+            
+            .nav-tabs a {
+                border-left: none;
+                border-bottom: 4px solid transparent;
+                padding: 10px 15px;
+            }
+            
+            .nav-tabs a:hover,
+            .nav-tabs a.active {
+                border-left: none;
+                border-bottom: 4px solid var(--accent);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-container">
+        <div class="nav-header">
+            <h1>Java Fundamentals</h1>
+            <p>MAC286 Preparation</p>
+        </div>
+        <ul class="nav-tabs">
+            <li><a href="#intro" class="active"><i class="fas fa-home"></i> Introduction</a></li>
+            <li><a href="#variables"><i class="fas fa-code"></i> Variables & Data Types</a></li>
+            <li><a href="#conditionals"><i class="fas fa-sitemap"></i> Conditionals & Loops</a></li>
+            <li><a href="#methods"><i class="fas fa-cogs"></i> Methods</a></li>
+            <li><a href="#arrays"><i class="fas fa-bars"></i> Arrays & Strings</a></li>
+            <li><a href="#oop"><i class="fas fa-object-group"></i> OOP Basics</a></li>
+            <li><a href="#inheritance"><i class="fas fa-project-diagram"></i> Inheritance & Polymorphism</a></li>
+        </ul>
+    </div>
+    
+    <div class="content-container">
+        <!-- Introduction Tab -->
+        <div class="tab-content active" id="intro">
+            <header>
+                <h1>Java Fundamentals Review</h1>
+                <p class="subtitle">Essential concepts for Data Structures and Algorithms (MAC286)</p>
+            </header>
+            
+            <div class="definition-box">
+                <p>This review covers the fundamental Java programming concepts you need to understand before starting the Data Structures and Algorithms course (MAC286).</p>
+            </div>
+            
+            <h2>Why This Review Matters</h2>
+            <p>Data Structures and Algorithms build upon core programming concepts. A strong foundation in these Java fundamentals will help you:</p>
+            <ul>
+                <li>Understand how data structures are implemented</li>
+                <li>Analyze algorithm efficiency</li>
+                <li>Write cleaner, more efficient code</li>
+                <li>Debug and optimize your implementations</li>
+            </ul>
+            
+            <div class="important-note">
+                <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                <p>Click the <i class="fas fa-code"></i> icon on code examples to open them in an online Java editor where you can run and experiment with the code.</p>
+            </div>
+            
+            <h2>Topics Covered</h2>
+            <div class="step">1. Variables and Data Types</div>
+            <div class="step">2. Conditionals and Loops</div>
+            <div class="step">3. Methods</div>
+            <div class="step">4. Arrays and Strings</div>
+            <div class="step">5. Object-Oriented Programming Basics</div>
+            <div class="step">6. Inheritance and Polymorphism</div>
+        </div>
+        
+        <!-- Variables and Data Types Tab -->
+        <div class="tab-content" id="variables">
+            <header>
+                <h1>Variables and Data Types</h1>
+                <p class="subtitle">Storing and manipulating data in Java</p>
+            </header>
+            
+            <div class="definition-box">
+                <p>Variables are containers for storing data values. In Java, each variable must be declared with a specific data type.</p>
+                <p>Java is a statically-typed language, which means that all variables must be declared with a specific type before they can be used. This allows for compile-time type checking, which helps prevent many common programming errors.</p>
+            </div>
+            
+            <h2>Primitive Data Types</h2>
+            <p>Java has 8 primitive data types that represent single values:</p>
+            <ul>
+                <li><strong>byte</strong>: 8-bit integer (-128 to 127)</li>
+                <li><strong>short</strong>: 16-bit integer (-32,768 to 32,767)</li>
+                <li><strong>int</strong>: 32-bit integer (most common)</li>
+                <li><strong>long</strong>: 64-bit integer</li>
+                <li><strong>float</strong>: 32-bit floating point</li>
+                <li><strong>double</strong>: 64-bit floating point (most common)</li>
+                <li><strong>boolean</strong>: true or false</li>
+                <li><strong>char</strong>: single character</li>
+            </ul>
+            
+            <h2>Reference Data Types</h2>
+            <p>Java also has reference types, which refer to objects:</p>
+            <ul>
+                <li><strong>String</strong>: sequence of characters (immutable)</li>
+                <li><strong>Arrays</strong>: collections of elements</li>
+                <li><strong>Classes</strong>: custom data types</li>
+            </ul>
+            
+            <div class="example-box">
+                <h3>Variable Declaration Example</h3>
+                <div class="code-icon" onclick="openEditor('variablesExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="keyword">public class</span> <span class="type">VariablesExample</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// Integer types</span>
+        <span class="keyword">int</span> age = 25;
+        <span class="keyword">long</span> population = 7800000000L;
+        
+        <span class="comment">// Floating point types</span>
+        <span class="keyword">double</span> price = 19.99;
+        <span class="keyword">float</span> temperature = 36.6f;
+        
+        <span class="comment">// Other types</span>
+        <span class="keyword">char</span> grade = 'A';
+        <span class="keyword">boolean</span> isJavaFun = true;
+        
+        <span class="comment">// String type (reference type)</span>
+        String name = "John Doe";
+        
+        <span class="comment">// Output values</span>
+        System.out.println(<span class="string">"Name: "</span> + name);
+        System.out.println(<span class="string">"Age: "</span> + age);
+        System.out.println(<span class="string">"Population: "</span> + population);
+        System.out.println(<span class="string">"Price: $"</span> + price);
+        System.out.println(<span class="string">"Temperature: "</span> + temperature + <span class="string">"°C"</span>);
+        System.out.println(<span class="string">"Grade: "</span> + grade);
+        System.out.println(<span class="string">"Is Java fun? "</span> + isJavaFun);
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example demonstrates declaring variables of different data types in Java:</p>
+                    <ul>
+                        <li><strong>int</strong> and <strong>long</strong> for integer values. Note the 'L' suffix for long literals.</li>
+                        <li><strong>double</strong> and <strong>float</strong> for floating-point numbers. Note the 'f' suffix for float literals.</li>
+                        <li><strong>char</strong> for single characters, using single quotes.</li>
+                        <li><strong>boolean</strong> for true/false values.</li>
+                        <li><strong>String</strong> for text (note: String is a class, not a primitive type), using double quotes.</li>
+                    </ul>
+                    <p>Each variable declaration follows the pattern: <code>type variableName = value;</code>. Java requires explicit type declaration, which helps catch errors at compile time rather than runtime.</p>
+                </div>
+            </div>
+            
+            <div class="important-note">
+                <h4><i class="fas fa-exclamation-circle"></i> Remember</h4>
+                <p>Java is a statically-typed language, which means variables must be declared with a specific type before they can be used. This provides compile-time type checking, which helps prevent many common programming errors.</p>
+            </div>
+            
+            <div class="practice-box">
+                <h4><i class="fas fa-pencil-alt"></i> Practice Exercise</h4>
+                <p>Create a program that declares variables to store information about a product (name, price, quantity in stock, and whether it's available). Print all the information.</p>
+            </div>
+        </div>
+        
+        <!-- Conditionals and Loops Tab -->
+        <div class="tab-content" id="conditionals">
+            <header>
+                <h1>Conditionals and Loops</h1>
+                <p class="subtitle">Controlling program flow in Java</p>
+            </header>
+            
+            <div class="definition-box">
+                <p>Conditionals and loops allow you to control the flow of your program based on conditions and repeat operations. Conditionals enable decision-making in code, while loops allow for repeated execution of code blocks.</p>
+                <p>Control structures are fundamental to programming as they allow programs to respond differently to different inputs and situations, making programs dynamic and responsive.</p>
+            </div>
+            
+            <h2>Conditional Statements</h2>
+            <ul>
+                <li><strong>if</strong>: Executes a block of code if a condition is true</li>
+                <li><strong>if-else</strong>: Executes one block if true, another if false</li>
+                <li><strong>if-else-if</strong>: Checks multiple conditions in sequence</li>
+                <li><strong>switch</strong>: Selects one of many code blocks to execute based on a value</li>
+            </ul>
+            
+            <h2>Loop Statements</h2>
+            <ul>
+                <li><strong>for</strong>: loops through a block a specific number of times</li>
+                <li><strong>while</strong>: loops while a condition remains true</li>
+                <li><strong>do-while</strong>: similar to while but executes at least once</li>
+                <li><strong>Enhanced for</strong>: iterates through arrays and collections</li>
+            </ul>
+            
+            <div class="example-box">
+                <h3>Conditionals Example</h3>
+                <div class="code-icon" onclick="openEditor('conditionalsExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="keyword">public class</span> <span class="type">ConditionalsExample</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="keyword">int</span> number = 15;
+        
+        <span class="comment">// If-else example</span>
+        <span class="keyword">if</span> (number % 2 == 0) {
+            System.out.println(number + <span class="string">" is even"</span>);
+        } <span class="keyword">else</span> {
+            System.out.println(number + <span class="string">" is odd"</span>);
+        }
+        
+        <span class="comment">// If-else-if example</span>
+        <span class="keyword">if</span> (number < 0) {
+            System.out.println(<span class="string">"Negative number"</span>);
+        } <span class="keyword">else if</span> (number > 0) {
+            System.out.println(<span class="string">"Positive number"</span>);
+        } <span class="keyword">else</span> {
+            System.out.println(<span class="string">"Zero"</span>);
+        }
+        
+        <span class="comment">// Switch example</span>
+        <span class="keyword">int</span> day = 3;
+        String dayName;
+        
+        <span class="keyword">switch</span> (day) {
+            <span class="keyword">case</span> 1:
+                dayName = <span class="string">"Monday"</span>;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> 2:
+                dayName = <span class="string">"Tuesday"</span>;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> 3:
+                dayName = <span class="string">"Wednesday"</span>;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> 4:
+                dayName = <span class="string">"Thursday"</span>;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> 5:
+                dayName = <span class="string">"Friday"</span>;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> 6:
+                dayName = <span class="string">"Saturday"</span>;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> 7:
+                dayName = <span class="string">"Sunday"</span>;
+                <span class="keyword">break</span>;
+            <span class="keyword">default</span>:
+                dayName = <span class="string">"Invalid day"</span>;
+        }
+        System.out.println(<span class="string">"Day "</span> + day + <span class="string">" is "</span> + dayName);
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example shows different conditional statements in Java:</p>
+                    <ul>
+                        <li><strong>if-else</strong>: Checks if a number is even or odd using the modulus operator (%). The modulus operator returns the remainder of a division operation.</li>
+                        <li><strong>if-else-if</strong>: Checks if a number is negative, positive, or zero. Conditions are evaluated in order, and only the first true condition executes.</li>
+                        <li><strong>switch</strong>: Selects a day name based on a numeric value. The switch statement compares the value against each case label. The <strong>break</strong> statement is crucial to prevent "fall-through" to subsequent cases.</li>
+                    </ul>
+                    <p>Conditional statements allow programs to make decisions and execute different code paths based on conditions, making programs more flexible and responsive to different situations.</p>
+                </div>
+            </div>
+            
+            <div class="example-box">
+                <h3>Loops Example</h3>
+                <div class="code-icon" onclick="openEditor('loopsExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="keyword">public class</span> <span class="type">LoopsExample</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// For loop example</span>
+        System.out.println(<span class="string">"For loop (1 to 5):"</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 1; i <= 5; i++) {
+            System.out.print(i + <span class="string">" "</span>);
+        }
+        System.out.println();
+        
+        <span class="comment">// While loop example</span>
+        System.out.println(<span class="string">"While loop (5 to 1):"</span>);
+        <span class="keyword">int</span> j = 5;
+        <span class="keyword">while</span> (j >= 1) {
+            System.out.print(j + <span class="string">" "</span>);
+            j--;
+        }
+        System.out.println();
+        
+        <span class="comment">// Do-while loop example</span>
+        System.out.println(<span class="string">"Do-while loop (1 to 3):"</span>);
+        <span class="keyword">int</span> k = 1;
+        <span class="keyword">do</span> {
+            System.out.print(k + <span class="string">" "</span>);
+            k++;
+        } <span class="keyword">while</span> (k <= 3);
+        System.out.println();
+        
+        <span class="comment">// Nested loops example (multiplication table)</span>
+        System.out.println(<span class="string">"Multiplication table (1-3):"</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> x = 1; x <= 3; x++) {
+            <span class="keyword">for</span> (<span class="keyword">int</span> y = 1; y <= 3; y++) {
+                System.out.print(x * y + <span class="string">"\t"</span>);
+            }
+            System.out.println();
+        }
+        
+        <span class="comment">// Break and continue example</span>
+        System.out.println(<span class="string">"Break and continue example:"</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 1; i <= 10; i++) {
+            <span class="keyword">if</span> (i == 5) {
+                <span class="keyword">continue</span>; <span class="comment">// Skip the rest of the loop for i=5</span>
+            }
+            <span class="keyword">if</span> (i == 8) {
+                <span class="keyword">break</span>;  <span class="comment">// Exit the loop when i=8</span>
+            }
+            System.out.print(i + <span class="string">" "</span>);
+        }
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example demonstrates different loop structures in Java:</p>
+                    <ul>
+                        <li><strong>for loop</strong>: Counts from 1 to 5 with a fixed number of iterations. The for loop has three parts: initialization (int i = 1), condition (i <= 5), and increment (i++).</li>
+                        <li><strong>while loop</strong>: Counts down from 5 to 1, checking condition before each iteration. The loop continues as long as the condition remains true.</li>
+                        <li><strong>do-while loop</strong>: Counts from 1 to 3, executing at least once before checking condition. Unlike the while loop, the condition is checked after the loop body executes.</li>
+                        <li><strong>nested loops</strong>: Creates a multiplication table using a for loop inside another for loop. The inner loop completes all its iterations for each iteration of the outer loop.</li>
+                        <li><strong>break and continue</strong>: The break statement exits the loop entirely, while continue skips the current iteration and moves to the next one.</li>
+                    </ul>
+                    <p>Loops are essential for performing repetitive tasks efficiently. The choice of loop type depends on whether you know the number of iterations in advance and whether the loop should execute at least once.</p>
+                </div>
+            </div>
+            
+            <div class="practice-box">
+                <h4><i class="fas fa-pencil-alt"></i> Practice Exercise</h4>
+                <p>Write a program that prints numbers from 1 to 100. For multiples of 3, print "Fizz" instead of the number. For multiples of 5, print "Buzz". For numbers which are multiples of both 3 and 5, print "FizzBuzz".</p>
+            </div>
+        </div>
+        
+        <!-- Methods Tab -->
+        <div class="tab-content" id="methods">
+            <header>
+                <h1>Methods</h1>
+                <p class="subtitle">Organizing code into reusable blocks</p>
+            </header>
+            
+            <div class="definition-box">
+                <p>Methods are blocks of code that perform a specific task and can be reused throughout your program. They help with code organization, reusability, and maintenance.</p>
+                <p>Methods allow you to break down complex problems into smaller, manageable pieces. They promote code reuse, reduce duplication, and make programs easier to read, debug, and maintain. Methods can take parameters as input and can return a value as output.</p>
+            </div>
+            
+            <h2>Method Components</h2>
+            <ul>
+                <li><strong>Access modifier</strong>: public, private, protected, or package-private (default)</li>
+                <li><strong>Return type</strong>: data type of the value returned, or void if no return value</li>
+                <li><strong>Method name</strong>: should be a verb describing the action</li>
+                <li><strong>Parameters</strong>: input values the method needs to work</li>
+                <li><strong>Method body</strong>: the code that performs the task</li>
+            </ul>
+            
+            <h2>Method Overloading</h2>
+            <p>Java allows method overloading, which means multiple methods can have the same name but different parameters. This is useful when you want to perform similar operations with different types or numbers of inputs.</p>
+            
+            <div class="example-box">
+                <h3>Methods Example</h3>
+                <div class="code-icon" onclick="openEditor('methodsExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="keyword">public class</span> <span class="type">MethodsExample</span> {
+    
+    <span class="comment">// Method with no parameters and no return value</span>
+    <span class="keyword">public static void</span> <span class="method">greet</span>() {
+        System.out.println(<span class="string">"Hello, welcome to Java programming!"</span>);
+    }
+    
+    <span class="comment">// Method with parameters and no return value</span>
+    <span class="keyword">public static void</span> <span class="method">greetUser</span>(String name) {
+        System.out.println(<span class="string">"Hello, "</span> + name + <span class="string">"! Welcome to Java programming!"</span>);
+    }
+    
+    <span class="comment">// Method with parameters and return value</span>
+    <span class="keyword">public static int</span> <span class="method">addNumbers</span>(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
+        <span class="keyword">return</span> a + b;
+    }
+    
+    <span class="comment">// Method overloading - same name, different parameters</span>
+    <span class="keyword">public static double</span> <span class="method">addNumbers</span>(<span class="keyword">double</span> a, <span class="keyword">double</span> b) {
+        <span class="keyword">return</span> a + b;
+    }
+    
+    <span class="comment">// Method with multiple parameters</span>
+    <span class="keyword">public static void</span> <span class="method">printUserInfo</span>(String name, <span class="keyword">int</span> age, <span class="keyword">boolean</span> isStudent) {
+        System.out.println(<span class="string">"Name: "</span> + name);
+        System.out.println(<span class="string">"Age: "</span> + age);
+        System.out.println(<span class="string">"Student: "</span> + isStudent);
+    }
+    
+    <span class="comment">// Method calling another method</span>
+    <span class="keyword">public static void</span> <span class="method">processUser</span>(String name, <span class="keyword">int</span> age) {
+        greetUser(name);
+        System.out.println(<span class="string">"You are "</span> + age + <span class="string">" years old"</span>);
+    }
+    
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// Calling methods</span>
+        greet();
+        greetUser(<span class="string">"Alice"</span>);
+        
+        <span class="keyword">int</span> sum1 = addNumbers(5, 7);
+        System.out.println(<span class="string">"Sum of integers: "</span> + sum1);
+        
+        <span class="keyword">double</span> sum2 = addNumbers(3.5, 2.8);
+        System.out.println(<span class="string">"Sum of doubles: "</span> + sum2);
+        
+        <span class="comment">// Using a method in a calculation</span>
+        <span class="keyword">int</span> result = addNumbers(10, 20) * 2;
+        System.out.println(<span class="string">"Result: "</span> + result);
+        
+        <span class="comment">// Method with multiple parameters</span>
+        printUserInfo(<span class="string">"Bob"</span>, 25, true);
+        
+        <span class="comment">// Method calling another method</span>
+        processUser(<span class="string">"Charlie"</span>, 30);
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example demonstrates different aspects of methods in Java:</p>
+                    <ul>
+                        <li><strong>Simple method</strong>: greet() with no parameters and no return value (void). This method performs an action but doesn't return any data.</li>
+                        <li><strong>Parameterized method</strong>: greetUser(String name) with a parameter but no return value. Parameters allow methods to accept input values.</li>
+                        <li><strong>Method with return value</strong>: addNumbers(int a, int b) that returns the sum of two integers. The return statement sends a value back to the caller.</li>
+                        <li><strong>Method overloading</strong>: Two addNumbers methods with different parameter types (int vs double). Java determines which method to call based on the argument types.</li>
+                        <li><strong>Multiple parameters</strong>: printUserInfo() accepts three parameters of different types.</li>
+                        <li><strong>Method calling another method</strong>: processUser() calls greetUser() and performs additional operations.</li>
+                    </ul>
+                    <p>Method overloading allows using the same method name for different parameter types, making the code more intuitive and reducing the need for different method names for similar operations.</p>
+                </div>
+            </div>
+            
+            <div class="important-note">
+                <h4><i class="fas fa-exclamation-circle"></i> Remember</h4>
+                <p>The <strong>static</strong> keyword means the method belongs to the class itself rather than to instances of the class. This allows calling the method without creating an object. Static methods can only directly call other static methods and access static variables.</p>
+            </div>
+            
+            <div class="practice-box">
+                <h4><i class="fas fa-pencil-alt"></i> Practice Exercise</h4>
+                <p>Create a method called calculateCircleArea that takes a radius (double) as a parameter and returns the area of a circle. Use the formula: area = π * r². Call this method from main with different radius values.</p>
+            </div>
+        </div>
+        
+        <!-- Arrays and Strings Tab -->
+        <div class="tab-content" id="arrays">
+            <header>
+                <h1>Arrays and Strings</h1>
+                <p class="subtitle">Working with collections of data and text</p>
+            </header>
+            
+            <div class="definition-box">
+                <p>Arrays are containers that hold a fixed number of values of a single type. Strings are objects that represent sequences of characters.</p>
+                <p>Arrays provide a way to store and access multiple values of the same type using a single variable name and an index. Strings are immutable sequences of characters that provide numerous methods for manipulation and examination of text data.</p>
+            </div>
+            
+            <h2>Array Characteristics</h2>
+            <ul>
+                <li>Fixed size once created</li>
+                <li>Can hold primitives or objects</li>
+                <li>Zero-based indexing (first element is at index 0)</li>
+                <li>Elements are stored in contiguous memory locations</li>
+                <li>Array length is available via the length property</li>
+            </ul>
+            
+            <h2>String Characteristics</h2>
+            <ul>
+                <li>Immutable - cannot be changed after creation</li>
+                <li>String literals are stored in a string pool</li>
+                <li>Many useful methods for manipulation</li>
+                <li>Can be created with string literals or with new keyword</li>
+                <li>Implements the CharSequence interface</li>
+            </ul>
+            
+            <div class="example-box">
+                <h3>Arrays Example</h3>
+                <div class="code-icon" onclick="openEditor('arraysExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="keyword">public class</span> <span class="type">ArraysExample</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// Array declaration and initialization</span>
+        <span class="keyword">int</span>[] numbers = {10, 20, 30, 40, 50};
+        
+        <span class="comment">// Accessing array elements</span>
+        System.out.println(<span class="string">"First element: "</span> + numbers[0]);
+        System.out.println(<span class="string">"Third element: "</span> + numbers[2]);
+        
+        <span class="comment">// Modifying array elements</span>
+        numbers[1] = 25;
+        System.out.println(<span class="string">"Modified second element: "</span> + numbers[1]);
+        
+        <span class="comment">// Array length</span>
+        System.out.println(<span class="string">"Array length: "</span> + numbers.length);
+        
+        <span class="comment">// Iterating through array with for loop</span>
+        System.out.print(<span class="string">"All elements: "</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i < numbers.length; i++) {
+            System.out.print(numbers[i] + <span class="string">" "</span>);
+        }
+        System.out.println();
+        
+        <span class="comment">// Enhanced for loop (for-each)</span>
+        System.out.print(<span class="string">"Using for-each: "</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> num : numbers) {
+            System.out.print(num + <span class="string">" "</span>);
+        }
+        System.out.println();
+        
+        <span class="comment">// Array of strings</span>
+        String[] names = {<span class="string">"Alice"</span>, <span class="string">"Bob"</span>, <span class="string">"Charlie"</span>};
+        <span class="keyword">for</span> (String name : names) {
+            System.out.println(<span class="string">"Name: "</span> + name);
+        }
+        
+        <span class="comment">// Multi-dimensional array</span>
+        <span class="keyword">int</span>[][] matrix = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+        };
+        
+        System.out.println(<span class="string">"Matrix element at [1][2]: "</span> + matrix[1][2]);
+        
+        <span class="comment">// Iterating through multi-dimensional array</span>
+        System.out.println(<span class="string">"Matrix elements:"</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i < matrix.length; i++) {
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = 0; j < matrix[i].length; j++) {
+                System.out.print(matrix[i][j] + <span class="string">" "</span>);
+            }
+            System.out.println();
+        }
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example demonstrates working with arrays in Java:</p>
+                    <ul>
+                        <li><strong>Declaration and initialization</strong>: Creating an array with initial values using curly braces {}</li>
+                        <li><strong>Accessing elements</strong>: Using index notation (e.g., numbers[0]). Array indices start at 0.</li>
+                        <li><strong>Modifying elements</strong>: Changing values at specific indices using assignment</li>
+                        <li><strong>Array length</strong>: Using the length property (not a method call)</li>
+                        <li><strong>Iteration</strong>: Using both traditional for loops and enhanced for-each loops. The for-each loop is simpler but doesn't provide access to the index.</li>
+                        <li><strong>String arrays</strong>: Creating and working with arrays of strings</li>
+                        <li><strong>Multi-dimensional arrays</strong>: Arrays of arrays, useful for representing matrices or grids</li>
+                    </ul>
+                    <p>Arrays are fundamental data structures that store elements of the same type in contiguous memory locations. They provide fast access to elements by index but have a fixed size once created.</p>
+                </div>
+            </div>
+            
+            <div class="example-box">
+                <h3>Strings Example</h3>
+                <div class="code-icon" onclick="openEditor('stringsExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="keyword">public class</span> <span class="type">StringsExample</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// Different ways to create strings</span>
+        String str1 = <span class="string">"Hello"</span>;  <span class="comment">// String literal (stored in string pool)</span>
+        String str2 = <span class="keyword">new</span> String(<span class="string">"World"</span>);  <span class="comment">// Using constructor (new object)</span>
+        
+        <span class="comment">// String concatenation</span>
+        String message = str1 + <span class="string">" "</span> + str2;
+        System.out.println(message);
+        
+        <span class="comment">// String length</span>
+        System.out.println(<span class="string">"Length: "</span> + message.length());
+        
+        <span class="comment">// Character at specific position</span>
+        System.out.println(<span class="string">"Character at index 1: "</span> + message.charAt(1));
+        
+        <span class="comment">// Substring</span>
+        System.out.println(<span class="string">"Substring (0-5): "</span> + message.substring(0, 5));
+        
+        <span class="comment">// String comparison</span>
+        String s1 = <span class="string">"Java"</span>;
+        String s2 = <span class="string">"Java"</span>;
+        String s3 = <span class="keyword">new</span> String(<span class="string">"Java"</span>);
+        String s4 = <span class="string">"java"</span>;
+        
+        System.out.println(<span class="string">"s1 == s2: "</span> + (s1 == s2));  <span class="comment">// true (same object in string pool)</span>
+        System.out.println(<span class="string">"s1 == s3: "</span> + (s1 == s3));  <span class="comment">// false (different objects)</span>
+        System.out.println(<span class="string">"s1.equals(s3): "</span> + s1.equals(s3));  <span class="comment">// true (same content)</span>
+        System.out.println(<span class="string">"s1.equals(s4): "</span> + s1.equals(s4));  <span class="comment">// false (case difference)</span>
+        System.out.println(<span class="string">"s1.equalsIgnoreCase(s4): "</span> + s1.equalsIgnoreCase(s4));  <span class="comment">// true</span>
+        
+        <span class="comment">// String methods</span>
+        String text = <span class="string">"  Java Programming  "</span>;
+        System.out.println(<span class="string">"Original: '"</span> + text + <span class="string">"'"</span>);
+        System.out.println(<span class="string">"Trimmed: '"</span> + text.trim() + <span class="string">"'"</span>);
+        System.out.println(<span class="string">"Uppercase: '"</span> + text.toUpperCase() + <span class="string">"'"</span>);
+        System.out.println(<span class="string">"Lowercase: '"</span> + text.toLowerCase() + <span class="string">"'"</span>);
+        System.out.println(<span class="string">"Contains 'Pro': "</span> + text.contains(<span class="string">"Pro"</span>));
+        System.out.println(<span class="string">"Replaced: '"</span> + text.replace(<span class="string">"Java"</span>, <span class="string">"Python"</span>) + <span class="string">"'"</span>);
+        System.out.println(<span class="string">"Starts with 'Java': "</span> + text.trim().startsWith(<span class="string">"Java"</span>));
+        System.out.println(<span class="string">"Ends with 'ing': "</span> + text.trim().endsWith(<span class="string">"ing"</span>));
+        
+        <span class="comment">// String splitting</span>
+        String csv = <span class="string">"Apple,Banana,Orange,Mango"</span>;
+        String[] fruits = csv.split(<span class="string">","</span>);
+        System.out.println(<span class="string">"Fruits: "</span>);
+        <span class="keyword">for</span> (String fruit : fruits) {
+            System.out.println(<span class="string">"- "</span> + fruit);
+        }
+        
+        <span class="comment">// String building efficiently</span>
+        StringBuilder sb = <span class="keyword">new</span> StringBuilder();
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i < 5; i++) {
+            sb.append(<span class="string">"Line "</span>).append(i).append(<span class="string">"\n"</span>);
+        }
+        System.out.println(<span class="string">"StringBuilder result:\n"</span> + sb.toString());
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example demonstrates working with strings in Java:</p>
+                    <ul>
+                        <li><strong>String creation</strong>: Using literals (pooled) vs. new keyword (new object). String literals are stored in a string pool to save memory.</li>
+                        <li><strong>Concatenation</strong>: Using the + operator to combine strings. For multiple concatenations, StringBuilder is more efficient.</li>
+                        <li><strong>String methods</strong>: length(), charAt(), substring(), etc. Strings provide numerous methods for examination and manipulation.</li>
+                        <li><strong>Comparison</strong>: Difference between == (reference equality) and equals() (content equality). equals() compares content, while == compares object references.</li>
+                        <li><strong>Useful methods</strong>: trim(), toUpperCase(), toLowerCase(), contains(), replace(), startsWith(), endsWith()</li>
+                        <li><strong>Splitting</strong>: Using split() to break a string into parts based on a delimiter</li>
+                        <li><strong>StringBuilder</strong>: For efficient string manipulation, especially in loops. Unlike Strings, StringBuilder is mutable.</li>
+                    </ul>
+                    <p>Strings are immutable in Java, meaning any operation that modifies a string actually creates a new string object. This immutability provides thread safety and security benefits but can be inefficient for frequent modifications.</p>
+                </div>
+            </div>
+            
+            <div class="practice-box">
+                <h4><i class="fas fa-pencil-alt"></i> Practice Exercise</h4>
+                <p>Create a program that takes an array of integers and returns the sum, average, maximum, and minimum values. Then create a method that takes a string and returns the number of vowels it contains.</p>
+            </div>
+        </div>
+        
+        <!-- OOP Basics Tab -->
+        <div class="tab-content" id="oop">
+            <header>
+                <h1>OOP Basics</h1>
+                <p class="subtitle">Object-Oriented Programming Fundamentals</p>
+            </header>
+            
+            <div class="definition-box">
+                <p>Object-Oriented Programming (OOP) is a programming paradigm based on the concept of "objects", which can contain data and code to manipulate that data.</p>
+                <p>OOP models software as a collection of objects that interact with each other. Each object is an instance of a class, which defines the object's properties (attributes) and behaviors (methods). OOP helps manage complexity in large software systems by providing principles like encapsulation, inheritance, and polymorphism.</p>
+            </div>
+            
+            <h2>OOP Principles</h2>
+            <ul>
+                <li><strong>Encapsulation</strong>: Bundling data and methods that operate on that data, and restricting direct access to some of an object's components. This is achieved through access modifiers (public, private, protected) and helps maintain data integrity.</li>
+                <li><strong>Inheritance</strong>: Creating new classes based on existing ones, allowing code reuse and establishing relationships between classes. A subclass inherits fields and methods from its superclass.</li>
+                <li><strong>Polymorphism</strong>: Ability to present the same interface for different underlying forms. This allows objects of different classes to be treated as objects of a common superclass.</li>
+                <li><strong>Abstraction</strong>: Hiding complex implementation details and showing only essential features. Abstract classes and interfaces are used to define abstractions in Java.</li>
+            </ul>
+            
+            <h2>Class Components</h2>
+            <ul>
+                <li><strong>Fields</strong>: Variables that hold the state of an object (also called attributes or properties)</li>
+                <li><strong>Constructors</strong>: Special methods to initialize new objects. They have the same name as the class and no return type.</li>
+                <li><strong>Methods</strong>: Functions that define object behavior and operations</li>
+                <li><strong>Access modifiers</strong>: public, private, protected controls visibility of class members</li>
+            </ul>
+            
+            <div class="example-box">
+                <h3>Class Example</h3>
+                <div class="code-icon" onclick="openEditor('oopExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="comment">// A simple class representing a BankAccount</span>
+<span class="keyword">public class</span> <span class="type">BankAccount</span> {
+    <span class="comment">// Fields (attributes) - encapsulated with private access</span>
+    <span class="keyword">private</span> String accountNumber;
+    <span class="keyword">private</span> String accountHolder;
+    <span class="keyword">private</span> <span class="keyword">double</span> balance;
+    
+    <span class="comment">// Constructor - initializes new objects</span>
+    <span class="keyword">public</span> <span class="method">BankAccount</span>(String accountNumber, String accountHolder, <span class="keyword">double</span> initialBalance) {
+        this.accountNumber = accountNumber;
+        this.accountHolder = accountHolder;
+        <span class="keyword">this</span>.balance = initialBalance;
+    }
+    
+    <span class="comment">// Default constructor (overloading)</span>
+    <span class="keyword">public</span> <span class="method">BankAccount</span>() {
+        this(<span class="string">"000000"</span>, <span class="string">"Unknown"</span>, 0.0);
+    }
+    
+    <span class="comment">// Methods (behaviors)</span>
+    <span class="keyword">public void</span> <span class="method">deposit</span>(<span class="keyword">double</span> amount) {
+        <span class="keyword">if</span> (amount > 0) {
+            balance += amount;
+            System.out.println(<span class="string">"Deposited: $"</span> + amount);
+        } <span class="keyword">else</span> {
+            System.out.println(<span class="string">"Invalid deposit amount"</span>);
+        }
+    }
+    
+    <span class="keyword">public void</span> <span class="method">withdraw</span>(<span class="keyword">double</span> amount) {
+        <span class="keyword">if</span> (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println(<span class="string">"Withdrew: $"</span> + amount);
+        } <span class="keyword">else</span> {
+            System.out.println(<span class="string">"Invalid withdrawal amount or insufficient funds"</span>);
+        }
+    }
+    
+    <span class="comment">// Accessor (getter) methods - provide controlled access to private fields</span>
+    <span class="keyword">public</span> String <span class="method">getAccountNumber</span>() {
+        <span class="keyword">return</span> accountNumber;
+    }
+    
+    <span class="keyword">public</span> String <span class="method">getAccountHolder</span>() {
+        <span class="keyword">return</span> accountHolder;
+    }
+    
+    <span class="keyword">public</span> <span class="keyword">double</span> <span class="method">getBalance</span>() {
+        <span class="keyword">return</span> balance;
+    }
+    
+    <span class="comment">// Mutator (setter) method - provide controlled modification of private fields</span>
+    <span class="keyword">public void</span> <span class="method">setAccountHolder</span>(String accountHolder) {
+        <span class="keyword">if</span> (accountHolder != <span class="keyword">null</span> && !accountHolder.trim().isEmpty()) {
+            this.accountHolder = accountHolder;
+        } <span class="keyword">else</span> {
+            System.out.println(<span class="string">"Invalid account holder name"</span>);
+        }
+    }
+    
+    <span class="comment">// toString method to represent object as string</span>
+    <span class="keyword">public</span> String <span class="method">toString</span>() {
+        <span class="keyword">return</span> <span class="string">"BankAccount[accountNumber="</span> + accountNumber + 
+               <span class="string">", accountHolder="</span> + accountHolder + 
+               <span class="string">", balance=$"</span> + balance + <span class="string">"]"</span>;
+    }
+}
+
+<span class="comment">// Main class to test BankAccount</span>
+<span class="keyword">public class</span> <span class="type">BankAccountTest</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// Create a BankAccount object</span>
+        BankAccount account = <span class="keyword">new</span> BankAccount(<span class="string">"123456"</span>, <span class="string">"John Doe"</span>, 1000.0);
+        
+        <span class="comment">// Use object methods</span>
+        System.out.println(account);
+        account.deposit(500.0);
+        account.withdraw(200.0);
+        System.out.println(<span class="string">"Current balance: $"</span> + account.getBalance());
+        
+        <span class="comment">// Change account holder name</span>
+        account.setAccountHolder(<span class="string">"John Smith"</span>);
+        System.out.println(<span class="string">"New account holder: "</span> + account.getAccountHolder());
+        
+        <span class="comment">// Try to set invalid name</span>
+        account.setAccountHolder(<span class="string">""</span>);
+        
+        <span class="comment">// Create another account using default constructor</span>
+        BankAccount defaultAccount = <span class="keyword">new</span> BankAccount();
+        System.out.println(defaultAccount);
+        
+        <span class="comment">// Demonstrate encapsulation - this would cause a compilation error:</span>
+        <span class="comment">// account.balance = 1000000; // Error: balance has private access</span>
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example demonstrates Object-Oriented Programming basics in Java:</p>
+                    <ul>
+                        <li><strong>Class definition</strong>: BankAccount class with fields, constructors, and methods. A class is a blueprint for creating objects.</li>
+                        <li><strong>Encapsulation</strong>: Using private fields with public getters and setters. This protects the object's internal state from invalid modifications.</li>
+                        <li><strong>Constructors</strong>: Parameterized constructor and default constructor (overloading). Constructors initialize new objects.</li>
+                        <li><strong>Methods</strong>: deposit(), withdraw(), and accessor/mutator methods. Methods define object behavior.</li>
+                        <li><strong>this keyword</strong>: Referring to the current object instance. Used to disambiguate between instance variables and parameters.</li>
+                        <li><strong>Object creation</strong>: Using the new keyword to create instances. Each object has its own copy of instance variables.</li>
+                        <li><strong>toString() method</strong>: Overriding to provide a string representation of the object. This is called automatically when an object is printed.</li>
+                    </ul>
+                    <p>OOP allows modeling real-world entities as objects with both data and behavior, promoting code organization and reusability. Encapsulation ensures that an object's internal state remains consistent by controlling how it can be modified.</p>
+                </div>
+            </div>
+            
+            <div class="important-note">
+                <h4><i class="fas fa-exclamation-circle"></i> Remember</h4>
+                <p>Access modifiers control visibility:</p>
+                <ul>
+                    <li><strong>private</strong>: Accessible only within the class. Provides the highest level of encapsulation.</li>
+                    <li><strong>protected</strong>: Accessible within the package and subclasses. Useful for inheritance hierarchies.</li>
+                    <li><strong>public</strong>: Accessible from anywhere. Used for methods that form the class's public interface.</li>
+                    <li><strong>default</strong> (no modifier): Accessible within the package. Provides package-level encapsulation.</li>
+                </ul>
+            </div>
+            
+            <div class="practice-box">
+                <h4><i class="fas fa-pencil-alt"></i> Practice Exercise</h4>
+                <p>Create a Book class with fields for title, author, ISBN, and price. Include a constructor, getters and setters with validation, and a method to apply a discount percentage to the price. Create a few Book objects and test all the methods.</p>
+            </div>
+        </div>
+        
+        <!-- Inheritance and Polymorphism Tab -->
+        <div class="tab-content" id="inheritance">
+            <header>
+                <h1>Inheritance and Polymorphism</h1>
+                <p class="subtitle">Extending classes and implementing flexibility</p>
+            </header>
+            
+            <div class="definition-box">
+                <p>Inheritance allows a class to inherit properties and behaviors from another class. Polymorphism allows objects of different classes to be treated as objects of a common superclass.</p>
+                <p>Inheritance creates an "is-a" relationship between classes, where a subclass is a specialized version of its superclass. Polymorphism enables writing more flexible and reusable code by allowing methods to work with objects of various types through a common interface.</p>
+            </div>
+            
+            <h2>Inheritance Concepts</h2>
+            <ul>
+                <li><strong>Superclass (parent)</strong>: The class being inherited from. Also called base class.</li>
+                <li><strong>Subclass (child)</strong>: The class that inherits from another class. Also called derived class.</li>
+                <li><strong>extends keyword</strong>: Used to create a subclass. Java supports single inheritance for classes.</li>
+                <li><strong>super keyword</strong>: Refers to the superclass constructor or methods. Used to call superclass constructors or overridden methods.</li>
+                <li><strong>Method overriding</strong>: Subclass provides a specific implementation of a method defined in its superclass.</li>
+            </ul>
+            
+            <h2>Polymorphism Concepts</h2>
+            <ul>
+                <li><strong>Dynamic method dispatch</strong>: Method implementation determined at runtime based on the actual object type.</li>
+                <li><strong>Upcasting</strong>: Treating a subclass object as superclass object. Always safe and implicit.</li>
+                <li><strong>Downcasting</strong>: Treating a superclass reference as subclass object. Requires explicit casting and can cause ClassCastException.</li>
+                <li><strong>Abstract classes</strong>: Classes that cannot be instantiated, used as base classes for inheritance.</li>
+                <li><strong>Interfaces</strong>: Define contracts that classes can implement, enabling multiple inheritance of types.</li>
+            </ul>
+            
+            <div class="example-box">
+                <h3>Inheritance Example</h3>
+                <div class="code-icon" onclick="openEditor('inheritanceExample')">
+                    <i class="fas fa-code"></i>
+                </div>
+                <pre><code><span class="comment">// Superclass</span>
+<span class="keyword">class</span> <span class="type">Vehicle</span> {
+    <span class="keyword">protected</span> String brand;
+    <span class="keyword">protected</span> <span class="keyword">int</span> year;
+    
+    <span class="keyword">public</span> <span class="method">Vehicle</span>(String brand, <span class="keyword">int</span> year) {
+        this.brand = brand;
+        this.year = year;
+    }
+    
+    <span class="keyword">public void</span> <span class="method">start</span>() {
+        System.out.println(<span class="string">"The vehicle is starting"</span>);
+    }
+    
+    <span class="keyword">public void</span> <span class="method">stop</span>() {
+        System.out.println(<span class="string">"The vehicle is stopping"</span>);
+    }
+    
+    <span class="keyword">public</span> String <span class="method">getInfo</span>() {
+        <span class="keyword">return</span> <span class="string">"Brand: "</span> + brand + <span class="string">", Year: "</span> + year;
+    }
+}
+
+<span class="comment">// Subclass 1</span>
+<span class="keyword">class</span> <span class="type">Car</span> <span class="keyword">extends</span> <span class="type">Vehicle</span> {
+    <span class="keyword">private</span> <span class="keyword">int</span> numberOfDoors;
+    
+    <span class="keyword">public</span> <span class="method">Car</span>(String brand, <span class="keyword">int</span> year, <span class="keyword">int</span> numberOfDoors) {
+        <span class="keyword">super</span>(brand, year);  <span class="comment">// Call superclass constructor</span>
+        this.numberOfDoors = numberOfDoors;
+    }
+    
+    <span class="comment">// Method overriding - providing specific implementation</span>
+    <span class="keyword">public void</span> <span class="method">start</span>() {
+        System.out.println(<span class="string">"The car is starting with a key"</span>);
+    }
+    
+    <span class="comment">// Additional method specific to Car</span>
+    <span class="keyword">public void</span> <span class="method">honk</span>() {
+        System.out.println(<span class="string">"Beep beep!"</span>);
+    }
+    
+    <span class="comment">// Override getInfo method</span>
+    <span class="keyword">public</span> String <span class="method">getInfo</span>() {
+        <span class="keyword">return</span> <span class="keyword">super</span>.getInfo() + <span class="string">", Doors: "</span> + numberOfDoors;
+    }
+}
+
+<span class="comment">// Subclass 2</span>
+<span class="keyword">class</span> <span class="type">Motorcycle</span> <span class="keyword">extends</span> <span class="type">Vehicle</span> {
+    <span class="keyword">private</span> <span class="keyword">boolean</span> hasSidecar;
+    
+    <span class="keyword">public</span> <span class="method">Motorcycle</span>(String brand, <span class="keyword">int</span> year, <span class="keyword">boolean</span> hasSidecar) {
+        <span class="keyword">super</span>(brand, year);
+        this.hasSidecar = hasSidecar;
+    }
+    
+    <span class="comment">// Method overriding</span>
+    <span class="keyword">public void</span> <span class="method">start</span>() {
+        System.out.println(<span class="string">"The motorcycle is starting with a kick"</span>);
+    }
+    
+    <span class="comment">// Override getInfo method</span>
+    <span class="keyword">public</span> String <span class="method">getInfo</span>() {
+        <span class="keyword">return</span> <span class="keyword">super</span>.getInfo() + <span class="string">", Has sidecar: "</span> + hasSidecar;
+    }
+}
+
+<span class="comment">// Main class to test inheritance</span>
+<span class="keyword">public class</span> <span class="type">InheritanceTest</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// Create objects</span>
+        Car car = <span class="keyword">new</span> Car(<span class="string">"Toyota"</span>, 2020, 4);
+        Motorcycle motorcycle = <span class="keyword">new</span> Motorcycle(<span class="string">"Harley-Davidson"</span>, 2019, false);
+        
+        <span class="comment">// Call methods</span>
+        System.out.println(car.getInfo());
+        car.start();
+        car.honk();  <span class="comment">// Specific to Car</span>
+        car.stop();
+        
+        System.out.println();
+        
+        System.out.println(motorcycle.getInfo());
+        motorcycle.start();
+        motorcycle.stop();
+        
+        <span class="comment">// Polymorphism example</span>
+        System.out.println(<span class="string">"\n--- Polymorphism Example ---"</span>);
+        Vehicle[] vehicles = <span class="keyword">new</span> Vehicle[2];
+        vehicles[0] = car;        <span class="comment">// Upcasting: Car -> Vehicle</span>
+        vehicles[1] = motorcycle; <span class="comment">// Upcasting: Motorcycle -> Vehicle</span>
+        
+        <span class="keyword">for</span> (Vehicle vehicle : vehicles) {
+            vehicle.start();  <span class="comment">// Dynamic method binding - calls appropriate version</span>
+            System.out.println(vehicle.getInfo());  <span class="comment">// Also polymorphic</span>
+            System.out.println();
+        }
+        
+        <span class="comment">// Demonstrating downcasting</span>
+        System.out.println(<span class="string">"--- Downcasting Example ---"</span>);
+        <span class="keyword">for</span> (Vehicle vehicle : vehicles) {
+            <span class="keyword">if</span> (vehicle <span class="keyword">instanceof</span> Car) {
+                Car carObject = (Car) vehicle; <span class="comment">// Downcasting: Vehicle -> Car</span>
+                carObject.honk(); <span class="comment">// Can now call Car-specific method</span>
+            }
+        }
+    }
+}</code></pre>
+                <div class="explanation">
+                    <h4><i class="fas fa-info-circle"></i> Explanation</h4>
+                    <p>This example demonstrates inheritance and polymorphism in Java:</p>
+                    <ul>
+                        <li><strong>Inheritance</strong>: Car and Motorcycle classes extend the Vehicle class using the <strong>extends</strong> keyword. This creates an "is-a" relationship (Car is a Vehicle).</li>
+                        <li><strong>super keyword</strong>: Used to call superclass constructor and methods. The super() call must be the first statement in a constructor.</li>
+                        <li><strong>Method overriding</strong>: Subclasses provide their own implementation of start() and getInfo() methods. The @Override annotation can be used to explicitly declare overriding.</li>
+                        <li><strong>Polymorphism</strong>: Treating Car and Motorcycle objects as Vehicle objects in an array. This allows writing code that works with general types rather than specific ones.</li>
+                        <li><strong>Dynamic binding</strong>: The JVM determines which version of start() to call at runtime based on the actual object type. This enables polymorphic behavior.</li>
+                        <li><strong>Upcasting</strong>: Assigning subclass objects to superclass references (implicit and always safe).</li>
+                        <li><strong>Downcasting</strong>: Assigning superclass references to subclass references (explicit and requires type checking with instanceof).</li>
+                    </ul>
+                    <p>Inheritance promotes code reuse, and polymorphism allows writing more flexible and maintainable code. Together, they form the foundation of object-oriented programming in Java.</p>
+                </div>
+            </div>
+            
+            <div class="important-note">
+                <h4><i class="fas fa-exclamation-circle"></i> Remember</h4>
+                <p>Java supports single inheritance for classes (a class can extend only one superclass) but multiple inheritance for interfaces. Use the <strong>instanceof</strong> operator to check an object's type before downcasting to avoid ClassCastException.</p>
+            </div>
+            
+            <div class="practice-box">
+                <h4><i class="fas fa-pencil-alt"></i> Practice Exercise</h4>
+                <p>Create a Shape superclass with methods calculateArea() and calculatePerimeter(). Create subclasses Circle, Rectangle, and Triangle that override these methods with appropriate implementations. Create an array of different shapes and demonstrate polymorphism by calling these methods.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Java Fundamentals Review for MAC286 © 2023 | Created for educational purposes</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to show the selected tab
+        function showTab(tabId) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update active tab button
+            const navLinks = document.querySelectorAll('.nav-tabs a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === '#' + tabId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        
+        // Set up navigation
+        document.querySelectorAll('.nav-tabs a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabId = this.getAttribute('href').substring(1);
+                showTab(tabId);
+            });
+        });
+        
+        // Function to open code in online editor
+        function openEditor(exampleName) {
+            let code = '';
+            
+            switch(exampleName) {
+                case 'variablesExample':
+                    code = `public class VariablesExample {
+    public static void main(String[] args) {
+        // Integer types
+        int age = 25;
+        long population = 7800000000L;
+        
+        // Floating point types
+        double price = 19.99;
+        float temperature = 36.6f;
+        
+        // Other types
+        char grade = 'A';
+        boolean isJavaFun = true;
+        
+        // String type (reference type)
+        String name = "John Doe";
+        
+        // Output values
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("Population: " + population);
+        System.out.println("Price: $" + price);
+        System.out.println("Temperature: " + temperature + "°C");
+        System.out.println("Grade: " + grade);
+        System.out.println("Is Java fun? " + isJavaFun);
+    }
+}`;
+                    break;
+                case 'conditionalsExample':
+                    code = `public class ConditionalsExample {
+    public static void main(String[] args) {
+        int number = 15;
+        
+        // If-else example
+        if (number % 2 == 0) {
+            System.out.println(number + " is even");
+        } else {
+            System.out.println(number + " is odd");
+        }
+        
+        // If-else-if example
+        if (number < 0) {
+            System.out.println("Negative number");
+        } else if (number > 0) {
+            System.out.println("Positive number");
+        } else {
+            System.out.println("Zero");
+        }
+        
+        // Switch example
+        int day = 3;
+        String dayName;
+        
+        switch (day) {
+            case 1:
+                dayName = "Monday";
+                break;
+            case 2:
+                dayName = "Tuesday";
+                break;
+            case 3:
+                dayName = "Wednesday";
+                break;
+            case 4:
+                dayName = "Thursday";
+                break;
+            case 5:
+                dayName = "Friday";
+                break;
+            case 6:
+                dayName = "Saturday";
+                break;
+            case 7:
+                dayName = "Sunday";
+                break;
+            default:
+                dayName = "Invalid day";
+        }
+        System.out.println("Day " + day + " is " + dayName);
+    }
+}`;
+                    break;
+                case 'loopsExample':
+                    code = `public class LoopsExample {
+    public static void main(String[] args) {
+        // For loop example
+        System.out.println("For loop (1 to 5):");
+        for (int i = 1; i <= 5; i++) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+        
+        // While loop example
+        System.out.println("While loop (5 to 1):");
+        int j = 5;
+        while (j >= 1) {
+            System.out.print(j + " ");
+            j--;
+        }
+        System.out.println();
+        
+        // Do-while loop example
+        System.out.println("Do-while loop (1 to 3):");
+        int k = 1;
+        do {
+            System.out.print(k + " ");
+            k++;
+        } while (k <= 3);
+        System.out.println();
+        
+        // Nested loops example (multiplication table)
+        System.out.println("Multiplication table (1-3):");
+        for (int x = 1; x <= 3; x++) {
+            for (int y = 1; y <= 3; y++) {
+                System.out.print(x * y + "\t");
+            }
+            System.out.println();
+        }
+        
+        // Break and continue example
+        System.out.println("Break and continue example:");
+        for (int i = 1; i <= 10; i++) {
+            if (i == 5) {
+                continue; // Skip the rest of the loop for i=5
+            }
+            if (i == 8) {
+                break;  // Exit the loop when i=8
+            }
+            System.out.print(i + " ");
+        }
+    }
+}`;
+                    break;
+                case 'methodsExample':
+                    code = `public class MethodsExample {
+    
+    // Method with no parameters and no return value
+    public static void greet() {
+        System.out.println("Hello, welcome to Java programming!");
+    }
+    
+    // Method with parameters and no return value
+    public static void greetUser(String name) {
+        System.out.println("Hello, " + name + "! Welcome to Java programming!");
+    }
+    
+    // Method with parameters and return value
+    public static int addNumbers(int a, int b) {
+        return a + b;
+    }
+    
+    // Method overloading - same name, different parameters
+    public static double addNumbers(double a, double b) {
+        return a + b;
+    }
+    
+    // Method with multiple parameters
+    public static void printUserInfo(String name, int age, boolean isStudent) {
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("Student: " + isStudent);
+    }
+    
+    // Method calling another method
+    public static void processUser(String name, int age) {
+        greetUser(name);
+        System.out.println("You are " + age + " years old");
+    }
+    
+    public static void main(String[] args) {
+        // Calling methods
+        greet();
+        greetUser("Alice");
+        
+        int sum1 = addNumbers(5, 7);
+        System.out.println("Sum of integers: " + sum1);
+        
+        double sum2 = addNumbers(3.5, 2.8);
+        System.out.println("Sum of doubles: " + sum2);
+        
+        // Using a method in a calculation
+        int result = addNumbers(10, 20) * 2;
+        System.out.println("Result: " + result);
+        
+        // Method with multiple parameters
+        printUserInfo("Bob", 25, true);
+        
+        // Method calling another method
+        processUser("Charlie", 30);
+    }
+}`;
+                    break;
+                case 'arraysExample':
+                    code = `public class ArraysExample {
+    public static void main(String[] args) {
+        // Array declaration and initialization
+        int[] numbers = {10, 20, 30, 40, 50};
+        
+        // Accessing array elements
+        System.out.println("First element: " + numbers[0]);
+        System.out.println("Third element: " + numbers[2]);
+        
+        // Modifying array elements
+        numbers[1] = 25;
+        System.out.println("Modified second element: " + numbers[1]);
+        
+        // Array length
+        System.out.println("Array length: " + numbers.length);
+        
+        // Iterating through array with for loop
+        System.out.print("All elements: ");
+        for (int i = 0; i < numbers.length; i++) {
+            System.out.print(numbers[i] + " ");
+        }
+        System.out.println();
+        
+        // Enhanced for loop (for-each)
+        System.out.print("Using for-each: ");
+        for (int num : numbers) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+        
+        // Array of strings
+        String[] names = {"Alice", "Bob", "Charlie"};
+        for (String name : names) {
+            System.out.println("Name: " + name);
+        }
+        
+        // Multi-dimensional array
+        int[][] matrix = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+        };
+        
+        System.out.println("Matrix element at [1][2]: " + matrix[1][2]);
+        
+        // Iterating through multi-dimensional array
+        System.out.println("Matrix elements:");
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}`;
+                    break;
+                case 'stringsExample':
+                    code = `public class StringsExample {
+    public static void main(String[] args) {
+        // Different ways to create strings
+        String str1 = "Hello";  // String literal (stored in string pool)
+        String str2 = new String("World");  // Using constructor (new object)
+        
+        // String concatenation
+        String message = str1 + " " + str2;
+        System.out.println(message);
+        
+        // String length
+        System.out.println("Length: " + message.length());
+        
+        // Character at specific position
+        System.out.println("Character at index 1: " + message.charAt(1));
+        
+        // Substring
+        System.out.println("Substring (0-5): " + message.substring(0, 5));
+        
+        // String comparison
+        String s1 = "Java";
+        String s2 = "Java";
+        String s3 = new String("Java");
+        String s4 = "java";
+        
+        System.out.println("s1 == s2: " + (s1 == s2));  // true (same object in string pool)
+        System.out.println("s1 == s3: " + (s1 == s3));  // false (different objects)
+        System.out.println("s1.equals(s3): " + s1.equals(s3));  // true (same content)
+        System.out.println("s1.equals(s4): " + s1.equals(s4));  // false (case difference)
+        System.out.println("s1.equalsIgnoreCase(s4): " + s1.equalsIgnoreCase(s4));  // true
+        
+        // String methods
+        String text = "  Java Programming  ";
+        System.out.println("Original: '" + text + "'");
+        System.out.println("Trimmed: '" + text.trim() + "'");
+        System.out.println("Uppercase: '" + text.toUpperCase() + "'");
+        System.out.println("Lowercase: '" + text.toLowerCase() + "'");
+        System.out.println("Contains 'Pro': " + text.contains("Pro"));
+        System.out.println("Replaced: '" + text.replace("Java", "Python") + "'");
+        System.out.println("Starts with 'Java': " + text.trim().startsWith("Java"));
+        System.out.println("Ends with 'ing': " + text.trim().endsWith("ing"));
+        
+        // String splitting
+        String csv = "Apple,Banana,Orange,Mango";
+        String[] fruits = csv.split(",");
+        System.out.println("Fruits: ");
+        for (String fruit : fruits) {
+            System.out.println("- " + fruit);
+        }
+        
+        // String building efficiently
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            sb.append("Line ").append(i).append("\n");
+        }
+        System.out.println("StringBuilder result:\n" + sb.toString());
+    }
+}`;
+                    break;
+                case 'oopExample':
+                    code = `// A simple class representing a BankAccount
+public class BankAccount {
+    // Fields (attributes) - encapsulated with private access
+    private String accountNumber;
+    private String accountHolder;
+    private double balance;
+    
+    // Constructor - initializes new objects
+    public BankAccount(String accountNumber, String accountHolder, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.accountHolder = accountHolder;
+        this.balance = initialBalance;
+    }
+    
+    // Default constructor (overloading)
+    public BankAccount() {
+        this("000000", "Unknown", 0.0);
+    }
+    
+    // Methods (behaviors)
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Deposited: $" + amount);
+        } else {
+            System.out.println("Invalid deposit amount");
+        }
+    }
+    
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println("Withdrew: $" + amount);
+        } else {
+            System.out.println("Invalid withdrawal amount or insufficient funds");
+        }
+    }
+    
+    // Accessor (getter) methods - provide controlled access to private fields
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+    
+    public String getAccountHolder() {
+        return accountHolder;
+    }
+    
+    public double getBalance() {
+        return balance;
+    }
+    
+    // Mutator (setter) method - provide controlled modification of private fields
+    public void setAccountHolder(String accountHolder) {
+        if (accountHolder != null && !accountHolder.trim().isEmpty()) {
+            this.accountHolder = accountHolder;
+        } else {
+            System.out.println("Invalid account holder name");
+        }
+    }
+    
+    // toString method to represent object as string
+    public String toString() {
+        return "BankAccount[accountNumber=" + accountNumber + 
+               ", accountHolder=" + accountHolder + 
+               ", balance=$" + balance + "]";
+    }
+}
+
+// Main class to test BankAccount
+public class BankAccountTest {
+    public static void main(String[] args) {
+        // Create a BankAccount object
+        BankAccount account = new BankAccount("123456", "John Doe", 1000.0);
+        
+        // Use object methods
+        System.out.println(account);
+        account.deposit(500.0);
+        account.withdraw(200.0);
+        System.out.println("Current balance: $" + account.getBalance());
+        
+        // Change account holder name
+        account.setAccountHolder("John Smith");
+        System.out.println("New account holder: " + account.getAccountHolder());
+        
+        // Try to set invalid name
+        account.setAccountHolder("");
+        
+        // Create another account using default constructor
+        BankAccount defaultAccount = new BankAccount();
+        System.out.println(defaultAccount);
+        
+        // Demonstrate encapsulation - this would cause a compilation error:
+        // account.balance = 1000000; // Error: balance has private access
+    }
+}`;
+                    break;
+                case 'inheritanceExample':
+                    code = `// Superclass
+class Vehicle {
+    protected String brand;
+    protected int year;
+    
+    public Vehicle(String brand, int year) {
+        this.brand = brand;
+        this.year = year;
+    }
+    
+    public void start() {
+        System.out.println("The vehicle is starting");
+    }
+    
+    public void stop() {
+        System.out.println("The vehicle is stopping");
+    }
+    
+    public String getInfo() {
+        return "Brand: " + brand + ", Year: " + year;
+    }
+}
+
+// Subclass 1
+class Car extends Vehicle {
+    private int numberOfDoors;
+    
+    public Car(String brand, int year, int numberOfDoors) {
+        super(brand, year);  // Call superclass constructor
+        this.numberOfDoors = numberOfDoors;
+    }
+    
+    // Method overriding - providing specific implementation
+    public void start() {
+        System.out.println("The car is starting with a key");
+    }
+    
+    // Additional method specific to Car
+    public void honk() {
+        System.out.println("Beep beep!");
+    }
+    
+    // Override getInfo method
+    public String getInfo() {
+        return super.getInfo() + ", Doors: " + numberOfDoors;
+    }
+}
+
+// Subclass 2
+class Motorcycle extends Vehicle {
+    private boolean hasSidecar;
+    
+    public Motorcycle(String brand, int year, boolean hasSidecar) {
+        super(brand, year);
+        this.hasSidecar = hasSidecar;
+    }
+    
+    // Method overriding
+    public void start() {
+        System.out.println("The motorcycle is starting with a kick");
+    }
+    
+    // Override getInfo method
+    public String getInfo() {
+        return super.getInfo() + ", Has sidecar: " + hasSidecar;
+    }
+}
+
+// Main class to test inheritance
+public class InheritanceTest {
+    public static void main(String[] args) {
+        // Create objects
+        Car car = new Car("Toyota", 2020, 4);
+        Motorcycle motorcycle = new Motorcycle("Harley-Davidson", 2019, false);
+        
+        // Call methods
+        System.out.println(car.getInfo());
+        car.start();
+        car.honk();  // Specific to Car
+        car.stop();
+        
+        System.out.println();
+        
+        System.out.println(motorcycle.getInfo());
+        motorcycle.start();
+        motorcycle.stop();
+        
+        // Polymorphism example
+        System.out.println("\n--- Polymorphism Example ---");
+        Vehicle[] vehicles = new Vehicle[2];
+        vehicles[0] = car;        // Upcasting: Car -> Vehicle
+        vehicles[1] = motorcycle; // Upcasting: Motorcycle -> Vehicle
+        
+        for (Vehicle vehicle : vehicles) {
+            vehicle.start();  // Dynamic method binding - calls appropriate version
+            System.out.println(vehicle.getInfo());  // Also polymorphic
+            System.out.println();
+        }
+        
+        // Demonstrating downcasting
+        System.out.println("--- Downcasting Example ---");
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle instanceof Car) {
+                Car carObject = (Car) vehicle; // Downcasting: Vehicle -> Car
+                carObject.honk(); // Can now call Car-specific method
+            }
+        }
+    }
+}`;
+                    break;
+            }
+            
+            // Encode the code for URL
+            const encodedCode = encodeURIComponent(code);
+            
+            // Open in an online Java editor (using JDoodle as an example)
+            window.open(`https://www.jdoodle.com/online-java-compiler/?code=${encodedCode}`, '_blank');
+        }
+    </script>
+</body>
+</html>
