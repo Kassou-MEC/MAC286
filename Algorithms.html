@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complexity of Algorithms in Java</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #555;
+            font-size: 1.2rem;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn:hover {
+            background: #2a3a8c;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #b21f1f;
+        }
+        
+        .btn-secondary:hover {
+            background: #c22f2f;
+        }
+        
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fdbb2d;
+        }
+        
+        h3 {
+            color: #1a2a6c;
+            margin: 25px 0 15px 0;
+        }
+        
+        p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .card {
+            background: #f0f5ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #1a2a6c;
+        }
+        
+        .complexity-card {
+            background: #fff8e6;
+            border-left: 4px solid #fdbb2d;
+        }
+        
+        .code-container {
+            background: #2d3a4b;
+            color: #f8f8f2;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+        
+        .code-icon {
+            font-size: 1.5rem;
+            color: #50fa7b;
+        }
+        
+        .code-example {
+            line-height: 1.5;
+        }
+        
+        .keyword {
+            color: #ff79c6;
+        }
+        
+        .comment {
+            color: #6272a4;
+        }
+        
+        .string {
+            color: #f1fa8c;
+        }
+        
+        .class-name {
+            color: #50fa7b;
+        }
+        
+        .method {
+            color: #8be9fd;
+        }
+        
+        .chart-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 900px) {
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .chart-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: white;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .algorithm-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .algorithm-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .algorithm-card h4 {
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #fdbb2d;
+        }
+        
+        .algorithm-card ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .algorithm-card li {
+            margin-bottom: 8px;
+        }
+        
+        .execution-example {
+            background: #e6f2ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .comparison-table th {
+            background: #1a2a6c;
+            color: white;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Complexity of Algorithms in Java</h1>
+            <p class="subtitle">Understanding Time and Space Complexity with Java Examples</p>
+        </header>
+        
+        <div class="nav-buttons">
+            <button class="btn" onclick="showPage(1)">Introduction</button>
+            <button class="btn" onclick="showPage(2)">Big O Notation</button>
+            <button class="btn" onclick="showPage(3)">O(1) Constant Time</button>
+            <button class="btn" onclick="showPage(4)">O(log n) Logarithmic</button>
+            <button class="btn" onclick="showPage(5)">O(n) Linear</button>
+            <button class="btn" onclick="showPage(6)">O(n log n) Linearithmic</button>
+            <button class="btn" onclick="showPage(7)">O(n²) Quadratic</button>
+            <button class="btn btn-secondary" onclick="showPage(8)">O(2ⁿ) Exponential</button>
+        </div>
+        
+        <!-- Page 1: Introduction -->
+        <div class="page active" id="page1">
+            <div class="content-section">
+                <h2>What are Algorithms?</h2>
+                <p>An algorithm is a step-by-step procedure to solve a problem or accomplish a task. In computer science, algorithms are the foundation of programming - they provide the logic that manipulates data stored in data structures.</p>
+                
+                <div class="card">
+                    <h3>Characteristics of Good Algorithms</h3>
+                    <ul>
+                        <li><strong>Correctness:</strong> It should produce the correct output for all valid inputs</li>
+                        <li><strong>Efficiency:</strong> It should use minimal computational resources (time and memory)</li>
+                        <li><strong>Clarity:</strong> It should be easy to understand and implement</li>
+                        <li><strong>Robustness:</strong> It should handle edge cases and unexpected inputs gracefully</li>
+                    </ul>
+                </div>
+                
+                <h3>Why Algorithm Analysis Matters</h3>
+                <p>Analyzing algorithms helps us understand how they perform as the input size grows. This is crucial for writing efficient programs, especially when working with large datasets.</p>
+                
+                <div class="card">
+                    <h3>Types of Complexity</h3>
+                    <p>There are two main types of complexity:</p>
+                    <ol>
+                        <li><strong>Time Complexity:</strong> Measures the amount of time an algorithm takes to complete as a function of the input size.</li>
+                        <li><strong>Space Complexity:</strong> Measures the amount of memory an algorithm uses as a function of the input size.</li>
+                    </ol>
+                </div>
+                
+                <h3>What Does Input Size Represent?</h3>
+                <p>The input size can vary depending on the problem:</p>
+                <ul>
+                    <li>For a <strong>list of numbers</strong>, the input size is the <strong>number of elements</strong> in the list.</li>
+                    <li>For a <strong>matrix</strong>, the input size could be the <strong>number of rows and columns</strong>.</li>
+                    <li>For a <strong>string</strong>, the input size is the <strong>length of the string</strong>.</li>
+                    <li>For a <strong>graph</strong>, the input size could be the <strong>number of vertices and edges</strong>.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Page 2: Big O Notation -->
+        <div class="page" id="page2">
+            <div class="content-section">
+                <h2>Understanding Big O Notation</h2>
+                <p>Big O notation is a mathematical concept used in computer science and mathematics to describe the upper bound of an algorithm's time complexity or space complexity in terms of the input size.</p>
+                
+                <div class="card complexity-card">
+                    <h3>Common Time Complexities</h3>
+                    <p>Here are the most common time complexities you'll encounter, from fastest to slowest:</p>
+                    <ul>
+                        <li><strong>O(1)</strong> - Constant Time: Runtime doesn't depend on input size</li>
+                        <li><strong>O(log n)</strong> - Logarithmic Time: Runtime grows logarithmically with input size</li>
+                        <li><strong>O(n)</strong> - Linear Time: Runtime grows proportionally with input size</li>
+                        <li><strong>O(n log n)</strong> - Linearithmic Time: Runtime grows slightly faster than linear</li>
+                        <li><strong>O(n²)</strong> - Quadratic Time: Runtime grows proportionally to the square of input size</li>
+                        <li><strong>O(2ⁿ)</strong> - Exponential Time: Runtime doubles with each additional input element</li>
+                    </ul>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>Time Complexity Comparison</h3>
+                        <canvas id="timeComplexityChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-box">
+                        <h3>Operations for Different Input Sizes</h3>
+                        <canvas id="operationsChart"></canvas>
+                    </div>
+                </div>
+                
+                <h3>Execution Time Formula</h3>
+                <p>The execution time of a program or algorithm can be calculated using the following formula:</p>
+                
+                <div class="execution-example">
+                    <p>\[ \text{Execution Time} = \text{Number of CPU Cycles} \times \text{Cycle Time} \]</p>
+                    <p>Where:</p>
+                    <ul>
+                        <li><strong>Number of CPU Cycles:</strong> The total number of clock cycles required to execute the program</li>
+                        <li><strong>Cycle Time:</strong> The time taken to complete one clock cycle, which is the inverse of the clock speed</li>
+                    </ul>
+                    <p>\[ \text{Cycle Time} = \frac{1}{\text{Clock Speed}} \]</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Example Calculation</h3>
+                    <p><strong>Problem:</strong> A program requires 10,000 clock cycles to execute. The processor has a clock speed of 2 GHz.</p>
+                    <p><strong>Solution:</strong></p>
+                    <p>\[ \text{Cycle Time} = \frac{1}{2 \times 10^9} = 0.5 \times 10^{-9} \text{ seconds} = 0.5 \text{ nanoseconds} \]</p>
+                    <p>\[ \text{Execution Time} = 10,000 \times 0.5 \times 10^{-9} = 5 \times 10^{-6} \text{ seconds} = 5 \text{ microseconds} \]</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page 3: O(1) Constant Time -->
+        <div class="page" id="page3">
+            <div class="content-section">
+                <h2>O(1) - Constant Time</h2>
+                <p>The runtime is constant and does not change with the size of the input.</p>
+                
+                <div class="card">
+                    <h3>Examples of O(1) Operations</h3>
+                    <ul>
+                        <li>Accessing an element in an array by index</li>
+                        <li>Inserting or deleting an element at the beginning of a linked list (if you have a pointer to the head)</li>
+                        <li>Pushing or popping from a stack</li>
+                        <li>Accessing a value in a hash table (on average)</li>
+                    </ul>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Java O(1) Example: Array Access</span>
+                        <i class="fas fa-code code-icon"></i>
+                    </div>
+                    <div class="code-example">
+                        <pre><span class="keyword">public class</span> <span class="class-name">ConstantTimeExample</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// Array with 5 elements</span>
+        <span class="keyword">int</span>[] arr = {10, 20, 30, 40, 50};
+        
+        <span class="comment">// Accessing an element by index - O(1) operation</span>
+        <span class="keyword">int</span> index = 2;
+        <span class="keyword">int</span> element = arr[index];
+        
+        System.out.println(<span class="string">"Element at index "</span> + index + <span class="string">": "</span> + element);
+    }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="execution-example">
+                    <h3>Execution Time Calculation for Array Access</h3>
+                    <p>For a MacBook Pro M4 (4.4 GHz CPU), accessing an array element (O(1)) takes approximately:</p>
+                    <p>\[ \text{Cycle Time} = \frac{1}{4.4 \times 10^9} = 2.27 \times 10^{-10} \text{ seconds} \]</p>
+                    <p>\[ \text{Execution Time} = 5 \text{ cycles} \times 2.27 \times 10^{-10} = 1.14 \times 10^{-9} \text{ seconds} = 1.14 \text{ nanoseconds} \]</p>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>O(1) Complexity Visualization</h3>
+                        <canvas id="constantTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page 4: O(log n) Logarithmic Time -->
+        <div class="page" id="page4">
+            <div class="content-section">
+                <h2>O(log n) - Logarithmic Time</h2>
+                <p>The runtime grows logarithmically with the size of the input. Each step of the algorithm reduces the problem size by a significant factor.</p>
+                
+                <div class="card">
+                    <h3>Examples of O(log n) Operations</h3>
+                    <ul>
+                        <li>Binary search in a sorted array</li>
+                        <li>Finding an element in a balanced binary search tree</li>
+                        <li>Euclidean algorithm for finding GCD</li>
+                    </ul>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Java O(log n) Example: Binary Search</span>
+                        <i class="fas fa-code code-icon"></i>
+                    </div>
+                    <div class="code-example">
+                        <pre><span class="keyword">public class</span> <span class="class-name">BinarySearch</span> {
+    <span class="keyword">public static int</span> <span class="method">binarySearch</span>(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> target) {
+        <span class="keyword">int</span> left = 0;
+        <span class="keyword">int</span> right = arr.length - 1;
+        
+        <span class="keyword">while</span> (left <= right) {
+            <span class="keyword">int</span> mid = left + (right - left) / 2;
+            
+            <span class="keyword">if</span> (arr[mid] == target) {
+                <span class="keyword">return</span> mid;
+            } <span class="keyword">else if</span> (arr[mid] < target) {
+                left = mid + 1;
+            } <span class="keyword">else</span> {
+                right = mid - 1;
+            }
+        }
+        
+        <span class="keyword">return</span> -1;
+    }
+    
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="keyword">int</span>[] numbers = {1, 3, 5, 7, 9, 11, 13, 15};
+        <span class="keyword">int</span> target = 9;
+        <span class="keyword">int</span> result = binarySearch(numbers, target);
+        
+        <span class="keyword">if</span> (result != -1) {
+            System.out.println(<span class="string">"Element found at index: "</span> + result);
+        } <span class="keyword">else</span> {
+            System.out.println(<span class="string">"Element not found"</span>);
+        }
+    }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Java O(log n) Example: Euclidean Algorithm for GCD</span>
+                        <i class="fas fa-code code-icon"></i>
+                    </div>
+                    <div class="code-example">
+                        <pre><span class="keyword">public class</span> <span class="class-name">EuclideanAlgorithm</span> {
+    <span class="keyword">public static int</span> <span class="method">gcd</span>(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
+        <span class="keyword">while</span> (b != 0) {
+            <span class="keyword">int</span> temp = b;
+            b = a % b;
+            a = temp;
+        }
+        <span class="keyword">return</span> a;
+    }
+    
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        System.out.println(<span class="string">"GCD of 48 and 18 is: "</span> + gcd(48, 18));
+    }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="execution-example">
+                    <h3>Execution Time Calculation for GCD Algorithm</h3>
+                    <p>For GCD(48,18) on a MacBook Pro M4 (4.4 GHz CPU):</p>
+                    <p>\[ \text{Cycle Time} = \frac{1}{4.4 \times 10^9} = 2.27 \times 10^{-10} \text{ seconds} \]</p>
+                    <p>\[ \text{Total CPU Cycles} = 3 \text{ iterations} \times 15 \text{ cycles/iteration} = 45 \text{ cycles} \]</p>
+                    <p>\[ \text{Execution Time} = 45 \times 2.27 \times 10^{-10} = 1.02 \times 10^{-8} \text{ seconds} = 10.2 \text{ nanoseconds} \]</p>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>O(log n) Complexity Visualization</h3>
+                        <canvas id="logTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page 5: O(n) Linear Time -->
+        <div class="page" id="page5">
+            <div class="content-section">
+                <h2>O(n) - Linear Time</h2>
+                <p>The runtime increases linearly with the size of the input.</p>
+                
+                <div class="card">
+                    <h3>Examples of O(n) Operations</h3>
+                    <ul>
+                        <li>Finding the maximum or minimum element in an unsorted array</li>
+                        <li>Checking if an element exists in an unsorted array</li>
+                        <li>Calculating the sum of all elements in an array</li>
+                        <li>Traversing a linked list</li>
+                    </ul>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Java O(n) Example: Finding Maximum Value</span>
+                        <i class="fas fa-code code-icon"></i>
+                    </div>
+                    <div class="code-example">
+                        <pre><span class="keyword">public class</span> <span class="class-name">LinearTimeExample</span> {
+    <span class="keyword">public static int</span> <span class="method">findMax</span>(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">if</span> (arr.length == 0) {
+            <span class="keyword">throw new</span> IllegalArgumentException(<span class="string">"Array cannot be empty"</span>);
+        }
+        
+        <span class="keyword">int</span> max = arr[0];
+        
+        <span class="comment">// Iterate through each element - O(n) operation</span>
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 1; i < arr.length; i++) {
+            <span class="keyword">if</span> (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        
+        <span class="keyword">return</span> max;
+    }
+    
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="keyword">int</span>[] numbers = {3, 1, 9, 7, 5, 11, 2, 8, 6, 4};
+        <span class="keyword">int</span> maxValue = findMax(numbers);
+        System.out.println(<span class="string">"Maximum value: "</span> + maxValue);
+    }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>O(n) Complexity Visualization</h3>
+                        <canvas id="linearTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page 6: O(n log n) Linearithmic Time -->
+        <div class="page" id="page6">
+            <div class="content-section">
+                <h2>O(n log n) - Linearithmic Time</h2>
+                <p>The runtime increases in a linearithmic manner, combining linear and logarithmic growth.</p>
+                
+                <div class="card">
+                    <h3>Examples of O(n log n) Operations</h3>
+                    <ul>
+                        <li>Efficient sorting algorithms like Merge Sort, Quick Sort (average case), and Heap Sort</li>
+                        <li>Constructing a binary search tree from a sorted array</li>
+                        <li>Some divide and conquer algorithms</li>
+                    </ul>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Java O(n log n) Example: Merge Sort</span>
+                        <i class="fas fa-code code-icon"></i>
+                    </div>
+                    <div class="code-example">
+                        <pre><span class="keyword">public class</span> <span class="class-name">MergeSort</span> {
+    <span class="keyword">public static void</span> <span class="method">mergeSort</span>(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">if</span> (arr.length <= 1) {
+            <span class="keyword">return</span>;
+        }
+        
+        <span class="comment">// Divide the array into two halves</span>
+        <span class="keyword">int</span> mid = arr.length / 2;
+        <span class="keyword">int</span>[] left = <span class="keyword">new int</span>[mid];
+        <span class="keyword">int</span>[] right = <span class="keyword">new int</span>[arr.length - mid];
+        
+        System.arraycopy(arr, 0, left, 0, mid);
+        System.arraycopy(arr, mid, right, 0, arr.length - mid);
+        
+        <span class="comment">// Recursively sort both halves</span>
+        mergeSort(left);
+        mergeSort(right);
+        
+        <span class="comment">// Merge the sorted halves</span>
+        merge(arr, left, right);
+    }
+    
+    <span class="keyword">private static void</span> <span class="method">merge</span>(<span class="keyword">int</span>[] arr, <span class="keyword">int</span>[] left, <span class="keyword">int</span>[] right) {
+        <span class="keyword">int</span> i = 0, j = 0, k = 0;
+        
+        <span class="keyword">while</span> (i < left.length && j < right.length) {
+            <span class="keyword">if</span> (left[i] <= right[j]) {
+                arr[k++] = left[i++];
+            } <span class="keyword">else</span> {
+                arr[k++] = right[j++];
+            }
+        }
+        
+        <span class="keyword">while</span> (i < left.length) {
+            arr[k++] = left[i++];
+        }
+        
+        <span class="keyword">while</span> (j < right.length) {
+            arr[k++] = right[j++];
+        }
+    }
+    
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="keyword">int</span>[] numbers = {3, 1, 9, 7, 5, 11, 2, 8, 6, 4};
+        mergeSort(numbers);
+        System.out.print(<span class="string">"Sorted array: "</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> num : numbers) {
+            System.out.print(num + <span class="string">" "</span>);
+        }
+    }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>O(n log n) Complexity Visualization</h3>
+                        <canvas id="linearithmicTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page 7: O(n²) Quadratic Time -->
+        <div class="page" id="page7">
+            <div class="content-section">
+                <h2>O(n²) - Quadratic Time</h2>
+                <p>The runtime increases quadratically with the size of the input.</p>
+                
+                <div class="card">
+                    <h3>Examples of O(n²) Operations</h3>
+                    <ul>
+                        <li>Simple sorting algorithms like Bubble Sort, Selection Sort, and Insertion Sort</li>
+                        <li>Checking all pairs of elements in an array</li>
+                        <li>Some matrix operations</li>
+                    </ul>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Java O(n²) Example: Bubble Sort</span>
+                        <i class="fas fa-code code-icon"></i>
+                    </div>
+                    <div class="code-example">
+                        <pre><span class="keyword">public class</span> <span class="class-name">BubbleSort</span> {
+    <span class="keyword">public static void</span> <span class="method">bubbleSort</span>(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        <span class="keyword">boolean</span> swapped;
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i < n - 1; i++) {
+            swapped = false;
+            
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = 0; j < n - i - 1; j++) {
+                <span class="keyword">if</span> (arr[j] > arr[j + 1]) {
+                    <span class="comment">// Swap elements</span>
+                    <span class="keyword">int</span> temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            
+            <span class="comment">// If no two elements were swapped, array is sorted</span>
+            <span class="keyword">if</span> (!swapped) {
+                <span class="keyword">break</span>;
+            }
+        }
+    }
+    
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="keyword">int</span>[] numbers = {3, 1, 9, 7, 5, 11, 2, 8, 6, 4};
+        bubbleSort(numbers);
+        System.out.print(<span class="string">"Sorted array: "</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> num : numbers) {
+            System.out.print(num + <span class="string">" "</span>);
+        }
+    }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="execution-example">
+                    <h3>Total Number of Iterations in Bubble Sort</h3>
+                    <p>Bubble Sort operates with two nested loops:</p>
+                    <ul>
+                        <li><strong>Outer Loop (i):</strong> Runs n times</li>
+                        <li><strong>Inner Loop (j):</strong> Runs (n - i - 1) times</li>
+                    </ul>
+                    <p>The total number of comparisons is calculated using the formula:</p>
+                    <p>\[ \sum_{i=0}^{n-1} (n-i-1) = \frac{n(n-1)}{2} \]</p>
+                    <p>For n = 10: \[ \frac{10 \times 9}{2} = 45 \text{ comparisons} \]</p>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>O(n²) Complexity Visualization</h3>
+                        <canvas id="quadraticTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page 8: O(2ⁿ) Exponential Time -->
+        <div class="page" id="page8">
+            <div class="content-section">
+                <h2>O(2ⁿ) - Exponential Time</h2>
+                <p>The runtime doubles with each additional input element. These algorithms are very inefficient for large inputs.</p>
+                
+                <div class="card">
+                    <h3>Examples of O(2ⁿ) Operations</h3>
+                    <ul>
+                        <li>Recursive Fibonacci without memoization</li>
+                        <li>Solving the traveling salesman problem with brute force</li>
+                        <li>Generating all subsets of a set</li>
+                    </ul>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Java O(2ⁿ) Example: Recursive Fibonacci</span>
+                        <i class="fas fa-code code-icon"></i>
+                    </div>
+                    <div class="code-example">
+                        <pre><span class="keyword">public class</span> <span class="class-name">Fibonacci</span> {
+    <span class="comment">// Inefficient recursive Fibonacci - O(2^n) time complexity</span>
+    <span class="keyword">public static int</span> <span class="method">fibonacci</span>(<span class="keyword">int</span> n) {
+        <span class="keyword">if</span> (n <= 1) {
+            <span class="keyword">return</span> n;
+        }
+        <span class="keyword">return</span> fibonacci(n - 1) + fibonacci(n - 2);
+    }
+    
+    <span class="comment">// Optimized Fibonacci with memoization - O(n) time complexity</span>
+    <span class="keyword">public static int</span> <span class="method">fibonacciMemo</span>(<span class="keyword">int</span> n) {
+        <span class="keyword">return</span> fibonacciMemoHelper(n, <span class="keyword">new int</span>[n + 1]);
+    }
+    
+    <span class="keyword">private static int</span> <span class="method">fibonacciMemoHelper</span>(<span class="keyword">int</span> n, <span class="keyword">int</span>[] memo) {
+        <span class="keyword">if</span> (n <= 1) {
+            <span class="keyword">return</span> n;
+        }
+        <span class="keyword">if</span> (memo[n] != 0) {
+            <span class="keyword">return</span> memo[n];
+        }
+        memo[n] = fibonacciMemoHelper(n - 1, memo) + fibonacciMemoHelper(n - 2, memo);
+        <span class="keyword">return</span> memo[n];
+    }
+    
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="keyword">int</span> n = 10;
+        System.out.println(<span class="string">"Fibonacci("</span> + n + <span class="string">") = "</span> + fibonacci(n));
+        System.out.println(<span class="string">"Fibonacci with memoization("</span> + n + <span class="string">") = "</span> + fibonacciMemo(n));
+    }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="execution-example">
+                    <h3>Function Calls for Recursive Fibonacci</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>n</th>
+                            <th>Number of Calls (Approximate)</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>9</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>177</td>
+                        </tr>
+                        <tr>
+                            <td>20</td>
+                            <td>21,891</td>
+                        </tr>
+                        <tr>
+                            <td>30</td>
+                            <td>2,692,537</td>
+                        </tr>
+                    </table>
+                    <p>For n = 50, we get approximately 1 trillion function calls, which is infeasible!</p>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>O(2ⁿ) Complexity Visualization</h3>
+                        <canvas id="exponentialTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Complexity of Algorithms in Java - Interactive Learning Presentation</p>
+            <p>© 2023 - For Educational Purposes</p>
+        </footer>
+    </div>
+
+    <script>
+        // Page navigation
+        function showPage(pageNumber) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('page' + pageNumber).classList.add('active');
+        }
+        
+        // Charts
+        window.onload = function() {
+            // Time Complexity Chart
+            const timeCtx = document.getElementById('timeComplexityChart').getContext('2d');
+            new Chart(timeCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '10', '100', '1000', '10000'],
+                    datasets: [
+                        {
+                            label: 'O(1)',
+                            data: [1, 1, 1, 1, 1],
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'O(log n)',
+                            data: [0, 1, 2, 3, 4],
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'O(n)',
+                            data: [1, 10, 100, 1000, 10000],
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'O(n log n)',
+                            data: [0, 10, 200, 3000, 40000],
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'O(n²)',
+                            data: [1, 100, 10000, 1000000, 100000000],
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'O(2ⁿ)',
+                            data: [2, 1024, 1.26e30, 1.07e301, 1.99e3010],
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'logarithmic',
+                            title: {
+                                display: true,
+                                text: 'Operations (log scale)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Input Size (n)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Operations Chart
+            const opsCtx = document.getElementById('operationsChart').getContext('2d');
+            new Chart(opsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)', 'O(n²)', 'O(2ⁿ)'],
+                    datasets: [{
+                        label: 'Operations for n=100',
+                        data: [1, 7, 100, 664, 10000, 1.26e30],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'logarithmic',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Operations (log scale)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // O(1) Chart
+            const constantCtx = document.getElementById('constantTimeChart').getContext('2d');
+            new Chart(constantCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '10', '100', '1000', '10000'],
+                    datasets: [{
+                        label: 'O(1)',
+                        data: [1, 1, 1, 1, 1],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Operations'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Input Size (n)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // O(log n) Chart
+            const logCtx = document.getElementById('logTimeChart').getContext('2d');
+            new Chart(logCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '10', '100', '1000', '10000'],
+                    datasets: [{
+                        label: 'O(log n)',
+                        data: [0, 1, 2, 3, 4],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Operations'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Input Size (n)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // O(n) Chart
+            const linearCtx = document.getElementById('linearTimeChart').getContext('2d');
+            new Chart(linearCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '10', '100', '1000', '10000'],
+                    datasets: [{
+                        label: 'O(n)',
+                        data: [1, 10, 100, 1000, 10000],
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Operations'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Input Size (n)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // O(n log n) Chart
+            const linearithmicCtx = document.getElementById('linearithmicTimeChart').getContext('2d');
+            new Chart(linearithmicCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '10', '100', '1000', '10000'],
+                    datasets: [{
+                        label: 'O(n log n)',
+                        data: [0, 10, 200, 3000, 40000],
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Operations'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Input Size (n)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // O(n²) Chart
+            const quadraticCtx = document.getElementById('quadraticTimeChart').getContext('2d');
+            new Chart(quadraticCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '10', '100', '1000', '10000'],
+                    datasets: [{
+                        label: 'O(n²)',
+                        data: [1, 100, 10000, 1000000, 100000000],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'logarithmic',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Operations (log scale)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Input Size (n)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // O(2ⁿ) Chart
+            const exponentialCtx = document.getElementById('exponentialTimeChart').getContext('2d');
+            new Chart(exponentialCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '10', '20', '30', '40'],
+                    datasets: [{
+                        label: 'O(2ⁿ)',
+                        data: [2, 1024, 1048576, 1073741824, 1099511627776],
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'logarithmic',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Operations (log scale)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Input Size (n)'
+                            }
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>
