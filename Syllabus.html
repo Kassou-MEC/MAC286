@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC286 Data Structures Syllabus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Source+Code+Pro:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        header {
+            background: #003366;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .college-name {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .university-name {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .course-info {
+            background: #004d80;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .info-item {
+            margin: 8px 15px;
+            text-align: center;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #003366;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e6e6e6;
+        }
+        
+        h2 {
+            color: #004d80;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        
+        h3 {
+            color: #0066b3;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .card {
+            background: #f0f7ff;
+            border-left: 4px solid #0066b3;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 1px;
+            background-color: #e6e6e6;
+            margin: 25px 0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .grid-header {
+            background-color: #004d80;
+            color: white;
+            padding: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .grid-item {
+            background-color: white;
+            padding: 12px;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .highlight {
+            background-color: #fff8e6;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 25px 0;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .course-info {
+                flex-direction: column;
+            }
+        }
+        
+        .instructor-info {
+            background: #e6f2ff;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #003366;
+            color: white;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="college-name">LAGUARDIA COMMUNITY COLLEGE</div>
+            <div class="university-name">CITY UNIVERSITY OF NEW YORK</div>
+            <div>MATHEMATICS, ENGINEERING, AND COMPUTER SCIENCE DEPARTMENT</div>
+        </header>
+        
+        <div class="course-info">
+            <div class="info-item">
+                <div class="info-label">COURSE</div>
+                <div class="info-value">MAC286 — DATA STRUCTURES</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">SECTION</div>
+                <div class="info-value">3022</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">CREDITS</div>
+                <div class="info-value">3 (4 hours: 3 lecture, 1 lab)</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <h1>DATA STRUCTURES - Fall 2024</h1>
+            
+            <div class="instructor-info">
+                <h2>Instructor Information</h2>
+                <p><strong>Name:</strong> Khalid Kassou</p>
+                <p><strong>Class Time:</strong> MoWe 8:00AM - 10:15AM</p>
+                <p><strong>Location:</strong> M Building M-B47</p>
+                <p><strong>Office Hours:</strong> Tuesday & Thursday 12:00pm to 2:00pm</p>
+            </div>
+            
+            <h2>Prerequisites</h2>
+            <p>MAC190, MAT231</p>
+            <p><strong>Pre/Co-requisite:</strong> MAC281</p>
+            
+            <h2>Catalog Description</h2>
+            <p>This advanced computer science course focuses on data structures. It is assumed that the student is familiar with basic computer concepts of object-oriented programming. Topics will include linear data structures such as a linked lists, stacks, queues and trees, sorting and searching, and recursion. Programming assignments will focus on implementing complex algorithms.</p>
+            
+            <h2>Instructional Objectives</h2>
+            <ol>
+                <li>To introduce the student to the concept of aggregate, dynamic and linear data structures.</li>
+                <li>To enable the student to solve complex problems using data structures.</li>
+                <li>To enable the student to write programs that require the use of various advanced techniques and data structures.</li>
+                <li>To enable the student to choose the correct data structures for problem-solving.</li>
+                <li>To encourage proper programming methodologies.</li>
+                <li>To provide the students with advanced problem-solving and programming techniques.</li>
+            </ol>
+            
+            <h2>Performance Objectives</h2>
+            <ol>
+                <li>Identify aggregate, dynamic and linear structures.</li>
+                <li>Solve complex problems using data structures.</li>
+                <li>Write programs that require the use of advanced techniques and data structures.</li>
+                <li>Choose the correct data structures to implement for various problems.</li>
+                <li>Apply various techniques for advanced problem-solving and programming.</li>
+                <li>Demonstrate proper programming methodologies.</li>
+            </ol>
+            
+            <h2>Textbook</h2>
+            <div class="card">
+                <p><strong>Data Structures in Java - 2nd Edition</strong>, by Robert Lafore; SAMS.</p>
+                <p>ISBN# 0672324539</p>
+            </div>
+            
+            <h2>Evaluation</h2>
+            <div class="grid-container">
+                <div class="grid-header">Component</div>
+                <div class="grid-header">Description</div>
+                <div class="grid-header">Weight</div>
+                
+                <div class="grid-item">Quizzes/Assignments/Projects</div>
+                <div class="grid-item">Regular assessments throughout the semester</div>
+                <div class="grid-item">20%</div>
+                
+                <div class="grid-item">Tests (2 @ 20% each)</div>
+                <div class="grid-item">Two major examinations</div>
+                <div class="grid-item">40%</div>
+                
+                <div class="grid-item">Final Exam</div>
+                <div class="grid-item">Comprehensive final examination</div>
+                <div class="grid-item">40%</div>
+                
+                <div class="grid-item" style="grid-column: span 2; text-align: right; font-weight: bold;">Total</div>
+                <div class="grid-item" style="font-weight: bold;">100%</div>
+            </div>
+            
+            <h2>Academic Integrity</h2>
+            <div class="highlight">
+                <p>This class will be conducted in compliance with LaGuardia Community College's academic integrity policy.</p>
+                <p><strong>Sanctions for Academic Integrity Violations:</strong> Sanctions or penalties for violations of academic integrity are imposed by the faculty member teaching the course upon discovery of a violation. All cases of academic dishonesty are filed with the College Adjudicator, who maintains a record of academic integrity violations.</p>
+                <p>The occurrence of a second or third offense of academic dishonesty may involve the imposition of a disciplinary sanction in addition to the academic sanction imposed by the instructor.</p>
+            </div>
+            
+            <h3>Sanctions include but are not limited to:</h3>
+            <ul>
+                <li>Failure of an exam</li>
+                <li>A grade of F on an essay or research paper</li>
+                <li>Failure of a course project</li>
+                <li>Failure of the course</li>
+                <li>Suspension from the College</li>
+                <li>Dismissal from the College</li>
+            </ul>
+            
+            <div class="card">
+                <p><em>"In certain instances, at the discretion of the instructor, a student may be asked to demonstrate his/her ability of conceptually understanding the work he/she submitted. In such instances, the instructor may ask any student for a written or oral (live video session) clarification or explanation of solutions to any assignment, including homework, quizzes, tests, final exam, etc."</em></p>
+                <p><em>"Solutions submitted by students for any assignment in this course, including homework, quizzes, tests, final exam, etc., must be based on the covered material. Solutions that are based on material that was not or will not be covered in this course or will be covered but has not been covered yet, will not be accepted and will receive no credit."</em></p>
+            </div>
+            
+            <h2>Attendance Policy</h2>
+            <div class="card">
+                <p>The maximum number of unexcused absences allowed is 15% of the total class meetings (about 7 hours). Unexcused absences beyond this maximum will result in a grade of WU or F.</p>
+            </div>
+            
+            <h2>Course Outline</h2>
+            <div class="grid-container">
+                <div class="grid-header">Week</div>
+                <div class="grid-header">Topics</div>
+                <div class="grid-header">Chapter</div>
+                
+                <div class="grid-item">1</div>
+                <div class="grid-item">Overview, Terminology, Object Oriented Programming</div>
+                <div class="grid-item">1</div>
+                
+                <div class="grid-item">2</div>
+                <div class="grid-item">Arrays, Algorithms with Arrays, Programs with multiple classes, Interfaces, Ordered Array, Logarithms, Big O Notation, Linear Search, Binary Search</div>
+                <div class="grid-item">2</div>
+                
+                <div class="grid-item">3</div>
+                <div class="grid-item">Simple Sorting</div>
+                <div class="grid-item">3</div>
+                
+                <div class="grid-item">4</div>
+                <div class="grid-item">Stacks, Queues, Priority Queues</div>
+                <div class="grid-item">4</div>
+                
+                <div class="grid-item">5-6</div>
+                <div class="grid-item">
+                    Linked Lists: References, Simple Linked Lists, Inserting and Deleting Nodes, Double-Ended Lists, Sorted Lists, Efficiency, Doubly Linked Lists, Iterators
+                    <br><strong>Test #1</strong>
+                </div>
+                <div class="grid-item">5</div>
+                
+                <div class="grid-item">7</div>
+                <div class="grid-item">Binary Trees: Terminology, Finding a Node, Inserting a Node, Traversing the Tree, Finding Max/Min Values, Deleting a Node, Representing Trees as Arrays</div>
+                <div class="grid-item">8</div>
+                
+                <div class="grid-item">8</div>
+                <div class="grid-item">Hash Tables, Introduction to Hashing, Open Addressing, Separate Chaining, Hash Functions, Hashing Efficiency, External Storage</div>
+                <div class="grid-item">11</div>
+                
+                <div class="grid-item">9-10</div>
+                <div class="grid-item">
+                    Heaps, Introduction to Heaps, Insertion, Removal, Array Size, Expanding the Heap, HeapSort, HeapSort Efficiency
+                    <br><strong>Test #2</strong>
+                </div>
+                <div class="grid-item">12</div>
+                
+                <div class="grid-item">11</div>
+                <div class="grid-item">Graphs, Searches, Directed Graphs, Weighted Graphs, Shortest-Path Problem, The Knight's Tour</div>
+                <div class="grid-item">13, 14</div>
+                
+                <div class="grid-item">12</div>
+                <div class="grid-item">When to Use What: Evaluation of General-Purposes and Special Purpose Data Structures, Sorting Graphs, External Storage</div>
+                <div class="grid-item">15</div>
+                
+                <div class="grid-item">13</div>
+                <div class="grid-item"><strong>Final Examination</strong></div>
+                <div class="grid-item"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>LaGuardia Community College - Mathematics, Engineering, and Computer Science Department</p>
+            <p>Fall 2024</p>
+        </div>
+    </div>
+</body>
+</html>
