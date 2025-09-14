@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithms & Complexity: The Fun Way!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --danger: #f56565;
+            --warning: #ed8936;
+            --dark: #2d3748;
+            --light: #f7fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px;
+            margin: 20px 0;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h2 {
+            color: var(--primary);
+            margin: 30px 0 20px;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 15px;
+            font-size: 1.5em;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block::before {
+            content: "Java";
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+        }
+
+        .keyword { color: #f472b6; }
+        .type { color: #60a5fa; }
+        .function { color: #fbbf24; }
+        .comment { color: #6b7280; font-style: italic; }
+        .string { color: #10b981; }
+        .number { color: #f59e0b; }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .graph-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            min-height: 400px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .complexity-animation {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .complexity-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px;
+            text-align: center;
+            min-width: 150px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .complexity-box:hover {
+            transform: scale(1.1);
+        }
+
+        .quiz-option {
+            background: #f0f4f8;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .quiz-option:hover {
+            background: #e2e8f0;
+            border-color: var(--primary);
+        }
+
+        .quiz-option.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .quiz-option.correct {
+            background: var(--success);
+            color: white;
+        }
+
+        .quiz-option.incorrect {
+            background: var(--danger);
+            color: white;
+        }
+
+        .fun-fact {
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fun-fact::before {
+            content: "💡";
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.2;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .exercise-box {
+            background: #f7fafc;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: white;
+            transform: scale(1.5);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .card { padding: 20px; }
+            .nav-dots { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="nav-dots">
+        <div class="dot active" onclick="scrollToSlide(0)"></div>
+        <div class="dot" onclick="scrollToSlide(1)"></div>
+        <div class="dot" onclick="scrollToSlide(2)"></div>
+        <div class="dot" onclick="scrollToSlide(3)"></div>
+        <div class="dot" onclick="scrollToSlide(4)"></div>
+        <div class="dot" onclick="scrollToSlide(5)"></div>
+        <div class="dot" onclick="scrollToSlide(6)"></div>
+        <div class="dot" onclick="scrollToSlide(7)"></div>
+    </div>
+
+    <div class="container">
+        <!-- Slide 1: Title -->
+        <div class="slide" id="slide0">
+            <div class="card">
+                <h1>🚀 Algorithms & Complexity</h1>
+                <h2 style="text-align: center;">The Fun Way to Master Big O!</h2>
+                <div class="fun-fact">
+                    <strong>Did you know?</strong> The term "Big O" was popularized by Donald Knuth, who probably thought "Big Oh No!" when seeing inefficient code! 😄
+                </div>
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="btn" onclick="scrollToSlide(1)">Let's Begin the Adventure! →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: What is Complexity? -->
+        <div class="slide" id="slide1">
+            <div class="card">
+                <h1>What is Complexity? 🤔</h1>
+                
+                <h3>Time Complexity</h3>
+                <p style="font-size: 1.1em; margin: 15px 0;">
+                    <strong>Time Complexity</strong> measures how the runtime of an algorithm increases as the input size grows. 
+                    It's like asking: "If I double my data, will my program take twice as long, or will it completely melt down?" 🔥
+                </p>
+
+                <h3>Space Complexity</h3>
+                <p style="font-size: 1.1em; margin: 15px 0;">
+                    <strong>Space Complexity</strong> measures how much memory an algorithm uses as input size increases.
+                    Think of it as: "Will my program eat all my RAM like Cookie Monster eats cookies?" 🍪
+                </p>
+
+                <div class="fun-fact">
+                    <strong>Fun Fact:</strong> In the 1960s, computers had about 64KB of RAM. Today's smartphones have 100,000+ times more! 
+                    Yet we still need to care about space complexity because our data grew even faster! 📱
+                </div>
+
+                <h3>Big O Notation</h3>
+                <p style="font-size: 1.1em; margin: 15px 0;">
+                    Big O describes the <strong>worst-case scenario</strong>. It's pessimistic, like assuming every traffic light will be red on your way to work!
+                </p>
+
+                <div class="complexity-animation">
+                    <div class="complexity-box" onclick="showComplexityExample('O(1)')">
+                        O(1)<br><small>Constant</small>
+                    </div>
+                    <div class="complexity-box" onclick="showComplexityExample('O(log n)')">
+                        O(log n)<br><small>Logarithmic</small>
+                    </div>
+                    <div class="complexity-box" onclick="showComplexityExample('O(n)')">
+                        O(n)<br><small>Linear</small>
+                    </div>
+                    <div class="complexity-box" onclick="showComplexityExample('O(n log n)')">
+                        O(n log n)<br><small>Linearithmic</small>
+                    </div>
+                    <div class="complexity-box" onclick="showComplexityExample('O(n²)')">
+                        O(n²)<br><small>Quadratic</small>
+                    </div>
+                    <div class="complexity-box" onclick="showComplexityExample('O(2ⁿ)')">
+                        O(2ⁿ)<br><small>Exponential</small>
+                    </div>
+                </div>
+
+                <div id="complexityExample" style="margin-top: 20px;"></div>
+
+                <button class="btn" onclick="scrollToSlide(2)">See Visual Comparisons →</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Interactive Graph -->
+        <div class="slide" id="slide2">
+            <div class="card">
+                <h1>📊 Complexity Visualized</h1>
+                
+                <div class="graph-container">
+                    <canvas id="complexityGraph" width="800" height="400"></canvas>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn" onclick="animateGraph()">🎬 Animate Growth</button>
+                    <button class="btn" onclick="toggleScale()">📏 Toggle Scale</button>
+                </div>
+
+                <div class="fun-fact">
+                    <strong>Mind-blowing:</strong> With O(2ⁿ) complexity and n=50, even if each operation took 1 nanosecond, 
+                    it would take over 13 days to complete! With n=100, it would take longer than the age of the universe! 🌌
+                </div>
+
+                <button class="btn" onclick="scrollToSlide(3)">Let's See Java Examples →</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: O(1) Examples -->
+        <div class="slide" id="slide3">
+            <div class="card">
+                <h1>O(1) - Constant Time ⚡</h1>
+                <p style="font-size: 1.1em;">Like a ninja - swift, precise, doesn't care how many enemies there are!</p>
+
+                <h3>Easy Example: Array Access</h3>
+                <div class="code-block">
+<span class="type">int</span>[] numbers = {<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>};
+<span class="type">int</span> value = numbers[<span class="number">2</span>]; <span class="comment">// O(1) - Direct access!</span>
+                </div>
+
+                <h3>Medium Example: HashMap Operations</h3>
+                <div class="code-block">
+<span class="type">HashMap</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; map = <span class="keyword">new</span> <span class="type">HashMap</span>&lt;&gt;();
+map.<span class="function">put</span>(<span class="string">"score"</span>, <span class="number">100</span>);      <span class="comment">// O(1) average case</span>
+<span class="type">Integer</span> score = map.<span class="function">get</span>(<span class="string">"score"</span>); <span class="comment">// O(1) average case</span>
+<span class="type">boolean</span> exists = map.<span class="function">containsKey</span>(<span class="string">"score"</span>); <span class="comment">// O(1) average case</span>
+                </div>
+
+                <h3>Hard Example: Bitwise Operations</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">boolean</span> <span class="function">isPowerOfTwo</span>(<span class="type">int</span> n) {
+    <span class="comment">// Check if n is power of 2 using bit manipulation</span>
+    <span class="keyword">return</span> n > <span class="number">0</span> && (n & (n - <span class="number">1</span>)) == <span class="number">0</span>; <span class="comment">// O(1) - Single operation!</span>
+}
+
+<span class="keyword">public</span> <span class="type">void</span> <span class="function">swap</span>(<span class="type">int</span>[] arr, <span class="type">int</span> i, <span class="type">int</span> j) {
+    <span class="comment">// XOR swap without temp variable - O(1)</span>
+    arr[i] = arr[i] ^ arr[j];
+    arr[j] = arr[i] ^ arr[j];
+    arr[i] = arr[i] ^ arr[j];
+}
+                </div>
+
+                <div class="exercise-box">
+                    <strong>🏋️ Exercise:</strong> Which of these is NOT O(1)?
+                    <ol style="margin: 10px 0 0 20px;">
+                        <li>Accessing the first element of an array</li>
+                        <li>Finding the maximum element in an unsorted array</li>
+                        <li>Pushing to a stack (with array implementation and space available)</li>
+                        <li>Getting the size of an ArrayList</li>
+                    </ol>
+                    <button class="btn" onclick="alert('Answer: #2 - Finding max in unsorted array is O(n)!')">Show Answer</button>
+                </div>
+
+                <button class="btn" onclick="scrollToSlide(4)">Next: O(n) Examples →</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: O(n) and O(n²) Examples -->
+        <div class="slide" id="slide4">
+            <div class="card">
+                <h1>O(n) and O(n²) - Linear & Quadratic 📈</h1>
+
+                <h2>O(n) - Linear Time</h2>
+                <p>Like reading a book - you have to go through each page!</p>
+
+                <h3>Easy: Find Maximum</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">int</span> <span class="function">findMax</span>(<span class="type">int</span>[] arr) {
+    <span class="type">int</span> max = arr[<span class="number">0</span>];
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i < arr.length; i++) { <span class="comment">// O(n)</span>
+        <span class="keyword">if</span> (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    <span class="keyword">return</span> max;
+}
+                </div>
+
+                <h3>Medium: Two Pointers Technique</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">boolean</span> <span class="function">isPalindrome</span>(<span class="type">String</span> s) {
+    <span class="type">int</span> left = <span class="number">0</span>, right = s.<span class="function">length</span>() - <span class="number">1</span>;
+    <span class="keyword">while</span> (left < right) { <span class="comment">// O(n/2) = O(n)</span>
+        <span class="keyword">if</span> (s.<span class="function">charAt</span>(left++) != s.<span class="function">charAt</span>(right--)) {
+            <span class="keyword">return</span> <span class="keyword">false</span>;
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">true</span>;
+}
+                </div>
+
+                <h2>O(n²) - Quadratic Time</h2>
+                <p>Like comparing everyone in a room with everyone else - party introductions nightmare! 🎉😱</p>
+
+                <h3>Easy: Bubble Sort</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">void</span> <span class="function">bubbleSort</span>(<span class="type">int</span>[] arr) {
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i < arr.length - <span class="number">1</span>; i++) {      <span class="comment">// O(n)</span>
+        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j < arr.length - i - <span class="number">1</span>; j++) { <span class="comment">// O(n)</span>
+            <span class="keyword">if</span> (arr[j] > arr[j + <span class="number">1</span>]) {
+                <span class="comment">// Swap - Total: O(n²)</span>
+                <span class="type">int</span> temp = arr[j];
+                arr[j] = arr[j + <span class="number">1</span>];
+                arr[j + <span class="number">1</span>] = temp;
+            }
+        }
+    }
+}
+                </div>
+
+                <h3>Hard: Finding All Pairs with Sum</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">List</span>&lt;<span class="type">int</span>[]&gt; <span class="function">findPairsWithSum</span>(<span class="type">int</span>[] arr, <span class="type">int</span> target) {
+    <span class="type">List</span>&lt;<span class="type">int</span>[]&gt; pairs = <span class="keyword">new</span> <span class="type">ArrayList</span>&lt;&gt;();
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i < arr.length; i++) {        <span class="comment">// O(n)</span>
+        <span class="keyword">for</span> (<span class="type">int</span> j = i + <span class="number">1</span>; j < arr.length; j++) {  <span class="comment">// O(n)</span>
+            <span class="keyword">if</span> (arr[i] + arr[j] == target) {
+                pairs.<span class="function">add</span>(<span class="keyword">new</span> <span class="type">int</span>[]{arr[i], arr[j]});
+            }
+        }
+    }
+    <span class="keyword">return</span> pairs; <span class="comment">// Total: O(n²)</span>
+}
+
+<span class="comment">// Better solution using HashMap - O(n)!</span>
+<span class="keyword">public</span> <span class="type">List</span>&lt;<span class="type">int</span>[]&gt; <span class="function">findPairsOptimized</span>(<span class="type">int</span>[] arr, <span class="type">int</span> target) {
+    <span class="type">List</span>&lt;<span class="type">int</span>[]&gt; pairs = <span class="keyword">new</span> <span class="type">ArrayList</span>&lt;&gt;();
+    <span class="type">Set</span>&lt;<span class="type">Integer</span>&gt; seen = <span class="keyword">new</span> <span class="type">HashSet</span>&lt;&gt;();
+    
+    <span class="keyword">for</span> (<span class="type">int</span> num : arr) { <span class="comment">// O(n)</span>
+        <span class="type">int</span> complement = target - num;
+        <span class="keyword">if</span> (seen.<span class="function">contains</span>(complement)) { <span class="comment">// O(1)</span>
+            pairs.<span class="function">add</span>(<span class="keyword">new</span> <span class="type">int</span>[]{complement, num});
+        }
+        seen.<span class="function">add</span>(num);
+    }
+    <span class="keyword">return</span> pairs; <span class="comment">// Total: O(n)!</span>
+}
+                </div>
+
+                <button class="btn" onclick="scrollToSlide(5)">Advanced Complexities →</button>
+            </div>
+        </div>
+
+        <!-- Slide 6: O(log n) and O(n log n) -->
+        <div class="slide" id="slide5">
+            <div class="card">
+                <h1>O(log n) & O(n log n) - The Efficient Ones 🎯</h1>
+
+                <h2>O(log n) - Logarithmic Time</h2>
+                <p>Like finding a word in a dictionary - you don't read every page! 📖</p>
+
+                <h3>Classic: Binary Search</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">int</span> <span class="function">binarySearch</span>(<span class="type">int</span>[] arr, <span class="type">int</span> target) {
+    <span class="type">int</span> left = <span class="number">0</span>, right = arr.length - <span class="number">1</span>;
+    
+    <span class="keyword">while</span> (left <= right) {
+        <span class="type">int</span> mid = left + (right - left) / <span class="number">2</span>; <span class="comment">// Avoid overflow!</span>
+        
+        <span class="keyword">if</span> (arr[mid] == target) {
+            <span class="keyword">return</span> mid;
+        } <span class="keyword">else if</span> (arr[mid] < target) {
+            left = mid + <span class="number">1</span>; <span class="comment">// Search right half</span>
+        } <span class="keyword">else</span> {
+            right = mid - <span class="number">1</span>; <span class="comment">// Search left half</span>
+        }
+    }
+    <span class="keyword">return</span> -<span class="number">1</span>; <span class="comment">// O(log n) - Halves search space each time!</span>
+}
+                </div>
+
+                <h3>Advanced: Find Peak Element</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">int</span> <span class="function">findPeakElement</span>(<span class="type">int</span>[] nums) {
+    <span class="comment">// Peak: nums[i] > nums[i-1] && nums[i] > nums[i+1]</span>
+    <span class="type">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;
+    
+    <span class="keyword">while</span> (left < right) {
+        <span class="type">int</span> mid = left + (right - left) / <span class="number">2</span>;
+        
+        <span class="keyword">if</span> (nums[mid] > nums[mid + <span class="number">1</span>]) {
+            <span class="comment">// Peak is on left side (including mid)</span>
+            right = mid;
+        } <span class="keyword">else</span> {
+            <span class="comment">// Peak is on right side</span>
+            left = mid + <span class="number">1</span>;
+        }
+    }
+    <span class="keyword">return</span> left; <span class="comment">// O(log n) - Binary search variant!</span>
+}
+                </div>
+
+                <h2>O(n log n) - Linearithmic Time</h2>
+                <p>The sweet spot for sorting algorithms! Not too fast, not too slow, just right! 🐻</p>
+
+                <h3>Merge Sort Implementation</h3>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">void</span> <span class="function">mergeSort</span>(<span class="type">int</span>[] arr, <span class="type">int</span> left, <span class="type">int</span> right) {
+    <span class="keyword">if</span> (left < right) {
+        <span class="type">int</span> mid = left + (right - left) / <span class="number">2</span>;
+        
+        mergeSort(arr, left, mid);    <span class="comment">// T(n/2)</span>
+        mergeSort(arr, mid + <span class="number">1</span>, right); <span class="comment">// T(n/2)</span>
+        merge(arr, left, mid, right);  <span class="comment">// O(n)</span>
+    }
+    <span class="comment">// Total: T(n) = 2T(n/2) + O(n) = O(n log n)</span>
+}
+
+<span class="keyword">private</span> <span class="type">void</span> <span class="function">merge</span>(<span class="type">int</span>[] arr, <span class="type">int</span> left, <span class="type">int</span> mid, <span class="type">int</span> right) {
+    <span class="type">int</span>[] temp = <span class="keyword">new</span> <span class="type">int</span>[right - left + <span class="number">1</span>];
+    <span class="type">int</span> i = left, j = mid + <span class="number">1</span>, k = <span class="number">0</span>;
+    
+    <span class="keyword">while</span> (i <= mid && j <= right) {
+        temp[k++] = (arr[i] <= arr[j]) ? arr[i++] : arr[j++];
+    }
+    <span class="keyword">while</span> (i <= mid) temp[k++] = arr[i++];
+    <span class="keyword">while</span> (j <= right) temp[k++] = arr[j++];
+    
+    <span class="keyword">for</span> (i = <span class="number">0</span>; i < temp.length; i++) {
+        arr[left + i] = temp[i];
+    }
+}
+                </div>
+
+                <div class="fun-fact">
+                    <strong>Real-world impact:</strong> Switching from O(n²) to O(n log n) sorting for 1 million items 
+                    reduces operations from 1 trillion to just 20 million - that's 50,000x faster! 🚀
+                </div>
+
+                <button class="btn" onclick="scrollToSlide(6)">Practice Exercises →</button>
+            </div>
+        </div>
+
+        <!-- Slide 7: Practice Exercises -->
+        <div class="slide" id="slide6">
+            <div class="card">
+                <h1>🏋️ Practice Time!</h1>
+
+                <h2>Exercise 1: Analyze the Complexity</h2>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">void</span> <span class="function">mystery</span>(<span class="type">int</span> n) {
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i <= n; i *= <span class="number">2</span>) {
+        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j < n; j++) {
+            System.out.<span class="function">println</span>(i + j);
+        }
+    }
+}
+                </div>
+                <div class="exercise-box">
+                    <p>What's the time complexity?</p>
+                    <button class="btn" onclick="revealAnswer(4)">Show Answer</button>
+                    <div id="answer4" style="display:none; margin-top:15px;">
+                        <strong>Answer: O(n log n)</strong><br>
+                        Outer loop runs log₂(n) times (i doubles each time), inner loop runs n times.
+                        Total: log(n) × n = O(n log n)
+                    </div>
+                </div>
+
+                <h2>Exercise 2: Optimize This!</h2>
+                <div class="code-block">
+<span class="comment">// Current implementation - Find if array has duplicates</span>
+<span class="keyword">public</span> <span class="type">boolean</span> <span class="function">hasDuplicates</span>(<span class="type">int</span>[] arr) {
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i < arr.length; i++) {
+        <span class="keyword">for</span> (<span class="type">int</span> j = i + <span class="number">1</span>; j < arr.length; j++) {
+            <span class="keyword">if</span> (arr[i] == arr[j]) {
+                <span class="keyword">return</span> <span class="keyword">true</span>;
+            }
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+}
+                </div>
+                <div class="exercise-box">
+                    <p>Current complexity: O(n²). Can you optimize it to O(n)?</p>
+                    <button class="btn" onclick="revealAnswer(5)">Show Solution</button>
+                    <div id="answer5" style="display:none; margin-top:15px;">
+                        <div class="code-block">
+<span class="keyword">public</span> <span class="type">boolean</span> <span class="function">hasDuplicatesOptimized</span>(<span class="type">int</span>[] arr) {
+    <span class="type">Set</span>&lt;<span class="type">Integer</span>&gt; seen = <span class="keyword">new</span> <span class="type">HashSet</span>&lt;&gt;();
+    <span class="keyword">for</span> (<span class="type">int</span> num : arr) {
+        <span class="keyword">if</span> (!seen.<span class="function">add</span>(num)) { <span class="comment">// add returns false if already exists</span>
+            <span class="keyword">return</span> <span class="keyword">true</span>;
+        }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+} <span class="comment">// O(n) time, O(n) space</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Exercise 3: Space Complexity Challenge</h2>
+                <div class="code-block">
+<span class="keyword">public</span> <span class="type">int</span> <span class="function">fibonacci</span>(<span class="type">int</span> n) {
+    <span class="keyword">if</span> (n <= <span class="number">1</span>) <span class="keyword">return</span> n;
+    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);
+}
+                </div>
+                <div class="exercise-box">
+                    <p>What's the space complexity due to the call stack?</p>
+                    <button class="btn" onclick="revealAnswer(6)">Show Answer</button>
+                    <div id="answer6" style="display:none; margin-top:15px;">
+                        <strong>Answer: O(n)</strong><br>
+                        Maximum depth of recursion tree is n (going all the way down the left side).
+                        Time complexity is O(2ⁿ) though - very inefficient! Use dynamic programming instead.
+                    </div>
+                </div>
+
+                <button class="btn" onclick="scrollToSlide(7)">Final Quiz! 🎯</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: Quiz -->
+        <div class="slide" id="slide7">
+            <div class="card">
+                <h1>🎯 Final Quiz Challenge!</h1>
+                <div id="quizContainer">
+                    <div id="questionContainer"></div>
+                    <div id="quizResult" style="display:none; text-align:center; margin-top:30px;">
+                        <h2 id="scoreDisplay"></h2>
+                        <div id="scoreMessage"></div>
+                        <button class="btn" onclick="restartQuiz()">Try Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ================================
+           Quiz data
+        ================================= */
+        const quizQuestions = [
+            {
+                question: "What's the time complexity of accessing an element in a HashMap?",
+                options: ["O(1) average case", "O(n)", "O(log n)", "O(n²)"],
+                correct: 0
+            },
+            {
+                question: "Which sorting algorithm has the best worst-case time complexity?",
+                options: ["Bubble Sort - O(n²)", "Quick Sort - O(n²)", "Merge Sort - O(n log n)", "Selection Sort - O(n²)"],
+                correct: 2
+            },
+            {
+                question: "What's the space complexity of merge sort?",
+                options: ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+                correct: 2
+            },
+            {
+                question: "Binary search requires the array to be:",
+                options: ["Unsorted", "Sorted", "Unique elements only", "Prime numbers only"],
+                correct: 1
+            },
+            {
+                question: "What's the time complexity of finding the minimum element in a binary search tree?",
+                options: ["O(1)", "O(log n) average", "O(n)", "O(n log n)"],
+                correct: 1
+            }
+        ];
+
+        /* ================================
+           Global navigation state
+        ================================= */
+        const getSlides = () => document.querySelectorAll('.slide');
+        let activeSlide = 0;
+
+        function updateNavDots(active) {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => dot.classList.toggle('active', index === active));
+        }
+
+        function scrollToSlide(slideNum) {
+            const s = document.getElementById(`slide${slideNum}`);
+            if (!s) return;
+            activeSlide = slideNum;
+            s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            updateNavDots(slideNum);
+        }
+
+        function go(delta) {
+            const total = getSlides().length;
+            const target = Math.max(0, Math.min(total - 1, activeSlide + delta));
+            scrollToSlide(target);
+        }
+
+        // Keyboard navigation: ←/→, PageUp/PageDown, Space (next), Shift+Space (prev)
+        window.addEventListener('keydown', (e) => {
+            const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+            if (tag === 'input' || tag === 'textarea' || e.isComposing) return;
+
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(1); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+            else if (e.key === ' ') { e.preventDefault(); e.shiftKey ? go(-1) : go(1); }
+        });
+
+        /* ================================
+           Complexity helper
+        ================================= */
+        function showComplexityExample(complexity) {
+            const examples = {
+                'O(1)': '<strong>O(1) - Constant Time:</strong><br>Examples: Array access, HashMap get/put, Stack push/pop<br>Performance: Lightning fast! ⚡ Doesn\'t matter if you have 10 or 10 million items!',
+                'O(log n)': '<strong>O(log n) - Logarithmic Time:</strong><br>Examples: Binary search, Balanced BST operations<br>Performance: Very efficient! Doubles input = adds only ~1 step',
+                'O(n)': '<strong>O(n) - Linear Time:</strong><br>Examples: Array traversal, Linear search, Finding max/min<br>Performance: Doubles input = doubles time',
+                'O(n log n)': '<strong>O(n log n) - Linearithmic Time:</strong><br>Examples: Merge Sort, Heap Sort, good Quick Sort<br>Performance: Best possible for comparison-based sorting',
+                'O(n²)': '<strong>O(n²) - Quadratic Time:</strong><br>Examples: Bubble Sort, Selection Sort, naive nested loops<br>Performance: Gets slow quickly! 100 items → 10,000 ops 😰',
+                'O(2ⁿ)': '<strong>O(2ⁿ) - Exponential Time:</strong><br>Examples: Recursive Fibonacci, power set, all subsets<br>Performance: Avoid if possible! 💀 20 items → ≈1M ops'
+            };
+            document.getElementById('complexityExample').innerHTML =
+                `<div class="fun-fact">${examples[complexity]}</div>`;
+        }
+
+        /* ================================
+           Graph drawing (with safe animation & log scale)
+        ================================= */
+        let logScale = false;
+
+        function drawGraph() {
+            const canvas = document.getElementById('complexityGraph');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(40, height - 40);
+            ctx.lineTo(width - 20, height - 40);
+            ctx.moveTo(40, height - 40);
+            ctx.lineTo(40, 20);
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.fillText('Input Size (n)', width / 2 - 40, height - 10);
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(logScale ? 'Operations (log scale)' : 'Operations', -55, 0);
+            ctx.restore();
+
+            // Complexity definitions
+            const funcs = [
+                { name: 'O(1)', color: '#48bb78', f: n => 10 },
+                { name: 'O(log n)', color: '#4299e1', f: n => Math.log2(Math.max(1, n)) * 15 },
+                { name: 'O(n)', color: '#ed8936', f: n => n * 3 },
+                { name: 'O(n log n)', color: '#9f7aea', f: n => n * Math.log2(Math.max(2, n)) * 2 },
+                { name: 'O(n²)', color: '#f56565', f: n => (n * n) / 4 }
+            ];
+
+            // Y-scaling helper
+            const yScale = (v) => {
+                if (!logScale) return v;
+                // compress with log10; multiplier keeps curves visible
+                return Math.log10(1 + Math.max(0, v)) * 60;
+            };
+
+            // Draw each curve
+            funcs.forEach(comp => {
+                ctx.strokeStyle = comp.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let x = 1; x <= 100; x++) {
+                    const yVal = Math.min(yScale(comp.f(x)), height - 60);
+                    const canvasX = 40 + (x * (width - 60) / 100);
+                    const canvasY = height - 40 - yVal;
+                    if (x === 1) ctx.moveTo(canvasX, canvasY);
+                    else ctx.lineTo(canvasX, canvasY);
+                }
+                ctx.stroke();
+
+                // Label near n=80
+                ctx.fillStyle = comp.color;
+                ctx.font = 'bold 12px Arial';
+                const y80 = Math.min(yScale(comp.f(80)), height - 60);
+                ctx.fillText(comp.name, width - 110, height - 40 - y80);
+            });
+        }
+
+        let animationFrame = 0;
+        function animateGraph() {
+            const canvas = document.getElementById('complexityGraph');
+            const ctx = canvas.getContext('2d');
+
+            function frame() {
+                drawGraph();
+
+                // Highlight current point (start at n=1 to avoid log(0))
+                const n = Math.max(1, (animationFrame % 100) + 1);
+                const funcs = [
+                    { color: '#48bb78', f: n => 10 },
+                    { color: '#4299e1', f: n => Math.log2(Math.max(1, n)) * 15 },
+                    { color: '#ed8936', f: n => n * 3 },
+                    { color: '#9f7aea', f: n => n * Math.log2(Math.max(2, n)) * 2 },
+                    { color: '#f56565', f: n => (n * n) / 4 }
+                ];
+                const yScale = (v) => logScale ? Math.log10(1 + Math.max(0, v)) * 60 : v;
+
+                funcs.forEach(comp => {
+                    const xCanvas = 40 + (n * (canvas.width - 60) / 100);
+                    const yCanvas = canvas.height - 40 - Math.min(yScale(comp.f(n)), canvas.height - 60);
+                    ctx.fillStyle = comp.color;
+                    ctx.beginPath();
+                    ctx.arc(xCanvas, yCanvas, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                animationFrame++;
+                if (animationFrame <= 100) {
+                    requestAnimationFrame(frame);
+                }
+            }
+
+            animationFrame = 0;
+            frame();
+        }
+
+        function toggleScale() {
+            logScale = !logScale;
+            drawGraph();
+            alert(logScale ? 'Switched to logarithmic Y-scale' : 'Switched to linear Y-scale');
+        }
+
+        /* ================================
+           Quiz logic (robust for any #options)
+        ================================= */
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = -1;
+
+        function loadQuestion() {
+            if (currentQuestion >= quizQuestions.length) {
+                showQuizResult();
+                return;
+            }
+
+            const q = quizQuestions[currentQuestion];
+            let html = `
+                <h2>Question ${currentQuestion + 1} of ${quizQuestions.length}</h2>
+                <p style="font-size: 1.2em; margin: 20px 0;">${q.question}</p>
+            `;
+
+            q.options.forEach((option, index) => {
+                html += `
+                    <div class="quiz-option" onclick="selectAnswer(${index})" id="option${index}">
+                        ${option}
+                    </div>
+                `;
+            });
+
+            html += `
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="checkAnswer()">Submit Answer</button>
+                </div>
+            `;
+
+            const container = document.getElementById('questionContainer');
+            container.innerHTML = html;
+            selectedAnswer = -1;
+        }
+
+        function selectAnswer(index) {
+            // Clear previous selection
+            document.querySelectorAll('#questionContainer .quiz-option')
+                .forEach(el => el.classList.remove('selected', 'correct', 'incorrect'));
+            // Select new
+            const chosen = document.getElementById(`option${index}`);
+            if (chosen) {
+                chosen.classList.add('selected');
+                selectedAnswer = index;
+            }
+        }
+
+        function checkAnswer() {
+            if (selectedAnswer === -1) {
+                alert('Please select an answer!');
+                return;
+            }
+
+            const correct = quizQuestions[currentQuestion].correct;
+            const options = document.querySelectorAll('#questionContainer .quiz-option');
+
+            if (options[correct]) options[correct].classList.add('correct');
+            if (selectedAnswer !== correct && options[selectedAnswer]) {
+                options[selectedAnswer].classList.add('incorrect');
+            } else {
+                score++;
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 1200);
+        }
+
+        function showQuizResult() {
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('quizResult').style.display = 'block';
+
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            document.getElementById('scoreDisplay').innerHTML =
+                `Your Score: ${score}/${quizQuestions.length} (${percentage}%)`;
+
+            let message = '';
+            if (percentage >= 80) message = '🎉 Excellent! You\'re a Big O Master!';
+            else if (percentage >= 60) message = '👏 Good job! You understand the concepts well!';
+            else message = '📚 Keep practicing! You\'re getting there!';
+
+            document.getElementById('scoreMessage').innerHTML =
+                `<p style="font-size: 1.3em; margin: 20px 0;">${message}</p>`;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = -1;
+            document.getElementById('questionContainer').style.display = 'block';
+            document.getElementById('quizResult').style.display = 'none';
+            loadQuestion();
+        }
+
+        /* ================================
+           Small helpers used earlier
+        ================================= */
+        function revealAnswer(num) {
+            const el = document.getElementById(`answer${num}`);
+            if (el) el.style.display = 'block';
+        }
+
+        // Progress bar & active dot syncing on scroll
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+
+            // Update nav dots based on visible slide
+            const slides = getSlides();
+            slides.forEach((slide, index) => {
+                const rect = slide.getBoundingClientRect();
+                if (rect.top <= 100 && rect.bottom >= 100) {
+                    activeSlide = index;
+                    updateNavDots(index);
+                }
+            });
+        });
+
+        // Initialize
+        window.onload = () => {
+            drawGraph();
+            loadQuestion();
+            updateNavDots(0);
+            activeSlide = 0;
+        };
+    </script>
+</body>
+</html>
