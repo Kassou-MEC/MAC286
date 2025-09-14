@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arrays & OOP: The Epic Journey!</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary:#6366f1; --secondary:#8b5cf6; --accent:#ec4899; --success:#10b981;
+      --warning:#f59e0b; --danger:#ef4444; --dark:#1e293b; --light:#f8fafc;
+    }
+
+    body{
+      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+      background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);
+      min-height:100vh; color:#1e293b; overflow-x:hidden;
+    }
+
+    .container{max-width:1200px;margin:0 auto;padding:20px}
+    .slide{
+      min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+      align-items:center; padding:40px 20px; opacity:0; animation:fadeIn .8s forwards;
+    }
+    @keyframes fadeIn{to{opacity:1}}
+
+    .card{
+      background:rgba(255,255,255,.98); border-radius:25px; padding:40px;
+      box-shadow:0 25px 60px rgba(0,0,0,.2); width:100%; max-width:1000px; margin:20px 0;
+      backdrop-filter:blur(10px); animation:slideUp .6s ease-out;
+    }
+    @keyframes slideUp{from{transform:translateY(50px);opacity:0} to{transform:translateY(0);opacity:1}}
+
+    h1{
+      font-size:3.5em; background:linear-gradient(135deg,#6366f1,#8b5cf6,#ec4899);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-align:center; margin-bottom:30px; animation:glow 3s ease-in-out infinite;
+    }
+    @keyframes glow{0%,100%{filter:brightness(1)} 50%{filter:brightness(1.2)}}
+    h2{color:var(--primary); margin:30px 0 20px; font-size:2.2em}
+    h3{color:var(--secondary); margin:25px 0 15px; font-size:1.6em}
+
+    .code-block{
+      background:linear-gradient(135deg,#1e293b,#334155); color:#e2e8f0;
+      padding:25px; border-radius:15px; margin:20px 0; overflow-x:auto; position:relative;
+      font-family:'Courier New',monospace; font-size:14px; line-height:1.6;
+      box-shadow:0 10px 30px rgba(0,0,0,.3);
+    }
+    .code-block::before{
+      content:"Java"; position:absolute; top:8px; right:12px;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff; padding:4px 12px; border-radius:20px; font-size:.8em; font-weight:bold;
+    }
+    .keyword{color:#f472b6;font-weight:bold} .type{color:#60a5fa} .function{color:#fbbf24}
+    .comment{color:#94a3b8;font-style:italic} .string{color:#10b981} .number{color:#f59e0b}
+    .variable{color:#c084fc}
+
+    .btn{
+      background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; border:none;
+      padding:15px 35px; border-radius:50px; font-size:1.1em; font-weight:bold; cursor:pointer;
+      transition:.3s; margin:10px; box-shadow:0 5px 20px rgba(99,102,241,.3);
+    }
+    .btn:hover{transform:translateY(-3px) scale(1.05); box-shadow:0 10px 30px rgba(99,102,241,.5)}
+    .btn:active{transform:translateY(-1px)}
+
+    .fun-fact{
+      background:linear-gradient(135deg,#06b6d4,#3b82f6); color:#fff; padding:25px; border-radius:20px;
+      margin:25px 0; font-size:1.15em; position:relative; overflow:hidden;
+      box-shadow:0 10px 30px rgba(6,182,212,.3);
+    }
+    .fun-fact::before{
+      content:"💡"; position:absolute; font-size:80px; opacity:.15; right:20px; top:50%;
+      transform:translateY(-50%) rotate(-15deg);
+    }
+
+    .warning-box{
+      background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#fff; padding:20px; border-radius:15px; margin:20px 0;
+      position:relative; font-weight:500;
+    }
+    .warning-box::before{content:"⚠️"; font-size:1.5em; margin-right:10px}
+
+    .exercise-box{
+      background:linear-gradient(135deg,#f0f9ff,#e0f2fe); border-left:5px solid var(--primary);
+      padding:25px; margin:25px 0; border-radius:10px; position:relative;
+    }
+    .exercise-box::before{content:"💪"; position:absolute; font-size:30px; right:20px; top:20px; opacity:.5}
+
+    .array-visual{display:flex; justify-content:center; align-items:center; margin:30px 0; flex-wrap:wrap; gap:10px}
+    .array-element{
+      background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; width:60px; height:60px;
+      display:flex; align-items:center; justify-content:center; border-radius:15px; font-size:1.3em; font-weight:bold;
+      transition:.3s; cursor:pointer; position:relative; box-shadow:0 5px 15px rgba(99,102,241,.3);
+    }
+    .array-element:hover{transform:translateY(-5px) scale(1.1); box-shadow:0 10px 25px rgba(99,102,241,.5)}
+    .array-index{position:absolute; top:-25px; font-size:.8em; color:var(--dark); font-weight:normal}
+
+    .interactive-demo{
+      background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:20px; padding:30px; margin:30px 0; text-align:center;
+    }
+    .input-group{display:flex; justify-content:center; align-items:center; gap:15px; margin:20px 0; flex-wrap:wrap}
+    input[type="text"], input[type="number"]{
+      padding:12px 20px; border:2px solid var(--primary); border-radius:25px; font-size:1.1em; outline:none; transition:.3s;
+    }
+    input:focus{border-color:var(--secondary); box-shadow:0 0 0 3px rgba(139,92,246,.1)}
+
+    .quiz-option{
+      background:linear-gradient(135deg,#f3f4f6,#e5e7eb); padding:20px; margin:15px 0; border-radius:15px;
+      cursor:pointer; transition:.3s; border:3px solid transparent; font-size:1.1em;
+    }
+    .quiz-option:hover{background:linear-gradient(135deg,#e0e7ff,#c7d2fe); border-color:var(--primary); transform:translateX(10px)}
+    .quiz-option.selected{background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; border-color:var(--secondary)}
+    .quiz-option.correct{background:linear-gradient(135deg,var(--success),#059669); color:#fff; animation:pulse .5s}
+    .quiz-option.incorrect{background:linear-gradient(135deg,var(--danger),#dc2626); color:#fff; animation:shake .5s}
+    @keyframes pulse{0%,100%{transform:scale(1)} 50%{transform:scale(1.05)}}
+    @keyframes shake{0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)}}
+
+    .nav-dots{
+      position:fixed; right:30px; top:50%; transform:translateY(-50%); z-index:1000;
+    }
+    .dot{
+      width:15px; height:15px; border-radius:50%; background:rgba(255,255,255,.4); margin:12px 0; cursor:pointer;
+      transition:.3s; border:2px solid rgba(255,255,255,.6);
+    }
+    .dot:hover{transform:scale(1.3); background:rgba(255,255,255,.6)}
+    .dot.active{background:#fff; transform:scale(1.5); box-shadow:0 0 20px rgba(255,255,255,.8)}
+
+    .progress-bar{
+      position:fixed; top:0; left:0; height:5px;
+      background:linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899); transition:width .3s; z-index:1001;
+      box-shadow:0 2px 10px rgba(99,102,241,.5);
+    }
+
+    .answer-reveal{display:none; margin-top:20px; padding:20px; background:linear-gradient(135deg,#e0f2fe,#bae6fd); border-radius:15px; border-left:5px solid var(--success)}
+
+    .sorting-animation{display:flex; justify-content:center; align-items:flex-end; height:200px; margin:30px 0; gap:5px}
+    .bar{
+      background:linear-gradient(135deg,var(--primary),var(--secondary)); width:40px; transition:.3s; border-radius:5px 5px 0 0;
+      display:flex; align-items:flex-end; justify-content:center; color:#fff; font-weight:bold; padding-bottom:5px;
+    }
+    .bar.comparing{background:linear-gradient(135deg,var(--warning),#ea580c)}
+    .bar.sorted{background:linear-gradient(135deg,var(--success),#059669)}
+
+    @media (max-width:768px){
+      h1{font-size:2.5em} h2{font-size:1.8em} .card{padding:25px} .nav-dots{display:none}
+      .array-element{width:50px; height:50px; font-size:1.1em}
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Nav dots for 10 slides (0..9) -->
+  <div class="nav-dots" id="navDots">
+    <div class="dot active" onclick="scrollToSlide(0)"></div>
+    <div class="dot" onclick="scrollToSlide(1)"></div>
+    <div class="dot" onclick="scrollToSlide(2)"></div>
+    <div class="dot" onclick="scrollToSlide(3)"></div>
+    <div class="dot" onclick="scrollToSlide(4)"></div>
+    <div class="dot" onclick="scrollToSlide(5)"></div>
+    <div class="dot" onclick="scrollToSlide(6)"></div>
+    <div class="dot" onclick="scrollToSlide(7)"></div>
+    <div class="dot" onclick="scrollToSlide(8)"></div>
+    <div class="dot" onclick="scrollToSlide(9)"></div>
+  </div>
+
+  <div class="container">
+    <!-- Slide 0 -->
+    <section class="slide" id="slide0">
+      <div class="card">
+        <h1>🚀 Arrays & OOP Adventure</h1>
+        <h2 style="text-align:center;color:var(--secondary)">From Zero to Array Hero!</h2>
+
+        <div class="fun-fact">
+          <strong>Fun Fact:</strong> The word “array” comes from Old French “areer” — “to put in order.” Knights arrayed for battle; we array data for speed! ⚔️
+        </div>
+
+        <div class="array-visual" style="margin:40px 0" id="introArray">
+          <!-- populated by JS for nice click-fill effect -->
+        </div>
+
+        <div style="text-align:center;margin-top:40px">
+          <button class="btn" onclick="scrollToSlide(1)">Start the Journey! 🎮</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 1 -->
+    <section class="slide" id="slide1">
+      <div class="card">
+        <h1>📦 Array Basics</h1>
+
+        <h3>What is an Array?</h3>
+        <p style="font-size:1.15em;line-height:1.6">
+          An <strong>array</strong> is a container that holds a fixed number of values of a single type.
+          Think of it as a row of numbered boxes 📦 where each box holds one item of the same type.
+        </p>
+
+        <div class="fun-fact">
+          <strong>Why Arrays?</strong> O(1) random access to any element — like teleporting straight to any box! 🎯
+        </div>
+
+        <h3>Array Declaration & Initialization</h3>
+
+        <h4 style="color:var(--accent);margin-top:20px">Easy: Basic Declaration</h4>
+        <div class="code-block"><pre><code><span class="comment">// Method 1: Declare then initialize</span>
+<span class="type">int</span>[] numbers;
+numbers = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">5</span>]; <span class="comment">// 5 integers (all 0)</span>
+
+<span class="comment">// Method 2: Declare and initialize together</span>
+<span class="type">int</span>[] scores = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>];
+
+<span class="comment">// Method 3: With values</span>
+<span class="type">int</span>[] primes = {<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">11</span>};
+
+<span class="comment">// Method 4: Alternative syntax</span>
+<span class="type">int</span>[] ages = <span class="keyword">new</span> <span class="type">int</span>[] {<span class="number">21</span>,<span class="number">18</span>,<span class="number">25</span>,<span class="number">30</span>};
+</code></pre></div>
+
+        <h4 style="color:var(--accent);margin-top:20px">Medium: Different Types</h4>
+        <div class="code-block"><pre><code><span class="comment">// String array</span>
+<span class="type">String</span>[] names = {<span class="string">"Alice"</span>, <span class="string">"Bob"</span>, <span class="string">"Charlie"</span>};
+
+<span class="comment">// Double array</span>
+<span class="type">double</span>[] prices = <span class="keyword">new</span> <span class="type">double</span>[<span class="number">100</span>];
+
+<span class="comment">// Boolean array</span>
+<span class="type">boolean</span>[] flags = <span class="keyword">new</span> <span class="type">boolean</span>[<span class="number">8</span>];
+
+<span class="comment">// Character array</span>
+<span class="type">char</span>[] letters = <span class="string">"Hello"</span>.<span class="function">toCharArray</span>(); <span class="comment">// ['H','e','l','l','o']</span>
+</code></pre></div>
+
+        <h4 style="color:var(--accent);margin-top:20px">Hard: Multi-dimensional Arrays</h4>
+        <div class="code-block"><pre><code><span class="comment">// 2D array (matrix)</span>
+<span class="type">int</span>[][] matrix = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">3</span>][<span class="number">4</span>];
+
+<span class="comment">// Initialize 2D array</span>
+<span class="type">int</span>[][] grid = {
+  {<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>},
+  {<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>},
+  {<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>}
+};
+
+<span class="comment">// Jagged array</span>
+<span class="type">int</span>[][] jagged = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">3</span>][];
+jagged[<span class="number">0</span>] = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">5</span>];
+jagged[<span class="number">1</span>] = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">3</span>];
+jagged[<span class="number">2</span>] = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">4</span>];
+
+<span class="comment">// 3D array</span>
+<span class="type">int</span>[][][] cube = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">2</span>][<span class="number">3</span>][<span class="number">4</span>];
+</code></pre></div>
+
+        <div class="warning-box"><strong>Common Pitfall:</strong> Arrays are fixed-size. Need resizing? Use <code>ArrayList</code>.</div>
+
+        <button class="btn" onclick="scrollToSlide(2)">Explore Array Operations →</button>
+      </div>
+    </section>
+
+    <!-- Slide 2 -->
+    <section class="slide" id="slide2">
+      <div class="card">
+        <h1>⚙️ Array Operations</h1>
+
+        <h2>Essential Array Operations</h2>
+        <div class="interactive-demo">
+          <h3>🎮 Interactive Array Demo</h3>
+          <div id="demoArray" class="array-visual"></div>
+          <div class="input-group">
+            <input type="number" id="arrayValue" placeholder="Enter value" min="0" max="99">
+            <input type="number" id="arrayIndex" placeholder="Enter index" min="0" max="4">
+            <button class="btn" onclick="updateArray()">Update</button>
+            <button class="btn" onclick="resetArray()">Reset</button>
+          </div>
+        </div>
+
+        <h3>Easy: Basic Operations</h3>
+        <div class="code-block"><pre><code><span class="type">int</span>[] arr = {<span class="number">10</span>,<span class="number">20</span>,<span class="number">30</span>,<span class="number">40</span>,<span class="number">50</span>};
+
+<span class="comment">// 1. Access</span>
+<span class="type">int</span> first = arr[<span class="number">0</span>];
+<span class="type">int</span> last  = arr[arr.length - <span class="number">1</span>];
+
+<span class="comment">// 2. Modify</span>
+arr[<span class="number">2</span>] = <span class="number">35</span>;
+
+<span class="comment">// 3. Length</span>
+<span class="type">int</span> size = arr.length;
+
+<span class="comment">// 4. Loop</span>
+<span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span>; i&lt;arr.length; i++){
+  System.out.<span class="function">println</span>(<span class="string">"Index "</span>+i+<span class="string">": "</span>+arr[i]);
+}
+
+<span class="comment">// 5. Enhanced for</span>
+<span class="keyword">for</span> (<span class="type">int</span> num : arr){
+  System.out.<span class="function">println</span>(num);
+}
+</code></pre></div>
+
+        <h3>Medium: Common Algorithms</h3>
+        <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ArrayOperations</span>{
+
+  <span class="comment">// Max</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">findMax</span>(<span class="type">int</span>[] arr){
+    <span class="type">int</span> max = arr[<span class="number">0</span>];
+    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;arr.length; i++){
+      <span class="keyword">if</span>(arr[i] &gt; max) max = arr[i];
+    }
+    <span class="keyword">return</span> max;
+  }
+
+  <span class="comment">// Sum</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">sum</span>(<span class="type">int</span>[] arr){
+    <span class="type">int</span> total = <span class="number">0</span>;
+    <span class="keyword">for</span>(<span class="type">int</span> v : arr) total += v;
+    <span class="keyword">return</span> total;
+  }
+
+  <span class="comment">// Reverse in-place</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="function">reverse</span>(<span class="type">int</span>[] arr){
+    <span class="type">int</span> i=<span class="number">0</span>, j=arr.length-<span class="number">1</span>;
+    <span class="keyword">while</span>(i&lt;j){
+      <span class="type">int</span> t = arr[i]; arr[i]=arr[j]; arr[j]=t; i++; j--;
+    }
+  }
+}
+</code></pre></div>
+
+        <h3>Hard: Advanced Operations</h3>
+        <div class="code-block"><pre><code><span class="comment">// Rotate right by k</span>
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="function">rotateRight</span>(<span class="type">int</span>[] a, <span class="type">int</span> k){
+  k %= a.length;
+  <span class="function">rev</span>(a,<span class="number">0</span>,a.length-<span class="number">1</span>);
+  <span class="function">rev</span>(a,<span class="number">0</span>,k-<span class="number">1</span>);
+  <span class="function">rev</span>(a,k,a.length-<span class="number">1</span>);
+}
+<span class="keyword">private</span> <span class="keyword">static</span> <span class="type">void</span> <span class="function">rev</span>(<span class="type">int</span>[] a,<span class="type">int</span> i,<span class="type">int</span> j){
+  <span class="keyword">while</span>(i&lt;j){<span class="type">int</span> t=a[i]; a[i]=a[j]; a[j]=t; i++; j--;}
+}
+
+<span class="comment">// Pairs with sum (indices)</span>
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">List</span>&lt;<span class="type">int</span>[]&gt; <span class="function">findPairsWithSum</span>(<span class="type">int</span>[] arr, <span class="type">int</span> target){
+  <span class="type">List</span>&lt;<span class="type">int</span>[]&gt; res = <span class="keyword">new</span> <span class="type">ArrayList</span>&lt;&gt;();
+  <span class="type">Map</span>&lt;<span class="type">Integer</span>,<span class="type">Integer</span>&gt; seen = <span class="keyword">new</span> <span class="type">HashMap</span>&lt;&gt;();
+  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;arr.length; i++){
+    <span class="type">int</span> c = target - arr[i];
+    <span class="keyword">if</span>(seen.<span class="function">containsKey</span>(c)) res.<span class="function">add</span>(<span class="keyword">new</span> <span class="type">int</span>[]{seen.<span class="function">get</span>(c), i});
+    seen.<span class="function">put</span>(arr[i], i);
+  }
+  <span class="keyword">return</span> res;
+}
+
+<span class="comment">// Kadane</span>
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">maxSubarraySum</span>(<span class="type">int</span>[] a){
+  <span class="type">int</span> best=a[<span class="number">0</span>], cur=a[<span class="number">0</span>];
+  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;a.length; i++){
+    cur = Math.<span class="function">max</span>(a[i], cur+a[i]);
+    best = Math.<span class="function">max</span>(best, cur);
+  }
+  <span class="keyword">return</span> best;
+}
+</code></pre></div>
+
+        <div class="exercise-box">
+          <strong>Exercise:</strong> Write a method to find the second largest element in an array.
+          <button class="btn" onclick="toggleAnswer(1)">Show Solution</button>
+          <div id="answer1" class="answer-reveal">
+            <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">findSecondLargest</span>(<span class="type">int</span>[] a){
+  <span class="keyword">if</span>(a.length&lt;<span class="number">2</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">IllegalArgumentException</span>(<span class="string">"Need 2+"</span>);
+  <span class="type">int</span> max = <span class="type">Integer</span>.MIN_VALUE, second = <span class="type">Integer</span>.MIN_VALUE;
+  <span class="keyword">for</span>(<span class="type">int</span> v : a){
+    <span class="keyword">if</span>(v &gt; max){second = max; max = v;}
+    <span class="keyword">else</span> <span class="keyword">if</span>(v &gt; second && v != max){second = v;}
+  }
+  <span class="keyword">return</span> second;
+}
+</code></pre></div>
+          </div>
+        </div>
+
+        <button class="btn" onclick="scrollToSlide(3)">Arrays with OOP →</button>
+      </div>
+    </section>
+
+    <!-- Slide 3 -->
+    <section class="slide" id="slide3">
+      <div class="card">
+        <h1>🎭 Arrays and OOP</h1>
+
+        <h2>Arrays of Objects</h2>
+        <p style="font-size:1.15em">Arrays can hold <em>object references</em>, not just primitives — powerful for modeling complex data!</p>
+
+        <div class="fun-fact"><strong>Pro Tip:</strong> Arrays of objects are arrays of <em>references</em>. The objects themselves live on the heap 🏠.</div>
+
+        <h3>Easy: Creating Object Arrays</h3>
+        <div class="code-block"><pre><code><span class="comment">// Simple Student class</span>
+<span class="keyword">class</span> <span class="type">Student</span>{
+  <span class="keyword">private</span> <span class="type">String</span> name; <span class="keyword">private</span> <span class="type">int</span> grade;
+  <span class="keyword">public</span> <span class="function">Student</span>(<span class="type">String</span> n,<span class="type">int</span> g){<span class="keyword">this</span>.name=n; <span class="keyword">this</span>.grade=g;}
+  <span class="keyword">public</span> <span class="type">String</span> <span class="function">getName</span>(){<span class="keyword">return</span> name;}
+  <span class="keyword">public</span> <span class="type">int</span> <span class="function">getGrade</span>(){<span class="keyword">return</span> grade;}
+}
+
+<span class="comment">// Creating array of Students</span>
+<span class="type">Student</span>[] classroom = <span class="keyword">new</span> <span class="type">Student</span>[<span class="number">5</span>]; <span class="comment">// [null,null,null,null,null]</span>
+
+<span class="comment">// Initialize elements</span>
+classroom[<span class="number">0</span>] = <span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"Alice"</span>,<span class="number">95</span>);
+classroom[<span class="number">1</span>] = <span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"Bob"</span>,<span class="number">87</span>);
+classroom[<span class="number">2</span>] = <span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"Charlie"</span>,<span class="number">92</span>);
+
+<span class="comment">// Alternative</span>
+<span class="type">Student</span>[] top = {
+  <span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"Diana"</span>,<span class="number">98</span>),
+  <span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"Eve"</span>,<span class="number">96</span>),
+  <span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"Frank"</span>,<span class="number">94</span>)
+};
+</code></pre></div>
+
+        <h3>Medium: Managing Object Arrays</h3>
+        <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">Library</span>{
+  <span class="keyword">private</span> <span class="type">Book</span>[] books; <span class="keyword">private</span> <span class="type">int</span> count;
+  <span class="keyword">public</span> <span class="function">Library</span>(<span class="type">int</span> cap){books=<span class="keyword">new</span> <span class="type">Book</span>[cap]; count=<span class="number">0</span>;}
+
+  <span class="keyword">public</span> <span class="type">boolean</span> <span class="function">addBook</span>(<span class="type">Book</span> b){
+    <span class="keyword">if</span>(count&lt;books.length){books[count++]=b; <span class="keyword">return</span> <span class="keyword">true</span>;}
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+  }
+
+  <span class="keyword">public</span> <span class="type">Book</span> <span class="function">findBook</span>(<span class="type">String</span> title){
+    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;count; i++)
+      <span class="keyword">if</span>(books[i].<span class="function">getTitle</span>().<span class="function">equals</span>(title)) <span class="keyword">return</span> books[i];
+    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+
+  <span class="keyword">public</span> <span class="type">boolean</span> <span class="function">removeBook</span>(<span class="type">String</span> title){
+    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;count; i++){
+      <span class="keyword">if</span>(books[i].<span class="function">getTitle</span>().<span class="function">equals</span>(title)){
+        <span class="keyword">for</span>(<span class="type">int</span> j=i; j&lt;count-<span class="number">1</span>; j++) books[j]=books[j+<span class="number">1</span>];
+        books[--count]=<span class="keyword">null</span>; <span class="keyword">return</span> <span class="keyword">true</span>;
+      }
+    }
+    <span class="keyword">return</span> <span class="keyword">false</span>;
+  }
+}
+</code></pre></div>
+
+        <h3>Hard: Polymorphism with Arrays</h3>
+        <div class="code-block"><pre><code><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="type">Shape</span>{
+  <span class="keyword">protected</span> <span class="type">String</span> color;
+  <span class="keyword">public</span> <span class="function">Shape</span>(<span class="type">String</span> c){<span class="keyword">this</span>.color=c;}
+  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="type">double</span> <span class="function">area</span>();
+  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="type">double</span> <span class="function">perimeter</span>();
+}
+<span class="keyword">class</span> <span class="type">Circle</span> <span class="keyword">extends</span> <span class="type">Shape</span>{
+  <span class="keyword">private</span> <span class="type">double</span> r;
+  <span class="keyword">public</span> <span class="function">Circle</span>(<span class="type">String</span> c,<span class="type">double</span> r){<span class="keyword">super</span>(c); <span class="keyword">this</span>.r=r;}
+  <span class="keyword">public</span> <span class="type">double</span> <span class="function">area</span>(){<span class="keyword">return</span> Math.PI*r*r;}
+  <span class="keyword">public</span> <span class="type">double</span> <span class="function">perimeter</span>(){<span class="keyword">return</span> <span class="number">2</span>*Math.PI*r;}
+}
+<span class="keyword">class</span> <span class="type">Rectangle</span> <span class="keyword">extends</span> <span class="type">Shape</span>{
+  <span class="keyword">private</span> <span class="type">double</span> w,h;
+  <span class="keyword">public</span> <span class="function">Rectangle</span>(<span class="type">String</span> c,<span class="type">double</span> w,<span class="type">double</span> h){<span class="keyword">super</span>(c); <span class="keyword">this</span>.w=w; <span class="keyword">this</span>.h=h;}
+  <span class="keyword">public</span> <span class="type">double</span> <span class="function">area</span>(){<span class="keyword">return</span> w*h;}
+  <span class="keyword">public</span> <span class="type">double</span> <span class="function">perimeter</span>(){<span class="keyword">return</span> <span class="number">2</span>*(w+h);}
+}
+</code></pre></div>
+
+        <div class="warning-box"><strong>Remember:</strong> For arrays of objects, initialize each element before use to avoid <code>NullPointerException</code>.</div>
+
+        <button class="btn" onclick="scrollToSlide(4)">Ordered Arrays →</button>
+      </div>
+    </section>
+
+    <!-- Slide 4 -->
+    <section class="slide" id="slide4">
+      <div class="card">
+        <h1>📊 Ordered Arrays</h1>
+
+        <h2>Sorted Arrays: The Power of Order!</h2>
+        <p style="font-size:1.15em">Sorted arrays enable binary search, easier deduplication, range queries, and more.</p>
+
+        <div class="fun-fact"><strong>Did you know?</strong> Binary search was described in 1946, but a bug-free version didn’t appear in print until 1962. It’s subtle! 🐛</div>
+
+        <h3>Sorting Visualization</h3>
+        <div class="sorting-animation" id="sortingBars"></div>
+        <div style="text-align:center">
+          <button class="btn" onclick="animateSort()">Animate Bubble Sort</button>
+          <button class="btn" onclick="resetBars()">Reset</button>
+        </div>
+
+        <h3>Easy: Basic Sorting</h3>
+        <div class="code-block"><pre><code><span class="keyword">import</span> java.util.Arrays;
+
+<span class="type">int</span>[] numbers = {<span class="number">64</span>,<span class="number">34</span>,<span class="number">25</span>,<span class="number">12</span>,<span class="number">22</span>,<span class="number">11</span>,<span class="number">90</span>};
+Arrays.<span class="function">sort</span>(numbers); <span class="comment">// [11,12,22,25,34,64,90]</span>
+
+<span class="type">int</span>[] arr = {<span class="number">5</span>,<span class="number">2</span>,<span class="number">8</span>,<span class="number">1</span>,<span class="number">9</span>,<span class="number">3</span>};
+Arrays.<span class="function">sort</span>(arr,<span class="number">1</span>,<span class="number">4</span>); <span class="comment">// sort indices 1-3</span>
+
+<span class="type">Integer</span>[] nums = {<span class="number">5</span>,<span class="number">2</span>,<span class="number">8</span>,<span class="number">1</span>,<span class="number">9</span>};
+Arrays.<span class="function">sort</span>(nums, java.util.Collections.<span class="function">reverseOrder</span>());
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="function">isSorted</span>(<span class="type">int</span>[] a){
+  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;a.length; i++) <span class="keyword">if</span>(a[i] &lt; a[i-<span class="number">1</span>]) <span class="keyword">return</span> <span class="keyword">false</span>;
+  <span class="keyword">return</span> <span class="keyword">true</span>;
+}
+</code></pre></div>
+
+        <h3>Medium: Binary Search</h3>
+        <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">binarySearch</span>(<span class="type">int</span>[] a,<span class="type">int</span> target){
+  <span class="type">int</span> L=<span class="number">0</span>, R=a.length-<span class="number">1</span>;
+  <span class="keyword">while</span>(L &lt;= R){
+    <span class="type">int</span> m = L + (R-L)/<span class="number">2</span>;
+    <span class="keyword">if</span>(a[m]==target) <span class="keyword">return</span> m;
+    <span class="keyword">else</span> <span class="keyword">if</span>(a[m] &lt; target) L = m+<span class="number">1</span>;
+    <span class="keyword">else</span> R = m-<span class="number">1</span>;
+  }
+  <span class="keyword">return</span> -<span class="number">1</span>;
+}
+</code></pre></div>
+
+        <h3>Hard: Advanced Sorted Array Ops</h3>
+        <div class="code-block"><pre><code><span class="comment">// Find first occurrence</span>
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">findFirst</span>(<span class="type">int</span>[] a,<span class="type">int</span> x){
+  <span class="type">int</span> ans=-<span class="number">1</span>,L=<span class="number">0</span>,R=a.length-<span class="number">1</span>;
+  <span class="keyword">while</span>(L&lt;=R){
+    <span class="type">int</span> m=L+(R-L)/<span class="number">2</span>;
+    <span class="keyword">if</span>(a[m]==x){ans=m; R=m-<span class="number">1</span>;}
+    <span class="keyword">else</span> <span class="keyword">if</span>(a[m] &lt; x) L=m+<span class="number">1</span>; <span class="keyword">else</span> R=m-<span class="number">1</span>;
+  } <span class="keyword">return</span> ans;
+}
+<span class="comment">// Find insertion position</span>
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">findInsertPosition</span>(<span class="type">int</span>[] a,<span class="type">int</span> x){
+  <span class="type">int</span> L=<span class="number">0</span>,R=a.length;
+  <span class="keyword">while</span>(L&lt;R){
+    <span class="type">int</span> m=L+(R-L)/<span class="number">2</span>;
+    <span class="keyword">if</span>(a[m] &lt; x) L=m+<span class="number">1</span>; <span class="keyword">else</span> R=m;
+  } <span class="keyword">return</span> L;
+}
+</code></pre></div>
+
+        <div class="exercise-box">
+          <strong>Challenge:</strong> Count occurrences of a target in a sorted array using binary search.
+          <button class="btn" onclick="toggleAnswer(2)">Show Solution</button>
+          <div id="answer2" class="answer-reveal">
+            <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">countOccurrences</span>(<span class="type">int</span>[] a,<span class="type">int</span> x){
+  <span class="type">int</span> first = <span class="function">findFirst</span>(a,x);
+  <span class="keyword">if</span>(first==-<span class="number">1</span>) <span class="keyword">return</span> <span class="number">0</span>;
+  <span class="type">int</span> L=<span class="number">0</span>,R=a.length-<span class="number">1</span>, last=-<span class="number">1</span>;
+  <span class="keyword">while</span>(L&lt;=R){
+    <span class="type">int</span> m=L+(R-L)/<span class="number">2</span>;
+    <span class="keyword">if</span>(a[m]==x){last=m; L=m+<span class="number">1</span>;}
+    <span class="keyword">else</span> <span class="keyword">if</span>(a[m] &lt; x) L=m+<span class="number">1</span>; <span class="keyword">else</span> R=m-<span class="number">1</span>;
+  }
+  <span class="keyword">return</span> last-first+<span class="number">1</span>;
+}
+</code></pre></div>
+          </div>
+        </div>
+
+        <button class="btn" onclick="scrollToSlide(5)">Sorting Algorithms →</button>
+      </div>
+    </section>
+
+    <!-- Slide 5 -->
+    <section class="slide" id="slide5">
+      <div class="card">
+        <h1>🔄 Sorting Algorithms</h1>
+
+        <h2>The Art of Ordering</h2>
+        <div class="fun-fact"><strong>Sorting Humor:</strong> Tried bubble sort to fix a problem, now you have O(n²) problems 😄</div>
+
+        <h3>Sorting Algorithm Comparison</h3>
+        <table style="width:100%;margin:20px 0;border-collapse:collapse">
+          <thead>
+          <tr style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff">
+            <th style="padding:15px;border:1px solid #ddd">Algorithm</th>
+            <th style="padding:15px;border:1px solid #ddd">Best</th>
+            <th style="padding:15px;border:1px solid #ddd">Average</th>
+            <th style="padding:15px;border:1px solid #ddd">Worst</th>
+            <th style="padding:15px;border:1px solid #ddd">Space</th>
+            <th style="padding:15px;border:1px solid #ddd">Stable?</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr style="background:#f9fafb"><td style="padding:15px;border:1px solid #ddd">Bubble</td><td style="padding:15px;border:1px solid #ddd">O(n)</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(1)</td><td style="padding:15px;border:1px solid #ddd">Yes</td></tr>
+          <tr><td style="padding:15px;border:1px solid #ddd">Selection</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(1)</td><td style="padding:15px;border:1px solid #ddd">No</td></tr>
+          <tr style="background:#f9fafb"><td style="padding:15px;border:1px solid #ddd">Insertion</td><td style="padding:15px;border:1px solid #ddd">O(n)</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(1)</td><td style="padding:15px;border:1px solid #ddd">Yes</td></tr>
+          <tr><td style="padding:15px;border:1px solid #ddd">Merge</td><td style="padding:15px;border:1px solid #ddd">O(n log n)</td><td style="padding:15px;border:1px solid #ddd">O(n log n)</td><td style="padding:15px;border:1px solid #ddd">O(n log n)</td><td style="padding:15px;border:1px solid #ddd">O(n)</td><td style="padding:15px;border:1px solid #ddd">Yes</td></tr>
+          <tr style="background:#f9fafb"><td style="padding:15px;border:1px solid #ddd">Quick</td><td style="padding:15px;border:1px solid #ddd">O(n log n)</td><td style="padding:15px;border:1px solid #ddd">O(n log n)</td><td style="padding:15px;border:1px solid #ddd">O(n²)</td><td style="padding:15px;border:1px solid #ddd">O(log n)</td><td style="padding:15px;border:1px solid #ddd">No</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Implementation Examples</h3>
+        <div class="code-block"><pre><code><span class="comment">// Bubble (early termination)</span>
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="function">bubbleSort</span>(<span class="type">int</span>[] a){
+  <span class="type">int</span> n=a.length;
+  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;n-<span class="number">1</span>; i++){
+    <span class="type">boolean</span> swapped=<span class="keyword">false</span>;
+    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>; j&lt;n-i-<span class="number">1</span>; j++){
+      <span class="keyword">if</span>(a[j]&gt;a[j+<span class="number">1</span>]){
+        <span class="type">int</span> t=a[j]; a[j]=a[j+<span class="number">1</span>]; a[j+<span class="number">1</span>]=t; swapped=<span class="keyword">true</span>;
+      }
+    }
+    <span class="keyword">if</span>(!swapped) <span class="keyword">break</span>;
+  }
+}
+</code></pre></div>
+
+        <button class="btn" onclick="scrollToSlide(6)">Practice Time! →</button>
+      </div>
+    </section>
+
+    <!-- Slide 6 -->
+    <section class="slide" id="slide6">
+      <div class="card">
+        <h1>💪 Practice Problems</h1>
+        <h2>Test Your Skills!</h2>
+
+        <div class="exercise-box">
+          <h3>Problem 1: Two Sum</h3>
+          <p>Given an array and a target, return indices of two numbers that add to target.</p>
+          <div class="code-block"><pre><code><span class="comment">// Example: nums=[2,7,11,15], target=9 → [0,1]</span></code></pre></div>
+          <button class="btn" onclick="toggleAnswer(3)">Show Solution</button>
+          <div id="answer3" class="answer-reveal">
+            <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span>[] <span class="function">twoSum</span>(<span class="type">int</span>[] nums,<span class="type">int</span> target){
+  <span class="type">Map</span>&lt;<span class="type">Integer</span>,<span class="type">Integer</span>&gt; m=<span class="keyword">new</span> <span class="type">HashMap</span>&lt;&gt;();
+  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;nums.length; i++){
+    <span class="type">int</span> c=target-nums[i];
+    <span class="keyword">if</span>(m.<span class="function">containsKey</span>(c)) <span class="keyword">return</span> <span class="keyword">new</span> <span class="type">int</span>[]{m.<span class="function">get</span>(c), i};
+    m.<span class="function">put</span>(nums[i], i);
+  }
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="type">int</span>[<span class="number">0</span>];
+}
+</code></pre></div>
+          </div>
+        </div>
+
+        <div class="exercise-box">
+          <h3>Problem 2: Move Zeros</h3>
+          <p>Move all zeros to end while keeping order of non-zeros.</p>
+          <div class="code-block"><pre><code><span class="comment">// Example: [0,1,0,3,12] → [1,3,12,0,0]</span></code></pre></div>
+          <button class="btn" onclick="toggleAnswer(4)">Show Solution</button>
+          <div id="answer4" class="answer-reveal">
+            <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="function">moveZeros</span>(<span class="type">int</span>[] a){
+  <span class="type">int</span> w=<span class="number">0</span>;
+  <span class="keyword">for</span>(<span class="type">int</span> v: a) <span class="keyword">if</span>(v!=<span class="number">0</span>) a[w++]=v;
+  <span class="keyword">while</span>(w&lt;a.length) a[w++]=<span class="number">0</span>;
+}
+</code></pre></div>
+          </div>
+        </div>
+
+        <div class="exercise-box">
+          <h3>Problem 3: Missing Number</h3>
+          <p>Given n distinct numbers from 0..n, find the missing one.</p>
+          <div class="code-block"><pre><code><span class="comment">// Example: [3,0,1] → 2</span></code></pre></div>
+          <button class="btn" onclick="toggleAnswer(5)">Show Solution</button>
+          <div id="answer5" class="answer-reveal">
+            <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="function">missingNumber</span>(<span class="type">int</span>[] a){
+  <span class="type">int</span> n=a.length, expect=n*(n+<span class="number">1</span>)/<span class="number">2</span>, sum=<span class="number">0</span>;
+  <span class="keyword">for</span>(<span class="type">int</span> v:a) sum+=v;
+  <span class="keyword">return</span> expect-sum;
+}
+</code></pre></div>
+          </div>
+        </div>
+
+        <button class="btn" onclick="scrollToSlide(7)">More Challenges →</button>
+      </div>
+    </section>
+
+    <!-- Slide 7 -->
+    <section class="slide" id="slide7">
+      <div class="card">
+        <h1>🏆 Advanced Challenges</h1>
+
+        <div class="exercise-box">
+          <h3>Challenge 1: Product of Array Except Self</h3>
+          <p>Return array where each element is product of all others (no division, O(n)).</p>
+          <div class="code-block"><pre><code><span class="comment">// Example: [1,2,3,4] → [24,12,8,6]</span></code></pre></div>
+          <button class="btn" onclick="toggleAnswer(6)">Show Solution</button>
+          <div id="answer6" class="answer-reveal">
+            <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span>[] <span class="function">productExceptSelf</span>(<span class="type">int</span>[] a){
+  <span class="type">int</span> n=a.length; <span class="type">int</span>[] res=<span class="keyword">new</span> <span class="type">int</span>[n];
+  res[<span class="number">0</span>]=<span class="number">1</span>;
+  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;n; i++) res[i]=res[i-<span class="number">1</span>]*a[i-<span class="number">1</span>];
+  <span class="type">int</span> right=<span class="number">1</span>;
+  <span class="keyword">for</span>(<span class="type">int</span> i=n-<span class="number">1</span>; i&gt;=<span class="number">0</span>; i--){res[i]*=right; right*=a[i];}
+  <span class="keyword">return</span> res;
+}
+</code></pre></div>
+          </div>
+        </div>
+
+        <div class="exercise-box">
+          <h3>Challenge 2: 3Sum</h3>
+          <p>Find all unique triplets summing to zero.</p>
+          <div class="code-block"><pre><code><span class="comment">// Example: [-1,0,1,2,-1,-4] → [[-1,-1,2],[-1,0,1]]</span></code></pre></div>
+          <button class="btn" onclick="toggleAnswer(7)">Show Solution</button>
+          <div id="answer7" class="answer-reveal">
+            <div class="code-block"><pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">java.util.List</span>&lt;<span class="type">java.util.List</span>&lt;<span class="type">Integer</span>&gt;&gt; <span class="function">threeSum</span>(<span class="type">int</span>[] a){
+  java.util.List&lt;java.util.List&lt;Integer&gt;&gt; res=<span class="keyword">new</span> java.util.ArrayList&lt;&gt;();
+  java.util.Arrays.<span class="function">sort</span>(a);
+  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;a.length-<span class="number">2</span>; i++){
+    <span class="keyword">if</span>(i&gt;<span class="number">0</span> && a[i]==a[i-<span class="number">1</span>]) <span class="keyword">continue</span>;
+    <span class="type">int</span> L=i+<span class="number">1</span>, R=a.length-<span class="number">1</span>;
+    <span class="keyword">while</span>(L&lt;R){
+      <span class="type">int</span> s=a[i]+a[L]+a[R];
+      <span class="keyword">if</span>(s==<span class="number">0</span>){
+        res.<span class="function">add</span>(java.util.Arrays.<span class="function">asList</span>(a[i],a[L],a[R]));
+        <span class="keyword">while</span>(L&lt;R && a[L]==a[L+<span class="number">1</span>]) L++;
+        <span class="keyword">while</span>(L&lt;R && a[R]==a[R-<span class="number">1</span>]) R--;
+        L++; R--;
+      } <span class="keyword">else</span> <span class="keyword">if</span>(s&lt;<span class="number">0</span>) L++; <span class="keyword">else</span> R--;
+    }
+  } <span class="keyword">return</span> res;
+}
+</code></pre></div>
+          </div>
+        </div>
+
+        <button class="btn" onclick="scrollToSlide(8)">Final Quiz! 🎯</button>
+      </div>
+    </section>
+
+    <!-- Slide 8 -->
+    <section class="slide" id="slide8">
+      <div class="card">
+        <h1>🎯 Final Quiz!</h1>
+        <div id="quizContainer">
+          <div id="questionContainer"></div>
+          <div id="quizResult" style="display:none;text-align:center;margin-top:30px">
+            <h2 id="scoreDisplay"></h2>
+            <div id="scoreMessage" style="font-size:1.3em;margin:20px 0"></div>
+            <button class="btn" onclick="restartQuiz()">Try Again 🔄</button>
+            <button class="btn" onclick="scrollToSlide(0)">Back to Start</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 9 -->
+    <section class="slide" id="slide9">
+      <div class="card">
+        <h1>🎊 Congratulations!</h1>
+        <h2 style="text-align:center">You're Now an Array Master!</h2>
+
+        <div class="fun-fact">
+          <strong>What you've learned:</strong>
+          <ul style="list-style:none;padding:10px 0">
+            <li>✅ Array basics and declarations</li>
+            <li>✅ Array operations and algorithms</li>
+            <li>✅ Arrays with OOP and polymorphism</li>
+            <li>✅ Sorted arrays and binary search</li>
+            <li>✅ Sorting algorithms</li>
+            <li>✅ Advanced array techniques</li>
+          </ul>
+        </div>
+
+        <div style="text-align:center;margin:40px 0">
+          <h3 style="color:var(--accent)">Keep practicing and remember:</h3>
+          <p style="font-size:1.3em;margin:20px 0">“The master has failed more times than the beginner has tried.”</p>
+        </div>
+
+        <div style="text-align:center">
+          <button class="btn" onclick="scrollToSlide(0)">Start Over</button>
+          <button class="btn" onclick="scrollToSlide(8)">Take Quiz Again</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* ---------------------------
+       Utilities
+    ---------------------------- */
+    const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+    /* ---------------------------
+       Navigation & Progress
+    ---------------------------- */
+    function scrollToSlide(n){
+      const el = document.getElementById('slide'+n);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      setActiveDot(n);
+    }
+
+    function setActiveDot(index){
+      const dots = document.querySelectorAll('.nav-dots .dot');
+      dots.forEach((d,i)=>d.classList.toggle('active', i===index));
+    }
+
+    function updateProgressAndDots(){
+      const doc = document.documentElement;
+      const winScroll = document.body.scrollTop || doc.scrollTop;
+      const height = doc.scrollHeight - doc.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      const bar = document.getElementById('progressBar');
+      if(bar) bar.style.width = scrolled + '%';
+
+      // Activate the dot for the slide most centered in viewport
+      const slides = [...document.querySelectorAll('.slide')];
+      const centerY = window.innerHeight / 2;
+      let bestIdx = 0, bestDist = Infinity;
+      slides.forEach((s, i) => {
+        const rect = s.getBoundingClientRect();
+        const dist = Math.abs((rect.top + rect.bottom)/2 - centerY);
+        if(dist < bestDist){ bestDist = dist; bestIdx = i; }
+      });
+      setActiveDot(bestIdx);
+    }
+    window.addEventListener('scroll', updateProgressAndDots);
+
+    /* ---------------------------
+       Slide 0: Intro tiles
+    ---------------------------- */
+    function renderIntroArray(){
+      const arr = [42,17,88,23,99];
+      const host = document.getElementById('introArray');
+      host.innerHTML = '';
+      arr.forEach((v,i)=>{
+        const el = document.createElement('div');
+        el.className = 'array-element';
+        el.innerHTML = `<span class="array-index">[${i}]</span>${v}`;
+        host.appendChild(el);
+      });
+    }
+
+    /* ---------------------------
+       Slide 2: Interactive array
+    ---------------------------- */
+    let demoArray = [10,20,30,40,50];
+
+    function initDemoArray(){
+      updateDemoArrayDisplay();
+    }
+    function updateDemoArrayDisplay(){
+      const container = document.getElementById('demoArray');
+      if(!container) return;
+      container.innerHTML = '';
+      demoArray.forEach((value, index) => {
+        const element = document.createElement('div');
+        element.className = 'array-element';
+        element.innerHTML = `<span class="array-index">[${index}]</span>${value}`;
+        element.onclick = () => {
+          document.getElementById('arrayIndex').value = index;
+          document.getElementById('arrayValue').value = value;
+        };
+        container.appendChild(element);
+      });
+    }
+    function updateArray(){
+      const v = parseInt(document.getElementById('arrayValue').value, 10);
+      const i = parseInt(document.getElementById('arrayIndex').value, 10);
+      if(Number.isNaN(v) || Number.isNaN(i) || i<0 || i>=demoArray.length){
+        alert('Please enter valid values! Index must be 0–4.'); return;
+      }
+      demoArray[i] = v;
+      updateDemoArrayDisplay();
+    }
+    function resetArray(){
+      demoArray = [10,20,30,40,50];
+      updateDemoArrayDisplay();
+    }
+
+    /* ---------------------------
+       Slide 4: Sorting visualization
+    ---------------------------- */
+    let sortArray = [64,34,25,12,22,11,90];
+    let animating = false;
+
+    function initSortingBars(){
+      updateSortingDisplay();
+    }
+    function updateSortingDisplay(sortedUpto = -1, comparingA = -1, comparingB = -1){
+      const container = document.getElementById('sortingBars');
+      if(!container) return;
+      container.innerHTML = '';
+      const max = Math.max(...sortArray);
+      sortArray.forEach((value, index) => {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        if(index === comparingA || index === comparingB) bar.classList.add('comparing');
+        if(index > sortArray.length - 1 - sortedUpto && sortedUpto >= 0) bar.classList.add('sorted');
+        bar.style.height = `${(value / max) * 180}px`;
+        bar.textContent = value;
+        container.appendChild(bar);
+      });
+    }
+    async function animateSort(){
+      if(animating) return;
+      animating = true;
+      const n = sortArray.length;
+      let sortedUpto = 0;
+      for(let i=0;i<n-1;i++){
+        let swapped = false;
+        for(let j=0;j<n-i-1;j++){
+          updateSortingDisplay(i, j, j+1);
+          await sleep(350);
+          if(sortArray[j] > sortArray[j+1]){
+            const t = sortArray[j]; sortArray[j] = sortArray[j+1]; sortArray[j+1] = t;
+            swapped = true;
+            updateSortingDisplay(i, j, j+1);
+            await sleep(200);
+          }
+        }
+        sortedUpto = i+1; // one more element is in place at the end
+        updateSortingDisplay(i);
+        if(!swapped) break; // already sorted
+      }
+      // Final render: mark all as sorted
+      updateSortingDisplay(sortArray.length);
+      animating = false;
+    }
+    function resetBars(){
+      if(animating) return;
+      sortArray = [64,34,25,12,22,11,90];
+      updateSortingDisplay();
+    }
+
+    /* ---------------------------
+       Answers toggler (Exercises)
+    ---------------------------- */
+    function toggleAnswer(n){
+      const el = document.getElementById('answer'+n);
+      if(!el) return;
+      el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    /* ---------------------------
+       Slide 8: Quiz
+    ---------------------------- */
+    const quizQuestions = [
+      { question: "Accessing arr[i] is:", options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"], correct: 0 },
+      { question: "Binary search requires the array to be:", options: ["Unsorted", "Sorted", "Unique only", "All positive"], correct: 1 },
+      { question: "Insert at index 0 in an array of size n is:", options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"], correct: 2 },
+      { question: "Arrays of objects store:", options: ["Objects inline", "References to objects", "Bytecode", "Nothing until compiled"], correct: 1 },
+      { question: "Best average-case sorting bound (comparison based):", options: ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"], correct: 1 },
+      { question: "Kadane’s algorithm computes:", options: ["Min element", "Max subarray sum", "Median", "Product of array"], correct: 1 },
+      { question: "Array length in Java is:", options: ["Method .length()", "Field .length", "Function length()", "Property size"], correct: 1 },
+      { question: "Arrays are:", options: ["Resizable by default", "Fixed-size", "Linked lists", "Hash tables"], correct: 1 }
+    ];
+    let currentQuestion = 0, score = 0, selectedAnswer = -1;
+
+    function loadQuestion(){
+      const qc = document.getElementById('questionContainer');
+      const qr = document.getElementById('quizResult');
+      if(currentQuestion >= quizQuestions.length){
+        qc.style.display = 'none';
+        qr.style.display = 'block';
+        const pct = Math.round(100 * score / quizQuestions.length);
+        document.getElementById('scoreDisplay').textContent = `Your Score: ${score}/${quizQuestions.length} (${pct}%)`;
+        document.getElementById('scoreMessage').textContent = pct>=80 ? "🎉 Excellent! Array ace!" : (pct>=60 ? "👏 Good job! Keep going!" : "📚 Practice time—review ordered arrays & binary search.");
+        return;
+      }
+      qr.style.display = 'none';
+      qc.style.display = 'block';
+
+      const q = quizQuestions[currentQuestion];
+      let html = `<h2>Question ${currentQuestion+1} of ${quizQuestions.length}</h2>
+                  <p style="font-size:1.2em;margin:20px 0">${q.question}</p>`;
+      q.options.forEach((opt, idx) => {
+        html += `<div class="quiz-option" id="opt${idx}" onclick="selectAnswer(${idx})">${opt}</div>`;
+      });
+      html += `<div style="text-align:center;margin-top:30px"><button class="btn" onclick="checkAnswer()">Submit Answer</button></div>`;
+      qc.innerHTML = html;
+      selectedAnswer = -1;
+    }
+    function selectAnswer(i){
+      for(let k=0;k<4;k++){
+        const el = document.getElementById('opt'+k);
+        if(el) el.classList.remove('selected','correct','incorrect');
+      }
+      const el = document.getElementById('opt'+i);
+      if(el) el.classList.add('selected');
+      selectedAnswer = i;
+    }
+    function checkAnswer(){
+      if(selectedAnswer === -1){ alert('Please select an answer!'); return; }
+      const correct = quizQuestions[currentQuestion].correct;
+      const chosen = document.getElementById('opt'+selectedAnswer);
+      const right  = document.getElementById('opt'+correct);
+      if(chosen) chosen.classList.add(selectedAnswer===correct ? 'correct' : 'incorrect');
+      if(right && right !== chosen) right.classList.add('correct');
+      if(selectedAnswer === correct) score++;
+      setTimeout(()=>{ currentQuestion++; loadQuestion(); }, 900);
+    }
+    function restartQuiz(){
+      currentQuestion = 0; score = 0; selectedAnswer = -1; loadQuestion();
+    }
+
+    /* ---------------------------
+       Initialize page
+    ---------------------------- */
+    function init(){
+      renderIntroArray();
+      initDemoArray();
+      initSortingBars();
+      restartQuiz();              // ensure quiz is ready
+      updateProgressAndDots();    // set initial progress & active dot
+    }
+    window.onload = init;
+  </script>
+</body>
+</html>
