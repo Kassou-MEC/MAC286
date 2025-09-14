@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Arrays &amp; OOP in Java — Multi-Page Guide (Explained)</title>
+
+  <!-- Prism (reliable syntax highlighting) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-okaidia.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-core.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-clike.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-java.min.js"></script>
+
+  <style>
+    :root{
+      --bg: #0f172a;
+      --panel: #0b1224;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --primary: #6366f1;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --ring: rgba(99,102,241,.35);
+      --card: linear-gradient(135deg, #0f172a 0%, #111c36 60%, #102247 100%);
+      --shadow: 0 10px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    }
+    html, body {
+      height: 100%;
+      background:
+        radial-gradient(1200px 600px at -10% -20%, #172554 0%, transparent 60%),
+        radial-gradient(1000px 600px at 120% -10%, #2e1065 0%, transparent 55%),
+        radial-gradient(900px 600px at 50% 110%, #083344 0%, transparent 60%),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+
+    /* Top nav */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: saturate(1.2) blur(10px);
+      background: rgba(10, 12, 24, .6);
+      border-bottom: 1px solid rgba(148,163,184,.15);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+    .brand {
+      font-weight: 800;
+      letter-spacing: .4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 18px;
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .nav-links a {
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #cbd5e1;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: .2s ease;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .nav-links a:hover {
+      border-color: rgba(148,163,184,.35);
+      background: rgba(148,163,184,.08);
+    }
+    .nav-links a.active {
+      color: white;
+      border-color: var(--ring);
+      background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(139,92,246,.18));
+      box-shadow: 0 0 0 4px rgba(99,102,241,.08);
+    }
+
+    /* Layout */
+    .wrap {
+      max-width: 1100px;
+      margin: 28px auto 80px;
+      padding: 0 20px;
+    }
+    .page {
+      display: none;
+      animation: fade .35s ease;
+    }
+    .page.active { display: block; }
+    @keyframes fade { from {opacity: .6; transform: translateY(6px)} to {opacity: 1; transform: none} }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(148,163,184,.15);
+    }
+    h1 {
+      font-size: 32px;
+      line-height: 1.15;
+      margin: 0 0 10px;
+      letter-spacing: .2px;
+    }
+    h2 { font-size: 22px; margin: 20px 0 8px; color: #dbeafe; }
+    h3 { font-size: 18px; margin: 16px 0 6px; color: #c7d2fe; }
+    p, li { color: #cbd5e1; }
+    .lead { color: #e2e8f0; font-size: 18px; }
+    .muted { color: var(--muted); }
+
+    .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .btn {
+      appearance: none;
+      cursor: pointer;
+      border: 1px solid rgba(148,163,184,.28);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #e5e7eb;
+      background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(139,92,246,.18));
+      transition: .2s ease;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.25); }
+    .btn.secondary { background: rgba(148,163,184,.06); }
+    .next-prev {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .def, .tip, .warn, .explain {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-radius: 10px;
+    }
+    .def  { border-left: 3px solid var(--primary);
+            background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); }
+    .tip  { border-left: 3px solid var(--success);
+            background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.06)); }
+    .warn { border-left: 3px solid var(--warning);
+            background: linear-gradient(135deg, rgba(245,158,11,.10), rgba(251,191,36,.06)); }
+    .explain { border-left: 3px solid #22d3ee;
+               background: linear-gradient(135deg, rgba(34,211,238,.10), rgba(59,130,246,.06)); }
+
+    /* Code blocks */
+    .code-block {
+      position: relative;
+      margin: 14px 0 10px;
+      background: #0b1224;
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 28px rgba(0,0,0,.3);
+    }
+    .code-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.10));
+      color: #c7d2fe;
+      border-bottom: 1px solid rgba(148,163,184,.16);
+    }
+    .lang-pill {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(99,102,241,.18);
+      border: 1px solid rgba(99,102,241,.35);
+      color: #e0e7ff;
+    }
+    .copy-btn {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(148,163,184,.28);
+      color: #e5e7eb;
+      background: rgba(148,163,184,.06);
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .copy-btn:hover { background: rgba(148,163,184,.12); }
+    .copied { background: rgba(16,185,129,.15) !important; border-color: rgba(16,185,129,.5) !important; color: #bbf7d0 !important; }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      max-width: 100%;
+    }
+    code[class*="language-"] {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      tab-size: 4;
+      white-space: pre;
+    }
+
+    /* Demos */
+    .array-visual {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 10px;
+      margin: 14px 0 10px;
+    }
+    .cell {
+      background: linear-gradient(135deg, rgba(99,102,241,.14), rgba(139,92,246,.14));
+      border: 1px solid rgba(148,163,184,.25);
+      border-radius: 12px;
+      text-align: center;
+      padding: 16px 8px;
+      font-weight: 800;
+      color: #e2e8f0;
+      position: relative;
+    }
+    .idx {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .inputs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .inputs input {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,.35);
+      background: rgba(148,163,184,.06);
+      color: #e5e7eb;
+      outline: none;
+    }
+    .inputs input:focus { box-shadow: 0 0 0 4px rgba(99,102,241,.18); border-color: var(--ring); }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { border: 1px solid rgba(148,163,184,.18); padding: 10px 12px; }
+    thead th {
+      background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(139,92,246,.18));
+      color: #e0e7ff;
+      text-align: left;
+    }
+    tbody tr:nth-child(odd) { background: rgba(148,163,184,.05); }
+
+    /* Quiz */
+    .quiz-option {
+      margin: 10px 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(148,163,184,.06);
+      border: 1px solid rgba(148,163,184,.25);
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .quiz-option:hover { background: rgba(148,163,184,.12); }
+    .quiz-option.selected { border-color: var(--primary); background: rgba(99,102,241,.18); }
+    .quiz-option.correct { border-color: rgba(16,185,129,.7); background: rgba(16,185,129,.15); }
+    .quiz-option.incorrect { border-color: rgba(239,68,68,.7); background: rgba(239,68,68,.15); }
+    .quiz-meta { color: var(--muted); font-size: 14px; }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      h1 { font-size: 26px; }
+      .nav-inner { grid-template-columns: 1fr; }
+      .nav-links { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">Arrays &amp; OOP in Java</div>
+      <nav class="nav-links" id="topNav">
+        <a href="#home">Home</a>
+        <a href="#array-basics">Array Basics</a>
+        <a href="#array-ops">Array Operations</a>
+        <a href="#arrays-oop">Arrays &amp; OOP</a>
+        <a href="#ordered">Ordered Arrays</a>
+        <a href="#sorting">Sorting</a>
+        <a href="#practice">Practice</a>
+        <a href="#advanced">Advanced</a>
+        <a href="#quiz">Quiz</a>
+        <a href="#glossary">Glossary</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Page: Home -->
+    <section class="page active" data-route="home">
+      <div class="card">
+        <h1>Welcome! 👋</h1>
+        <p class="lead">
+          A clean, multi-page guide to <strong>Java Arrays</strong> and how they connect to
+          <strong>Object-Oriented Programming (OOP)</strong>, with clear explanations under every code sample.
+        </p>
+
+        <div class="def">
+          <strong>Roadmap:</strong> Array basics → operations → arrays of objects → ordered arrays &amp; binary search → sorting →
+          practice → advanced → quiz → glossary.
+        </div>
+
+        <div class="tip">
+          <strong>Navigation:</strong> Use the top links or the Next button. Every code block has a Copy button.
+        </div>
+
+        <div class="btns">
+          <a class="btn" href="#array-basics">Start → Array Basics</a>
+          <a class="btn secondary" href="#quiz">Jump to Quiz</a>
+        </div>
+
+        <div class="next-prev">
+          <span></span>
+          <a class="btn" href="#array-basics">Next: Array Basics →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Array Basics -->
+    <section class="page" data-route="array-basics">
+      <div class="card">
+        <h1>Array Basics 📦</h1>
+
+        <div class="def">
+          <strong>Array:</strong> A fixed-size, indexed sequence of values of the same type stored contiguously in memory.
+        </div>
+
+        <div class="warn">
+          <strong>Fixed size:</strong> Once created, an array’s length cannot change. Need resize? Consider <code>ArrayList&lt;T&gt;</code>.
+        </div>
+
+        <h2>Declaring &amp; Initializing</h2>
+        <p>Common ways to declare and initialize integer arrays:</p>
+
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">// Method 1: Declare, then create with a fixed length (defaults to 0s)
+int[] numbers;
+numbers = new int[5];              // [0, 0, 0, 0, 0]
+
+// Method 2: Declare + create in one line
+int[] scores = new int[10];        // length = 10
+
+// Method 3: Create with literal values (length inferred)
+int[] primes = { 2, 3, 5, 7, 11 }; // length = 5
+
+// Method 4: Alternative "new int[]" literal form
+int[] ages = new int[]{ 21, 18, 25, 30 };
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong>Default values:</strong> numeric types → <code>0</code>, boolean → <code>false</code>, object refs → <code>null</code>.</li>
+            <li><strong>Length:</strong> available as <code>arr.length</code> (a field, not a method).</li>
+            <li><strong>Bounds:</strong> indices run <code>0</code>..<code>length-1</code>. Accessing outside throws <code>ArrayIndexOutOfBoundsException</code>.</li>
+          </ul>
+        </div>
+
+        <h3>Other Types</h3>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">// Strings, doubles, booleans, chars
+String[] names = { "Alice", "Bob", "Charlie" };
+double[] prices = new double[100];     // default 0.0
+boolean[] flags = new boolean[8];      // default false
+char[] letters = "Hello".toCharArray();// ['H','e','l','l','o']
+</code></pre>
+        </div>
+        <div class="explain">
+          <p><strong>String vs char[]:</strong> <code>String</code> is an immutable object; <code>toCharArray()</code> gives a mutable array of characters.</p>
+        </div>
+
+        <h3>2D &amp; Jagged Arrays</h3>
+        <p>A <strong>2D array</strong> is an array of arrays (matrix). A <strong>jagged</strong> array has rows with different lengths.</p>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">// 2D array (3 rows × 4 cols)
+int[][] matrix = new int[3][4];
+
+// With values
+int[][] grid = {
+    { 1, 2, 3 },
+    { 4, 5, 6 },
+    { 7, 8, 9 }
+};
+
+// Jagged (rows with different lengths)
+int[][] jagged = new int[3][];
+jagged[0] = new int[5];
+jagged[1] = new int[3];
+jagged[2] = new int[4];
+</code></pre>
+        </div>
+        <div class="explain">
+          <p><strong>Memory note:</strong> A 2D Java array isn’t a true matrix; each row is its own array (hence “jagged” rows are allowed).</p>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#home">← Back: Home</a>
+          <a class="btn" href="#array-ops">Next: Array Operations →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Array Operations -->
+    <section class="page" data-route="array-ops">
+      <div class="card">
+        <h1>Core Array Operations ⚙️</h1>
+
+        <div class="def">
+          <strong>Random access (O(1)):</strong> <code>arr[i]</code> is constant-time because arrays are contiguous in memory.
+        </div>
+
+        <h2>Access, Update, Loop</h2>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">int[] arr = { 10, 20, 30, 40, 50 };
+
+// Access
+int first = arr[0];                 // 10
+int last  = arr[arr.length - 1];    // 50
+
+// Update
+arr[2] = 35;                        // {10, 20, 35, 40, 50}
+
+// Loop (classic for)
+for (int i = 0; i &lt; arr.length; i++) {
+    System.out.println("Index " + i + ": " + arr[i]);
+}
+
+// Enhanced for
+for (int x : arr) {
+    System.out.println(x);
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong>Classic for:</strong> use when you need the index <code>i</code>.</li>
+            <li><strong>Enhanced for:</strong> simple value iteration; you can’t modify the array’s structure (still fine to assign via index).</li>
+            <li><strong>Complexity:</strong> both loops are O(n) time, O(1) extra space.</li>
+          </ul>
+        </div>
+
+        <h2>Interactive Mini-Demo</h2>
+        <p class="muted">Click a box to fill the inputs, then update a value.</p>
+        <div id="demoArray" class="array-visual"></div>
+        <div class="inputs">
+          <input id="demoIndex" type="number" placeholder="Index (0–4)" min="0" max="4" />
+          <input id="demoValue" type="number" placeholder="New value" />
+          <button class="btn" id="demoApply">Apply</button>
+          <button class="btn secondary" id="demoReset">Reset</button>
+        </div>
+
+        <h2>Useful Utilities</h2>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public final class ArrayUtils {
+
+    // O(n): find max
+    public static int max(int[] arr) {
+        int best = arr[0];
+        for (int i = 1; i &lt; arr.length; i++) {
+            if (arr[i] &gt; best) best = arr[i];
+        }
+        return best;
+    }
+
+    // O(n): sum
+    public static int sum(int[] arr) {
+        int total = 0;
+        for (int x : arr) total += x;
+        return total;
+    }
+
+    // O(n): reverse in place (two pointers)
+    public static void reverse(int[] arr) {
+        int L = 0, R = arr.length - 1;
+        while (L &lt; R) {
+            int tmp = arr[L];
+            arr[L] = arr[R];
+            arr[R] = tmp;
+            L++; R--;
+        }
+    }
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong><code>max</code>:</strong> scans once; track best so far.</li>
+            <li><strong><code>sum</code>:</strong> add as you go; beware of integer overflow for very large sums.</li>
+            <li><strong><code>reverse</code>:</strong> swap symmetric elements from ends inward (two-pointer technique).</li>
+          </ul>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#array-basics">← Back: Array Basics</a>
+          <a class="btn" href="#arrays-oop">Next: Arrays &amp; OOP →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Arrays & OOP -->
+    <section class="page" data-route="arrays-oop">
+      <div class="card">
+        <h1>Arrays &amp; OOP 🎭</h1>
+
+        <div class="def">
+          <strong>Array of objects:</strong> Stores <em>references</em> to objects. You must instantiate each element before use.
+        </div>
+
+        <h2>Arrays of Custom Objects</h2>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">// Simple Student class
+class Student {
+    private String name;
+    private int grade;
+
+    public Student(String name, int grade) {
+        this.name  = name;
+        this.grade = grade;
+    }
+
+    public String getName()  { return name;  }
+    public int    getGrade() { return grade; }
+}
+
+// Creating and initializing an object array
+Student[] classroom = new Student[3]; // {null, null, null}
+classroom[0] = new Student("Alice", 95);
+classroom[1] = new Student("Bob",   87);
+classroom[2] = new Student("Cara",  92);
+</code></pre>
+        </div>
+        <div class="explain">
+          <p><strong>Nulls at start:</strong> <code>new Student[3]</code> creates storage for 3 references, all <code>null</code> until you assign real objects.</p>
+        </div>
+
+        <h2>Managing Object Arrays (Encapsulation)</h2>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">final class Library {
+    private Book[] books;
+    private int count;
+
+    public Library(int capacity) {
+        books = new Book[capacity];
+        count = 0;
+    }
+
+    // O(1) add (if capacity allows)
+    public boolean add(Book b) {
+        if (count == books.length) return false; // full
+        books[count++] = b;
+        return true;
+    }
+
+    // O(n): linear search by title
+    public Book find(String title) {
+        for (int i = 0; i &lt; count; i++) {
+            if (books[i].getTitle().equals(title)) return books[i];
+        }
+        return null;
+    }
+
+    // O(n): remove and left-shift the tail
+    public boolean remove(String title) {
+        for (int i = 0; i &lt; count; i++) {
+            if (books[i].getTitle().equals(title)) {
+                for (int j = i; j &lt; count - 1; j++) books[j] = books[j + 1];
+                books[--count] = null; // avoid stale reference
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+final class Book {
+    private final String title;
+    private final String author;
+    private final int    year;
+
+    public Book(String t, String a, int y) {
+        title = t; author = a; year = y;
+    }
+    public String getTitle()  { return title;  }
+    public String getAuthor() { return author; }
+    public int    getYear()   { return year;   }
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong>Encapsulation:</strong> fields are private; behavior exposed via methods.</li>
+            <li><strong>Remove:</strong> shifts elements so remaining books stay contiguous; last slot nulled to prevent memory leak.</li>
+          </ul>
+        </div>
+
+        <h2>Polymorphism with Arrays</h2>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">abstract class Shape {
+    protected String color;
+    public Shape(String color) { this.color = color; }
+    public abstract double area();
+    public abstract double perimeter();
+}
+
+final class Circle extends Shape {
+    private final double r;
+    public Circle(String color, double r) {
+        super(color); this.r = r;
+    }
+    public double area()      { return Math.PI * r * r; }
+    public double perimeter() { return 2 * Math.PI * r; }
+}
+
+final class Rectangle extends Shape {
+    private final double w, h;
+    public Rectangle(String color, double w, double h) {
+        super(color); this.w = w; this.h = h;
+    }
+    public double area()      { return w * h; }
+    public double perimeter() { return 2 * (w + h); }
+}
+
+// Polymorphic array
+Shape[] shapes = {
+    new Circle("Red", 5.0),
+    new Rectangle("Blue", 4.0, 6.0),
+    new Circle("Green", 3.0),
+};
+double totalArea = 0;
+for (Shape s : shapes) totalArea += s.area();
+</code></pre>
+        </div>
+        <div class="explain">
+          <p><strong>Polymorphism:</strong> the <code>area()</code> call dispatches to the appropriate subclass implementation at runtime.</p>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#array-ops">← Back: Array Operations</a>
+          <a class="btn" href="#ordered">Next: Ordered Arrays →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Ordered Arrays -->
+    <section class="page" data-route="ordered">
+      <div class="card">
+        <h1>Ordered (Sorted) Arrays 📊</h1>
+
+        <div class="def">
+          <strong>Definition:</strong> Elements arranged in non-decreasing (or non-increasing) order. Enables <em>binary search</em> in O(log n).
+        </div>
+
+        <h2>Built-in Sorting</h2>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">import java.util.Arrays;
+import java.util.Collections;
+
+int[] a = { 64, 34, 25, 12, 22, 11, 90 };
+Arrays.sort(a); // ascending
+
+Integer[] b = { 5, 2, 8, 1, 9 };
+Arrays.sort(b, Collections.reverseOrder()); // descending (needs wrapper type)
+</code></pre>
+        </div>
+        <div class="explain">
+          <p><strong>Why <code>Integer[]</code> for reverse?</strong> Java’s <code>reverseOrder()</code> comparator works with objects, not primitives.</p>
+        </div>
+
+        <h2>Binary Search (Iterative)</h2>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">// Returns index of target or -1 if not found (array must be sorted)
+public static int binarySearch(int[] arr, int target) {
+    int L = 0, R = arr.length - 1;
+    while (L &lt;= R) {
+        int mid = L + (R - L) / 2;   // avoids (L+R) overflow
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] &lt; target) L = mid + 1;
+        else R = mid - 1;
+    }
+    return -1;
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong>Invariant:</strong> search range is <code>[L, R]</code> inclusive; shrink toward the target.</li>
+            <li><strong>Complexity:</strong> O(log n) time, O(1) extra space.</li>
+          </ul>
+        </div>
+
+        <h3>First/Last Occurrence (Duplicates)</h3>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public static int firstIndex(int[] arr, int target) {
+    int L = 0, R = arr.length - 1, ans = -1;
+    while (L &lt;= R) {
+        int mid = L + (R - L) / 2;
+        if (arr[mid] &gt;= target) R = mid - 1;
+        else L = mid + 1;
+        if (arr[mid] == target) ans = mid; // keep going left
+    }
+    return ans;
+}
+
+public static int lastIndex(int[] arr, int target) {
+    int L = 0, R = arr.length - 1, ans = -1;
+    while (L &lt;= R) {
+        int mid = L + (R - L) / 2;
+        if (arr[mid] &lt;= target) L = mid + 1;
+        else R = mid - 1;
+        if (arr[mid] == target) ans = mid; // keep going right
+    }
+    return ans;
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <p><strong>Trick:</strong> when you find the target, don’t stop—shift the search to the side you need and remember the best index so far.</p>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#arrays-oop">← Back: Arrays &amp; OOP</a>
+          <a class="btn" href="#sorting">Next: Sorting →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Sorting -->
+    <section class="page" data-route="sorting">
+      <div class="card">
+        <h1>Sorting Algorithms 🔄</h1>
+
+        <div class="def">
+          <strong>Stable sort:</strong> preserves relative order of equal keys (e.g., <code>Merge Sort</code>).<br/>
+          <strong>In-place:</strong> uses O(1) extra space (ignoring recursion stack), e.g., <code>Insertion Sort</code>, <code>Quick Sort</code>.
+        </div>
+
+        <h2>Quick Comparison</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Bubble</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+            <tr><td>Insertion</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+            <tr><td>Selection</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>No</td></tr>
+            <tr><td>Merge</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>Yes</td></tr>
+            <tr><td>Quick</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>No</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Implementations</h2>
+
+        <h3>Bubble Sort (early exit)</h3>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public static void bubbleSort(int[] arr) {
+    int n = arr.length;
+    for (int i = 0; i &lt; n - 1; i++) {
+        boolean swapped = false;
+        for (int j = 0; j &lt; n - i - 1; j++) {
+            if (arr[j] &gt; arr[j + 1]) {
+                int t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t;
+                swapped = true;
+            }
+        }
+        if (!swapped) break; // already sorted
+    }
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <p>Repeatedly “bubble” the largest element to the end. Early exit stops once a pass makes no swaps.</p>
+        </div>
+
+        <h3>Insertion Sort</h3>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public static void insertionSort(int[] arr) {
+    for (int i = 1; i &lt; arr.length; i++) {
+        int key = arr[i];
+        int j = i - 1;
+        while (j &gt;= 0 &amp;&amp; arr[j] &gt; key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <p>Builds the sorted portion one element at a time; fast for nearly sorted inputs, stable, in-place.</p>
+        </div>
+
+        <h3>Quick Sort</h3>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public static void quickSort(int[] a, int low, int high) {
+    if (low &lt; high) {
+        int p = partition(a, low, high);
+        quickSort(a, low, p - 1);
+        quickSort(a, p + 1, high);
+    }
+}
+
+private static int partition(int[] a, int low, int high) {
+    int pivot = a[high];
+    int i = low - 1;
+    for (int j = low; j &lt; high; j++) {
+        if (a[j] &lt; pivot) {
+            i++;
+            int t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+    }
+    int t = a[i + 1]; a[i + 1] = a[high]; a[high] = t;
+    return i + 1;
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong>Idea:</strong> partition into &lt; pivot and ≥ pivot, then recurse.</li>
+            <li><strong>Average:</strong> O(n log n). <strong>Worst:</strong> O(n²) (e.g., already sorted with bad pivot choice).</li>
+            <li><strong>Space:</strong> O(log n) recursion depth on average.</li>
+          </ul>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#ordered">← Back: Ordered Arrays</a>
+          <a class="btn" href="#practice">Next: Practice →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Practice -->
+    <section class="page" data-route="practice">
+      <div class="card">
+        <h1>Practice Problems 💪</h1>
+
+        <h2>Two Sum</h2>
+        <div class="def">
+          <strong>Task:</strong> Given <code>nums</code> and <code>target</code>, return indices of two numbers adding to <code>target</code>.
+          <strong>Idea:</strong> Hash map of value → index.
+        </div>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">import java.util.*;
+
+public static int[] twoSum(int[] nums, int target) {
+    Map&lt;Integer, Integer&gt; pos = new HashMap&lt;&gt;();
+    for (int i = 0; i &lt; nums.length; i++) {
+        int need = target - nums[i];
+        if (pos.containsKey(need)) return new int[]{ pos.get(need), i };
+        pos.put(nums[i], i);
+    }
+    return new int[0];
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong>Map:</strong> stores numbers we’ve seen and their positions.</li>
+            <li><strong>Check:</strong> for each <code>nums[i]</code>, look up <code>target - nums[i]</code>.</li>
+            <li><strong>Complexity:</strong> O(n) time, O(n) space.</li>
+          </ul>
+        </div>
+
+        <h2>Move Zeros</h2>
+        <div class="def">
+          <strong>Task:</strong> Move all zeros to the end, keep order of non-zeros. <strong>Idea:</strong> Two-pointer compaction.
+        </div>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public static void moveZeros(int[] nums) {
+    int k = 0;                       // next position for a non-zero
+    for (int x : nums) if (x != 0) nums[k++] = x;
+    while (k &lt; nums.length) nums[k++] = 0;
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <p>First pass copies non-zeros forward; second pass pads the rest with 0s. O(n) time, O(1) extra space.</p>
+        </div>
+
+        <h2>Missing Number (0..n)</h2>
+        <div class="def">
+          <strong>Task:</strong> Given <code>n</code> distinct numbers in <code>[0..n]</code>, find the missing one.
+          <strong>Ideas:</strong> Sum formula or XOR trick.
+        </div>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public static int missingNumberSum(int[] nums) {
+    int n = nums.length;
+    int expected = n * (n + 1) / 2;
+    int actual = 0;
+    for (int x : nums) actual += x;
+    return expected - actual;
+}
+
+public static int missingNumberXor(int[] nums) {
+    int x = nums.length;
+    for (int i = 0; i &lt; nums.length; i++) x ^= i ^ nums[i];
+    return x;
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <ul>
+            <li><strong>Sum:</strong> arithmetic series minus actual sum → missing number.</li>
+            <li><strong>XOR:</strong> each index &amp; value cancels; leftover is the missing value. O(n) time, O(1) space.</li>
+          </ul>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#sorting">← Back: Sorting</a>
+          <a class="btn" href="#advanced">Next: Advanced →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Advanced -->
+    <section class="page" data-route="advanced">
+      <div class="card">
+        <h1>Advanced Challenges 🏆</h1>
+
+        <h2>Product of Array Except Self (No Division, O(n))</h2>
+        <div class="def">
+          <strong>Idea:</strong> Prefix products × suffix products. Space O(1) if you reuse the output array.
+        </div>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">public static int[] productExceptSelf(int[] nums) {
+    int n = nums.length;
+    int[] res = new int[n];
+
+    // left products
+    res[0] = 1;
+    for (int i = 1; i &lt; n; i++) res[i] = res[i - 1] * nums[i - 1];
+
+    // right product accumulator
+    int right = 1;
+    for (int i = n - 1; i &gt;= 0; i--) {
+        res[i] *= right;
+        right *= nums[i];
+    }
+    return res;
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <p>For each index, multiply the product of all items to its left by the product of all items to its right.</p>
+        </div>
+
+        <h2>3Sum (All Unique Triplets Summing to 0)</h2>
+        <div class="def">
+          <strong>Idea:</strong> Sort + two pointers; skip duplicates carefully to avoid repeated triplets.
+        </div>
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">import java.util.*;
+
+public static List&lt;List&lt;Integer&gt;&gt; threeSum(int[] nums) {
+    List&lt;List&lt;Integer&gt;&gt; out = new ArrayList&lt;&gt;();
+    Arrays.sort(nums);
+    for (int i = 0; i &lt; nums.length - 2; i++) {
+        if (i &gt; 0 &amp;&amp; nums[i] == nums[i - 1]) continue; // skip dup anchors
+        int L = i + 1, R = nums.length - 1;
+        while (L &lt; R) {
+            int s = nums[i] + nums[L] + nums[R];
+            if (s == 0) {
+                out.add(Arrays.asList(nums[i], nums[L], nums[R]));
+                while (L &lt; R &amp;&amp; nums[L] == nums[L + 1]) L++;
+                while (L &lt; R &amp;&amp; nums[R] == nums[R - 1]) R--;
+                L++; R--;
+            } else if (s &lt; 0) L++;
+            else R--;
+        }
+    }
+    return out;
+}
+</code></pre>
+        </div>
+        <div class="explain">
+          <p><strong>Why sort?</strong> Sorting enables the two-pointer sweep and simplifies duplicate handling. Complexity O(n²).</p>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#practice">← Back: Practice</a>
+          <a class="btn" href="#quiz">Next: Quiz →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Quiz -->
+    <section class="page" data-route="quiz">
+      <div class="card">
+        <h1>Quiz 🎯</h1>
+        <p class="quiz-meta">5 questions • multiple choice</p>
+        <div id="quizBox">
+          <div id="qText"></div>
+          <div id="qOptions"></div>
+          <div class="btns">
+            <button class="btn" id="submitAns">Submit</button>
+            <button class="btn secondary" id="nextQ" style="display:none">Next</button>
+          </div>
+          <p id="qProgress" class="quiz-meta"></p>
+        </div>
+
+        <div id="quizResult" style="display:none">
+          <h2 id="scoreLine"></h2>
+          <p id="scoreMsg"></p>
+          <div class="btns">
+            <button class="btn" id="retryQuiz">Retry</button>
+            <a class="btn secondary" href="#home">Back to Home</a>
+          </div>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#advanced">← Back: Advanced</a>
+          <a class="btn" href="#glossary">Next: Glossary →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Glossary -->
+    <section class="page" data-route="glossary">
+      <div class="card">
+        <h1>Glossary 📚</h1>
+        <ul>
+          <li><strong>Array:</strong> Fixed-size, indexed collection of same-type elements.</li>
+          <li><strong>Index:</strong> Position of an element (0-based in Java).</li>
+          <li><strong>Reference:</strong> Address pointing to an object on the heap.</li>
+          <li><strong>Heap:</strong> Memory region where objects live.</li>
+          <li><strong>Stack:</strong> Memory for call frames and local variables.</li>
+          <li><strong>O(1):</strong> Constant time.</li>
+          <li><strong>O(n):</strong> Linear time.</li>
+          <li><strong>O(log n):</strong> Logarithmic time.</li>
+          <li><strong>Stable sort:</strong> Keeps relative order of equal keys.</li>
+          <li><strong>In-place:</strong> Uses O(1) extra working space (ignoring recursion).</li>
+          <li><strong>Binary search:</strong> O(log n) search on sorted arrays.</li>
+          <li><strong>Two pointers:</strong> Using two indices that move to find structure.</li>
+        </ul>
+
+        <div class="next-prev">
+          <a class="btn" href="#quiz">← Back: Quiz</a>
+          <a class="btn" href="#home">Finish → Home</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* =========================
+       Tiny Router (hash-based)
+       ========================= */
+    const routes = [
+      "home","array-basics","array-ops","arrays-oop",
+      "ordered","sorting","practice","advanced","quiz","glossary"
+    ];
+
+    function setActiveRoute() {
+      const route = location.hash.replace("#","") || "home";
+      document.querySelectorAll(".page").forEach(p => {
+        p.classList.toggle("active", p.dataset.route === route);
+      });
+      document.querySelectorAll("#topNav a").forEach(a => {
+        a.classList.toggle("active", a.getAttribute("href") === "#" + route);
+      });
+      const active = document.querySelector('.page.active h1');
+      if (active) active.setAttribute('tabindex','-1'), active.focus({preventScroll:true});
+      // re-run Prism on the visible page
+      if (window.Prism) Prism.highlightAllUnder(document.querySelector('.page.active'));
+      // ensure copy buttons on this page respond (in case of dynamic DOM)
+      wireCopyButtons(document.querySelector('.page.active') || document);
+    }
+    window.addEventListener("hashchange", setActiveRoute);
+
+    /* ===============
+       Copy buttons
+       =============== */
+    function wireCopyButtons(scope=document) {
+      scope.querySelectorAll(".code-block .copy-btn").forEach(btn => {
+        if (btn.dataset.wired) return;
+        btn.dataset.wired = "1";
+        btn.addEventListener("click", () => {
+          const code = btn.closest(".code-block").querySelector("code").textContent;
+          navigator.clipboard.writeText(code).then(() => {
+            btn.classList.add("copied");
+            btn.textContent = "Copied!";
+            setTimeout(() => { btn.classList.remove("copied"); btn.textContent = "Copy"; }, 900);
+          });
+        });
+      });
+    }
+
+    /* ========================
+       Array mini-demo wiring
+       ======================== */
+    let demoArr = [10, 20, 30, 40, 50];
+    function renderDemoArray() {
+      const host = document.getElementById("demoArray");
+      if (!host) return;
+      host.innerHTML = "";
+      demoArr.forEach((v,i) => {
+        const el = document.createElement("div");
+        el.className = "cell";
+        el.innerHTML = `<div class="idx">[${i}]</div>${v}`;
+        el.title = `Index ${i}`;
+        el.addEventListener("click", () => {
+          const idx = document.getElementById("demoIndex");
+          const val = document.getElementById("demoValue");
+          if (idx && val) { idx.value = String(i); val.value = String(v); }
+        });
+        host.appendChild(el);
+      });
+    }
+    function wireDemoControls() {
+      const apply = document.getElementById("demoApply");
+      const reset = document.getElementById("demoReset");
+      if (apply) apply.addEventListener("click", () => {
+        const i = parseInt(document.getElementById("demoIndex").value, 10);
+        const v = parseInt(document.getElementById("demoValue").value, 10);
+        if (Number.isNaN(i) || i < 0 || i >= demoArr.length || Number.isNaN(v)) {
+          alert("Please enter a valid index (0–4) and value.");
+          return;
+        }
+        demoArr[i] = v;
+        renderDemoArray();
+      });
+      if (reset) reset.addEventListener("click", () => {
+        demoArr = [10,20,30,40,50];
+        renderDemoArray();
+      });
+    }
+
+    /* =====
+       Quiz
+       ===== */
+    const quiz = [
+      {
+        q: "Accessing arr[i] in a Java array is...",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+        correct: 0
+      },
+      {
+        q: "Binary search works only if the array is...",
+        options: ["Reversed", "Shuffled", "Sorted", "All unique"],
+        correct: 2
+      },
+      {
+        q: "Which sort is stable and O(n log n) worst case?",
+        options: ["Quick Sort", "Merge Sort", "Selection Sort", "Heap Sort"],
+        correct: 1
+      },
+      {
+        q: "Arrays in Java are...",
+        options: ["Resizable", "Fixed-size", "Hash-indexed", "Immutable"],
+        correct: 1
+      },
+      {
+        q: "An array of objects stores...",
+        options: ["Objects inline", "References to objects", "Only primitives", "Only Strings"],
+        correct: 1
+      }
+    ];
+    let qi = 0, score = 0, picked = -1;
+
+    function showQuestion() {
+      const box = document.getElementById("quizBox");
+      const t = document.getElementById("qText");
+      const o = document.getElementById("qOptions");
+      const next = document.getElementById("nextQ");
+      const submit = document.getElementById("submitAns");
+      const prog = document.getElementById("qProgress");
+      if (!box) return;
+
+      picked = -1;
+      const cur = quiz[qi];
+      t.innerHTML = `<h3>Q${qi+1}. ${cur.q}</h3>`;
+      o.innerHTML = "";
+      cur.options.forEach((opt, idx) => {
+        const div = document.createElement("div");
+        div.className = "quiz-option";
+        div.textContent = opt;
+        div.addEventListener("click", () => {
+          document.querySelectorAll(".quiz-option").forEach(x => x.classList.remove("selected"));
+          div.classList.add("selected");
+          picked = idx;
+        });
+        o.appendChild(div);
+      });
+      submit.style.display = "";
+      next.style.display = "none";
+      prog.textContent = `Question ${qi+1} of ${quiz.length}`;
+    }
+
+    function wireQuiz() {
+      const submit = document.getElementById("submitAns");
+      const next = document.getElementById("nextQ");
+      const result = document.getElementById("quizResult");
+      const box = document.getElementById("quizBox");
+      const scoreLine = document.getElementById("scoreLine");
+      const scoreMsg = document.getElementById("scoreMsg");
+      const retry = document.getElementById("retryQuiz");
+
+      if (submit) submit.addEventListener("click", () => {
+        if (picked === -1) return alert("Please choose an option.");
+        const opts = document.querySelectorAll(".quiz-option");
+        opts.forEach((el, idx) => {
+          if (idx === quiz[qi].correct) el.classList.add("correct");
+          else if (idx === picked) el.classList.add("incorrect");
+        });
+        if (picked === quiz[qi].correct) score++;
+        submit.style.display = "none";
+        next.style.display = "";
+      });
+
+      if (next) next.addEventListener("click", () => {
+        qi++;
+        if (qi < quiz.length) showQuestion();
+        else {
+          box.style.display = "none";
+          result.style.display = "";
+          const pct = Math.round(100 * score / quiz.length);
+          scoreLine.textContent = `Your Score: ${score}/${quiz.length} (${pct}%)`;
+          scoreMsg.textContent = pct >= 80
+            ? "Excellent! You’re an array ace. 🚀"
+            : pct >= 60
+            ? "Nice work! A bit more practice and you’ll nail it."
+            : "Keep going — revisit the pages and try again!";
+        }
+      });
+
+      if (retry) retry.addEventListener("click", () => {
+        qi = 0; score = 0; picked = -1;
+        document.getElementById("quizBox").style.display = "";
+        document.getElementById("quizResult").style.display = "none";
+        showQuestion();
+      });
+    }
+
+    /* ==========
+       Boot
+       ========== */
+    window.addEventListener("DOMContentLoaded", () => {
+      setActiveRoute();
+      wireCopyButtons(document);
+
+      renderDemoArray();
+      wireDemoControls();
+
+      showQuestion();
+      wireQuiz();
+    });
+  </script>
+</body>
+</html>
