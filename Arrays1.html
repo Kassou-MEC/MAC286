@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Arrays Tutorial</title>
+    <style>
+        :root {
+            --primary: #2196F3;
+            --secondary: #FF9800;
+            --accent: #F44336;
+            --dark: #333;
+            --light: #f5f5f5;
+            --success: #4CAF50;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 5px solid var(--secondary);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            display: flex;
+            background: var(--dark);
+            padding: 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            color: white;
+        }
+        
+        .nav-item:hover {
+            background: #444;
+        }
+        
+        .nav-item.active {
+            background: #444;
+            border-bottom: 3px solid var(--secondary);
+        }
+        
+        .content {
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--secondary);
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+        
+        .example {
+            background: #e8f4fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            tab-size: 4;
+            -moz-tab-size: 4;
+            line-height: 1.5;
+        }
+        
+        .interactive {
+            background: #fff5e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed var(--secondary);
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px 5px;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background: #0b7dda;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button.run {
+            background: var(--success);
+        }
+        
+        button.run:hover {
+            background: #3d8b40;
+        }
+        
+        input, select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 8px 5px;
+            font-size: 1rem;
+            width: 200px;
+        }
+        
+        .quiz-container {
+            background: #ffe6e6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .question {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ffcccc;
+        }
+        
+        .options label {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #ddd;
+        }
+        
+        .options label:hover {
+            background: #f9f9f9;
+            border-color: #ccc;
+        }
+        
+        .result {
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .incorrect {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .array-visualization {
+            display: flex;
+            justify-content: center;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        .array-element {
+            width: 70px;
+            height: 70px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .index {
+            font-size: 0.8rem;
+            margin-top: 60px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .highlight {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--accent);
+            background: var(--accent);
+        }
+        
+        .note {
+            font-style: italic;
+            color: #666;
+            margin: 10px 0;
+            padding-left: 15px;
+            border-left: 3px solid #ddd;
+        }
+        
+        .output {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--dark);
+            color: white;
+        }
+        
+        .two-column {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .col {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .method-list {
+            list-style-type: none;
+            margin: 15px 0;
+        }
+        
+        .method-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .method-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Java Arrays Tutorial</h1>
+            <div class="subtitle">Learn Java arrays with interactive examples and visualizations</div>
+        </header>
+        
+        <div class="nav">
+            <div class="nav-item active" data-target="intro">Introduction</div>
+            <div class="nav-item" data-target="declaration">Declaration</div>
+            <div class="nav-item" data-target="multi">Multi-dimensional</div>
+            <div class="nav-item" data-target="arraylist">ArrayList</div>
+            <div class="nav-item" data-target="exercises">Exercises</div>
+            <div class="nav-item" data-target="quiz">Quiz</div>
+        </div>
+        
+        <div class="content">
+            <!-- Introduction Section -->
+            <div class="section active" id="intro">
+                <h2>Introduction to Java Arrays</h2>
+                <p>An array in Java is a container object that holds a fixed number of values of a single type. The length of an array is established when the array is created and cannot be changed.</p>
+                
+                <div class="example">
+                    <h3>Key Characteristics of Java Arrays</h3>
+                    <ul>
+                        <li>Fixed size - once created, the size cannot be changed</li>
+                        <li>Indexed - elements are accessed by their numerical index</li>
+                        <li>Homogeneous - all elements must be of the same type</li>
+                        <li>Zero-based - the first element is at index 0</li>
+                        <li>Object - arrays are objects in Java, even if they hold primitives</li>
+                    </ul>
+                </div>
+                
+                <div class="interactive">
+                    <h3>Array Visualization</h3>
+                    <p>This is a visual representation of an integer array with 8 elements:</p>
+                    
+                    <div class="array-visualization">
+                        <div class="array-element">42</div>
+                        <div class="array-element">17</div>
+                        <div class="array-element">89</div>
+                        <div class="array-element">5</div>
+                        <div class="array-element">36</div>
+                        <div class="array-element">71</div>
+                        <div class="array-element">53</div>
+                        <div class="array-element">28</div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center;">
+                        <div class="index">Index 0</div>
+                        <div class="index">Index 1</div>
+                        <div class="index">Index 2</div>
+                        <div class="index">Index 3</div>
+                        <div class="index">Index 4</div>
+                        <div class="index">Index 5</div>
+                        <div class="index">Index 6</div>
+                        <div class="index">Index 7</div>
+                    </div>
+                    
+                    <div class="note">
+                        Each "box" represents an array element, and the number below is its index.
+                        Notice that indexing starts at 0, not 1.
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>Basic Array Example</h3>
+                    <div class="code">// Declare and initialize an array of integers
+int[] numbers = {10, 20, 30, 40, 50};
+
+// Access elements by index
+System.out.println(numbers[0]);  // Output: 10
+System.out.println(numbers[3]);  // Output: 40
+
+// Get the length of the array
+System.out.println(numbers.length);  // Output: 5
+
+// Change an element
+numbers[2] = 99;
+System.out.println(numbers[2]);  // Output: 99</div>
+                </div>
+            </div>
+            
+            <!-- Declaration Section -->
+            <div class="section" id="declaration">
+                <h2>Declaring and Initializing Arrays</h2>
+                <p>There are several ways to declare and initialize arrays in Java. The most common approaches are shown below.</p>
+                
+                <div class="example">
+                    <h3>Different Ways to Create Arrays</h3>
+                    <div class="code">// Method 1: Declare, then initialize
+int[] numbers;
+numbers = new int[5];
+
+// Method 2: Declare and initialize in one line
+int[] numbers = new int[5];
+
+// Method 3: Initialize with values
+int[] numbers = {10, 20, 30, 40, 50};
+
+// Method 4: Initialize with values (alternative syntax)
+int[] numbers = new int[]{10, 20, 30, 40, 50};</div>
+                </div>
+                
+                <div class="interactive">
+                    <h3>Array Initialization Demo</h3>
+                    <p>Select an array type and see how it's initialized:</p>
+                    
+                    <select id="arrayType">
+                        <option value="int">int[]</option>
+                        <option value="double">double[]</option>
+                        <option value="char">char[]</option>
+                        <option value="boolean">boolean[]</option>
+                        <option value="String">String[]</option>
+                    </select>
+                    
+                    <button id="showInitialization">Show Initialization Code</button>
+                    
+                    <div class="output" id="initOutput">
+                        // Output will appear here
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>Default Values</h3>
+                    <p>When you create an array without initializing with values, Java assigns default values:</p>
+                    <div class="code">int[] intArray = new int[3];        // Default: [0, 0, 0]
+double[] doubleArray = new double[3]; // Default: [0.0, 0.0, 0.0]
+boolean[] boolArray = new boolean[3]; // Default: [false, false, false]
+char[] charArray = new char[3];       // Default: ['\0', '\0', '\0']
+String[] strArray = new String[3];    // Default: [null, null, null]</div>
+                </div>
+                
+                <div class="example">
+                    <h3>Iterating Through Arrays</h3>
+                    <p>You can use for loops or enhanced for loops to iterate through arrays:</p>
+                    <div class="code">int[] numbers = {10, 20, 30, 40, 50};
+
+// Standard for loop
+for (int i = 0; i < numbers.length; i++) {
+    System.out.println("Element at index " + i + ": " + numbers[i]);
+}
+
+// Enhanced for loop (for-each)
+for (int num : numbers) {
+    System.out.println("Element: " + num);
+}</div>
+                </div>
+            </div>
+            
+            <!-- Multi-dimensional Section -->
+            <div class="section" id="multi">
+                <h2>Multi-dimensional Arrays</h2>
+                <p>Java supports multi-dimensional arrays, which are essentially arrays of arrays. The most common type is the 2D array.</p>
+                
+                <div class="example">
+                    <h3>2D Array Examples</h3>
+                    <div class="code">// Declare and initialize a 2D array
+int[][] matrix = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+// Access elements
+System.out.println(matrix[0][0]); // Output: 1
+System.out.println(matrix[1][2]); // Output: 6
+System.out.println(matrix[2][1]); // Output: 8
+
+// Get dimensions
+System.out.println(matrix.length);    // Output: 3 (number of rows)
+System.out.println(matrix[0].length); // Output: 3 (number of columns in first row)</div>
+                </div>
+                
+                <div class="interactive">
+                    <h3>2D Array Visualization</h3>
+                    <p>This is a visual representation of a 3x3 matrix:</p>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="display: flex;">
+                            <div class="array-element">1</div>
+                            <div class="array-element">2</div>
+                            <div class="array-element">3</div>
+                        </div>
+                        <div style="display: flex;">
+                            <div class="array-element">4</div>
+                            <div class="array-element">5</div>
+                            <div class="array-element">6</div>
+                        </div>
+                        <div style="display: flex;">
+                            <div class="array-element">7</div>
+                            <div class="array-element">8</div>
+                            <div class="array-element">9</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 15px;">
+                        <div>Row 0: [0][0], [0][1], [0][2]</div>
+                        <div>Row 1: [1][0], [1][1], [1][2]</div>
+                        <div>Row 2: [2][0], [2][1], [2][2]</div>
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>Iterating Through 2D Arrays</h3>
+                    <div class="code">int[][] matrix = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+// Nested for loops
+for (int i = 0; i < matrix.length; i++) {
+    for (int j = 0; j < matrix[i].length; j++) {
+        System.out.print(matrix[i][j] + " ");
+    }
+    System.out.println();
+}
+
+// Enhanced for loops
+for (int[] row : matrix) {
+    for (int value : row) {
+        System.out.print(value + " ");
+    }
+    System.out.println();
+}</div>
+                </div>
+                
+                <div class="example">
+                    <h3>Ragged Arrays</h3>
+                    <p>Java supports "ragged" arrays where each row can have a different length:</p>
+                    <div class="code">int[][] ragged = new int[3][];
+ragged[0] = new int[2]; // First row has 2 columns
+ragged[1] = new int[4]; // Second row has 4 columns
+ragged[2] = new int[3]; // Third row has 3 columns
+
+// Initialize with values
+int[][] ragged = {
+    {1, 2},
+    {3, 4, 5, 6},
+    {7, 8, 9}
+};</div>
+                </div>
+            </div>
+            
+            <!-- ArrayList Section -->
+            <div class="section" id="arraylist">
+                <h2>ArrayList: Dynamic Arrays</h2>
+                <p>While basic arrays have a fixed size, Java provides the ArrayList class which offers dynamic arrays that can grow or shrink as needed.</p>
+                
+                <div class="example">
+                    <h3>ArrayList Basics</h3>
+                    <div class="code">import java.util.ArrayList;
+
+// Create an ArrayList
+ArrayList<String> names = new ArrayList<>();
+
+// Add elements
+names.add("Alice");
+names.add("Bob");
+names.add("Charlie");
+
+// Access elements
+System.out.println(names.get(0)); // Output: Alice
+
+// Get size
+System.out.println(names.size()); // Output: 3
+
+// Remove elements
+names.remove(1); // Removes "Bob"
+System.out.println(names); // Output: [Alice, Charlie]</div>
+                </div>
+                
+                <div class="example">
+                    <h3>Key ArrayList Methods</h3>
+                    <ul class="method-list">
+                        <li><strong>add(element)</strong> - Appends the element to the end</li>
+                        <li><strong>add(index, element)</strong> - Inserts element at specified position</li>
+                        <li><strong>get(index)</strong> - Returns element at specified position</li>
+                        <li><strong>set(index, element)</strong> - Replaces element at specified position</li>
+                        <li><strong>remove(index)</strong> - Removes element at specified position</li>
+                        <li><strong>size()</strong> - Returns number of elements</li>
+                        <li><strong>isEmpty()</strong> - Returns true if list is empty</li>
+                        <li><strong>contains(element)</strong> - Returns true if list contains element</li>
+                    </ul>
+                </div>
+                
+                <div class="interactive">
+                    <h3>ArrayList vs Array</h3>
+                    <div class="two-column">
+                        <div class="col">
+                            <h4>Arrays</h4>
+                            <ul>
+                                <li>Fixed size</li>
+                                <li>Primitives or objects</li>
+                                <li>Faster for certain operations</li>
+                                <li>Less memory overhead</li>
+                                <li>Use when size is known and fixed</li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <h4>ArrayList</h4>
+                            <ul>
+                                <li>Dynamic size</li>
+                                <li>Objects only (uses autoboxing for primitives)</li>
+                                <li>Slower for certain operations</li>
+                                <li>More memory overhead</li>
+                                <li>Use when size may change</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>Converting Between Arrays and ArrayList</h3>
+                    <div class="code">import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+
+// Array to ArrayList
+String[] array = {"Apple", "Banana", "Orange"};
+ArrayList<String> list = new ArrayList<>(Arrays.asList(array));
+
+// ArrayList to Array
+ArrayList<String> fruitList = new ArrayList<>();
+fruitList.add("Apple");
+fruitList.add("Banana");
+fruitList.add("Orange");
+
+String[] fruitArray = fruitList.toArray(new String[0]);</div>
+                </div>
+            </div>
+            
+            <!-- Exercises Section -->
+            <div class="section" id="exercises">
+                <h2>Array Exercises</h2>
+                <p>Practice your Java array skills with these exercises. Try to solve them before looking at the solutions.</p>
+                
+                <div class="example">
+                    <h3>Exercise 1: Find the Maximum Value</h3>
+                    <p>Write a method that takes an integer array and returns the maximum value.</p>
+                    <div class="code">public static int findMax(int[] arr) {
+    // Your code here
+}
+
+// Example usage:
+int[] numbers = {5, 17, 3, 25, 11, 8};
+System.out.println(findMax(numbers)); // Should print 25</div>
+                    <button class="run" onclick="showSolution(1)">Show Solution</button>
+                    <div class="output" id="solution1"></div>
+                </div>
+                
+                <div class="example">
+                    <h3>Exercise 2: Reverse an Array</h3>
+                    <p>Write a method that reverses the elements of an array.</p>
+                    <div class="code">public static void reverseArray(int[] arr) {
+    // Your code here
+}
+
+// Example usage:
+int[] numbers = {1, 2, 3, 4, 5};
+reverseArray(numbers);
+System.out.println(Arrays.toString(numbers)); // Should print [5, 4, 3, 2, 1]</div>
+                    <button class="run" onclick="showSolution(2)">Show Solution</button>
+                    <div class="output" id="solution2"></div>
+                </div>
+                
+                <div class="example">
+                    <h3>Exercise 3: Find Common Elements</h3>
+                    <p>Write a method that finds common elements between two arrays.</p>
+                    <div class="code">public static int[] findCommon(int[] arr1, int[] arr2) {
+    // Your code here
+}
+
+// Example usage:
+int[] array1 = {1, 2, 3, 4, 5};
+int[] array2 = {3, 4, 5, 6, 7};
+int[] common = findCommon(array1, array2);
+System.out.println(Arrays.toString(common)); // Should print [3, 4, 5]</div>
+                    <button class="run" onclick="showSolution(3)">Show Solution</button>
+                    <div class="output" id="solution3"></div>
+                </div>
+                
+                <div class="example">
+                    <h3>Exercise 4: Matrix Multiplication</h3>
+                    <p>Write a method that multiplies two matrices.</p>
+                    <div class="code">public static int[][] multiplyMatrices(int[][] a, int[][] b) {
+    // Your code here
+}
+
+// Example usage:
+int[][] matrixA = {{1, 2, 3}, {4, 5, 6}};
+int[][] matrixB = {{7, 8}, {9, 10}, {11, 12}};
+int[][] result = multiplyMatrices(matrixA, matrixB);
+// Result should be {{58, 64}, {139, 154}}</div>
+                    <button class="run" onclick="showSolution(4)">Show Solution</button>
+                    <div class="output" id="solution4"></div>
+                </div>
+            </div>
+            
+            <!-- Quiz Section -->
+            <div class="section" id="quiz">
+                <h2>Java Arrays Quiz</h2>
+                <p>Test your knowledge of Java arrays with this quiz!</p>
+                
+                <div class="quiz-container">
+                    <div class="question">
+                        <h3>Question 1: How do you get the length of an array?</h3>
+                        <div class="options">
+                            <label><input type="radio" name="q1" value="a"> array.length</label>
+                            <label><input type="radio" name="q1" value="b"> array.length()</label>
+                            <label><input type="radio" name="q1" value="c"> array.size</label>
+                            <label><input type="radio" name="q1" value="d"> array.size()</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Question 2: What is the default value of a boolean array element?</h3>
+                        <div class="options">
+                            <label><input type="radio" name="q2" value="a"> true</label>
+                            <label><input type="radio" name="q2" value="b"> false</label>
+                            <label><input type="radio" name="q2" value="c"> null</label>
+                            <label><input type="radio" name="q2" value="d"> 0</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Question 3: How do you initialize an array with values?</h3>
+                        <div class="options">
+                            <label><input type="radio" name="q3" value="a"> int[] arr = new int[5]{1, 2, 3, 4, 5};</label>
+                            <label><input type="radio" name="q3" value="b"> int[] arr = {1, 2, 3, 4, 5};</label>
+                            <label><input type="radio" name="q3" value="c"> int arr = [1, 2, 3, 4, 5];</label>
+                            <label><input type="radio" name="q3" value="d"> int[] arr = new int[]{1, 2, 3, 4, 5};</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Question 4: What is the output of this code?<br>int[] arr = new int[5];<br>System.out.println(arr[2]);</h3>
+                        <div class="options">
+                            <label><input type="radio" name="q4" value="a"> 0</label>
+                            <label><input type="radio" name="q4" value="b"> 2</label>
+                            <label><input type="radio" name="q4" value="c"> null</label>
+                            <label><input type="radio" name="q4" value="d"> Throws an exception</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Question 5: How do you copy an array?</h3>
+                        <div class="options">
+                            <label><input type="radio" name="q5" value="a"> Arrays.copy()</label>
+                            <label><input type="radio" name="q5" value="b"> System.arraycopy()</label>
+                            <label><input type="radio" name="q5" value="c"> array.clone()</label>
+                            <label><input type="radio" name="q5" value="d"> All of the above</label>
+                        </div>
+                    </div>
+                    
+                    <button id="submitQuiz">Submit Answers</button>
+                    <div id="quizResult" class="result"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Java Arrays Tutorial &copy; 2023 | Learn and practice Java arrays</p>
+        </footer>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show target section
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+        
+        // Array Initialization Demo
+        document.getElementById('showInitialization').addEventListener('click', function() {
+            const type = document.getElementById('arrayType').value;
+            let code = '';
+            
+            switch(type) {
+                case 'int':
+                    code = 'int[] array = new int[5];\n// Default values: [0, 0, 0, 0, 0]';
+                    break;
+                case 'double':
+                    code = 'double[] array = new double[5];\n// Default values: [0.0, 0.0, 0.0, 0.0, 0.0]';
+                    break;
+                case 'char':
+                    code = 'char[] array = new char[5];\n// Default values: [\\0, \\0, \\0, \\0, \\0]';
+                    break;
+                case 'boolean':
+                    code = 'boolean[] array = new boolean[5];\n// Default values: [false, false, false, false, false]';
+                    break;
+                case 'String':
+                    code = 'String[] array = new String[5];\n// Default values: [null, null, null, null, null]';
+                    break;
+            }
+            
+            document.getElementById('initOutput').textContent = code;
+        });
+        
+        // Exercise Solutions
+        function showSolution(exerciseNum) {
+            const solutionDiv = document.getElementById('solution' + exerciseNum);
+            
+            switch(exerciseNum) {
+                case 1:
+                    solutionDiv.innerHTML = 'public static int findMax(int[] arr) {\n    int max = arr[0];\n    for (int i = 1; i < arr.length; i++) {\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n    return max;\n}';
+                    break;
+                case 2:
+                    solutionDiv.innerHTML = 'public static void reverseArray(int[] arr) {\n    for (int i = 0; i < arr.length / 2; i++) {\n        int temp = arr[i];\n        arr[i] = arr[arr.length - 1 - i];\n        arr[arr.length - 1 - i] = temp;\n    }\n}';
+                    break;
+                case 3:
+                    solutionDiv.innerHTML = 'public static int[] findCommon(int[] arr1, int[] arr2) {\n    ArrayList<Integer> common = new ArrayList<>();\n    for (int num1 : arr1) {\n        for (int num2 : arr2) {\n            if (num1 == num2 && !common.contains(num1)) {\n                common.add(num1);\n            }\n        }\n    }\n    \n    // Convert ArrayList to array\n    int[] result = new int[common.size()];\n    for (int i = 0; i < common.size(); i++) {\n        result[i] = common.get(i);\n    }\n    return result;\n}';
+                    break;
+                case 4:
+                    solutionDiv.innerHTML = 'public static int[][] multiplyMatrices(int[][] a, int[][] b) {\n    int rowsA = a.length;\n    int colsA = a[0].length;\n    int colsB = b[0].length;\n    \n    int[][] result = new int[rowsA][colsB];\n    \n    for (int i = 0; i < rowsA; i++) {\n        for (int j = 0; j < colsB; j++) {\n            for (int k = 0; k < colsA; k++) {\n                result[i][j] += a[i][k] * b[k][j];\n            }\n        }\n    }\n    \n    return result;\n}';
+                    break;
+            }
+        }
+        
+        // Quiz functionality
+        document.getElementById('submitQuiz').addEventListener('click', function() {
+            const answers = {
+                q1: document.querySelector('input[name="q1"]:checked')?.value,
+                q2: document.querySelector('input[name="q2"]:checked')?.value,
+                q3: document.querySelector('input[name="q3"]:checked')?.value,
+                q4: document.querySelector('input[name="q4"]:checked')?.value,
+                q5: document.querySelector('input[name="q5"]:checked')?.value
+            };
+            
+            // Check if all questions are answered
+            if (Object.values(answers).includes(undefined)) {
+                alert('Please answer all questions!');
+                return;
+            }
+            
+            // Correct answers
+            const correctAnswers = {
+                q1: 'a',
+                q2: 'b',
+                q3: 'b', // Both b and d are correct, but b is simpler
+                q4: 'a',
+                q5: 'd'
+            };
+            
+            // Calculate score
+            let score = 0;
+            for (const question in answers) {
+                if (answers[question] === correctAnswers[question]) {
+                    score++;
+                }
+            }
+            
+            // For Q3, both b and d are correct, so give credit for either
+            if (answers.q3 === 'd') {
+                score++;
+                // But don't count twice if they already got it right
+                if (answers.q3 === correctAnswers.q3) {
+                    score--; // This is just to handle the logic correctly
+                }
+            }
+            
+            // Display result
+            const resultElement = document.getElementById('quizResult');
+            resultElement.textContent = `You scored ${score} out of 5!`;
+            resultElement.className = score >= 3 ? 'result correct' : 'result incorrect';
+            
+            if (score === 5) {
+                resultElement.textContent += ' 🎉 Perfect! You\'re a Java array expert!';
+            } else if (score >= 3) {
+                resultElement.textContent += ' 👍 Good job! Keep studying!';
+            } else {
+                resultElement.textContent += ' 👎 Review the material and try again!';
+            }
+            
+            // Add explanation for Q3
+            if (answers.q3 !== 'b' && answers.q3 !== 'd') {
+                resultElement.innerHTML += '<br><br>Note: For question 3, both options b and d are correct ways to initialize an array.';
+            }
+        });
+    </script>
+</body>
+</html>
