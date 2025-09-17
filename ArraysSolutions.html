@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Array Exercises - Basic Level</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border-radius: 10px;
+            color: white;
+        }
+        .nav-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            margin: 0 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        .nav-btn.active {
+            background: #28a745;
+        }
+        .exercise-section {
+            margin-bottom: 40px;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            overflow: hidden;
+            border-left: 5px solid #28a745;
+        }
+        .section-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e0e0e0;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .exercise {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .exercise:last-child {
+            border-bottom: none;
+        }
+        .code-container {
+            position: relative;
+            margin: 15px 0;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            padding: 20px 20px 20px 50px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .code-block::before {
+            content: "☕ Java";
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            background: #f56565;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .code-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4a5568;
+            color: #e2e8f0;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .copy-btn:hover {
+            opacity: 1;
+            background: #2d3748;
+        }
+        .visual-demo {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .array-visual {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .array-cell {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #e3f2fd;
+        }
+        .highlight {
+            background: #ffeb3b !important;
+            animation: pulse 1s infinite;
+        }
+        .selected {
+            background: #4caf50 !important;
+            color: white;
+        }
+        .moved {
+            background: #ff9800 !important;
+            color: white;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .step {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .complexity {
+            background: #f0f8ff;
+            border: 1px solid #b0d4f1;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .key-points {
+            background: #fff;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .key-points h4 {
+            color: #28a745;
+            margin-top: 0;
+        }
+        .explanation-box {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .code-snippet {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🟢 Java Array Exercises - Basic Level</h1>
+            <p>Master the fundamentals of array manipulation in Java</p>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="#" class="nav-btn active">🟢 Basic</a>
+            <a href="#" class="nav-btn">🟡 Intermediate</a>
+            <a href="#" class="nav-btn">🔴 Advanced</a>
+        </div>
+
+        <div class="exercise-section">
+            <div class="section-header">
+                🟢 BASIC EXERCISES - Foundation Skills
+            </div>
+
+            <!-- Exercise 1: Find Maximum -->
+            <div class="exercise">
+                <h3>Exercise 1: Find Maximum Value</h3>
+                
+                <div class="key-points">
+                    <h4>🎯 Learning Objective</h4>
+                    <p>Learn how to iterate through an array and find the largest element using a simple linear search approach. This exercise teaches basic array traversal and comparison operations.</p>
+                    <p><strong>Key Concepts:</strong> Array indexing, for loops, conditional statements, variable initialization</p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-block">public class ArrayExercises {
+    public static int findMax(int[] arr) {
+        if (arr == null || arr.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty or null");
+        }
+        
+        int max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] test1 = {3, 5, 7, 2, 8, -1, 4, 10, 12};
+        System.out.println("Max of test1: " + findMax(test1)); // 12
+        
+        int[] test2 = {-5, -2, -10, -1};
+        System.out.println("Max of test2: " + findMax(test2)); // -1
+    }
+}</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">📋 Copy</button>
+                </div>
+
+                <div class="key-points">
+                    <h4>📝 Line-by-Line Code Explanation</h4>
+                    <div class="explanation-box">
+                        <p><strong>Line 1:</strong> <span class="code-snippet">public class ArrayExercises {</span></p>
+                        <ul>
+                            <li><span class="code-snippet">public</span> - Class can be accessed from other packages</li>
+                            <li><span class="code-snippet">class</span> - Keyword to define a class</li>
+                            <li><span class="code-snippet">ArrayExercises</span> - Class name (must match filename)</li>
+                            <li><span class="code-snippet">{</span> - Opening brace starts class body</li>
+                        </ul>
+
+                        <p><strong>Line 2:</strong> <span class="code-snippet">public static int findMax(int[] arr)</span></p>
+                        <ul>
+                            <li><span class="code-snippet">public</span> - Can be called from anywhere</li>
+                            <li><span class="code-snippet">static</span> - Belongs to class, not instance (no object needed)</li>
+                            <li><span class="code-snippet">int</span> - Returns an integer value</li>
+                            <li><span class="code-snippet">findMax</span> - Method name (descriptive verb)</li>
+                            <li><span class="code-snippet">int[] arr</span> - Parameter: array of integers named 'arr'</li>
+                        </ul>
+
+                        <p><strong>Lines 3-5:</strong> Input validation</p>
+                        <ul>
+                            <li><span class="code-snippet">if (arr == null || arr.length == 0)</span> - Check for invalid input</li>
+                            <li><span class="code-snippet">throw new IllegalArgumentException</span> - Prevent crashes with helpful error</li>
+                            <li>This is <strong>defensive programming</strong> - always validate inputs!</li>
+                        </ul>
+
+                        <p><strong>Line 7:</strong> <span class="code-snippet">int max = arr[0];</span></p>
+                        <ul>
+                            <li>Initialize <span class="code-snippet">max</span> with first element</li>
+                            <li>Assumption: first element might be the maximum</li>
+                            <li>We'll update this if we find a larger element</li>
+                        </ul>
+
+                        <p><strong>Line 8:</strong> <span class="code-snippet">for (int i = 1; i < arr.length; i++)</span></p>
+                        <ul>
+                            <li>Start loop at index 1 (skip first element already stored in max)</li>
+                            <li>Continue while <span class="code-snippet">i</span> is less than array length</li>
+                            <li>Increment <span class="code-snippet">i</span> after each iteration</li>
+                        </ul>
+
+                        <p><strong>Lines 9-11:</strong> Comparison and update</p>
+                        <ul>
+                            <li><span class="code-snippet">if (arr[i] > max)</span> - Check if current element is larger</li>
+                            <li><span class="code-snippet">max = arr[i];</span> - Update max if condition is true</li>
+                            <li>This ensures max always contains the largest value seen so far</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="visual-demo">
+                    <h4>📊 Visual Walkthrough</h4>
+                    <p><strong>Input Array:</strong> [3, 5, 7, 2, 8, -1, 4, 10, 12]</p>
+                    
+                    <div class="step">
+                        <strong>Step 1:</strong> Initialize max = arr[0] = 3
+                        <div class="array-visual">
+                            <div class="array-cell selected">3</div>
+                            <div class="array-cell">5</div>
+                            <div class="array-cell">7</div>
+                            <div class="array-cell">2</div>
+                            <div class="array-cell">8</div>
+                            <div class="array-cell">-1</div>
+                            <div class="array-cell">4</div>
+                            <div class="array-cell">10</div>
+                            <div class="array-cell">12</div>
+                        </div>
+                        <p>Current max: 3</p>
+                    </div>
+
+                    <div class="step">
+                        <strong>Steps 2-9:</strong> Compare each element with current max
+                        <ul>
+                            <li>5 > 3? Yes → max = 5</li>
+                            <li>7 > 5? Yes → max = 7</li>
+                            <li>2 > 7? No → max stays 7</li>
+                            <li>8 > 7? Yes → max = 8</li>
+                            <li>-1 > 8? No → max stays 8</li>
+                            <li>4 > 8? No → max stays 8</li>
+                            <li>10 > 8? Yes → max = 10</li>
+                            <li>12 > 10? Yes → max = 12</li>
+                        </ul>
+                    </div>
+
+                    <div class="step">
+                        <strong>Final Result:</strong> Maximum value = 12
+                        <div class="array-visual">
+                            <div class="array-cell">3</div>
+                            <div class="array-cell">5</div>
+                            <div class="array-cell">7</div>
+                            <div class="array-cell">2</div>
+                            <div class="array-cell">8</div>
+                            <div class="array-cell">-1</div>
+                            <div class="array-cell">4</div>
+                            <div class="array-cell">10</div>
+                            <div class="array-cell highlight">12</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="complexity">
+                    <strong>Time Complexity:</strong> O(n) - We visit each element once<br>
+                    <strong>Space Complexity:</strong> O(1) - Only using a constant amount of extra space<br>
+                    <strong>Best Practice:</strong> Always validate inputs to prevent runtime errors
+                </div>
+            </div>
+
+            <!-- Exercise 2: Calculate Average -->
+            <div class="exercise">
+                <h3>Exercise 2: Calculate Average</h3>
+                
+                <div class="key-points">
+                    <h4>🎯 Learning Objective</h4>
+                    <p>Learn to calculate the arithmetic mean using enhanced for loops and understand the difference between integer and floating-point division.</p>
+                    <p><strong>Key Concepts:</strong> Enhanced for loops, accumulator pattern, data types (double vs int)</p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-block">public class ArrayExercises {
+    public static double calculateAverage(double[] arr) {
+        if (arr == null || arr.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty or null");
+        }
+        
+        double sum = 0;
+        for (double num : arr) {
+            sum += num;
+        }
+        return sum / arr.length;
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        double[] test1 = {1.0, 2.0, 3.0, 4.0, 5.0};
+        System.out.println("Average of test1: " + calculateAverage(test1)); // 3.0
+        
+        double[] test2 = {5.5, 10.5, 8.5, 3.5};
+        System.out.println("Average of test2: " + calculateAverage(test2)); // 7.0
+    }
+}</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">📋 Copy</button>
+                </div>
+
+                <div class="visual-demo">
+                    <h4>📊 Visual Walkthrough</h4>
+                    <p><strong>Input Array:</strong> [1.0, 2.0, 3.0, 4.0, 5.0]</p>
+                    
+                    <div class="step">
+                        <strong>Step 1:</strong> Initialize sum = 0
+                        <div class="array-visual">
+                            <div class="array-cell">1.0</div>
+                            <div class="array-cell">2.0</div>
+                            <div class="array-cell">3.0</div>
+                            <div class="array-cell">4.0</div>
+                            <div class="array-cell">5.0</div>
+                        </div>
+                        <p>Sum: 0</p>
+                    </div>
+
+                    <div class="step">
+                        <strong>Step 2:</strong> Add each element to sum using enhanced for loop
+                        <ul>
+                            <li>sum += 1.0 → sum = 1.0</li>
+                            <li>sum += 2.0 → sum = 3.0</li>
+                            <li>sum += 3.0 → sum = 6.0</li>
+                            <li>sum += 4.0 → sum = 10.0</li>
+                            <li>sum += 5.0 → sum = 15.0</li>
+                        </ul>
+                    </div>
+
+                    <div class="step">
+                        <strong>Step 3:</strong> Calculate average = sum / length = 15.0 / 5 = 3.0
+                    </div>
+                </div>
+
+                <div class="complexity">
+                    <strong>Time Complexity:</strong> O(n) - We visit each element once<br>
+                    <strong>Space Complexity:</strong> O(1) - Only using sum variable<br>
+                    <strong>Enhanced For Loop:</strong> Cleaner syntax, automatically handles array bounds
+                </div>
+            </div>
+
+            <!-- Exercise 3: Reverse Array -->
+            <div class="exercise">
+                <h3>Exercise 3: Reverse Array</h3>
+                
+                <div class="key-points">
+                    <h4>🎯 Learning Objective</h4>
+                    <p>Master the two-pointer technique for in-place array manipulation. Learn how to swap elements and understand the efficiency of working from both ends simultaneously.</p>
+                    <p><strong>Key Concepts:</strong> Two-pointer technique, element swapping, in-place algorithms, generic methods</p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-block">public class ArrayExercises {
+    public static void reverseArray(int[] arr) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Array must not be null");
+        }
+        
+        int left = 0;
+        int right = arr.length - 1;
+        
+        while (left < right) {
+            // Swap elements
+            int temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+            
+            // Move pointers
+            left++;
+            right--;
+        }
+    }
+    
+    // Generic version for any type
+    public static <T> void reverseArray(T[] arr) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Array must not be null");
+        }
+        
+        int left = 0;
+        int right = arr.length - 1;
+        
+        while (left < right) {
+            // Swap elements
+            T temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+            
+            // Move pointers
+            left++;
+            right--;
+        }
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] test1 = {1, 2, 3, 4, 5};
+        reverseArray(test1);
+        System.out.print("Reversed test1: ");
+        for (int num : test1) System.out.print(num + " "); // 5 4 3 2 1
+        System.out.println();
+        
+        String[] test2 = {"A", "B", "C", "D"};
+        reverseArray(test2);
+        System.out.print("Reversed test2: ");
+        for (String s : test2) System.out.print(s + " "); // D C B A
+    }
+}</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this)">📋 Copy</button>
+                </div>
+
+                <div class="visual-demo">
+                    <h4>📊 Visual Walkthrough</h4>
+                    <p><strong>Input Array:</strong> [1, 2, 3, 4, 5]</p>
+                    
+                    <div class="step">
+                        <strong>Initial State:</strong> left = 0, right = 4
+                        <div class="array-visual">
+                            <div class="array-cell selected">1</div>
+                            <div class="array-cell">2</div>
+                            <div class="array-cell">3</div>
+                            <div class="array-cell">4</div>
+                            <div class="array-cell selected">5</div>
+                        </div>
+                        <p>Swap positions 0 and 4: [5, 2, 3, 4, 1]</p>
+                    </div>
+
+                    <div class="step">
+                        <strong>Iteration 2:</strong> left = 1, right = 3
+                        <div class="array-visual">
+                            <div class="array-cell moved">5</div>
+                            <div class="array-cell selected">2</div>
+                            <div class="array-cell">3</div>
+                            <div class="array-cell selected">4</div>
+                            <div class="array-cell moved">1</div>
+                        </div>
+                        <p>Swap positions 1 and 3: [5, 4, 3, 2, 1]</p>
+                    </div>
+
+                    <div class="step">
+                        <strong>Final State:</strong> left = 2, right = 2 (left >= right, stop)
+                        <div class="array-visual">
+                            <div class="array-cell moved">5</div>
+                            <div class="array-cell moved">4</div>
+                            <div class="array-cell">3</div>
+                            <div class="array-cell moved">2</div>
+                            <div class="array-cell moved">1</div>
+                        </div>
+                        <p>Array successfully reversed!</p>
+                    </div>
+                </div>
+
+                <div class="complexity">
+                    <strong>Time Complexity:</strong> O(n/2) = O(n) - We swap n/2 pairs<br>
+                    <strong>Space Complexity:</strong> O(1) - In-place reversal, only temp variable needed<br>
+                    <strong>Two-Pointer Technique:</strong> Efficient approach for array manipulation
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3>🎉 Basic Level Complete!</h3>
+            <p><strong>You've learned:</strong></p>
+            <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                <li>✅ <strong>Array Traversal:</strong> Using for loops and enhanced for loops</li>
+                <li>✅ <strong>Input Validation:</strong> Defensive programming with null checks</li>
+                <li>✅ <strong>Two-Pointer Technique:</strong> Efficient in-place manipulation</li>
+                <li>✅ <strong>Basic Algorithms:</strong> Linear search, accumulation, swapping</li>
+                <li>✅ <strong>Java Fundamentals:</strong> Method structure, data types, generics</li>
+            </ul>
+            
+            <div style="margin-top: 20px;">
+                <a href="#" class="nav-btn">🟡 Ready for Intermediate Level? →</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(button) {
+            const codeBlock = button.parentElement.querySelector('.code-block');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = '📋 Copy';
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = '📋 Copy';
+                }, 2000);
+            });
+        }
+
+        // Add interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const arrayCells = document.querySelectorAll('.array-cell');
+            arrayCells.forEach(cell => {
+                cell.addEventListener('click', function() {
+                    this.style.animation = 'pulse 0.6s ease';
+                    setTimeout(() => {
+                        this.style.animation = '';
+                    }, 600);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
