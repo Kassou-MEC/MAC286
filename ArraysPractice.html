@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Java Array Practice Exercises</title>
+
+  <!-- Prism (reliable syntax highlighting) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-okaidia.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-core.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-clike.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-java.min.js"></script>
+
+  <style>
+    :root{
+      --bg: #0f172a;
+      --panel: #0b1224;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --primary: #6366f1;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --ring: rgba(99,102,241,.35);
+      --card: linear-gradient(135deg, #0f172a 0%, #111c36 60%, #102247 100%);
+      --shadow: 0 10px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    }
+    html, body {
+      height: 100%;
+      background:
+        radial-gradient(1200px 600px at -10% -20%, #172554 0%, transparent 60%),
+        radial-gradient(1000px 600px at 120% -10%, #2e1065 0%, transparent 55%),
+        radial-gradient(900px 600px at 50% 110%, #083344 0%, transparent 60%),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+
+    /* Top nav */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: saturate(1.2) blur(10px);
+      background: rgba(10, 12, 24, .6);
+      border-bottom: 1px solid rgba(148,163,184,.15);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+    .brand {
+      font-weight: 800;
+      letter-spacing: .4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 18px;
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .nav-links a {
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #cbd5e1;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: .2s ease;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .nav-links a:hover {
+      border-color: rgba(148,163,184,.35);
+      background: rgba(148,163,184,.08);
+    }
+    .nav-links a.active {
+      color: white;
+      border-color: var(--ring);
+      background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(139,92,246,.18));
+      box-shadow: 0 0 0 4px rgba(99,102,241,.08);
+    }
+
+    /* Layout */
+    .wrap {
+      max-width: 1100px;
+      margin: 28px auto 80px;
+      padding: 0 20px;
+    }
+    .page {
+      display: none;
+      animation: fade .35s ease;
+    }
+    .page.active { display: block; }
+    @keyframes fade { from {opacity: .6; transform: translateY(6px)} to {opacity: 1; transform: none} }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(148,163,184,.15);
+    }
+    h1 {
+      font-size: 32px;
+      line-height: 1.15;
+      margin: 0 0 10px;
+      letter-spacing: .2px;
+    }
+    h2 { font-size: 22px; margin: 20px 0 8px; color: #dbeafe; }
+    h3 { font-size: 18px; margin: 16px 0 6px; color: #c7d2fe; }
+    p, li { color: #cbd5e1; }
+    .lead { color: #e2e8f0; font-size: 18px; }
+    .muted { color: var(--muted); }
+
+    .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .btn {
+      appearance: none;
+      cursor: pointer;
+      border: 1px solid rgba(148,163,184,.28);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #e5e7eb;
+      background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(139,92,246,.18));
+      transition: .2s ease;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.25); }
+    .btn.secondary { background: rgba(148,163,184,.06); }
+    .next-prev {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .def, .tip, .warn, .explain {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-radius: 10px;
+    }
+    .def  { border-left: 3px solid var(--primary);
+            background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); }
+    .tip  { border-left: 3px solid var(--success);
+            background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(59,130,246,.06)); }
+    .warn { border-left: 3px solid var(--warning);
+            background: linear-gradient(135deg, rgba(245,158,11,.10), rgba(251,191,36,.06)); }
+    .explain { border-left: 3px solid #22d3ee;
+               background: linear-gradient(135deg, rgba(34,211,238,.10), rgba(59,130,246,.06)); }
+
+    /* Code blocks */
+    .code-block {
+      position: relative;
+      margin: 14px 0 10px;
+      background: #0b1224;
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 28px rgba(0,0,0,.3);
+    }
+    .code-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.10));
+      color: #c7d2fe;
+      border-bottom: 1px solid rgba(148,163,184,.16);
+    }
+    .lang-pill {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(99,102,241,.18);
+      border: 1px solid rgba(99,102,241,.35);
+      color: #e0e7ff;
+    }
+    .copy-btn {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(148,163,184,.28);
+      color: #e5e7eb;
+      background: rgba(148,163,184,.06);
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .copy-btn:hover { background: rgba(148,163,184,.12); }
+    .copied { background: rgba(16,185,129,.15) !important; border-color: rgba(16,185,129,.5) !important; color: #bbf7d0 !important; }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      max-width: 100%;
+    }
+    code[class*="language-"] {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      tab-size: 4;
+      white-space: pre;
+    }
+
+    /* Demos */
+    .array-visual {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 10px;
+      margin: 14px 0 10px;
+    }
+    .cell {
+      background: linear-gradient(135deg, rgba(99,102,241,.14), rgba(139,92,246,.14));
+      border: 1px solid rgba(148,163,184,.25);
+      border-radius: 12px;
+      text-align: center;
+      padding: 16px 8px;
+      font-weight: 800;
+      color: #e2e8f0;
+      position: relative;
+    }
+    .idx {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .inputs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .inputs input {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,.35);
+      background: rgba(148,163,184,.06);
+      color: #e5e7eb;
+      outline: none;
+    }
+    .inputs input:focus { box-shadow: 0 0 0 4px rgba(99,102,241,.18); border-color: var(--ring); }
+
+    /* Exercise styling */
+    .exercise {
+      margin: 24px 0;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148,163,184,.2);
+    }
+    .exercise-title {
+      font-size: 20px;
+      margin-top: 0;
+      color: #93c5fd;
+    }
+    .exercise-desc {
+      margin-bottom: 16px;
+    }
+    .exercise-hint {
+      background: rgba(148,163,184,.08);
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin: 10px 0;
+      display: none;
+    }
+    .hint-btn {
+      margin-top: 8px;
+      font-size: 13px;
+      padding: 6px 10px;
+    }
+    .solution-toggle {
+      margin-top: 16px;
+      cursor: pointer;
+      color: var(--primary);
+      font-weight: 600;
+      display: inline-block;
+    }
+    .solution {
+      display: none;
+      margin-top: 16px;
+    }
+    .test-case {
+      margin: 12px 0;
+      padding: 12px;
+      background: rgba(148,163,184,.06);
+      border-radius: 8px;
+    }
+    .test-input, .test-expected {
+      font-family: var(--mono);
+      font-size: 14px;
+    }
+    .run-btn {
+      margin-top: 10px;
+    }
+    .output-area {
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 14px;
+      min-height: 20px;
+      border: 1px solid rgba(148,163,184,.2);
+    }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      h1 { font-size: 26px; }
+      .nav-inner { grid-template-columns: 1fr; }
+      .nav-links { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">Java Array Practice</div>
+      <nav class="nav-links" id="topNav">
+        <a href="#home">Home</a>
+        <a href="#basic">Basic Exercises</a>
+        <a href="#intermediate">Intermediate</a>
+        <a href="#advanced">Advanced</a>
+        <a href="#solutions">Solutions</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Page: Home -->
+    <section class="page active" data-route="home">
+      <div class="card">
+        <h1>Java Array Practice Exercises 🏋️‍♂️</h1>
+        <p class="lead">
+          Hands-on practice problems to strengthen your Java array skills. Each exercise includes:
+        </p>
+        <ul>
+          <li>Complete problem description</li>
+          <li>Hint system if you get stuck</li>
+          <li>Test cases to verify your solution</li>
+          <li>Complete solution code</li>
+        </ul>
+
+        <div class="def">
+          <strong>How to use:</strong> Try to solve each problem on your own first. Use hints only when needed, and check the solution after you've attempted your own implementation.
+        </div>
+
+        <div class="tip">
+          <strong>Pro tip:</strong> Type out the code instead of copying. This builds muscle memory and deeper understanding.
+        </div>
+
+        <div class="btns">
+          <a class="btn" href="#basic">Start with Basic Exercises →</a>
+          <a class="btn secondary" href="#solutions">Jump to Solutions</a>
+        </div>
+
+        <div class="next-prev">
+          <span></span>
+          <a class="btn" href="#basic">Next: Basic Exercises →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Basic Exercises -->
+    <section class="page" data-route="basic">
+      <div class="card">
+        <h1>Basic Array Exercises</h1>
+        <p class="muted">Start with these fundamental array operations.</p>
+
+        <!-- Exercise 1 -->
+        <div class="exercise">
+          <h3 class="exercise-title">Exercise 1: Find Maximum Value</h3>
+          <div class="exercise-desc">
+            <p>Write a method that finds the maximum value in an integer array.</p>
+            <div class="test-case">
+              <div class="test-input">Input: [3, 5, 7, 2, 8, -1, 4, 10, 12]</div>
+              <div class="test-expected">Expected output: 12</div>
+            </div>
+            <div class="test-case">
+              <div class="test-input">Input: [-5, -2, -10, -1]</div>
+              <div class="test-expected">Expected output: -1</div>
+            </div>
+          </div>
+          <button class="btn hint-btn">Show Hint</button>
+          <div class="exercise-hint">
+            <p>Initialize a variable to store the maximum value. Start with the first element of the array, then iterate through the array comparing each element to your current maximum.</p>
+          </div>
+          <div class="solution-toggle">View Solution</div>
+          <div class="solution">
+            <div class="code-block">
+              <div class="code-top">
+                <span class="lang-pill">Java</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+<pre><code class="language-java">public class ArrayExercises {
+    public static int findMax(int[] arr) {
+        if (arr == null || arr.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty or null");
+        }
+        
+        int max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] test1 = {3, 5, 7, 2, 8, -1, 4, 10, 12};
+        System.out.println("Max of test1: " + findMax(test1)); // 12
+        
+        int[] test2 = {-5, -2, -10, -1};
+        System.out.println("Max of test2: " + findMax(test2)); // -1
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="exercise">
+          <h3 class="exercise-title">Exercise 2: Calculate Average</h3>
+          <div class="exercise-desc">
+            <p>Write a method that calculates the average of values in a double array.</p>
+            <div class="test-case">
+              <div class="test-input">Input: [1.0, 2.0, 3.0, 4.0, 5.0]</div>
+              <div class="test-expected">Expected output: 3.0</div>
+            </div>
+            <div class="test-case">
+              <div class="test-input">Input: [5.5, 10.5, 8.5, 3.5]</div>
+              <div class="test-expected">Expected output: 7.0</div>
+            </div>
+          </div>
+          <button class="btn hint-btn">Show Hint</button>
+          <div class="exercise-hint">
+            <p>Sum all the elements in the array, then divide by the number of elements. Be careful with integer division if working with integers.</p>
+          </div>
+          <div class="solution-toggle">View Solution</div>
+          <div class="solution">
+            <div class="code-block">
+              <div class="code-top">
+                <span class="lang-pill">Java</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+<pre><code class="language-java">public class ArrayExercises {
+    public static double calculateAverage(double[] arr) {
+        if (arr == null || arr.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty or null");
+        }
+        
+        double sum = 0;
+        for (double num : arr) {
+            sum += num;
+        }
+        return sum / arr.length;
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        double[] test1 = {1.0, 2.0, 3.0, 4.0, 5.0};
+        System.out.println("Average of test1: " + calculateAverage(test1)); // 3.0
+        
+        double[] test2 = {5.5, 10.5, 8.5, 3.5};
+        System.out.println("Average of test2: " + calculateAverage(test2)); // 7.0
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="exercise">
+          <h3 class="exercise-title">Exercise 3: Reverse Array</h3>
+          <div class="exercise-desc">
+            <p>Write a method that reverses the elements of an array in place (without creating a new array).</p>
+            <div class="test-case">
+              <div class="test-input">Input: [1, 2, 3, 4, 5]</div>
+              <div class="test-expected">Expected output: [5, 4, 3, 2, 1]</div>
+            </div>
+            <div class="test-case">
+              <div class="test-input">Input: ["A", "B", "C", "D"]</div>
+              <div class="test-expected">Expected output: ["D", "C", "B", "A"]</div>
+            </div>
+          </div>
+          <button class="btn hint-btn">Show Hint</button>
+          <div class="exercise-hint">
+            <p>Use two pointers: one starting at the beginning and one at the end. Swap the elements at these pointers, then move the pointers toward the center until they meet.</p>
+          </div>
+          <div class="solution-toggle">View Solution</div>
+          <div class="solution">
+            <div class="code-block">
+              <div class="code-top">
+                <span class="lang-pill">Java</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+<pre><code class="language-java">public class ArrayExercises {
+    public static void reverseArray(int[] arr) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Array must not be null");
+        }
+        
+        int left = 0;
+        int right = arr.length - 1;
+        
+        while (left < right) {
+            // Swap elements
+            int temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+            
+            // Move pointers
+            left++;
+            right--;
+        }
+    }
+    
+    // Generic version for any type
+    public static <T> void reverseArray(T[] arr) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Array must not be null");
+        }
+        
+        int left = 0;
+        int right = arr.length - 1;
+        
+        while (left < right) {
+            // Swap elements
+            T temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+            
+            // Move pointers
+            left++;
+            right--;
+        }
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] test1 = {1, 2, 3, 4, 5};
+        reverseArray(test1);
+        System.out.print("Reversed test1: ");
+        for (int num : test1) System.out.print(num + " "); // 5 4 3 2 1
+        System.out.println();
+        
+        String[] test2 = {"A", "B", "C", "D"};
+        reverseArray(test2);
+        System.out.print("Reversed test2: ");
+        for (String s : test2) System.out.print(s + " "); // D C B A
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#home">← Back: Home</a>
+          <a class="btn" href="#intermediate">Next: Intermediate Exercises →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Intermediate Exercises -->
+    <section class="page" data-route="intermediate">
+      <div class="card">
+        <h1>Intermediate Array Exercises</h1>
+        <p class="muted">Challenge yourself with these more complex array problems.</p>
+
+        <!-- Exercise 1 -->
+        <div class="exercise">
+          <h3 class="exercise-title">Exercise 1: Remove Duplicates</h3>
+          <div class="exercise-desc">
+            <p>Write a method that removes duplicates from a sorted array in place and returns the new length. The relative order of elements should be kept the same.</p>
+            <div class="test-case">
+              <div class="test-input">Input: [1, 1, 2, 2, 3, 4, 4, 4, 5]</div>
+              <div class="test-expected">Expected output: 5 (and array becomes [1, 2, 3, 4, 5, ...])</div>
+            </div>
+            <div class="test-case">
+              <div class="test-input">Input: [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]</div>
+              <div class="test-expected">Expected output: 5</div>
+            </div>
+          </div>
+          <button class="btn hint-btn">Show Hint</button>
+          <div class="exercise-hint">
+            <p>Use two pointers: one to track the position of the last unique element, and another to iterate through the array. Only copy elements when they're different from the previous one.</p>
+          </div>
+          <div class="solution-toggle">View Solution</div>
+          <div class="solution">
+            <div class="code-block">
+              <div class="code-top">
+                <span class="lang-pill">Java</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+<pre><code class="language-java">public class ArrayExercises {
+    public static int removeDuplicates(int[] arr) {
+        if (arr == null) return 0;
+        if (arr.length == 0) return 0;
+        
+        int uniqueIndex = 0;
+        
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] != arr[uniqueIndex]) {
+                uniqueIndex++;
+                arr[uniqueIndex] = arr[i];
+            }
+        }
+        
+        return uniqueIndex + 1;
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] test1 = {1, 1, 2, 2, 3, 4, 4, 4, 5};
+        int newLength = removeDuplicates(test1);
+        System.out.println("New length: " + newLength); // 5
+        System.out.print("Unique elements: ");
+        for (int i = 0; i < newLength; i++) {
+            System.out.print(test1[i] + " "); // 1 2 3 4 5
+        }
+        System.out.println();
+        
+        int[] test2 = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4};
+        newLength = removeDuplicates(test2);
+        System.out.println("New length: " + newLength); // 5
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="exercise">
+          <h3 class="exercise-title">Exercise 2: Rotate Array</h3>
+          <div class="exercise-desc">
+            <p>Write a method that rotates an array to the right by k steps, where k is non-negative.</p>
+            <div class="test-case">
+              <div class="test-input">Input: [1, 2, 3, 4, 5, 6, 7], k = 3</div>
+              <div class="test-expected">Expected output: [5, 6, 7, 1, 2, 3, 4]</div>
+            </div>
+            <div class="test-case">
+              <div class="test-input">Input: [-1, -100, 3, 99], k = 2</div>
+              <div class="test-expected">Expected output: [3, 99, -1, -100]</div>
+            </div>
+          </div>
+          <button class="btn hint-btn">Show Hint</button>
+          <div class="exercise-hint">
+            <p>There are multiple approaches: 1) Reverse the entire array, then reverse the first k elements, then reverse the rest. 2) Use a temporary array to store the rotated elements.</p>
+          </div>
+          <div class="solution-toggle">View Solution</div>
+          <div class="solution">
+            <div class="code-block">
+              <div class="code-top">
+                <span class="lang-pill">Java</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+<pre><code class="language-java">public class ArrayExercises {
+    public static void rotate(int[] nums, int k) {
+        if (nums == null || nums.length == 0 || k == 0) return;
+        
+        k = k % nums.length; // Handle cases where k > nums.length
+        if (k == 0) return;
+        
+        // Reverse the entire array
+        reverse(nums, 0, nums.length - 1);
+        // Reverse the first k elements
+        reverse(nums, 0, k - 1);
+        // Reverse the remaining elements
+        reverse(nums, k, nums.length - 1);
+    }
+    
+    private static void reverse(int[] nums, int start, int end) {
+        while (start < end) {
+            int temp = nums[start];
+            nums[start] = nums[end];
+            nums[end] = temp;
+            start++;
+            end--;
+        }
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] test1 = {1, 2, 3, 4, 5, 6, 7};
+        rotate(test1, 3);
+        System.out.print("Rotated test1: ");
+        for (int num : test1) System.out.print(num + " "); // 5 6 7 1 2 3 4
+        System.out.println();
+        
+        int[] test2 = {-1, -100, 3, 99};
+        rotate(test2, 2);
+        System.out.print("Rotated test2: ");
+        for (int num : test2) System.out.print(num + " "); // 3 99 -1 -100
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#basic">← Back: Basic Exercises</a>
+          <a class="btn" href="#advanced">Next: Advanced Exercises →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Advanced Exercises -->
+    <section class="page" data-route="advanced">
+      <div class="card">
+        <h1>Advanced Array Exercises</h1>
+        <p class="muted">Tackle these challenging array problems that combine multiple concepts.</p>
+
+        <!-- Exercise 1 -->
+        <div class="exercise">
+          <h3 class="exercise-title">Exercise 1: Two Sum</h3>
+          <div class="exercise-desc">
+            <p>Given an array of integers and a target value, find two numbers that add up to the target and return their indices. Assume exactly one solution exists.</p>
+            <div class="test-case">
+              <div class="test-input">Input: [2, 7, 11, 15], target = 9</div>
+              <div class="test-expected">Expected output: [0, 1]</div>
+            </div>
+            <div class="test-case">
+              <div class="test-input">Input: [3, 2, 4], target = 6</div>
+              <div class="test-expected">Expected output: [1, 2]</div>
+            </div>
+          </div>
+          <button class="btn hint-btn">Show Hint</button>
+          <div class="exercise-hint">
+            <p>Use a HashMap to store each number's index as you iterate through the array. For each number, check if the complement (target - number) exists in the map.</p>
+          </div>
+          <div class="solution-toggle">View Solution</div>
+          <div class="solution">
+            <div class="code-block">
+              <div class="code-top">
+                <span class="lang-pill">Java</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+<pre><code class="language-java">import java.util.HashMap;
+import java.util.Map;
+
+public class ArrayExercises {
+    public static int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> numMap = new HashMap<>();
+        
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (numMap.containsKey(complement)) {
+                return new int[] { numMap.get(complement), i };
+            }
+            numMap.put(nums[i], i);
+        }
+        
+        throw new IllegalArgumentException("No two sum solution");
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] test1 = {2, 7, 11, 15};
+        int[] result1 = twoSum(test1, 9);
+        System.out.println("Indices for test1: [" + result1[0] + ", " + result1[1] + "]"); // [0, 1]
+        
+        int[] test2 = {3, 2, 4};
+        int[] result2 = twoSum(test2, 6);
+        System.out.println("Indices for test2: [" + result2[0] + ", " + result2[1] + "]"); // [1, 2]
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="exercise">
+          <h3 class="exercise-title">Exercise 2: Merge Sorted Arrays</h3>
+          <div class="exercise-desc">
+            <p>Given two sorted integer arrays, merge them into a single sorted array. The first array has enough space at the end to hold all elements.</p>
+            <div class="test-case">
+              <div class="test-input">Input: nums1 = [1, 2, 3, 0, 0, 0], m = 3, nums2 = [2, 5, 6], n = 3</div>
+              <div class="test-expected">Expected output: [1, 2, 2, 3, 5, 6]</div>
+            </div>
+            <div class="test-case">
+              <div class="test-input">Input: nums1 = [4, 5, 6, 0, 0, 0], m = 3, nums2 = [1, 2, 3], n = 3</div>
+              <div class="test-expected">Expected output: [1, 2, 3, 4, 5, 6]</div>
+            </div>
+          </div>
+          <button class="btn hint-btn">Show Hint</button>
+          <div class="exercise-hint">
+            <p>Work backwards from the end of the first array. Compare elements from both arrays and place the larger one at the current end position.</p>
+          </div>
+          <div class="solution-toggle">View Solution</div>
+          <div class="solution">
+            <div class="code-block">
+              <div class="code-top">
+                <span class="lang-pill">Java</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+<pre><code class="language-java">public class ArrayExercises {
+    public static void merge(int[] nums1, int m, int[] nums2, int n) {
+        int i = m - 1; // Last element of nums1
+        int j = n - 1; // Last element of nums2
+        int k = m + n - 1; // Last position of merged array
+        
+        while (i >= 0 && j >= 0) {
+            if (nums1[i] > nums2[j]) {
+                nums1[k] = nums1[i];
+                i--;
+            } else {
+                nums1[k] = nums2[j];
+                j--;
+            }
+            k--;
+        }
+        
+        // If there are remaining elements in nums2
+        while (j >= 0) {
+            nums1[k] = nums2[j];
+            j--;
+            k--;
+        }
+    }
+    
+    // Test the method
+    public static void main(String[] args) {
+        int[] nums1 = {1, 2, 3, 0, 0, 0};
+        int[] nums2 = {2, 5, 6};
+        merge(nums1, 3, nums2, 3);
+        System.out.print("Merged array: ");
+        for (int num : nums1) System.out.print(num + " "); // 1 2 2 3 5 6
+        System.out.println();
+        
+        int[] nums3 = {4, 5, 6, 0, 0, 0};
+        int[] nums4 = {1, 2, 3};
+        merge(nums3, 3, nums4, 3);
+        System.out.print("Merged array: ");
+        for (int num : nums3) System.out.print(num + " "); // 1 2 3 4 5 6
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#intermediate">← Back: Intermediate Exercises</a>
+          <a class="btn" href="#solutions">Next: All Solutions →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page: Solutions -->
+    <section class="page" data-route="solutions">
+      <div class="card">
+        <h1>Complete Solutions</h1>
+        <p class="muted">All exercise solutions in one place for reference.</p>
+
+        <div class="code-block">
+          <div class="code-top">
+            <span class="lang-pill">Java</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+<pre><code class="language-java">import java.util.HashMap;
+import java.util.Map;
+
+public class ArrayExercises {
+    
+    // Exercise 1: Find Maximum Value
+    public static int findMax(int[] arr) {
+        if (arr == null || arr.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty or null");
+        }
+        
+        int max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+    
+    // Exercise 2: Calculate Average
+    public static double calculateAverage(double[] arr) {
+        if (arr == null || arr.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty or null");
+        }
+        
+        double sum = 0;
+        for (double num : arr) {
+            sum += num;
+        }
+        return sum / arr.length;
+    }
+    
+    // Exercise 3: Reverse Array
+    public static void reverseArray(int[] arr) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Array must not be null");
+        }
+        
+        int left = 0;
+        int right = arr.length - 1;
+        
+        while (left < right) {
+            int temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+            left++;
+            right--;
+        }
+    }
+    
+    // Exercise 4: Remove Duplicates from Sorted Array
+    public static int removeDuplicates(int[] arr) {
+        if (arr == null) return 0;
+        if (arr.length == 0) return 0;
+        
+        int uniqueIndex = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] != arr[uniqueIndex]) {
+                uniqueIndex++;
+                arr[uniqueIndex] = arr[i];
+            }
+        }
+        return uniqueIndex + 1;
+    }
+    
+    // Exercise 5: Rotate Array
+    public static void rotate(int[] nums, int k) {
+        if (nums == null || nums.length == 0 || k == 0) return;
+        
+        k = k % nums.length;
+        if (k == 0) return;
+        
+        reverse(nums, 0, nums.length - 1);
+        reverse(nums, 0, k - 1);
+        reverse(nums, k, nums.length - 1);
+    }
+    
+    private static void reverse(int[] nums, int start, int end) {
+        while (start < end) {
+            int temp = nums[start];
+            nums[start] = nums[end];
+            nums[end] = temp;
+            start++;
+            end--;
+        }
+    }
+    
+    // Exercise 6: Two Sum
+    public static int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> numMap = new HashMap<>();
+        
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (numMap.containsKey(complement)) {
+                return new int[] { numMap.get(complement), i };
+            }
+            numMap.put(nums[i], i);
+        }
+        
+        throw new IllegalArgumentException("No two sum solution");
+    }
+    
+    // Exercise 7: Merge Sorted Arrays
+    public static void merge(int[] nums1, int m, int[] nums2, int n) {
+        int i = m - 1;
+        int j = n - 1;
+        int k = m + n - 1;
+        
+        while (i >= 0 && j >= 0) {
+            if (nums1[i] > nums2[j]) {
+                nums1[k] = nums1[i];
+                i--;
+            } else {
+                nums1[k] = nums2[j];
+                j--;
+            }
+            k--;
+        }
+        
+        while (j >= 0) {
+            nums1[k] = nums2[j];
+            j--;
+            k--;
+        }
+    }
+    
+    // Test all methods
+    public static void main(String[] args) {
+        // Test findMax
+        int[] test1 = {3, 5, 7, 2, 8, -1, 4, 10, 12};
+        System.out.println("Max: " + findMax(test1)); // 12
+        
+        // Test calculateAverage
+        double[] test2 = {1.0, 2.0, 3.0, 4.0, 5.0};
+        System.out.println("Average: " + calculateAverage(test2)); // 3.0
+        
+        // Test reverseArray
+        int[] test3 = {1, 2, 3, 4, 5};
+        reverseArray(test3);
+        System.out.print("Reversed: ");
+        for (int num : test3) System.out.print(num + " "); // 5 4 3 2 1
+        System.out.println();
+        
+        // Test removeDuplicates
+        int[] test4 = {1, 1, 2, 2, 3, 4, 4, 4, 5};
+        int newLength = removeDuplicates(test4);
+        System.out.println("New length: " + newLength); // 5
+        
+        // Test rotate
+        int[] test5 = {1, 2, 3, 4, 5, 6, 7};
+        rotate(test5, 3);
+        System.out.print("Rotated: ");
+        for (int num : test5) System.out.print(num + " "); // 5 6 7 1 2 3 4
+        System.out.println();
+        
+        // Test twoSum
+        int[] test6 = {2, 7, 11, 15};
+        int[] result = twoSum(test6, 9);
+        System.out.println("Two sum indices: [" + result[0] + ", " + result[1] + "]"); // [0, 1]
+        
+        // Test merge
+        int[] test7 = {1, 2, 3, 0, 0, 0};
+        int[] test8 = {2, 5, 6};
+        merge(test7, 3, test8, 3);
+        System.out.print("Merged: ");
+        for (int num : test7) System.out.print(num + " "); // 1 2 2 3 5 6
+    }
+}
+</code></pre>
+        </div>
+
+        <div class="next-prev">
+          <a class="btn" href="#advanced">← Back: Advanced Exercises</a>
+          <a class="btn" href="#home">Finish → Home</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* =========================
+       Tiny Router (hash-based)
+       ========================= */
+    const routes = [
+      "home","basic","intermediate","advanced","solutions"
+    ];
+
+    function setActiveRoute() {
+      const route = location.hash.replace("#","") || "home";
+      document.querySelectorAll(".page").forEach(p => {
+        p.classList.toggle("active", p.dataset.route === route);
+      });
+      document.querySelectorAll("#topNav a").forEach(a => {
+        a.classList.toggle("active", a.getAttribute("href") === "#" + route);
+      });
+      const active = document.querySelector('.page.active h1');
+      if (active) active.setAttribute('tabindex','-1'), active.focus({preventScroll:true});
+      // re-run Prism on the visible page
+      if (window.Prism) Prism.highlightAllUnder(document.querySelector('.page.active'));
+      // ensure copy buttons on this page respond (in case of dynamic DOM)
+      wireCopyButtons(document.querySelector('.page.active') || document);
+    }
+    window.addEventListener("hashchange", setActiveRoute);
+
+    /* ===============
+       Copy buttons
+       =============== */
+    function wireCopyButtons(scope=document) {
+      scope.querySelectorAll(".code-block .copy-btn").forEach(btn => {
+        if (btn.dataset.wired) return;
+        btn.dataset.wired = "1";
+        btn.addEventListener("click", () => {
+          const code = btn.closest(".code-block").querySelector("code").textContent;
+          navigator.clipboard.writeText(code).then(() => {
+            btn.classList.add("copied");
+            btn.textContent = "Copied!";
+            setTimeout(() => { btn.classList.remove("copied"); btn.textContent = "Copy"; }, 900);
+          });
+        });
+      });
+    }
+
+    /* ===================
+       Exercise toggles
+       =================== */
+    function wireExerciseToggles() {
+      // Hint buttons
+      document.querySelectorAll(".hint-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const hint = btn.nextElementSibling;
+          hint.style.display = hint.style.display === "block" ? "none" : "block";
+          btn.textContent = hint.style.display === "block" ? "Hide Hint" : "Show Hint";
+        });
+      });
+      
+      // Solution toggles
+      document.querySelectorAll(".solution-toggle").forEach(toggle => {
+        toggle.addEventListener("click", () => {
+          const solution = toggle.nextElementSibling;
+          solution.style.display = solution.style.display === "block" ? "none" : "block";
+          toggle.textContent = solution.style.display === "block" ? "Hide Solution" : "View Solution";
+        });
+      });
+    }
+
+    /* ==========
+       Boot
+       ========== */
+    window.addEventListener("DOMContentLoaded", () => {
+      setActiveRoute();
+      wireCopyButtons(document);
+      wireExerciseToggles();
+    });
+  </script>
+</body>
+</html>
