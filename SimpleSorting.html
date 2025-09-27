@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Sorting Algorithms - Interactive Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .content-section h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .code-container {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-header {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 15px -20px;
+            font-weight: bold;
+        }
+
+        .java-code {
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #3498db; }
+        .string { color: #e74c3c; }
+        .comment { color: #95a5a6; font-style: italic; }
+        .number { color: #f39c12; }
+
+        .explanation {
+            background: #ecf0f1;
+            padding: 20px;
+            border-left: 5px solid #3498db;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .complexity-box {
+            background: linear-gradient(45deg, #ff9a56, #ff6b35);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .quiz-container {
+            margin: 20px 0;
+        }
+
+        .question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #007bff;
+        }
+
+        .options {
+            margin: 15px 0;
+        }
+
+        .option {
+            background: white;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .option.selected {
+            background: #2196f3;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        .option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #388e3c;
+        }
+
+        .option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #d32f2f;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .practice-exercise {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .solution {
+            display: none;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .algorithm-steps {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 200px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Java Sorting Algorithms</h1>
+            <p>Master the fundamentals of sorting with interactive examples</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('introduction')">Introduction</button>
+            <button class="nav-btn" onclick="showSection('bubble')">Bubble Sort</button>
+            <button class="nav-btn" onclick="showSection('selection')">Selection Sort</button>
+            <button class="nav-btn" onclick="showSection('insertion')">Insertion Sort</button>
+            <button class="nav-btn" onclick="showSection('quick')">Quick Sort</button>
+            <button class="nav-btn" onclick="showSection('practice')">Practice</button>
+            <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
+        </div>
+
+        <!-- Introduction Section -->
+        <div id="introduction" class="content-section active">
+            <h2>📚 Introduction to Sorting Algorithms</h2>
+            
+            <div class="explanation">
+                <h3>What is Sorting?</h3>
+                <p><strong>Sorting</strong> is the process of arranging elements in a specific order, typically ascending or descending. It's one of the fundamental operations in computer science and is used extensively in various applications.</p>
+            </div>
+
+            <h3>Why Study Sorting Algorithms?</h3>
+            <ul style="margin: 20px 0; padding-left: 30px;">
+                <li><strong>Foundation:</strong> Understanding sorting helps grasp algorithm analysis concepts</li>
+                <li><strong>Optimization:</strong> Different algorithms have different time and space complexities</li>
+                <li><strong>Real-world Applications:</strong> Used in databases, search engines, and data processing</li>
+                <li><strong>Interview Preparation:</strong> Common topic in technical interviews</li>
+            </ul>
+
+            <div class="complexity-box">
+                <h3>⏱️ Time Complexity Overview</h3>
+                <p><strong>Best Case:</strong> When input is already in optimal condition</p>
+                <p><strong>Average Case:</strong> Expected performance for random input</p>
+                <p><strong>Worst Case:</strong> When input is in the most unfavorable condition</p>
+            </div>
+
+            <h3>Sorting Algorithms We'll Cover:</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                    <h4>🔵 Bubble Sort</h4>
+                    <p>Simple but inefficient - O(n²)</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                    <h4>🟣 Selection Sort</h4>
+                    <p>Finds minimum/maximum - O(n²)</p>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px;">
+                    <h4>🟢 Insertion Sort</h4>
+                    <p>Builds sorted array gradually - O(n²)</p>
+                </div>
+                <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+                    <h4>🟠 Quick Sort</h4>
+                    <p>Divide and conquer - O(n log n)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bubble Sort Section -->
+        <div id="bubble" class="content-section">
+            <h2>🔵 Bubble Sort</h2>
+            
+            <div class="explanation">
+                <h3>Definition</h3>
+                <p><strong>Bubble Sort</strong> is the simplest sorting algorithm that works by repeatedly swapping adjacent elements if they are in the wrong order. The largest element "bubbles" to the end in each iteration.</p>
+            </div>
+
+            <div class="algorithm-steps">
+                <h3>How Bubble Sort Works:</h3>
+                <div class="step">1. Compare adjacent elements</div>
+                <div class="step">2. Swap if they're in wrong order</div>
+                <div class="step">3. Continue through the entire array</div>
+                <div class="step">4. Repeat until no swaps are needed</div>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">📝 Complete Bubble Sort Implementation</div>
+                <div class="java-code">
+<span class="keyword">public class</span> BubbleSort {
+    
+    <span class="comment">// Main bubble sort method</span>
+    <span class="keyword">public static void</span> bubbleSort(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        
+        <span class="comment">// Outer loop for number of passes</span>
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < n - <span class="number">1</span>; i++) {
+            <span class="keyword">boolean</span> swapped = <span class="keyword">false</span>; <span class="comment">// Optimization flag</span>
+            
+            <span class="comment">// Inner loop for comparisons in each pass</span>
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j < n - i - <span class="number">1</span>; j++) {
+                <span class="comment">// Compare adjacent elements</span>
+                <span class="keyword">if</span> (arr[j] > arr[j + <span class="number">1</span>]) {
+                    <span class="comment">// Swap elements</span>
+                    <span class="keyword">int</span> temp = arr[j];
+                    arr[j] = arr[j + <span class="number">1</span>];
+                    arr[j + <span class="number">1</span>] = temp;
+                    swapped = <span class="keyword">true</span>;
+                }
+            }
+            
+            <span class="comment">// If no swapping occurred, array is sorted</span>
+            <span class="keyword">if</span> (!swapped) {
+                <span class="keyword">break</span>;
+            }
+        }
+    }
+    
+    <span class="comment">// Helper method to print array</span>
+    <span class="keyword">public static void</span> printArray(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < arr.length; i++) {
+            System.out.print(arr[i] + <span class="string">" "</span>);
+        }
+        System.out.println();
+    }
+    
+    <span class="comment">// Main method with example</span>
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="keyword">int</span>[] arr = {<span class="number">64</span>, <span class="number">34</span>, <span class="number">25</span>, <span class="number">12</span>, <span class="number">22</span>, <span class="number">11</span>, <span class="number">90</span>};
+        
+        System.out.println(<span class="string">"Original array:"</span>);
+        printArray(arr);
+        
+        bubbleSort(arr);
+        
+        System.out.println(<span class="string">"Sorted array:"</span>);
+        printArray(arr);
+    }
+}
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3>🔍 Detailed Code Explanation:</h3>
+                
+                <h4>1. Main bubbleSort Method:</h4>
+                <ul>
+                    <li><strong>Outer Loop (i):</strong> Controls the number of passes. We need n-1 passes maximum because after each pass, the largest unsorted element reaches its correct position.</li>
+                    <li><strong>swapped Flag:</strong> Optimization to detect if array becomes sorted early. If no swaps occur in a pass, the array is sorted.</li>
+                    <li><strong>Inner Loop (j):</strong> Performs comparisons and swaps. Range decreases by 1 each pass because the last i elements are already in correct position.</li>
+                    <li><strong>Comparison:</strong> <code>arr[j] > arr[j + 1]</code> checks if current element is greater than next element.</li>
+                    <li><strong>Swap Logic:</strong> Uses temporary variable to swap elements when they're in wrong order.</li>
+                </ul>
+                
+                <h4>2. Why n-i-1 in Inner Loop?</h4>
+                <p>We subtract i because after i passes, the last i elements are already sorted. We subtract 1 because we compare j with j+1, so j should not reach the last index.</p>
+                
+                <h4>3. Optimization Explanation:</h4>
+                <p>The <code>swapped</code> flag is crucial - without it, bubble sort always runs O(n²) time. With it, best case becomes O(n) for already sorted arrays.</p>
+                
+                <h4>4. Step-by-Step Trace:</h4>
+                <p><strong>Pass 1:</strong> [64, 34, 25, 12, 22, 11, 90] → [34, 25, 12, 22, 11, 64, 90]</p>
+                <p><strong>Pass 2:</strong> [34, 25, 12, 22, 11, 64, 90] → [25, 12, 22, 11, 34, 64, 90]</p>
+                <p><strong>Pass 3:</strong> [25, 12, 22, 11, 34, 64, 90] → [12, 22, 11, 25, 34, 64, 90]</p>
+                <p><strong>Continue until...</strong> [11, 12, 22, 25, 34, 64, 90]</p>
+            </div>
+
+            <div class="complexity-box">
+                <h3>⏱️ Time & Space Complexity</h3>
+                <p><strong>Best Case:</strong> O(n) - when array is already sorted</p>
+                <p><strong>Average Case:</strong> O(n²) - random order</p>
+                <p><strong>Worst Case:</strong> O(n²) - reverse sorted</p>
+                <p><strong>Space Complexity:</strong> O(1) - only uses constant extra space</p>
+            </div>
+        </div>
+
+        <!-- Selection Sort Section -->
+        <div id="selection" class="content-section">
+            <h2>🟣 Selection Sort</h2>
+            
+            <div class="explanation">
+                <h3>Definition</h3>
+                <p><strong>Selection Sort</strong> works by finding the minimum element from the unsorted portion and placing it at the beginning. It maintains two subarrays: sorted and unsorted.</p>
+            </div>
+
+            <div class="algorithm-steps">
+                <h3>How Selection Sort Works:</h3>
+                <div class="step">1. Find the minimum element in the unsorted array</div>
+                <div class="step">2. Swap it with the first element of unsorted portion</div>
+                <div class="step">3. Move the boundary of sorted portion</div>
+                <div class="step">4. Repeat until entire array is sorted</div>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">📝 Complete Selection Sort Implementation</div>
+                <div class="java-code">
+<span class="keyword">public class</span> SelectionSort {
+    
+    <span class="comment">// Main selection sort method</span>
+    <span class="keyword">public static void</span> selectionSort(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        
+        <span class="comment">// Traverse through all array elements</span>
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < n - <span class="number">1</span>; i++) {
+            <span class="comment">// Find the minimum element in remaining unsorted array</span>
+            <span class="keyword">int</span> minIndex = i;
+            
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j < n; j++) {
+                <span class="keyword">if</span> (arr[j] < arr[minIndex]) {
+                    minIndex = j; <span class="comment">// Update minimum index</span>
+                }
+            }
+            
+            <span class="comment">// Swap the found minimum element with first element</span>
+            <span class="keyword">if</span> (minIndex != i) {
+                <span class="keyword">int</span> temp = arr[minIndex];
+                arr[minIndex] = arr[i];
+                arr[i] = temp;
+            }
+            
+            <span class="comment">// Show progress (optional for learning)</span>
+            System.out.println(<span class="string">"After pass "</span> + (i + <span class="number">1</span>) + <span class="string">": "</span> + java.util.Arrays.toString(arr));
+        }
+    }
+    
+    <span class="comment">// Method to find index of minimum element in range</span>
+    <span class="keyword">public static int</span> findMinIndex(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> start, <span class="keyword">int</span> end) {
+        <span class="keyword">int</span> minIndex = start;
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = start + <span class="number">1</span>; i <= end; i++) {
+            <span class="keyword">if</span> (arr[i] < arr[minIndex]) {
+                minIndex = i;
+            }
+        }
+        <span class="keyword">return</span> minIndex;
+    }
+    
+    <span class="comment">// Main method with example</span>
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="keyword">int</span>[] arr = {<span class="number">29</span>, <span class="number">10</span>, <span class="number">14</span>, <span class="number">37</span>, <span class="number">13</span>, <span class="number">5</span>};
+        
+        System.out.println(<span class="string">"Original array: "</span> + java.util.Arrays.toString(arr));
+        selectionSort(arr);
+        System.out.println(<span class="string">"Final sorted array: "</span> + java.util.Arrays.toString(arr));
+    }
+}
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3>🔍 Detailed Code Explanation:</h3>
+                
+                <h4>1. Main selectionSort Method Structure:</h4>
+                <ul>
+                    <li><strong>Outer Loop (i):</strong> Iterates from 0 to n-2. We don't need to check the last element because it will automatically be in the correct position.</li>
+                    <li><strong>minIndex Variable:</strong> Keeps track of the index of the smallest element found in the unsorted portion.</li>
+                    <li><strong>Inner Loop (j):</strong> Searches through the unsorted portion (from i+1 to n-1) to find the minimum element.</li>
+                    <li><strong>Conditional Swap:</strong> Only swaps if minIndex != i, avoiding unnecessary operations.</li>
+                </ul>
+                
+                <h4>2. Algorithm Logic Breakdown:</h4>
+                <p><strong>Finding Minimum:</strong> The inner loop compares each element with the current minimum and updates minIndex when a smaller element is found.</p>
+                <p><strong>Positioning:</strong> After finding the minimum in unsorted portion, it's swapped with the first element of unsorted portion.</p>
+                <p><strong>Boundary Movement:</strong> The boundary between sorted and unsorted portions moves one position right after each iteration.</p>
+                
+                <h4>3. Key Characteristics:</h4>
+                <ul>
+                    <li><strong>Invariant:</strong> After i iterations, the first i elements are in their final sorted positions.</li>
+                    <li><strong>Minimal Swaps:</strong> Makes at most n-1 swaps, making it efficient when write operations are expensive.</li>
+                    <li><strong>Not Adaptive:</strong> Performance doesn't improve for partially sorted arrays.</li>
+                    <li><strong>Not Stable:</strong> May change relative order of equal elements.</li>
+                </ul>
+                
+                <h4>4. Helper Method Explanation:</h4>
+                <p><strong>findMinIndex:</strong> Demonstrates how to modularize the minimum-finding logic. This makes the code more readable and reusable.</p>
+                
+                <h4>5. Step-by-Step Trace:</h4>
+                <p><strong>Initial:</strong> [29, 10, 14, 37, 13, 5]</p>
+                <p><strong>Pass 1:</strong> Find min (5), swap with first → [5, 10, 14, 37, 13, 29]</p>
+                <p><strong>Pass 2:</strong> Find min (10), already in place → [5, 10, 14, 37, 13, 29]</p>
+                <p><strong>Pass 3:</strong> Find min (13), swap with 14 → [5, 10, 13, 37, 14, 29]</p>
+                <p><strong>Pass 4:</strong> Find min (14), swap with 37 → [5, 10, 13, 14, 37, 29]</p>
+                <p><strong>Pass 5:</strong> Find min (29), swap with 37 → [5, 10, 13, 14, 29, 37]</p>
+            </div>
+
+            <div class="complexity-box">
+                <h3>⏱️ Time & Space Complexity</h3>
+                <p><strong>Best Case:</strong> O(n²) - always scans entire unsorted portion</p>
+                <p><strong>Average Case:</strong> O(n²) - consistent performance</p>
+                <p><strong>Worst Case:</strong> O(n²) - no optimization possible</p>
+                <p><strong>Space Complexity:</strong> O(1) - in-place sorting</p>
+                <p><strong>Note:</strong> Makes minimum number of swaps: O(n)</p>
+            </div>
+        </div>
+
+        <!-- Insertion Sort Section -->
+        <div id="insertion" class="content-section">
+            <h2>🟢 Insertion Sort</h2>
+            
+            <div class="explanation">
+                <h3>Definition</h3>
+                <p><strong>Insertion Sort</strong> builds the final sorted array one element at a time. It's similar to how you might sort playing cards in your hands - take one card and insert it in the correct position.</p>
+            </div>
+
+            <div class="algorithm-steps">
+                <h3>How Insertion Sort Works:</h3>
+                <div class="step">1. Start with second element (first is considered sorted)</div>
+                <div class="step">2. Compare current element with sorted portion</div>
+                <div class="step">3. Shift larger elements to the right</div>
+                <div class="step">4. Insert current element in correct position</div>
+                <div class="step">5. Repeat for all remaining elements</div>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">📝 Complete Insertion Sort Implementation</div>
+                <div class="java-code">
+<span class="keyword">public class</span> InsertionSort {
+    
+    <span class="comment">// Main insertion sort method</span>
+    <span class="keyword">public static void</span> insertionSort(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        
+        <span class="comment">// Start from second element (index 1)</span>
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i < n; i++) {
+            <span class="keyword">int</span> key = arr[i]; <span class="comment">// Current element to be inserted</span>
+            <span class="keyword">int</span> j = i - <span class="number">1</span>;   <span class="comment">// Index of last element in sorted portion</span>
+            
+            <span class="comment">// Move elements greater than key one position ahead</span>
+            <span class="keyword">while</span> (j >= <span class="number">0</span> && arr[j] > key) {
+                arr[j + <span class="number">1</span>] = arr[j]; <span class="comment">// Shift element to right</span>
+                j = j - <span class="number">1</span>;           <span class="comment">// Move to previous element</span>
+            }
+            
+            <span class="comment">// Insert key at correct position</span>
+            arr[j + <span class="number">1</span>] = key;
+            
+            <span class="comment">// Show progress</span>
+            System.out.println(<span class="string">"After inserting "</span> + key + <span class="string">": "</span> + 
+                             java.util.Arrays.toString(arr));
+        }
+    }
+    
+    <span class="comment">// Recursive version of insertion sort</span>
+    <span class="keyword">public static void</span> insertionSortRecursive(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> n) {
+        <span class="comment">// Base case</span>
+        <span class="keyword">if</span> (n <= <span class="number">1</span>) {
+            <span class="keyword">return</span>;
+        }
+        
+        <span class="comment">// Sort first n-1 elements</span>
+        insertionSortRecursive(arr, n - <span class="number">1</span>);
+        
+        <span class="comment">// Insert last element at correct position</span>
+        <span class="keyword">int</span> last = arr[n - <span class="number">1</span>];
+        <span class="keyword">int</span> j = n - <span class="number">2</span>;
+        
+        <span class="keyword">while</span> (j >= <span class="number">0</span> && arr[j] > last) {
+            arr[j + <span class="number">1</span>] = arr[j];
+            j--;
+        }
+        arr[j + <span class="number">1</span>] = last;
+    }
+    
+    <span class="comment">// Binary search version for optimization</span>
+    <span class="keyword">public static void</span> binaryInsertionSort(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i < arr.length; i++) {
+            <span class="keyword">int</span> key = arr[i];
+            <span class="keyword">int</span> location = binarySearch(arr, <span class="number">0</span>, i, key);
+            
+            <span class="comment">// Shift elements and insert</span>
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = i - <span class="number">1</span>; j >= location; j--) {
+                arr[j + <span class="number">1</span>] = arr[j];
+            }
+            arr[location] = key;
+        }
+    }
+    
+    <span class="keyword">private static int</span> binarySearch(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high, <span class="keyword">int</span> key) {
+        <span class="keyword">while</span> (low < high) {
+            <span class="keyword">int</span> mid = low + (high - low) / <span class="number">2</span>;
+            <span class="keyword">if</span> (key < arr[mid]) {
+                high = mid;
+            } <span class="keyword">else</span> {
+                low = mid + <span class="number">1</span>;
+            }
+        }
+        <span class="keyword">return</span> low;
+    }
+    
+    <span class="comment">// Main method with example</span>
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="keyword">int</span>[] arr = {<span class="number">12</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">5</span>, <span class="number">6</span>};
+        
+        System.out.println(<span class="string">"Original array: "</span> + java.util.Arrays.toString(arr));
+        insertionSort(arr);
+        System.out.println(<span class="string">"Final sorted array: "</span> + java.util.Arrays.toString(arr));
+    }
+}
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3>🔍 Detailed Code Explanation:</h3>
+                
+                <h4>1. Main insertionSort Method Logic:</h4>
+                <ul>
+                    <li><strong>Starting Point:</strong> Begin from index 1 (second element) because a single element is trivially sorted.</li>
+                    <li><strong>Key Variable:</strong> Stores the current element to be inserted into the sorted portion.</li>
+                    <li><strong>Backward Scanning:</strong> Variable j starts from i-1 and moves backward to find the correct position for key.</li>
+                    <li><strong>Shifting Elements:</strong> Elements greater than key are moved one position to the right.</li>
+                    <li><strong>Insertion:</strong> Once the correct position is found, key is inserted at arr[j+1].</li>
+                </ul>
+                
+                <h4>2. While Loop Breakdown:</h4>
+                <p><strong>Condition 1:</strong> <code>j >= 0</code> ensures we don't go below array bounds.</p>
+                <p><strong>Condition 2:</strong> <code>arr[j] > key</code> checks if current element needs to be shifted right.</p>
+                <p><strong>Shifting:</strong> <code>arr[j + 1] = arr[j]</code> moves the larger element one position right.</p>
+                <p><strong>Decrement:</strong> <code>j = j - 1</code> moves to the previous element in sorted portion.</p>
+                
+                <h4>3. Recursive Version Explanation:</h4>
+                <ul>
+                    <li><strong>Base Case:</strong> If n <= 1, array is already sorted (trivial case).</li>
+                    <li><strong>Recursive Call:</strong> Sort the first n-1 elements recursively.</li>
+                    <li><strong>Insert Last:</strong> Insert the last element in its correct position among the sorted n-1 elements.</li>
+                    <li><strong>Space Complexity:</strong> O(n) due to recursive call stack.</li>
+                </ul>
+                
+                <h4>4. Binary Insertion Sort Optimization:</h4>
+                <ul>
+                    <li><strong>Binary Search:</strong> Instead of linear search, use binary search to find insertion position.</li>
+                    <li><strong>Time Improvement:</strong> Reduces comparisons from O(n) to O(log n) per insertion.</li>
+                    <li><strong>Overall Complexity:</strong> Still O(n²) because shifting elements still takes O(n) time.</li>
+                    <li><strong>When Useful:</strong> When comparisons are expensive operations.</li>
+                </ul>
+                
+                <h4>5. Adaptive Nature:</h4>
+                <p>Insertion sort is <strong>adaptive</strong> - it performs better on partially sorted arrays because the while loop terminates early when elements are already in correct relative positions.</p>
+                
+                <h4>6. Step-by-Step Visualization:</h4>
+                <p><strong>Initial:</strong> [12, 11, 13, 5, 6] (12 is considered sorted)</p>
+                <p><strong>i=1:</strong> Insert 11 → Compare with 12, shift 12 right → [11, 12, 13, 5, 6]</p>
+                <p><strong>i=2:</strong> Insert 13 → Compare with 12, 13 > 12, place after → [11, 12, 13, 5, 6]</p>
+                <p><strong>i=3:</strong> Insert 5 → Shift 13, 12, 11 right → [5, 11, 12, 13, 6]</p>
+                <p><strong>i=4:</strong> Insert 6 → Shift 13, 12, 11 right, place after 5 → [5, 6, 11, 12, 13]</p>
+            </div>
+
+            <div class="complexity-box">
+                <h3>⏱️ Time & Space Complexity</h3>
+                <p><strong>Best Case:</strong> O(n) - when array is already sorted</p>
+                <p><strong>Average Case:</strong> O(n²) - random order</p>
+                <p><strong>Worst Case:</strong> O(n²) - reverse sorted</p>
+                <p><strong>Space Complexity:</strong> O(1) - in-place sorting</p>
+                <p><strong>Advantages:</strong> Stable, online algorithm, efficient for small arrays</p>
+            </div>
+        </div>
+
+        <!-- Quick Sort Section -->
+        <div id="quick" class="content-section">
+            <h2>🟠 Quick Sort</h2>
+            
+            <div class="explanation">
+                <h3>Definition</h3>
+                <p><strong>Quick Sort</strong> is a divide-and-conquer algorithm that picks a 'pivot' element and partitions the array around it. Elements smaller than pivot go to left, larger elements go to right.</p>
+            </div>
+
+            <div class="algorithm-steps">
+                <h3>How Quick Sort Works:</h3>
+                <div class="step">1. Choose a pivot element from the array</div>
+                <div class="step">2. Partition array: elements < pivot on left, > pivot on right</div>
+                <div class="step">3. Recursively apply quicksort to left and right subarrays</div>
+                <div class="step">4. Combine the results (no extra work needed)</div>
+            </div>
+
+            <div class="code-container">
+                <div class="code-header">📝 Complete Quick Sort Implementation</div>
+                <div class="java-code">
+<span class="keyword">public class</span> QuickSort {
+    
+    <span class="comment">// Main quick sort method</span>
+    <span class="keyword">public static void</span> quickSort(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high) {
+        <span class="keyword">if</span> (low < high) {
+            <span class="comment">// Partition the array and get pivot index</span>
+            <span class="keyword">int</span> pivotIndex = partition(arr, low, high);
+            
+            <span class="comment">// Recursively sort elements before and after partition</span>
+            quickSort(arr, low, pivotIndex - <span class="number">1</span>);  <span class="comment">// Sort left subarray</span>
+            quickSort(arr, pivotIndex + <span class="number">1</span>, high); <span class="comment">// Sort right subarray</span>
+        }
+    }
+    
+    <span class="comment">// Partition method using last element as pivot</span>
+    <span class="keyword">private static int</span> partition(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high) {
+        <span class="keyword">int</span> pivot = arr[high]; <span class="comment">// Choose last element as pivot</span>
+        <span class="keyword">int</span> i = low - <span class="number">1</span>;        <span class="comment">// Index of smaller element</span>
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = low; j < high; j++) {
+            <span class="comment">// If current element is smaller than or equal to pivot</span>
+            <span class="keyword">if</span> (arr[j] <= pivot) {
+                i++; <span class="comment">// Increment index of smaller element</span>
+                swap(arr, i, j);
+            }
+        }
+        
+        <span class="comment">// Place pivot in correct position</span>
+        swap(arr, i + <span class="number">1</span>, high);
+        <span class="keyword">return</span> i + <span class="number">1</span>; <span class="comment">// Return partition index</span>
+    }
+    
+    <span class="comment">// Alternative partition method (Hoare's partition)</span>
+    <span class="keyword">private static int</span> hoarePartition(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high) {
+        <span class="keyword">int</span> pivot = arr[low]; <span class="comment">// Choose first element as pivot</span>
+        <span class="keyword">int</span> i = low - <span class="number">1</span>;
+        <span class="keyword">int</span> j = high + <span class="number">1</span>;
+        
+        <span class="keyword">while</span> (<span class="keyword">true</span>) {
+            <span class="keyword">do</span> {
+                i++;
+            } <span class="keyword">while</span> (arr[i] < pivot);
+            
+            <span class="keyword">do</span> {
+                j--;
+            } <span class="keyword">while</span> (arr[j] > pivot);
+            
+            <span class="keyword">if</span> (i >= j) {
+                <span class="keyword">return</span> j;
+            }
+            
+            swap(arr, i, j);
+        }
+    }
+    
+    <span class="comment">// Random pivot selection for better average case</span>
+    <span class="keyword">public static void</span> randomizedQuickSort(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high) {
+        <span class="keyword">if</span> (low < high) {
+            <span class="comment">// Randomly select pivot and swap with last element</span>
+            <span class="keyword">int</span> randomPivot = low + (<span class="keyword">int</span>) (Math.random() * (high - low + <span class="number">1</span>));
+            swap(arr, randomPivot, high);
+            
+            <span class="keyword">int</span> pivotIndex = partition(arr, low, high);
+            randomizedQuickSort(arr, low, pivotIndex - <span class="number">1</span>);
+            randomizedQuickSort(arr, pivotIndex + <span class="number">1</span>, high);
+        }
+    }
+    
+    <span class="comment">// Utility method to swap elements</span>
+    <span class="keyword">private static void</span> swap(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> i, <span class="keyword">int</span> j) {
+        <span class="keyword">int</span> temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    
+    <span class="comment">// Wrapper method for easy calling</span>
+    <span class="keyword">public static void</span> sort(<span class="keyword">int</span>[] arr) {
+        quickSort(arr, <span class="number">0</span>, arr.length - <span class="number">1</span>);
+    }
+    
+    <span class="comment">// Main method with example</span>
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="keyword">int</span>[] arr = {<span class="number">10</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">1</span>, <span class="number">5</span>};
+        
+        System.out.println(<span class="string">"Original array: "</span> + java.util.Arrays.toString(arr));
+        sort(arr);
+        System.out.println(<span class="string">"Sorted array: "</span> + java.util.Arrays.toString(arr));
+    }
+}
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3>🔍 Detailed Code Explanation:</h3>
+                
+                <h4>1. Main quickSort Method (Divide and Conquer):</h4>
+                <ul>
+                    <li><strong>Base Case:</strong> <code>if (low < high)</code> ensures we only process subarrays with more than one element.</li>
+                    <li><strong>Partition Step:</strong> Rearranges array so elements smaller than pivot are on left, larger on right.</li>
+                    <li><strong>Recursive Calls:</strong> Separately sort the left subarray (low to pivotIndex-1) and right subarray (pivotIndex+1 to high).</li>
+                    <li><strong>Combine:</strong> No explicit combine step needed - array is sorted in-place.</li>
+                </ul>
+                
+                <h4>2. Lomuto Partition Scheme Breakdown:</h4>
+                <ul>
+                    <li><strong>Pivot Selection:</strong> Choose last element <code>arr[high]</code> as pivot.</li>
+                    <li><strong>Index i:</strong> Points to the position where the next smaller element should be placed.</li>
+                    <li><strong>Scanning:</strong> Loop variable j scans from low to high-1.</li>
+                    <li><strong>Partitioning Logic:</strong> When <code>arr[j] <= pivot</code>, increment i and swap arr[i] with arr[j].</li>
+                    <li><strong>Final Placement:</strong> Swap pivot with arr[i+1] to place it in correct position.</li>
+                </ul>
+                
+                <h4>3. Partition Visualization:</h4>
+                <p><strong>Array Structure During Partition:</strong></p>
+                <p><code>[≤ pivot | > pivot | unprocessed | pivot]</code></p>
+                <p><strong>Invariant Maintained:</strong> Elements from low to i are ≤ pivot, elements from i+1 to j-1 are > pivot.</p>
+                
+                <h4>4. Hoare Partition Alternative:</h4>
+                <ul>
+                    <li><strong>Two Pointers:</strong> One from left (i) moving right, one from right (j) moving left.</li>
+                    <li><strong>Convergence:</strong> Pointers move towards each other, swapping misplaced elements.</li>
+                    <li><strong>Efficiency:</strong> Generally performs fewer swaps than Lomuto partition.</li>
+                    <li><strong>Pivot Position:</strong> Pivot may not end up at the partition point.</li>
+                </ul>
+                
+                <h4>5. Randomized Quick Sort Benefits:</h4>
+                <ul>
+                    <li><strong>Worst Case Avoidance:</strong> Random pivot selection makes worst-case scenario highly improbable.</li>
+                    <li><strong>Expected Performance:</strong> Guarantees O(n log n) expected time regardless of input.</li>
+                    <li><strong>Practical Improvement:</strong> Much better performance on already sorted or reverse sorted arrays.</li>
+                </ul>
+                
+                <h4>6. Recursion Tree Analysis:</h4>
+                <p><strong>Best Case:</strong> Balanced partitions create a tree of height log n with n work per level.</p>
+                <p><strong>Worst Case:</strong> Unbalanced partitions create a tree of height n with decreasing work per level.</p>
+                <p><strong>Average Case:</strong> Mixed partitions result in expected height of log n.</p>
+                
+                <h4>7. Memory Usage:</h4>
+                <ul>
+                    <li><strong>Stack Space:</strong> Each recursive call uses O(1) extra space on call stack.</li>
+                    <li><strong>Best Case:</strong> O(log n) stack depth for balanced partitions.</li>
+                    <li><strong>Worst Case:</strong> O(n) stack depth for completely unbalanced partitions.</li>
+                    <li><strong>Tail Recursion:</strong> Can optimize to reduce stack usage for one of the recursive calls.</li>
+                </ul>
+                
+                <h4>8. Complete Trace Example:</h4>
+                <p><strong>Array:</strong> [10, 7, 8, 9, 1, 5]</p>
+                <p><strong>Choose pivot:</strong> 5 (last element)</p>
+                <p><strong>Partition:</strong> i=-1, scan through array:</p>
+                <ul>
+                    <li>j=0: arr[0]=10 > 5, no swap</li>
+                    <li>j=1: arr[1]=7 > 5, no swap</li>
+                    <li>j=2: arr[2]=8 > 5, no swap</li>
+                    <li>j=3: arr[3]=9 > 5, no swap</li>
+                    <li>j=4: arr[4]=1 ≤ 5, i++, swap → [1, 7, 8, 9, 10, 5]</li>
+                    <li>Final: swap pivot → [1, 5, 8, 9, 10, 7]</li>
+                </ul>
+                <p><strong>Recursively sort:</strong> [1] and [8, 9, 10, 7]</p>
+                <p><strong>Continue until:</strong> [1, 5, 7, 8, 9, 10]</p>
+            </div>
+
+            <div class="complexity-box">
+                <h3>⏱️ Time & Space Complexity</h3>
+                <p><strong>Best Case:</strong> O(n log n) - pivot divides array evenly</p>
+                <p><strong>Average Case:</strong> O(n log n) - expected performance</p>
+                <p><strong>Worst Case:</strong> O(n²) - pivot is always smallest/largest</p>
+                <p><strong>Space Complexity:</strong> O(log n) - recursive call stack</p>
+                <p><strong>Note:</strong> Randomized version has O(n log n) expected time</p>
+            </div>
+        </div>
+
+        <!-- Practice Section -->
+        <div id="practice" class="content-section">
+            <h2>💪 Practice Exercises</h2>
+            
+            <div class="practice-exercise">
+                <h3>Exercise 1: Array Analysis</h3>
+                <p>Given the array [64, 25, 12, 22, 11], trace through the first two passes of bubble sort and show the array state after each pass.</p>
+                <button class="btn" onclick="toggleSolution('solution1')">Show Solution</button>
+                <div id="solution1" class="solution">
+                    <h4>Solution:</h4>
+                    <p><strong>Initial:</strong> [64, 25, 12, 22, 11]</p>
+                    <p><strong>Pass 1:</strong></p>
+                    <ul>
+                        <li>Compare 64 & 25 → swap → [25, 64, 12, 22, 11]</li>
+                        <li>Compare 64 & 12 → swap → [25, 12, 64, 22, 11]</li>
+                        <li>Compare 64 & 22 → swap → [25, 12, 22, 64, 11]</li>
+                        <li>Compare 64 & 11 → swap → [25, 12, 22, 11, 64]</li>
+                    </ul>
+                    <p><strong>After Pass 1:</strong> [25, 12, 22, 11, 64]</p>
+                    <p><strong>Pass 2:</strong></p>
+                    <ul>
+                        <li>Compare 25 & 12 → swap → [12, 25, 22, 11, 64]</li>
+                        <li>Compare 25 & 22 → swap → [12, 22, 25, 11, 64]</li>
+                        <li>Compare 25 & 11 → swap → [12, 22, 11, 25, 64]</li>
+                    </ul>
+                    <p><strong>After Pass 2:</strong> [12, 22, 11, 25, 64]</p>
+                    
+                    <h4>Complete Java Implementation:</h4>
+                    <div class="code-container">
+                        <div class="code-header">Exercise 1 - Bubble Sort Trace</div>
+                        <div class="java-code">
+<span class="keyword">public class</span> BubbleSortTrace {
+    <span class="keyword">public static void</span> bubbleSortWithTrace(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        System.out.println(<span class="string">"Initial array: "</span> + java.util.Arrays.toString(arr));
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> pass = <span class="number">0</span>; pass < n - <span class="number">1</span>; pass++) {
+            System.out.println(<span class="string">"\\n--- Pass "</span> + (pass + <span class="number">1</span>) + <span class="string">" ---"</span>);
+            <span class="keyword">boolean</span> swapped = <span class="keyword">false</span>;
+            
+            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < n - pass - <span class="number">1</span>; i++) {
+                System.out.printf(<span class="string">"Compare %d & %d: "</span>, arr[i], arr[i + <span class="number">1</span>]);
+                
+                <span class="keyword">if</span> (arr[i] > arr[i + <span class="number">1</span>]) {
+                    <span class="comment">// Swap elements</span>
+                    <span class="keyword">int</span> temp = arr[i];
+                    arr[i] = arr[i + <span class="number">1</span>];
+                    arr[i + <span class="number">1</span>] = temp;
+                    swapped = <span class="keyword">true</span>;
+                    System.out.println(<span class="string">"swap → "</span> + java.util.Arrays.toString(arr));
+                } <span class="keyword">else</span> {
+                    System.out.println(<span class="string">"no swap → "</span> + java.util.Arrays.toString(arr));
+                }
+            }
+            
+            System.out.println(<span class="string">"After Pass "</span> + (pass + <span class="number">1</span>) + <span class="string">": "</span> + 
+                             java.util.Arrays.toString(arr));
+            
+            <span class="keyword">if</span> (!swapped) {
+                System.out.println(<span class="string">"Array is sorted! Early termination."</span>);
+                <span class="keyword">break</span>;
+            }
+            
+            <span class="comment">// Stop after 2 passes for this exercise</span>
+            <span class="keyword">if</span> (pass == <span class="number">1</span>) {
+                System.out.println(<span class="string">"\\nShowing only first 2 passes as requested."</span>);
+                <span class="keyword">break</span>;
+            }
+        }
+    }
+    
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="keyword">int</span>[] arr = {<span class="number">64</span>, <span class="number">25</span>, <span class="number">12</span>, <span class="number">22</span>, <span class="number">11</span>};
+        bubbleSortWithTrace(arr);
+    }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="practice-exercise">
+                <h3>Exercise 2: Selection Sort Minimum Swaps</h3>
+                <p>For the array [20, 12, 10, 15, 2], determine how many swaps selection sort will make and which elements will be swapped.</p>
+                <button class="btn" onclick="toggleSolution('solution2')">Show Solution</button>
+                <div id="solution2" class="solution">
+                    <h4>Solution:</h4>
+                    <p><strong>Total Swaps: 2</strong></p>
+                    <p><strong>Pass 1:</strong> Find min (2), swap with 20 → [2, 12, 10, 15, 20]</p>
+                    <p><strong>Pass 2:</strong> Find min (10), swap with 12 → [2, 10, 12, 15, 20]</p>
+                    <p><strong>Pass 3:</strong> Find min (12), no swap needed → [2, 10, 12, 15, 20]</p>
+                    <p><strong>Pass 4:</strong> Find min (15), no swap needed → [2, 10, 12, 15, 20]</p>
+                    <p>Note: Selection sort makes exactly n-1 comparisons but only swaps when necessary.</p>
+                    
+                    <h4>Complete Java Implementation:</h4>
+                    <div class="code-container">
+                        <div class="code-header">Exercise 2 - Selection Sort Swap Counter</div>
+                        <div class="java-code">
+<span class="keyword">public class</span> SelectionSortSwapCounter {
+    <span class="keyword">public static int</span> selectionSortWithSwapCount(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        <span class="keyword">int</span> swapCount = <span class="number">0</span>;
+        
+        System.out.println(<span class="string">"Initial array: "</span> + java.util.Arrays.toString(arr));
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < n - <span class="number">1</span>; i++) {
+            <span class="keyword">int</span> minIndex = i;
+            
+            <span class="comment">// Find minimum element in unsorted portion</span>
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j < n; j++) {
+                <span class="keyword">if</span> (arr[j] < arr[minIndex]) {
+                    minIndex = j;
+                }
+            }
+            
+            System.out.printf(<span class="string">"Pass %d: Find min (%d) at index %d"</span>, 
+                            i + <span class="number">1</span>, arr[minIndex], minIndex);
+            
+            <span class="comment">// Swap if needed</span>
+            <span class="keyword">if</span> (minIndex != i) {
+                <span class="keyword">int</span> temp = arr[minIndex];
+                arr[minIndex] = arr[i];
+                arr[i] = temp;
+                swapCount++;
+                System.out.printf(<span class="string">", swap with %d → %s\\n"</span>, 
+                                temp, java.util.Arrays.toString(arr));
+            } <span class="keyword">else</span> {
+                System.out.printf(<span class="string">", no swap needed → %s\\n"</span>, 
+                                java.util.Arrays.toString(arr));
+            }
+        }
+        
+        System.out.println(<span class="string">"\\nTotal swaps made: "</span> + swapCount);
+        <span class="keyword">return</span> swapCount;
+    }
+    
+    <span class="comment">// Method to analyze swap pattern</span>
+    <span class="keyword">public static void</span> analyzeSwapPattern(<span class="keyword">int</span>[] arr) {
+        System.out.println(<span class="string">"\\n=== Swap Pattern Analysis ==="</span>);
+        <span class="keyword">int</span>[] original = arr.clone();
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < arr.length - <span class="number">1</span>; i++) {
+            <span class="keyword">int</span> minIndex = i;
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j < arr.length; j++) {
+                <span class="keyword">if</span> (arr[j] < arr[minIndex]) {
+                    minIndex = j;
+                }
+            }
+            
+            <span class="keyword">if</span> (minIndex != i) {
+                System.out.printf(<span class="string">"Position %d: %d ↔ %d\\n"</span>, 
+                                i, original[i], original[minIndex]);
+            }
+        }
+    }
+    
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="keyword">int</span>[] arr = {<span class="number">20</span>, <span class="number">12</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">2</span>};
+        analyzeSwapPattern(arr.clone());
+        selectionSortWithSwapCount(arr);
+    }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="practice-exercise">
+                <h3>Exercise 3: Quick Sort Partition</h3>
+                <p>Given array [3, 6, 8, 10, 1, 2, 1] with pivot = 3, show the array after partitioning.</p>
+                <button class="btn" onclick="toggleSolution('solution3')">Show Solution</button>
+                <div id="solution3" class="solution">
+                    <h4>Solution:</h4>
+                    <p><strong>Initial:</strong> [3, 6, 8, 10, 1, 2, 1] (pivot = 3)</p>
+                    <p><strong>Process:</strong></p>
+                    <ul>
+                        <li>i starts at -1</li>
+                        <li>j=1: arr[1]=6 > 3, no swap</li>
+                        <li>j=2: arr[2]=8 > 3, no swap</li>
+                        <li>j=3: arr[3]=10 > 3, no swap</li>
+                        <li>j=4: arr[4]=1 ≤ 3, i++, swap → [1, 6, 8, 10, 3, 2, 1]</li>
+                        <li>j=5: arr[5]=2 ≤ 3, i++, swap → [1, 2, 8, 10, 3, 6, 1]</li>
+                        <li>j=6: arr[6]=1 ≤ 3, i++, swap → [1, 2, 1, 10, 3, 6, 8]</li>
+                        <li>Place pivot: swap(i+1, high) → [1, 2, 1, 3, 10, 6, 8]</li>
+                    </ul>
+                    <p><strong>Result:</strong> [1, 2, 1, 3, 10, 6, 8] with pivot at index 3</p>
+                    
+                    <h4>Complete Java Implementation:</h4>
+                    <div class="code-container">
+                        <div class="code-header">Exercise 3 - Quick Sort Partition Trace</div>
+                        <div class="java-code">
+<span class="keyword">public class</span> QuickSortPartitionTrace {
+    <span class="keyword">public static int</span> partitionWithTrace(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high) {
+        <span class="keyword">int</span> pivot = arr[high];
+        <span class="keyword">int</span> i = low - <span class="number">1</span>;
+        
+        System.out.println(<span class="string">"Initial array: "</span> + java.util.Arrays.toString(arr));
+        System.out.println(<span class="string">"Pivot element: "</span> + pivot + <span class="string">" at index "</span> + high);
+        System.out.println(<span class="string">"Starting partition process...\\n"</span>);
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = low; j < high; j++) {
+            System.out.printf(<span class="string">"j=%d: arr[%d]=%d "</span>, j, j, arr[j]);
+            
+            <span class="keyword">if</span> (arr[j] <= pivot) {
+                i++;
+                System.out.printf(<span class="string">"≤ %d, i++, swap with index %d\\n"</span>, pivot, i);
+                
+                <span class="comment">// Swap arr[i] and arr[j]</span>
+                <span class="keyword">int</span> temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                
+                System.out.println(<span class="string">"    After swap: "</span> + java.util.Arrays.toString(arr));
+            } <span class="keyword">else</span> {
+                System.out.printf(<span class="string">"> %d, no swap\\n"</span>, pivot);
+            }
+        }
+        
+        <span class="comment">// Place pivot in correct position</span>
+        System.out.println(<span class="string">"\\nPlacing pivot in correct position..."</span>);
+        System.out.printf(<span class="string">"Swap pivot at index %d with element at index %d\\n"</span>, 
+                        high, i + <span class="number">1</span>);
+        
+        <span class="keyword">int</span> temp = arr[i + <span class="number">1</span>];
+        arr[i + <span class="number">1</span>] = arr[high];
+        arr[high] = temp;
+        
+        System.out.println(<span class="string">"Final partitioned array: "</span> + java.util.Arrays.toString(arr));
+        System.out.println(<span class="string">"Pivot "</span> + pivot + <span class="string">" is now at index "</span> + (i + <span class="number">1</span>));
+        
+        <span class="keyword">return</span> i + <span class="number">1</span>;
+    }
+    
+    <span class="comment">// Helper method to visualize partition result</span>
+    <span class="keyword">public static void</span> visualizePartition(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> pivotIndex) {
+        System.out.println(<span class="string">"\\n=== Partition Analysis ==="</span>);
+        System.out.print(<span class="string">"Elements ≤ pivot: ["</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < pivotIndex; i++) {
+            System.out.print(arr[i]);
+            <span class="keyword">if</span> (i < pivotIndex - <span class="number">1</span>) System.out.print(<span class="string">", "</span>);
+        }
+        System.out.println(<span class="string">"]"</span>);
+        
+        System.out.println(<span class="string">"Pivot: "</span> + arr[pivotIndex]);
+        
+        System.out.print(<span class="string">"Elements > pivot: ["</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = pivotIndex + <span class="number">1</span>; i < arr.length; i++) {
+            System.out.print(arr[i]);
+            <span class="keyword">if</span> (i < arr.length - <span class="number">1</span>) System.out.print(<span class="string">", "</span>);
+        }
+        System.out.println(<span class="string">"]"</span>);
+    }
+    
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="keyword">int</span>[] arr = {<span class="number">3</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>};
+        <span class="keyword">int</span> pivotIndex = partitionWithTrace(arr, <span class="number">0</span>, arr.length - <span class="number">1</span>);
+        visualizePartition(arr, pivotIndex);
+    }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="practice-exercise">
+                <h3>Exercise 4: Algorithm Selection</h3>
+                <p>You need to sort a small array of 10 elements that is already mostly sorted (only 2 elements out of place). Which algorithm would be most efficient and why?</p>
+                <button class="btn" onclick="toggleSolution('solution4')">Show Solution</button>
+                <div id="solution4" class="solution">
+                    <h4>Solution:</h4>
+                    <p><strong>Best Choice: Insertion Sort</strong></p>
+                    <p><strong>Reasons:</strong></p>
+                    <ul>
+                        <li>Insertion sort has O(n) best-case time complexity for nearly sorted arrays</li>
+                        <li>It's efficient for small arrays (constant factors are low)</li>
+                        <li>It's adaptive - performs better on partially sorted data</li>
+                        <li>Stable algorithm - maintains relative order of equal elements</li>
+                        <li>Simple implementation with minimal overhead</li>
+                    </ul>
+                    <p><strong>Why not others:</strong></p>
+                    <ul>
+                        <li>Bubble Sort: O(n²) even for nearly sorted arrays</li>
+                        <li>Selection Sort: Always O(n²), not adaptive</li>
+                        <li>Quick Sort: Overhead of recursion not worth it for small arrays</li>
+                    </ul>
+                    
+                    <h4>Complete Java Implementation:</h4>
+                    <div class="code-container">
+                        <div class="code-header">Exercise 4 - Algorithm Performance Comparison</div>
+                        <div class="java-code">
+<span class="keyword">public class</span> AlgorithmComparison {
+    <span class="comment">// Performance measurement utility</span>
+    <span class="keyword">static class</span> PerformanceResult {
+        String algorithmName;
+        <span class="keyword">long</span> executionTime;
+        <span class="keyword">int</span> comparisons;
+        <span class="keyword">int</span> swaps;
+        
+        PerformanceResult(String name, <span class="keyword">long</span> time, <span class="keyword">int</span> comp, <span class="keyword">int</span> swaps) {
+            <span class="keyword">this</span>.algorithmName = name;
+            <span class="keyword">this</span>.executionTime = time;
+            <span class="keyword">this</span>.comparisons = comp;
+            <span class="keyword">this</span>.swaps = swaps;
+        }
+    }
+    
+    <span class="comment">// Adaptive Insertion Sort with performance tracking</span>
+    <span class="keyword">public static</span> PerformanceResult adaptiveInsertionSort(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">long</span> startTime = System.nanoTime();
+        <span class="keyword">int</span> comparisons = <span class="number">0</span>, swaps = <span class="number">0</span>;
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i < arr.length; i++) {
+            <span class="keyword">int</span> key = arr[i];
+            <span class="keyword">int</span> j = i - <span class="number">1</span>;
+            
+            <span class="keyword">while</span> (j >= <span class="number">0</span> && (++comparisons > <span class="number">0</span>) && arr[j] > key) {
+                arr[j + <span class="number">1</span>] = arr[j];
+                j--;
+                swaps++;
+            }
+            arr[j + <span class="number">1</span>] = key;
+        }
+        
+        <span class="keyword">long</span> endTime = System.nanoTime();
+        <span class="keyword">return new</span> PerformanceResult(<span class="string">"Insertion Sort"</span>, 
+                                     endTime - startTime, comparisons, swaps);
+    }
+    
+    <span class="comment">// Bubble Sort with performance tracking</span>
+    <span class="keyword">public static</span> PerformanceResult bubbleSortPerformance(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">long</span> startTime = System.nanoTime();
+        <span class="keyword">int</span> comparisons = <span class="number">0</span>, swaps = <span class="number">0</span>;
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < arr.length - <span class="number">1</span>; i++) {
+            <span class="keyword">boolean</span> swapped = <span class="keyword">false</span>;
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j < arr.length - i - <span class="number">1</span>; j++) {
+                comparisons++;
+                <span class="keyword">if</span> (arr[j] > arr[j + <span class="number">1</span>]) {
+                    <span class="keyword">int</span> temp = arr[j];
+                    arr[j] = arr[j + <span class="number">1</span>];
+                    arr[j + <span class="number">1</span>] = temp;
+                    swaps++;
+                    swapped = <span class="keyword">true</span>;
+                }
+            }
+            <span class="keyword">if</span> (!swapped) <span class="keyword">break</span>;
+        }
+        
+        <span class="keyword">long</span> endTime = System.nanoTime();
+        <span class="keyword">return new</span> PerformanceResult(<span class="string">"Bubble Sort"</span>, 
+                                     endTime - startTime, comparisons, swaps);
+    }
+    
+    <span class="comment">// Selection Sort with performance tracking</span>
+    <span class="keyword">public static</span> PerformanceResult selectionSortPerformance(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">long</span> startTime = System.nanoTime();
+        <span class="keyword">int</span> comparisons = <span class="number">0</span>, swaps = <span class="number">0</span>;
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < arr.length - <span class="number">1</span>; i++) {
+            <span class="keyword">int</span> minIndex = i;
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j < arr.length; j++) {
+                comparisons++;
+                <span class="keyword">if</span> (arr[j] < arr[minIndex]) {
+                    minIndex = j;
+                }
+            }
+            <span class="keyword">if</span> (minIndex != i) {
+                <span class="keyword">int</span> temp = arr[minIndex];
+                arr[minIndex] = arr[i];
+                arr[i] = temp;
+                swaps++;
+            }
+        }
+        
+        <span class="keyword">long</span> endTime = System.nanoTime();
+        <span class="keyword">return new</span> PerformanceResult(<span class="string">"Selection Sort"</span>, 
+                                     endTime - startTime, comparisons, swaps);
+    }
+    
+    <span class="keyword">public static void</span> compareAlgorithms() {
+        <span class="comment">// Create a nearly sorted array (10 elements, 2 out of place)</span>
+        <span class="keyword">int</span>[] original = {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">9</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">4</span>, <span class="number">8</span>, <span class="number">10</span>};
+        
+        System.out.println(<span class="string">"Testing nearly sorted array: "</span> + 
+                         java.util.Arrays.toString(original));
+        System.out.println(<span class="string">"(Elements 4 and 9 are out of place)\\n"</span>);
+        
+        <span class="comment">// Test each algorithm</span>
+        PerformanceResult[] results = {
+            adaptiveInsertionSort(original.clone()),
+            bubbleSortPerformance(original.clone()),
+            selectionSortPerformance(original.clone())
+        };
+        
+        <span class="comment">// Display results</span>
+        System.out.println(<span class="string">"Performance Comparison:"</span>);
+        System.out.println(<span class="string">"Algorithm        | Time (ns) | Comparisons | Swaps"</span>);
+        System.out.println(<span class="string">"----------------|-----------|-------------|-------"</span>);
+        
+        <span class="keyword">for</span> (PerformanceResult result : results) {
+            System.out.printf(<span class="string">"%-15s | %9d | %11d | %5d\\n"</span>,
+                            result.algorithmName, result.executionTime,
+                            result.comparisons, result.swaps);
+        }
+        
+        <span class="comment">// Determine best algorithm</span>
+        PerformanceResult best = results[<span class="number">0</span>];
+        <span class="keyword">for</span> (PerformanceResult result : results) {
+            <span class="keyword">if</span> (result.comparisons < best.comparisons) {
+                best = result;
+            }
+        }
+        
+        System.out.println(<span class="string">"\\nBest algorithm for this scenario: "</span> + best.algorithmName);
+        System.out.println(<span class="string">"Reason: Fewest comparisons due to adaptive nature"</span>);
+    }
+    
+    <span class="keyword">public static void</span> main(String[] args) {
+        compareAlgorithms();
+    }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="practice-exercise">
+                <h3>Exercise 5: Code Implementation</h3>
+                <p>Write a modified bubble sort that counts the number of swaps performed and stops early if the array becomes sorted.</p>
+                <button class="btn" onclick="toggleSolution('solution5')">Show Solution</button>
+                <div id="solution5" class="solution">
+                    <h4>Complete Java Implementation:</h4>
+                    <div class="code-container">
+                        <div class="code-header">Exercise 5 - Optimized Bubble Sort with Swap Counter</div>
+                        <div class="java-code">
+<span class="keyword">public class</span> OptimizedBubbleSort {
+    
+    <span class="comment">// Main optimized bubble sort method</span>
+    <span class="keyword">public static int</span> optimizedBubbleSort(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        <span class="keyword">int</span> swapCount = <span class="number">0</span>;
+        <span class="keyword">int</span> passCount = <span class="number">0</span>;
+        
+        System.out.println(<span class="string">"Starting Optimized Bubble Sort..."</span>);
+        System.out.println(<span class="string">"Initial array: "</span> + java.util.Arrays.toString(arr));
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < n - <span class="number">1</span>; i++) {
+            <span class="keyword">boolean</span> swapped = <span class="keyword">false</span>;
+            passCount++;
+            
+            System.out.println(<span class="string">"\\n--- Pass "</span> + passCount + <span class="string">" ---"</span>);
+            
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j < n - i - <span class="number">1</span>; j++) {
+                <span class="keyword">if</span> (arr[j] > arr[j + <span class="number">1</span>]) {
+                    <span class="comment">// Swap elements</span>
+                    <span class="keyword">int</span> temp = arr[j];
+                    arr[j] = arr[j + <span class="number">1</span>];
+                    arr[j + <span class="number">1</span>] = temp;
+                    swapCount++;
+                    swapped = <span class="keyword">true</span>;
+                    
+                    System.out.printf(<span class="string">"  Swap %d: %d ↔ %d → %s\\n"</span>,
+                                    swapCount, temp, arr[j], 
+                                    java.util.Arrays.toString(arr));
+                }
+            }
+            
+            System.out.println(<span class="string">"After pass "</span> + passCount + <span class="string">": "</span> + 
+                             java.util.Arrays.toString(arr));
+            
+            <span class="comment">// Early termination if no swaps occurred</span>
+            <span class="keyword">if</span> (!swapped) {
+                System.out.println(<span class="string">"🎉 Array is sorted! Early termination after "</span> + 
+                                 passCount + <span class="string">" passes."</span>);
+                <span class="keyword">break</span>;
+            }
+        }
+        
+        System.out.println(<span class="string">"\\n=== Summary ==="</span>);
+        System.out.println(<span class="string">"Total swaps made: "</span> + swapCount);
+        System.out.println(<span class="string">"Total passes: "</span> + passCount);
+        System.out.println(<span class="string">"Final sorted array: "</span> + java.util.Arrays.toString(arr));
+        
+        <span class="keyword">return</span> swapCount;
+    }
+    
+    <span class="comment">// Enhanced version with more detailed statistics</span>
+    <span class="keyword">public static</span> BubbleSortStats enhancedBubbleSort(<span class="keyword">int</span>[] arr) {
+        <span class="keyword">int</span> n = arr.length;
+        <span class="keyword">int</span> swapCount = <span class="number">0</span>;
+        <span class="keyword">int</span> passCount = <span class="number">0</span>;
+        <span class="keyword">int</span> comparisons = <span class="number">0</span>;
+        <span class="keyword">long</span> startTime = System.nanoTime();
+        
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < n - <span class="number">1</span>; i++) {
+            <span class="keyword">boolean</span> swapped = <span class="keyword">false</span>;
+            passCount++;
+            
+            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j < n - i - <span class="number">1</span>; j++) {
+                comparisons++;
+                <span class="keyword">if</span> (arr[j] > arr[j + <span class="number">1</span>]) {
+                    <span class="comment">// Swap elements</span>
+                    <span class="keyword">int</span> temp = arr[j];
+                    arr[j] = arr[j + <span class="number">1</span>];
+                    arr[j + <span class="number">1</span>] = temp;
+                    swapCount++;
+                    swapped = <span class="keyword">true</span>;
+                }
+            }
+            
+            <span class="keyword">if</span> (!swapped) {
+                <span class="keyword">break</span>; <span class="comment">// Early termination</span>
+            }
+        }
+        
+        <span class="keyword">long</span> endTime = System.nanoTime();
+        <span class="keyword">return new</span> BubbleSortStats(swapCount, passCount, comparisons, 
+                                       endTime - startTime);
+    }
+    
+    <span class="comment">// Statistics class for detailed analysis</span>
+    <span class="keyword">static class</span> BubbleSortStats {
+        <span class="keyword">int</span> swaps, passes, comparisons;
+        <span class="keyword">long</span> executionTime;
+        
+        BubbleSortStats(<span class="keyword">int</span> swaps, <span class="keyword">int</span> passes, <span class="keyword">int</span> comp, <span class="keyword">long</span> time) {
+            <span class="keyword">this</span>.swaps = swaps;
+            <span class="keyword">this</span>.passes = passes;
+            <span class="keyword">this</span>.comparisons = comp;
+            <span class="keyword">this</span>.executionTime = time;
+        }
+        
+        <span class="keyword">public void</span> displayStats() {
+            System.out.println(<span class="string">"\\n=== Detailed Statistics ==="</span>);
+            System.out.println(<span class="string">"Swaps performed: "</span> + swaps);
+            System.out.println(<span class="string">"Passes completed: "</span> + passes);
+            System.out.println(<span class="string">"Comparisons made: "</span> + comparisons);
+            System.out.println(<span class="string">"Execution time: "</span> + executionTime + <span class="string">" nanoseconds"</span>);
+            System.out.println(<span class="string">"Early termination: "</span> + 
+                             (passes < comparisons ? <span class="string">"Yes"</span> : <span class="string">"No"</span>));
+        }
+    }
+    
+    <span class="comment">// Test method with different scenarios</span>
+    <span class="keyword">public static void</span> testDifferentScenarios() {
+        System.out.println(<span class="string">"=== Testing Different Array Scenarios ===\\n"</span>);
+        
+        <span class="comment">// Test 1: Random array</span>
+        <span class="keyword">int</span>[] randomArray = {<span class="number">64</span>, <span class="number">34</span>, <span class="number">25</span>, <span class="number">12</span>, <span class="number">22</span>, <span class="number">11</span>, <span class="number">90</span>};
+        System.out.println(<span class="string">"Test 1: Random Array"</span>);
+        optimizedBubbleSort(randomArray.clone());
+        
+        <span class="comment">// Test 2: Already sorted array</span>
+        <span class="keyword">int</span>[] sortedArray = {<span class="number">11</span>, <span class="number">12</span>, <span class="number">22</span>, <span class="number">25</span>, <span class="number">34</span>, <span class="number">64</span>, <span class="number">90</span>};
+        System.out.println(<span class="string">"\\n\\nTest 2: Already Sorted Array"</span>);
+        optimizedBubbleSort(sortedArray.clone());
+        
+        <span class="comment">// Test 3: Reverse sorted array</span>
+        <span class="keyword">int</span>[] reverseArray = {<span class="number">90</span>, <span class="number">64</span>, <span class="number">34</span>, <span class="number">25</span>, <span class="number">22</span>, <span class="number">12</span>, <span class="number">11</span>};
+        System.out.println(<span class="string">"\\n\\nTest 3: Reverse Sorted Array"</span>);
+        optimizedBubbleSort(reverseArray.clone());
+    }
+    
+    <span class="keyword">public static void</span> main(String[] args) {
+        testDifferentScenarios();
+        
+        <span class="comment">// Performance comparison</span>
+        System.out.println(<span class="string">"\\n\\n=== Performance Analysis ==="</span>);
+        <span class="keyword">int</span>[] testArray = {<span class="number">5</span>, <span class="number">2</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>};
+        BubbleSortStats stats = enhancedBubbleSort(testArray.clone());
+        stats.displayStats();
+    }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="content-section">
+            <h2>🧠 Multiple Choice Quiz</h2>
+            
+            <div class="quiz-container">
+                <div class="question">
+                    <h3>Question 1: Time Complexity</h3>
+                    <p>What is the best-case time complexity of bubble sort?</p>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, false)">A) O(n²)</div>
+                        <div class="option" onclick="selectOption(this, true)">B) O(n)</div>
+                        <div class="option" onclick="selectOption(this, false)">C) O(n log n)</div>
+                        <div class="option" onclick="selectOption(this, false)">D) O(1)</div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Best case occurs when array is already sorted and optimized bubble sort can detect this in O(n) time.</p>
+                </div>
+
+                <div class="question">
+                    <h3>Question 2: Algorithm Characteristics</h3>
+                    <p>Which sorting algorithm is NOT stable?</p>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, false)">A) Bubble Sort</div>
+                        <div class="option" onclick="selectOption(this, false)">B) Insertion Sort</div>
+                        <div class="option" onclick="selectOption(this, true)">C) Selection Sort</div>
+                        <div class="option" onclick="selectOption(this, false)">D) All are stable</div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Selection sort swaps non-adjacent elements, which can change the relative order of equal elements.</p>
+                </div>
+
+                <div class="question">
+                    <h3>Question 3: Quick Sort</h3>
+                    <p>In the worst case, quick sort has a time complexity of:</p>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, false)">A) O(n)</div>
+                        <div class="option" onclick="selectOption(this, false)">B) O(n log n)</div>
+                        <div class="option" onclick="selectOption(this, true)">C) O(n²)</div>
+                        <div class="option" onclick="selectOption(this, false)">D) O(log n)</div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Worst case occurs when pivot is always the smallest or largest element, leading to unbalanced partitions.</p>
+                </div>
+
+                <div class="question">
+                    <h3>Question 4: Space Complexity</h3>
+                    <p>Which algorithm has the highest space complexity?</p>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, false)">A) Bubble Sort</div>
+                        <div class="option" onclick="selectOption(this, false)">B) Selection Sort</div>
+                        <div class="option" onclick="selectOption(this, false)">C) Insertion Sort</div>
+                        <div class="option" onclick="selectOption(this, true)">D) Quick Sort</div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Quick sort uses O(log n) space due to recursive calls, while others use O(1).</p>
+                </div>
+
+                <div class="question">
+                    <h3>Question 5: Practical Application</h3>
+                    <p>For sorting a small array (< 10 elements) that might be partially sorted, which algorithm would be most efficient?</p>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, false)">A) Quick Sort</div>
+                        <div class="option" onclick="selectOption(this, false)">B) Selection Sort</div>
+                        <div class="option" onclick="selectOption(this, true)">C) Insertion Sort</div>
+                        <div class="option" onclick="selectOption(this, false)">D) Bubble Sort</div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Insertion sort is adaptive and efficient for small, partially sorted arrays.</p>
+                </div>
+
+                <div class="question">
+                    <h3>Question 6: Algorithm Analysis</h3>
+                    <p>How many swaps does selection sort make in the worst case for an array of n elements?</p>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this, false)">A) O(n²)</div>
+                        <div class="option" onclick="selectOption(this, true)">B) O(n)</div>
+                        <div class="option" onclick="selectOption(this, false)">C) O(n log n)</div>
+                        <div class="option" onclick="selectOption(this, false)">D) O(1)</div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Selection sort makes at most n-1 swaps, one per position, regardless of input.</p>
+                </div>
+
+                <button class="btn" onclick="calculateScore()">Calculate Score</button>
+                <div id="quiz-result" style="margin-top: 20px; font-size: 1.2em; font-weight: bold;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for quiz
+        let selectedAnswers = {};
+        let quizSubmitted = false;
+
+        // Navigation function
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav buttons
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Toggle solution visibility
+        function toggleSolution(solutionId) {
+            const solution = document.getElementById(solutionId);
+            if (solution.style.display === 'none' || solution.style.display === '') {
+                solution.style.display = 'block';
+            } else {
+                solution.style.display = 'none';
+            }
+        }
+
+        // Quiz functionality
+        function selectOption(element, isCorrect) {
+            if (quizSubmitted) return;
+
+            // Remove selection from other options in the same question
+            const question = element.closest('.question');
+            const options = question.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            
+            // Mark current option as selected
+            element.classList.add('selected');
+            
+            // Store the answer
+            const questionIndex = Array.from(document.querySelectorAll('.question')).indexOf(question);
+            selectedAnswers[questionIndex] = isCorrect;
+        }
+
+        function calculateScore() {
+            quizSubmitted = true;
+            let correct = 0;
+            let total = 6;
+            
+            // Check answers and mark correct/incorrect
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((question, index) => {
+                const options = question.querySelectorAll('.option');
+                options.forEach(option => {
+                    const isCorrect = option.onclick.toString().includes('true');
+                    if (isCorrect) {
+                        option.classList.add('correct');
+                    }
+                    if (option.classList.contains('selected') && !isCorrect) {
+                        option.classList.add('incorrect');
+                    }
+                });
+                
+                if (selectedAnswers[index] === true) {
+                    correct++;
+                }
+            });
+            
+            // Display result
+            const percentage = Math.round((correct / total) * 100);
+            let message = `Score: ${correct}/${total} (${percentage}%)`;
+            
+            if (percentage >= 90) {
+                message += " 🏆 Excellent! You've mastered sorting algorithms!";
+            } else if (percentage >= 70) {
+                message += " 👍 Good job! Review the concepts you missed.";
+            } else if (percentage >= 50) {
+                message += " 📚 Keep studying! Review the material and try again.";
+            } else {
+                message += " 📖 More practice needed. Go through the examples again.";
+            }
+            
+            document.getElementById('quiz-result').innerHTML = message;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            showSection('introduction');
+            
+            // Add some interactive features
+            const codeContainers = document.querySelectorAll('.code-container');
+            codeContainers.forEach(container => {
+                container.addEventListener('click', function() {
+                    // Add a visual feedback when code is clicked
+                    this.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
