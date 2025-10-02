@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linked Lists, Iterators & Practice Questions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --code-bg: #1e1e1e;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: var(--gradient-1);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            font-size: 2.2rem;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-color);
+            display: inline-block;
+        }
+        
+        h3 {
+            font-size: 1.6rem;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h3 i {
+            color: var(--accent-color);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+        }
+        
+        button {
+            background: var(--gradient-3);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .slide {
+            display: none;
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        .code-container {
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95rem;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #444;
+        }
+        
+        .code-title {
+            font-weight: bold;
+            color: #66d9ef;
+        }
+        
+        .copy-btn {
+            background: #444;
+            color: #f8f8f2;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #555;
+        }
+        
+        .code-keyword {
+            color: #f92672;
+        }
+        
+        .code-comment {
+            color: #75715e;
+        }
+        
+        .code-string {
+            color: #e6db74;
+        }
+        
+        .code-class {
+            color: #66d9ef;
+        }
+        
+        .code-method {
+            color: #a6e22e;
+        }
+        
+        .code-number {
+            color: #ae81ff;
+        }
+        
+        .exercise {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            padding: 1.5rem;
+            border-left: 5px solid var(--secondary-color);
+            margin: 1.5rem 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .exercise::before {
+            content: "Exercise";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 0 0 5px 0;
+        }
+        
+        .quiz-question {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s;
+        }
+        
+        .quiz-question:hover {
+            transform: translateY(-5px);
+        }
+        
+        .quiz-options {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+        
+        .quiz-options li {
+            margin-bottom: 0.5rem;
+            padding: 0.75rem 1rem;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quiz-options li:hover {
+            border-color: var(--secondary-color);
+            background-color: #f0f8ff;
+        }
+        
+        .quiz-options li.selected {
+            border-color: var(--secondary-color);
+            background-color: #e3f2fd;
+        }
+        
+        .quiz-options li.correct {
+            border-color: var(--success-color);
+            background-color: #e8f5e9;
+        }
+        
+        .quiz-options li.incorrect {
+            border-color: var(--accent-color);
+            background-color: #ffebee;
+        }
+        
+        .feedback {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-top: 1rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .feedback.correct {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6cb;
+        }
+        
+        .feedback.incorrect {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 50px;
+            height: 10px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-2);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .slide-counter {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .visualization-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .visualization {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .visual-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .linked-list-visual {
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .node {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        
+        .data {
+            padding: 10px 15px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .pointer {
+            width: 30px;
+            height: 2px;
+            background: #333;
+            position: relative;
+        }
+        
+        .pointer::after {
+            content: "";
+            position: absolute;
+            right: -5px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #333;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+        
+        .doubly-pointer {
+            display: flex;
+            align-items: center;
+            margin: 0 5px;
+        }
+        
+        .prev-pointer, .next-pointer {
+            width: 20px;
+            height: 2px;
+            background: #333;
+            position: relative;
+        }
+        
+        .prev-pointer::before {
+            content: "";
+            position: absolute;
+            left: -5px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-right: 10px solid #333;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+        
+        .next-pointer::after {
+            content: "";
+            position: absolute;
+            right: -5px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #333;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+        
+        .null-node {
+            padding: 10px;
+            background: #bdc3c7;
+            color: #7f8c8d;
+            border-radius: 5px;
+            font-style: italic;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .operation-result {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 6px;
+            background: #f0f0f0;
+            text-align: center;
+            font-weight: 600;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background-color: #f8f9fa;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .tab-button.active {
+            background-color: white;
+            border-bottom: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .answer {
+            display: none;
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(to right, #e3f2fd, #f3e5f5);
+            border-radius: var(--radius);
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .show-answer {
+            margin-top: 1rem;
+            background: var(--warning-color);
+        }
+        
+        .definition-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .definition-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        
+        .complexity-table th, .complexity-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .complexity-table th {
+            background: var(--gradient-1);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .complexity-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .complexity-table tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .iterator-demo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+        
+        .iterator-controls {
+            display: flex;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .iterator-input {
+            padding: 0.5rem;
+            border: 2px solid var(--secondary-color);
+            border-radius: 4px;
+            width: 120px;
+        }
+        
+        .current-node {
+            background: var(--accent-color) !important;
+            transform: scale(1.1);
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .slide {
+                padding: 1.5rem;
+            }
+            
+            .visualization-container {
+                flex-direction: column;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+            
+            .linked-list-visual {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .node {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-link"></i> MAC286 Prof. Khalid Kassou</h1>
+            <h1><i class="fas fa-link"></i> Linked Lists & Iterators</h1>
+            <p>Interactive Java Data Structures Presentation</p>
+        </header>
+        
+        <div class="slide-counter">
+            Slide <span id="current-slide">1</span> of <span id="total-slides">9</span>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div class="slide active" id="slide1">
+            <h2><i class="fas fa-home"></i> Introduction to Linked Lists</h2>
+            <p>A linked list is a linear data structure where elements are stored in nodes, and each node points to the next node in the sequence. Unlike arrays, linked lists don't require contiguous memory allocation.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-info-circle"></i> What are Linked Lists?</h3>
+                <p>Linked lists consist of nodes where each node contains:</p>
+                <ul>
+                    <li><strong>Data</strong> - The actual value stored in the node</li>
+                    <li><strong>Pointer/Reference</strong> - A link to the next node in the sequence</li>
+                </ul>
+                <p>The last node points to <code>null</code>, indicating the end of the list.</p>
+            </div>
+            
+            <p>In this presentation, we'll explore different types of linked lists:</p>
+            <ul>
+                <li><strong>Singly Linked Lists</strong> - Each node points only to the next node</li>
+                <li><strong>Double Ended Lists</strong> - Maintain references to both first and last nodes</li>
+                <li><strong>Doubly Linked Lists</strong> - Each node points to both next and previous nodes</li>
+                <li><strong>Stacks Implemented with Linked Lists</strong> - Using linked lists to create stack data structures</li>
+                <li><strong>Iterators</strong> - Traversing linked lists efficiently</li>
+            </ul>
+            
+            <div class="visualization">
+                <div class="visual-title">Linked List Visualization</div>
+                <div class="linked-list-visual" id="linked-list-visual">
+                    <div class="node">
+                        <div class="data">10</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="node">
+                        <div class="data">20</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="node">
+                        <div class="data">30</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="node">
+                        <div class="data">40</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="null-node">null</div>
+                </div>
+                <div class="controls">
+                    <button onclick="insertAtHead()"><i class="fas fa-plus"></i> Insert at Head</button>
+                    <button onclick="insertAtTail()"><i class="fas fa-plus"></i> Insert at Tail</button>
+                    <button onclick="deleteFromHead()"><i class="fas fa-minus"></i> Delete from Head</button>
+                    <button onclick="deleteFromTail()"><i class="fas fa-minus"></i> Delete from Tail</button>
+                </div>
+                <div class="operation-result" id="linked-list-result">Linked List Operations</div>
+            </div>
+            
+            <p>We'll explore their definitions, implementations in Java, practical examples, and practice problems to reinforce your understanding.</p>
+        </div>
+        
+        <div class="slide" id="slide2">
+            <h2><i class="fas fa-link"></i> Singly Linked Lists</h2>
+            <p>A singly linked list is the simplest type of linked list where each node contains data and a reference to the next node in the sequence.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-cube"></i> Singly Linked List Operations</h3>
+                <ul>
+                    <li><strong>insertAtHead(data)</strong> - Adds a new node at the beginning</li>
+                    <li><strong>insertAtTail(data)</strong> - Adds a new node at the end</li>
+                    <li><strong>deleteFromHead()</strong> - Removes the first node</li>
+                    <li><strong>deleteFromTail()</strong> - Removes the last node</li>
+                    <li><strong>search(data)</strong> - Finds a node with specific data</li>
+                    <li><strong>isEmpty()</strong> - Checks if the list is empty</li>
+                    <li><strong>display()</strong> - Prints all elements in the list</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Common Applications:</h3>
+            <ul>
+                <li>Implementing stacks and queues</li>
+                <li>Dynamic memory allocation</li>
+                <li>Undo functionality in applications</li>
+                <li>Hash table collision handling</li>
+                <li>Polynomial representation and arithmetic</li>
+            </ul>
+            
+            <table class="complexity-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Time Complexity</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Insert at Head</td>
+                        <td>O(1)</td>
+                        <td>Adds element at the beginning</td>
+                    </tr>
+                    <tr>
+                        <td>Insert at Tail</td>
+                        <td>O(n)</td>
+                        <td>Adds element at the end (without tail pointer)</td>
+                    </tr>
+                    <tr>
+                        <td>Delete from Head</td>
+                        <td>O(1)</td>
+                        <td>Removes the first element</td>
+                    </tr>
+                    <tr>
+                        <td>Delete from Tail</td>
+                        <td>O(n)</td>
+                        <td>Removes the last element</td>
+                    </tr>
+                    <tr>
+                        <td>Search</td>
+                        <td>O(n)</td>
+                        <td>Searches for an element in the list</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="slide" id="slide3">
+            <h2><i class="fas fa-code"></i> Singly Linked List Implementation</h2>
+            <p>Let's implement a singly linked list in Java with common operations:</p>
+            
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-title">SinglyLinkedList.java</div>
+                    <button class="copy-btn" onclick="copyCode('code1')">Copy Code</button>
+                </div>
+                <pre id="code1"><code><span class="code-keyword">public class</span> <span class="code-class">SinglyLinkedList</span> {
+    <span class="code-keyword">private</span> <span class="code-class">Node</span> head;
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">private static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> SinglyLinkedList() {
+        head = <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Check if list is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> head == <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Insert at the beginning</span>
+    <span class="code-keyword">public void</span> <span class="code-method">insertAtHead</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        newNode.next = head;
+        head = newNode;
+        System.out.println(<span class="code-string">"Inserted "</span> + data + <span class="code-string">" at head"</span>);
+    }
+    
+    <span class="code-comment">// Insert at the end</span>
+    <span class="code-keyword">public void</span> <span class="code-method">insertAtTail</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        
+        <span class="code-keyword">if</span> (isEmpty()) {
+            head = newNode;
+        } <span class="code-keyword">else</span> {
+            Node current = head;
+            <span class="code-keyword">while</span> (current.next != <span class="code-keyword">null</span>) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+        System.out.println(<span class="code-string">"Inserted "</span> + data + <span class="code-string">" at tail"</span>);
+    }
+    
+    <span class="code-comment">// Delete from the beginning</span>
+    <span class="code-keyword">public int</span> <span class="code-method">deleteFromHead</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty. Cannot delete."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">int</span> data = head.data;
+        head = head.next;
+        System.out.println(<span class="code-string">"Deleted "</span> + data + <span class="code-string">" from head"</span>);
+        <span class="code-keyword">return</span> data;
+    }
+    
+    <span class="code-comment">// Delete from the end</span>
+    <span class="code-keyword">public int</span> <span class="code-method">deleteFromTail</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty. Cannot delete."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">if</span> (head.next == <span class="code-keyword">null</span>) {
+            <span class="code-keyword">int</span> data = head.data;
+            head = <span class="code-keyword">null</span>;
+            System.out.println(<span class="code-string">"Deleted "</span> + data + <span class="code-string">" from tail"</span>);
+            <span class="code-keyword">return</span> data;
+        }
+        
+        Node current = head;
+        <span class="code-keyword">while</span> (current.next.next != <span class="code-keyword">null</span>) {
+            current = current.next;
+        }
+        
+        <span class="code-keyword">int</span> data = current.next.data;
+        current.next = <span class="code-keyword">null</span>;
+        System.out.println(<span class="code-string">"Deleted "</span> + data + <span class="code-string">" from tail"</span>);
+        <span class="code-keyword">return</span> data;
+    }
+    
+    <span class="code-comment">// Search for a value</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">search</span>(<span class="code-keyword">int</span> data) {
+        Node current = head;
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            <span class="code-keyword">if</span> (current.data == data) {
+                <span class="code-keyword">return</span> <span class="code-keyword">true</span>;
+            }
+            current = current.next;
+        }
+        <span class="code-keyword">return</span> <span class="code-keyword">false</span>;
+    }
+    
+    <span class="code-comment">// Display the list</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        Node current = head;
+        System.out.print(<span class="code-string">"List: "</span>);
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" -> "</span>);
+            current = current.next;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+    
+    <span class="code-comment">// Get the size of the list</span>
+    <span class="code-keyword">public int</span> <span class="code-method">size</span>() {
+        <span class="code-keyword">int</span> count = <span class="code-number">0</span>;
+        Node current = head;
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            count++;
+            current = current.next;
+        }
+        <span class="code-keyword">return</span> count;
+    }
+}</code></pre>
+            </div>
+            
+            <h3><i class="fas fa-play-circle"></i> Example Usage:</h3>
+            <div class="code-container">
+                <pre><code><span class="code-keyword">public class</span> <span class="code-class">SinglyLinkedListExample</span> {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        SinglyLinkedList list = <span class="code-keyword">new</span> SinglyLinkedList();
+        
+        list.insertAtHead(<span class="code-number">10</span>);
+        list.insertAtHead(<span class="code-number">20</span>);
+        list.insertAtTail(<span class="code-number">30</span>);
+        list.insertAtTail(<span class="code-number">40</span>);
+        
+        list.display(); <span class="code-comment">// Output: List: 20 -> 10 -> 30 -> 40 -> null</span>
+        
+        list.deleteFromHead();
+        list.deleteFromTail();
+        
+        list.display(); <span class="code-comment">// Output: List: 10 -> 30 -> null</span>
+        
+        System.out.println(<span class="code-string">"Search 30: "</span> + list.search(<span class="code-number">30</span>)); <span class="code-comment">// Output: true</span>
+        System.out.println(<span class="code-string">"Search 50: "</span> + list.search(<span class="code-number">50</span>)); <span class="code-comment">// Output: false</span>
+        
+        System.out.println(<span class="code-string">"Size: "</span> + list.size()); <span class="code-comment">// Output: 2</span>
+    }
+}</code></pre>
+            </div>
+            
+            <p><strong>Explanation:</strong> This implementation provides basic operations for a singly linked list. The <code>Node</code> class represents each element, containing data and a reference to the next node. The list maintains a reference to the head (first node).</p>
+        </div>
+        
+        <div class="slide" id="slide4">
+            <h2><i class="fas fa-arrows-alt-h"></i> Double Ended Lists</h2>
+            <p>A double ended list (or deque) is a linked list that maintains references to both the first and last nodes, allowing efficient insertion and deletion at both ends.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-exchange-alt"></i> Double Ended List Operations</h3>
+                <ul>
+                    <li><strong>insertFirst(data)</strong> - Adds a new node at the beginning</li>
+                    <li><strong>insertLast(data)</strong> - Adds a new node at the end</li>
+                    <li><strong>deleteFirst()</strong> - Removes the first node</li>
+                    <li><strong>deleteLast()</strong> - Removes the last node</li>
+                    <li><strong>peekFirst()</strong> - Returns data of first node without removal</li>
+                    <li><strong>peekLast()</strong> - Returns data of last node without removal</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Advantages:</h3>
+            <ul>
+                <li>O(1) insertion and deletion at both ends</li>
+                <li>More efficient than standard linked lists for queue operations</li>
+                <li>Can be used to implement both stacks and queues efficiently</li>
+            </ul>
+            
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-title">DoubleEndedList.java</div>
+                    <button class="copy-btn" onclick="copyCode('code2')">Copy Code</button>
+                </div>
+                <pre id="code2"><code><span class="code-keyword">public class</span> <span class="code-class">DoubleEndedList</span> {
+    <span class="code-keyword">private</span> <span class="code-class">Node</span> first;
+    <span class="code-keyword">private</span> <span class="code-class">Node</span> last;
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">private static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> DoubleEndedList() {
+        first = <span class="code-keyword">null</span>;
+        last = <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Check if list is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> first == <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Insert at the beginning</span>
+    <span class="code-keyword">public void</span> <span class="code-method">insertFirst</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        
+        <span class="code-keyword">if</span> (isEmpty()) {
+            first = newNode;
+            last = newNode;
+        } <span class="code-keyword">else</span> {
+            newNode.next = first;
+            first = newNode;
+        }
+        System.out.println(<span class="code-string">"Inserted "</span> + data + <span class="code-string">" at first"</span>);
+    }
+    
+    <span class="code-comment">// Insert at the end</span>
+    <span class="code-keyword">public void</span> <span class="code-method">insertLast</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        
+        <span class="code-keyword">if</span> (isEmpty()) {
+            first = newNode;
+            last = newNode;
+        } <span class="code-keyword">else</span> {
+            last.next = newNode;
+            last = newNode;
+        }
+        System.out.println(<span class="code-string">"Inserted "</span> + data + <span class="code-string">" at last"</span>);
+    }
+    
+    <span class="code-comment">// Delete from the beginning</span>
+    <span class="code-keyword">public int</span> <span class="code-method">deleteFirst</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty. Cannot delete."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">int</span> data = first.data;
+        
+        <span class="code-keyword">if</span> (first == last) { <span class="code-comment">// Only one node</span>
+            first = <span class="code-keyword">null</span>;
+            last = <span class="code-keyword">null</span>;
+        } <span class="code-keyword">else</span> {
+            first = first.next;
+        }
+        
+        System.out.println(<span class="code-string">"Deleted "</span> + data + <span class="code-string">" from first"</span>);
+        <span class="code-keyword">return</span> data;
+    }
+    
+    <span class="code-comment">// Delete from the end</span>
+    <span class="code-keyword">public int</span> <span class="code-method">deleteLast</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty. Cannot delete."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">int</span> data = last.data;
+        
+        <span class="code-keyword">if</span> (first == last) { <span class="code-comment">// Only one node</span>
+            first = <span class="code-keyword">null</span>;
+            last = <span class="code-keyword">null</span>;
+        } <span class="code-keyword">else</span> {
+            <span class="code-comment">// Find the node before last</span>
+            Node current = first;
+            <span class="code-keyword">while</span> (current.next != last) {
+                current = current.next;
+            }
+            current.next = <span class="code-keyword">null</span>;
+            last = current;
+        }
+        
+        System.out.println(<span class="code-string">"Deleted "</span> + data + <span class="code-string">" from last"</span>);
+        <span class="code-keyword">return</span> data;
+    }
+    
+    <span class="code-comment">// Peek at first element</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peekFirst</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> first.data;
+    }
+    
+    <span class="code-comment">// Peek at last element</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peekLast</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> last.data;
+    }
+    
+    <span class="code-comment">// Display the list</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        Node current = first;
+        System.out.print(<span class="code-string">"List: "</span>);
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" -> "</span>);
+            current = current.next;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+}</code></pre>
+            </div>
+            
+            <p><strong>Explanation:</strong> This implementation maintains references to both the first and last nodes, allowing O(1) insertion at both ends. However, deletion from the end still requires O(n) time as we need to find the node before the last node.</p>
+        </div>
+        
+        <div class="slide" id="slide5">
+            <h2><i class="fas fa-layer-group"></i> Stack Implemented by Linked List</h2>
+            <p>A stack can be efficiently implemented using a linked list. The top of the stack corresponds to the head of the linked list.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-cube"></i> Stack Operations with Linked List</h3>
+                <ul>
+                    <li><strong>push(data)</strong> - Adds an element to the top (insert at head)</li>
+                    <li><strong>pop()</strong> - Removes and returns the top element (delete from head)</li>
+                    <li><strong>peek()</strong> - Returns the top element without removal</li>
+                    <li><strong>isEmpty()</strong> - Checks if the stack is empty</li>
+                    <li><strong>size()</strong> - Returns the number of elements in the stack</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Advantages over Array Implementation:</h3>
+            <ul>
+                <li>No fixed size limitation</li>
+                <li>Dynamic memory allocation</li>
+                <li>No need to resize when capacity is exceeded</li>
+            </ul>
+            
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-title">LinkedListStack.java</div>
+                    <button class="copy-btn" onclick="copyCode('code3')">Copy Code</button>
+                </div>
+                <pre id="code3"><code><span class="code-keyword">public class</span> <span class="code-class">LinkedListStack</span> {
+    <span class="code-keyword">private</span> <span class="code-class">Node</span> top;
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">private static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> LinkedListStack() {
+        top = <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Push element to stack</span>
+    <span class="code-keyword">public void</span> <span class="code-method">push</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        newNode.next = top;
+        top = newNode;
+        System.out.println(<span class="code-string">"Pushed "</span> + data + <span class="code-string">" to stack"</span>);
+    }
+    
+    <span class="code-comment">// Pop element from stack</span>
+    <span class="code-keyword">public int</span> <span class="code-method">pop</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty. Cannot pop."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">int</span> data = top.data;
+        top = top.next;
+        System.out.println(<span class="code-string">"Popped "</span> + data + <span class="code-string">" from stack"</span>);
+        <span class="code-keyword">return</span> data;
+    }
+    
+    <span class="code-comment">// Peek at top element</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peek</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty. No top element."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> top.data;
+    }
+    
+    <span class="code-comment">// Check if stack is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> top == <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Get stack size</span>
+    <span class="code-keyword">public int</span> <span class="code-method">size</span>() {
+        <span class="code-keyword">int</span> count = <span class="code-number">0</span>;
+        Node current = top;
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            count++;
+            current = current.next;
+        }
+        <span class="code-keyword">return</span> count;
+    }
+    
+    <span class="code-comment">// Display stack</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        Node current = top;
+        System.out.print(<span class="code-string">"Stack (top to bottom): "</span>);
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" -> "</span>);
+            current = current.next;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+}</code></pre>
+            </div>
+            
+            <h3><i class="fas fa-play-circle"></i> Example Usage:</h3>
+            <div class="code-container">
+                <pre><code><span class="code-keyword">public class</span> <span class="code-class">LinkedListStackExample</span> {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        LinkedListStack stack = <span class="code-keyword">new</span> LinkedListStack();
+        
+        stack.push(<span class="code-number">10</span>);
+        stack.push(<span class="code-number">20</span>);
+        stack.push(<span class="code-number">30</span>);
+        
+        stack.display(); <span class="code-comment">// Output: Stack (top to bottom): 30 -> 20 -> 10 -> null</span>
+        
+        System.out.println(<span class="code-string">"Top element: "</span> + stack.peek()); <span class="code-comment">// Output: 30</span>
+        
+        stack.pop();
+        stack.pop();
+        
+        stack.display(); <span class="code-comment">// Output: Stack (top to bottom): 10 -> null</span>
+        
+        System.out.println(<span class="code-string">"Stack size: "</span> + stack.size()); <span class="code-comment">// Output: 1</span>
+    }
+}</code></pre>
+            </div>
+            
+            <p><strong>Explanation:</strong> This implementation uses a linked list to create a stack. The <code>push</code> operation adds a new node at the head (top), and the <code>pop</code> operation removes the head node. All operations have O(1) time complexity.</p>
+        </div>
+        
+        <div class="slide" id="slide6">
+            <h2><i class="fas fa-exchange-alt"></i> Doubly Linked Lists</h2>
+            <p>A doubly linked list is a linked list where each node contains references to both the next and previous nodes, allowing traversal in both directions.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-arrows-alt-h"></i> Doubly Linked List Operations</h3>
+                <ul>
+                    <li><strong>insertAtHead(data)</strong> - Adds a new node at the beginning</li>
+                    <li><strong>insertAtTail(data)</strong> - Adds a new node at the end</li>
+                    <li><strong>deleteFromHead()</strong> - Removes the first node</li>
+                    <li><strong>deleteFromTail()</strong> - Removes the last node</li>
+                    <li><strong>insertAfter(node, data)</strong> - Inserts after a specific node</li>
+                    <li><strong>deleteNode(node)</strong> - Deletes a specific node</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Advantages:</h3>
+            <ul>
+                <li>Bidirectional traversal</li>
+                <li>Easier deletion of nodes (no need to track previous node)</li>
+                <li>More flexible operations</li>
+            </ul>
+            
+            <h3><i class="fas fa-exclamation-triangle"></i> Disadvantages:</h3>
+            <ul>
+                <li>More memory per node (extra pointer)</li>
+                <li>More complex implementation</li>
+            </ul>
+            
+            <div class="visualization">
+                <div class="visual-title">Doubly Linked List Visualization</div>
+                <div class="linked-list-visual" id="doubly-linked-list-visual">
+                    <div class="null-node">null</div>
+                    <div class="doubly-pointer">
+                        <div class="prev-pointer"></div>
+                        <div class="data">10</div>
+                        <div class="next-pointer"></div>
+                    </div>
+                    <div class="doubly-pointer">
+                        <div class="prev-pointer"></div>
+                        <div class="data">20</div>
+                        <div class="next-pointer"></div>
+                    </div>
+                    <div class="doubly-pointer">
+                        <div class="prev-pointer"></div>
+                        <div class="data">30</div>
+                        <div class="next-pointer"></div>
+                    </div>
+                    <div class="null-node">null</div>
+                </div>
+                <div class="controls">
+                    <button onclick="doublyInsertAtHead()"><i class="fas fa-plus"></i> Insert at Head</button>
+                    <button onclick="doublyInsertAtTail()"><i class="fas fa-plus"></i> Insert at Tail</button>
+                    <button onclick="doublyDeleteFromHead()"><i class="fas fa-minus"></i> Delete from Head</button>
+                    <button onclick="doublyDeleteFromTail()"><i class="fas fa-minus"></i> Delete from Tail</button>
+                </div>
+                <div class="operation-result" id="doubly-linked-list-result">Doubly Linked List Operations</div>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide7">
+            <h2><i class="fas fa-code"></i> Doubly Linked List Implementation</h2>
+            <p>Let's implement a doubly linked list in Java with common operations:</p>
+            
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-title">DoublyLinkedList.java</div>
+                    <button class="copy-btn" onclick="copyCode('code4')">Copy Code</button>
+                </div>
+                <pre id="code4"><code><span class="code-keyword">public class</span> <span class="code-class">DoublyLinkedList</span> {
+    <span class="code-keyword">private</span> <span class="code-class">Node</span> head;
+    <span class="code-keyword">private</span> <span class="code-class">Node</span> tail;
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">private static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node prev;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.prev = <span class="code-keyword">null</span>;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> DoublyLinkedList() {
+        head = <span class="code-keyword">null</span>;
+        tail = <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Check if list is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> head == <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Insert at the beginning</span>
+    <span class="code-keyword">public void</span> <span class="code-method">insertAtHead</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        
+        <span class="code-keyword">if</span> (isEmpty()) {
+            head = newNode;
+            tail = newNode;
+        } <span class="code-keyword">else</span> {
+            newNode.next = head;
+            head.prev = newNode;
+            head = newNode;
+        }
+        System.out.println(<span class="code-string">"Inserted "</span> + data + <span class="code-string">" at head"</span>);
+    }
+    
+    <span class="code-comment">// Insert at the end</span>
+    <span class="code-keyword">public void</span> <span class="code-method">insertAtTail</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        
+        <span class="code-keyword">if</span> (isEmpty()) {
+            head = newNode;
+            tail = newNode;
+        } <span class="code-keyword">else</span> {
+            tail.next = newNode;
+            newNode.prev = tail;
+            tail = newNode;
+        }
+        System.out.println(<span class="code-string">"Inserted "</span> + data + <span class="code-string">" at tail"</span>);
+    }
+    
+    <span class="code-comment">// Delete from the beginning</span>
+    <span class="code-keyword">public int</span> <span class="code-method">deleteFromHead</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty. Cannot delete."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">int</span> data = head.data;
+        
+        <span class="code-keyword">if</span> (head == tail) { <span class="code-comment">// Only one node</span>
+            head = <span class="code-keyword">null</span>;
+            tail = <span class="code-keyword">null</span>;
+        } <span class="code-keyword">else</span> {
+            head = head.next;
+            head.prev = <span class="code-keyword">null</span>;
+        }
+        
+        System.out.println(<span class="code-string">"Deleted "</span> + data + <span class="code-string">" from head"</span>);
+        <span class="code-keyword">return</span> data;
+    }
+    
+    <span class="code-comment">// Delete from the end</span>
+    <span class="code-keyword">public int</span> <span class="code-method">deleteFromTail</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty. Cannot delete."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">int</span> data = tail.data;
+        
+        <span class="code-keyword">if</span> (head == tail) { <span class="code-comment">// Only one node</span>
+            head = <span class="code-keyword">null</span>;
+            tail = <span class="code-keyword">null</span>;
+        } <span class="code-keyword">else</span> {
+            tail = tail.prev;
+            tail.next = <span class="code-keyword">null</span>;
+        }
+        
+        System.out.println(<span class="code-string">"Deleted "</span> + data + <span class="code-string">" from tail"</span>);
+        <span class="code-keyword">return</span> data;
+    }
+    
+    <span class="code-comment">// Display list from head to tail</span>
+    <span class="code-keyword">public void</span> <span class="code-method">displayForward</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        Node current = head;
+        System.out.print(<span class="code-string">"List (forward): "</span>);
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" &lt;-&gt; "</span>);
+            current = current.next;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+    
+    <span class="code-comment">// Display list from tail to head</span>
+    <span class="code-keyword">public void</span> <span class="code-method">displayBackward</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"List is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        Node current = tail;
+        System.out.print(<span class="code-string">"List (backward): "</span>);
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" &lt;-&gt; "</span>);
+            current = current.prev;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+}</code></pre>
+            </div>
+            
+            <p><strong>Explanation:</strong> This implementation maintains references to both the head and tail nodes. Each node has pointers to both the next and previous nodes, allowing bidirectional traversal. Deletion operations are more efficient than in singly linked lists as we don't need to traverse to find the previous node.</p>
+        </div>
+        
+        <div class="slide" id="slide8">
+            <h2><i class="fas fa-sync-alt"></i> Iterators</h2>
+            <p>Iterators provide a way to access elements of a collection sequentially without exposing its underlying representation. They are particularly useful for linked lists.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-retweet"></i> Iterator Operations</h3>
+                <ul>
+                    <li><strong>hasNext()</strong> - Returns true if there are more elements</li>
+                    <li><strong>next()</strong> - Returns the next element and advances the iterator</li>
+                    <li><strong>remove()</strong> - Removes the last element returned by the iterator</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Benefits of Using Iterators:</h3>
+            <ul>
+                <li>Uniform way to traverse different data structures</li>
+                <li>Encapsulation of internal structure</li>
+                <li>Safe removal of elements during traversal</li>
+                <li>Support for multiple simultaneous traversals</li>
+            </ul>
+            
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-title">LinkedListIterator.java</div>
+                    <button class="copy-btn" onclick="copyCode('code5')">Copy Code</button>
+                </div>
+                <pre id="code5"><code><span class="code-keyword">import</span> java.util.Iterator;
+<span class="code-keyword">import</span> java.util.NoSuchElementException;
+
+<span class="code-keyword">public class</span> <span class="code-class">LinkedListIterator</span> <span class="code-keyword">implements</span> Iterable&lt;Integer&gt; {
+    <span class="code-keyword">private</span> <span class="code-class">Node</span> head;
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">private static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> LinkedListIterator() {
+        head = <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Add element to the list</span>
+    <span class="code-keyword">public void</span> <span class="code-method">add</span>(<span class="code-keyword">int</span> data) {
+        Node newNode = <span class="code-keyword">new</span> Node(data);
+        <span class="code-keyword">if</span> (head == <span class="code-keyword">null</span>) {
+            head = newNode;
+        } <span class="code-keyword">else</span> {
+            Node current = head;
+            <span class="code-keyword">while</span> (current.next != <span class="code-keyword">null</span>) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+    }
+    
+    <span class="code-comment">// Iterator implementation</span>
+    <span class="code-keyword">public</span> Iterator&lt;Integer&gt; <span class="code-method">iterator</span>() {
+        <span class="code-keyword">return</span> <span class="code-keyword">new</span> LinkedListIteratorImpl();
+    }
+    
+    <span class="code-comment">// Iterator implementation class</span>
+    <span class="code-keyword">private class</span> <span class="code-class">LinkedListIteratorImpl</span> <span class="code-keyword">implements</span> Iterator&lt;Integer&gt; {
+        <span class="code-keyword">private</span> Node current = head;
+        
+        <span class="code-keyword">public boolean</span> <span class="code-method">hasNext</span>() {
+            <span class="code-keyword">return</span> current != <span class="code-keyword">null</span>;
+        }
+        
+        <span class="code-keyword">public</span> Integer <span class="code-method">next</span>() {
+            <span class="code-keyword">if</span> (!hasNext()) {
+                <span class="code-keyword">throw new</span> NoSuchElementException();
+            }
+            <span class="code-keyword">int</span> data = current.data;
+            current = current.next;
+            <span class="code-keyword">return</span> data;
+        }
+        
+        <span class="code-keyword">public void</span> <span class="code-method">remove</span>() {
+            <span class="code-comment">// Optional operation - not implemented for simplicity</span>
+            <span class="code-keyword">throw new</span> UnsupportedOperationException();
+        }
+    }
+    
+    <span class="code-comment">// Display the list</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (head == <span class="code-keyword">null</span>) {
+            System.out.println(<span class="code-string">"List is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        Node current = head;
+        System.out.print(<span class="code-string">"List: "</span>);
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" -> "</span>);
+            current = current.next;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+}</code></pre>
+            </div>
+            
+            <h3><i class="fas fa-play-circle"></i> Example Usage:</h3>
+            <div class="code-container">
+                <pre><code><span class="code-keyword">public class</span> <span class="code-class">IteratorExample</span> {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        LinkedListIterator list = <span class="code-keyword">new</span> LinkedListIterator();
+        
+        list.add(<span class="code-number">10</span>);
+        list.add(<span class="code-number">20</span>);
+        list.add(<span class="code-number">30</span>);
+        list.add(<span class="code-number">40</span>);
+        
+        list.display(); <span class="code-comment">// Output: List: 10 -> 20 -> 30 -> 40 -> null</span>
+        
+        <span class="code-comment">// Using iterator with for-each loop</span>
+        System.out.print(<span class="code-string">"Using for-each: "</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> value : list) {
+            System.out.print(value + <span class="code-string">" "</span>);
+        }
+        System.out.println(); <span class="code-comment">// Output: Using for-each: 10 20 30 40</span>
+        
+        <span class="code-comment">// Using iterator explicitly</span>
+        System.out.print(<span class="code-string">"Using iterator: "</span>);
+        Iterator&lt;Integer&gt; iterator = list.iterator();
+        <span class="code-keyword">while</span> (iterator.hasNext()) {
+            System.out.print(iterator.next() + <span class="code-string">" "</span>);
+        }
+        System.out.println(); <span class="code-comment">// Output: Using iterator: 10 20 30 40</span>
+    }
+}</code></pre>
+            </div>
+            
+            <p><strong>Explanation:</strong> This implementation shows how to create an iterator for a linked list. By implementing the <code>Iterable</code> interface, we can use the for-each loop with our linked list. The iterator maintains a reference to the current node and provides methods to check for more elements and retrieve the next element.</p>
+            
+            <div class="iterator-demo">
+                <div class="visual-title">Iterator Visualization</div>
+                <div class="linked-list-visual" id="iterator-visual">
+                    <div class="node">
+                        <div class="data">10</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="node">
+                        <div class="data">20</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="node">
+                        <div class="data">30</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="node">
+                        <div class="data">40</div>
+                        <div class="pointer"></div>
+                    </div>
+                    <div class="null-node">null</div>
+                </div>
+                <div class="iterator-controls">
+                    <button onclick="iteratorNext()"><i class="fas fa-arrow-right"></i> Next</button>
+                    <button onclick="iteratorReset()"><i class="fas fa-redo"></i> Reset</button>
+                </div>
+                <div class="operation-result" id="iterator-result">Iterator at position: 0 (before first element)</div>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide9">
+            <h2><i class="fas fa-laptop-code"></i> Practice Exercises</h2>
+            <p>Test your understanding with these practice problems:</p>
+            
+            <div class="exercise">
+                <h3>Exercise 1: Reverse a Linked List</h3>
+                <p>Write a Java function to reverse a singly linked list.</p>
+                <p><strong>Example:</strong> </p>
+                <ul>
+                    <li>Input: 1 -> 2 -> 3 -> 4 -> null</li>
+                    <li>Output: 4 -> 3 -> 2 -> 1 -> null</li>
+                </ul>
+                <button class="show-answer" onclick="toggleAnswer('answer1')">Show Solution</button>
+                <div class="answer" id="answer1">
+                    <div class="code-container">
+                        <pre><code><span class="code-keyword">public class</span> <span class="code-class">ReverseLinkedList</span> {
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Iterative approach to reverse linked list</span>
+    <span class="code-keyword">public static</span> Node <span class="code-method">reverseIterative</span>(Node head) {
+        Node prev = <span class="code-keyword">null</span>;
+        Node current = head;
+        Node next = <span class="code-keyword">null</span>;
+        
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            next = current.next; <span class="code-comment">// Store next node</span>
+            current.next = prev; <span class="code-comment">// Reverse the link</span>
+            prev = current;      <span class="code-comment">// Move prev to current</span>
+            current = next;      <span class="code-comment">// Move current to next</span>
+        }
+        
+        <span class="code-keyword">return</span> prev; <span class="code-comment">// New head</span>
+    }
+    
+    <span class="code-comment">// Recursive approach to reverse linked list</span>
+    <span class="code-keyword">public static</span> Node <span class="code-method">reverseRecursive</span>(Node head) {
+        <span class="code-comment">// Base case: empty list or single node</span>
+        <span class="code-keyword">if</span> (head == <span class="code-keyword">null</span> || head.next == <span class="code-keyword">null</span>) {
+            <span class="code-keyword">return</span> head;
+        }
+        
+        <span class="code-comment">// Reverse the rest of the list</span>
+        Node newHead = reverseRecursive(head.next);
+        
+        <span class="code-comment">// Fix the connections</span>
+        head.next.next = head;
+        head.next = <span class="code-keyword">null</span>;
+        
+        <span class="code-keyword">return</span> newHead;
+    }
+    
+    <span class="code-comment">// Helper method to print linked list</span>
+    <span class="code-keyword">public static void</span> <span class="code-method">printList</span>(Node head) {
+        Node current = head;
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" -> "</span>);
+            current = current.next;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Create a linked list: 1 -> 2 -> 3 -> 4 -> null</span>
+        Node head = <span class="code-keyword">new</span> Node(<span class="code-number">1</span>);
+        head.next = <span class="code-keyword">new</span> Node(<span class="code-number">2</span>);
+        head.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">3</span>);
+        head.next.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">4</span>);
+        
+        System.out.println(<span class="code-string">"Original list:"</span>);
+        printList(head);
+        
+        <span class="code-comment">// Reverse using iterative approach</span>
+        Node reversedIterative = reverseIterative(head);
+        System.out.println(<span class="code-string">"Reversed list (iterative):"</span>);
+        printList(reversedIterative);
+        
+        <span class="code-comment">// Reverse back using recursive approach</span>
+        Node reversedRecursive = reverseRecursive(reversedIterative);
+        System.out.println(<span class="code-string">"Reversed back (recursive):"</span>);
+        printList(reversedRecursive);
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>Exercise 2: Detect Cycle in Linked List</h3>
+                <p>Write a Java function to detect if a linked list has a cycle (loop).</p>
+                <p><strong>Example:</strong></p>
+                <ul>
+                    <li>Input: 1 -> 2 -> 3 -> 4 -> 2 (cycle back to node with value 2)</li>
+                    <li>Output: true</li>
+                </ul>
+                <button class="show-answer" onclick="toggleAnswer('answer2')">Show Solution</button>
+                <div class="answer" id="answer2">
+                    <div class="code-container">
+                        <pre><code><span class="code-keyword">public class</span> <span class="code-class">CycleDetection</span> {
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Floyd's Cycle Detection Algorithm (Tortoise and Hare)</span>
+    <span class="code-keyword">public static boolean</span> <span class="code-method">hasCycle</span>(Node head) {
+        <span class="code-keyword">if</span> (head == <span class="code-keyword">null</span> || head.next == <span class="code-keyword">null</span>) {
+            <span class="code-keyword">return</span> <span class="code-keyword">false</span>;
+        }
+        
+        Node slow = head; <span class="code-comment">// Moves one step at a time</span>
+        Node fast = head; <span class="code-comment">// Moves two steps at a time</span>
+        
+        <span class="code-keyword">while</span> (fast != <span class="code-keyword">null</span> && fast.next != <span class="code-keyword">null</span>) {
+            slow = slow.next;
+            fast = fast.next.next;
+            
+            <span class="code-keyword">if</span> (slow == fast) {
+                <span class="code-keyword">return</span> <span class="code-keyword">true</span>; <span class="code-comment">// Cycle detected</span>
+            }
+        }
+        
+        <span class="code-keyword">return</span> <span class="code-keyword">false</span>; <span class="code-comment">// No cycle</span>
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Create a linked list with cycle: 1 -> 2 -> 3 -> 4 -> 2</span>
+        Node head = <span class="code-keyword">new</span> Node(<span class="code-number">1</span>);
+        head.next = <span class="code-keyword">new</span> Node(<span class="code-number">2</span>);
+        head.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">3</span>);
+        head.next.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">4</span>);
+        head.next.next.next.next = head.next; <span class="code-comment">// Create cycle: 4 points back to 2</span>
+        
+        System.out.println(<span class="code-string">"Does the linked list have a cycle? "</span> + hasCycle(head)); <span class="code-comment">// Output: true</span>
+        
+        <span class="code-comment">// Create a linked list without cycle: 1 -> 2 -> 3 -> 4 -> null</span>
+        Node head2 = <span class="code-keyword">new</span> Node(<span class="code-number">1</span>);
+        head2.next = <span class="code-keyword">new</span> Node(<span class="code-number">2</span>);
+        head2.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">3</span>);
+        head2.next.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">4</span>);
+        
+        System.out.println(<span class="code-string">"Does the linked list have a cycle? "</span> + hasCycle(head2)); <span class="code-comment">// Output: false</span>
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>Exercise 3: Find Middle of Linked List</h3>
+                <p>Write a Java function to find the middle element of a linked list. If the list has an even number of nodes, return the second middle element.</p>
+                <p><strong>Example:</strong></p>
+                <ul>
+                    <li>Input: 1 -> 2 -> 3 -> 4 -> 5 -> null → Output: 3</li>
+                    <li>Input: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null → Output: 4</li>
+                </ul>
+                <button class="show-answer" onclick="toggleAnswer('answer3')">Show Solution</button>
+                <div class="answer" id="answer3">
+                    <div class="code-container">
+                        <pre><code><span class="code-keyword">public class</span> <span class="code-class">MiddleOfLinkedList</span> {
+    
+    <span class="code-comment">// Node class</span>
+    <span class="code-keyword">static class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-comment">// Two-pointer approach to find middle</span>
+    <span class="code-keyword">public static</span> Node <span class="code-method">findMiddle</span>(Node head) {
+        <span class="code-keyword">if</span> (head == <span class="code-keyword">null</span>) {
+            <span class="code-keyword">return</span> <span class="code-keyword">null</span>;
+        }
+        
+        Node slow = head;
+        Node fast = head;
+        
+        <span class="code-keyword">while</span> (fast != <span class="code-keyword">null</span> && fast.next != <span class="code-keyword">null</span>) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        
+        <span class="code-keyword">return</span> slow;
+    }
+    
+    <span class="code-comment">// Helper method to print linked list</span>
+    <span class="code-keyword">public static void</span> <span class="code-method">printList</span>(Node head) {
+        Node current = head;
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" -> "</span>);
+            current = current.next;
+        }
+        System.out.println(<span class="code-string">"null"</span>);
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Create a linked list: 1 -> 2 -> 3 -> 4 -> 5 -> null</span>
+        Node head = <span class="code-keyword">new</span> Node(<span class="code-number">1</span>);
+        head.next = <span class="code-keyword">new</span> Node(<span class="code-number">2</span>);
+        head.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">3</span>);
+        head.next.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">4</span>);
+        head.next.next.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">5</span>);
+        
+        System.out.println(<span class="code-string">"Original list:"</span>);
+        printList(head);
+        
+        Node middle = findMiddle(head);
+        System.out.println(<span class="code-string">"Middle element: "</span> + (middle != <span class="code-keyword">null</span> ? middle.data : <span class="code-string">"N/A"</span>)); <span class="code-comment">// Output: 3</span>
+        
+        <span class="code-comment">// Add one more node: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null</span>
+        head.next.next.next.next.next = <span class="code-keyword">new</span> Node(<span class="code-number">6</span>);
+        
+        System.out.println(<span class="code-string">"List with even number of nodes:"</span>);
+        printList(head);
+        
+        middle = findMiddle(head);
+        System.out.println(<span class="code-string">"Middle element: "</span> + (middle != <span class="code-keyword">null</span> ? middle.data : <span class="code-string">"N/A"</span>)); <span class="code-comment">// Output: 4</span>
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide10">
+            <h2><i class="fas fa-question-circle"></i> Multiple Choice Quiz</h2>
+            <p>Test your knowledge with this multiple choice quiz:</p>
+            
+            <div class="quiz-question">
+                <h3>Question 1: What is the time complexity of inserting at the head of a singly linked list?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 1)">O(1)</li>
+                    <li onclick="selectOption(this, 1)">O(n)</li>
+                    <li onclick="selectOption(this, 1)">O(log n)</li>
+                    <li onclick="selectOption(this, 1)">O(n²)</li>
+                </ul>
+                <div class="feedback" id="feedback1"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2: Which data structure would be most appropriate for implementing an undo feature in a text editor?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 2)">Array</li>
+                    <li onclick="selectOption(this, 2)">Queue</li>
+                    <li onclick="selectOption(this, 2)">Stack</li>
+                    <li onclick="selectOption(this, 2)">Binary Tree</li>
+                </ul>
+                <div class="feedback" id="feedback2"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3: In a doubly linked list, what is the time complexity of deleting from the tail when we have a reference to the tail?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 3)">O(1)</li>
+                    <li onclick="selectOption(this, 3)">O(log n)</li>
+                    <li onclick="selectOption(this, 3)">O(n)</li>
+                    <li onclick="selectOption(this, 3)">O(n log n)</li>
+                </ul>
+                <div class="feedback" id="feedback3"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: Which algorithm is used to detect a cycle in a linked list?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 4)">Binary Search</li>
+                    <li onclick="selectOption(this, 4)">Floyd's Cycle Detection</li>
+                    <li onclick="selectOption(this, 4)">Depth-First Search</li>
+                    <li onclick="selectOption(this, 4)">Bubble Sort</li>
+                </ul>
+                <div class="feedback" id="feedback4"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5: What is the main advantage of using an iterator with a linked list?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 5)">It makes insertion faster</li>
+                    <li onclick="selectOption(this, 5)">It provides a uniform way to traverse the list</li>
+                    <li onclick="selectOption(this, 5)">It reduces memory usage</li>
+                    <li onclick="selectOption(this, 5)">It automatically sorts the list</li>
+                </ul>
+                <div class="feedback" id="feedback5"></div>
+            </div>
+            
+            <button onclick="checkQuiz()">Check Answers</button>
+            <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
+        </div>
+        
+        <div class="nav-buttons">
+            <button id="prev-btn" onclick="prevSlide()" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+            <button id="next-btn" onclick="nextSlide()">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Slide management
+        let currentSlide = 1;
+        const totalSlides = 10;
+        
+        function showSlide(n) {
+            // Hide all slides
+            const slides = document.getElementsByClassName('slide');
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            
+            // Show the current slide
+            document.getElementById('slide' + n).classList.add('active');
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = (n === 1);
+            document.getElementById('next-btn').disabled = (n === totalSlides);
+            
+            // Update progress bar
+            const progress = (n / totalSlides) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            
+            // Update slide counter
+            document.getElementById('current-slide').textContent = n;
+            
+            currentSlide = n;
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // Copy code to clipboard
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const copyBtn = event.target;
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }
+        
+        // Linked List visualization
+        let linkedListValues = [10, 20, 30, 40];
+        
+        function insertAtHead() {
+            const newValue = Math.floor(Math.random() * 100) + 50;
+            linkedListValues.unshift(newValue);
+            updateLinkedListVisualization();
+            document.getElementById('linked-list-result').textContent = `Inserted ${newValue} at head`;
+            document.getElementById('linked-list-result').style.background = '#e8f5e9';
+            document.getElementById('linked-list-result').style.color = '#2e7d32';
+        }
+        
+        function insertAtTail() {
+            const newValue = Math.floor(Math.random() * 100) + 50;
+            linkedListValues.push(newValue);
+            updateLinkedListVisualization();
+            document.getElementById('linked-list-result').textContent = `Inserted ${newValue} at tail`;
+            document.getElementById('linked-list-result').style.background = '#e8f5e9';
+            document.getElementById('linked-list-result').style.color = '#2e7d32';
+        }
+        
+        function deleteFromHead() {
+            if (linkedListValues.length > 0) {
+                const deleted = linkedListValues.shift();
+                updateLinkedListVisualization();
+                document.getElementById('linked-list-result').textContent = `Deleted ${deleted} from head`;
+                document.getElementById('linked-list-result').style.background = '#ffebee';
+                document.getElementById('linked-list-result').style.color = '#c62828';
+            } else {
+                document.getElementById('linked-list-result').textContent = 'List is empty!';
+                document.getElementById('linked-list-result').style.background = '#fff3e0';
+                document.getElementById('linked-list-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function deleteFromTail() {
+            if (linkedListValues.length > 0) {
+                const deleted = linkedListValues.pop();
+                updateLinkedListVisualization();
+                document.getElementById('linked-list-result').textContent = `Deleted ${deleted} from tail`;
+                document.getElementById('linked-list-result').style.background = '#ffebee';
+                document.getElementById('linked-list-result').style.color = '#c62828';
+            } else {
+                document.getElementById('linked-list-result').textContent = 'List is empty!';
+                document.getElementById('linked-list-result').style.background = '#fff3e0';
+                document.getElementById('linked-list-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function updateLinkedListVisualization() {
+            const listViz = document.getElementById('linked-list-visual');
+            listViz.innerHTML = '';
+            
+            if (linkedListValues.length === 0) {
+                const emptyElement = document.createElement('div');
+                emptyElement.className = 'null-node';
+                emptyElement.textContent = 'List is empty';
+                listViz.appendChild(emptyElement);
+                return;
+            }
+            
+            // Add nodes
+            for (let i = 0; i < linkedListValues.length; i++) {
+                const node = document.createElement('div');
+                node.className = 'node';
+                
+                const data = document.createElement('div');
+                data.className = 'data';
+                data.textContent = linkedListValues[i];
+                
+                const pointer = document.createElement('div');
+                pointer.className = 'pointer';
+                
+                node.appendChild(data);
+                
+                // Don't add pointer after the last node
+                if (i < linkedListValues.length - 1) {
+                    node.appendChild(pointer);
+                }
+                
+                listViz.appendChild(node);
+            }
+            
+            // Add null at the end
+            const nullNode = document.createElement('div');
+            nullNode.className = 'null-node';
+            nullNode.textContent = 'null';
+            listViz.appendChild(nullNode);
+        }
+        
+        // Doubly Linked List visualization
+        let doublyLinkedListValues = [10, 20, 30];
+        
+        function doublyInsertAtHead() {
+            const newValue = Math.floor(Math.random() * 100) + 50;
+            doublyLinkedListValues.unshift(newValue);
+            updateDoublyLinkedListVisualization();
+            document.getElementById('doubly-linked-list-result').textContent = `Inserted ${newValue} at head`;
+            document.getElementById('doubly-linked-list-result').style.background = '#e8f5e9';
+            document.getElementById('doubly-linked-list-result').style.color = '#2e7d32';
+        }
+        
+        function doublyInsertAtTail() {
+            const newValue = Math.floor(Math.random() * 100) + 50;
+            doublyLinkedListValues.push(newValue);
+            updateDoublyLinkedListVisualization();
+            document.getElementById('doubly-linked-list-result').textContent = `Inserted ${newValue} at tail`;
+            document.getElementById('doubly-linked-list-result').style.background = '#e8f5e9';
+            document.getElementById('doubly-linked-list-result').style.color = '#2e7d32';
+        }
+        
+        function doublyDeleteFromHead() {
+            if (doublyLinkedListValues.length > 0) {
+                const deleted = doublyLinkedListValues.shift();
+                updateDoublyLinkedListVisualization();
+                document.getElementById('doubly-linked-list-result').textContent = `Deleted ${deleted} from head`;
+                document.getElementById('doubly-linked-list-result').style.background = '#ffebee';
+                document.getElementById('doubly-linked-list-result').style.color = '#c62828';
+            } else {
+                document.getElementById('doubly-linked-list-result').textContent = 'List is empty!';
+                document.getElementById('doubly-linked-list-result').style.background = '#fff3e0';
+                document.getElementById('doubly-linked-list-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function doublyDeleteFromTail() {
+            if (doublyLinkedListValues.length > 0) {
+                const deleted = doublyLinkedListValues.pop();
+                updateDoublyLinkedListVisualization();
+                document.getElementById('doubly-linked-list-result').textContent = `Deleted ${deleted} from tail`;
+                document.getElementById('doubly-linked-list-result').style.background = '#ffebee';
+                document.getElementById('doubly-linked-list-result').style.color = '#c62828';
+            } else {
+                document.getElementById('doubly-linked-list-result').textContent = 'List is empty!';
+                document.getElementById('doubly-linked-list-result').style.background = '#fff3e0';
+                document.getElementById('doubly-linked-list-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function updateDoublyLinkedListVisualization() {
+            const listViz = document.getElementById('doubly-linked-list-visual');
+            listViz.innerHTML = '';
+            
+            if (doublyLinkedListValues.length === 0) {
+                const emptyElement = document.createElement('div');
+                emptyElement.className = 'null-node';
+                emptyElement.textContent = 'List is empty';
+                listViz.appendChild(emptyElement);
+                return;
+            }
+            
+            // Add null at the beginning
+            const nullNodeStart = document.createElement('div');
+            nullNodeStart.className = 'null-node';
+            nullNodeStart.textContent = 'null';
+            listViz.appendChild(nullNodeStart);
+            
+            // Add nodes
+            for (let i = 0; i < doublyLinkedListValues.length; i++) {
+                const node = document.createElement('div');
+                node.className = 'doubly-pointer';
+                
+                const prevPointer = document.createElement('div');
+                prevPointer.className = 'prev-pointer';
+                
+                const data = document.createElement('div');
+                data.className = 'data';
+                data.textContent = doublyLinkedListValues[i];
+                
+                const nextPointer = document.createElement('div');
+                nextPointer.className = 'next-pointer';
+                
+                node.appendChild(prevPointer);
+                node.appendChild(data);
+                node.appendChild(nextPointer);
+                
+                listViz.appendChild(node);
+            }
+            
+            // Add null at the end
+            const nullNodeEnd = document.createElement('div');
+            nullNodeEnd.className = 'null-node';
+            nullNodeEnd.textContent = 'null';
+            listViz.appendChild(nullNodeEnd);
+        }
+        
+        // Iterator visualization
+        let iteratorValues = [10, 20, 30, 40];
+        let iteratorPosition = 0;
+        
+        function iteratorNext() {
+            if (iteratorPosition < iteratorValues.length) {
+                iteratorPosition++;
+                updateIteratorVisualization();
+                if (iteratorPosition < iteratorValues.length) {
+                    document.getElementById('iterator-result').textContent = `Iterator at position: ${iteratorPosition} (pointing to ${iteratorValues[iteratorPosition]})`;
+                    document.getElementById('iterator-result').style.background = '#e3f2fd';
+                    document.getElementById('iterator-result').style.color = '#1565c0';
+                } else {
+                    document.getElementById('iterator-result').textContent = 'Iterator at position: end (no more elements)';
+                    document.getElementById('iterator-result').style.background = '#fff3e0';
+                    document.getElementById('iterator-result').style.color = '#ef6c00';
+                }
+            } else {
+                document.getElementById('iterator-result').textContent = 'Iterator has reached the end of the list';
+                document.getElementById('iterator-result').style.background = '#fff3e0';
+                document.getElementById('iterator-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function iteratorReset() {
+            iteratorPosition = 0;
+            updateIteratorVisualization();
+            document.getElementById('iterator-result').textContent = 'Iterator at position: 0 (before first element)';
+            document.getElementById('iterator-result').style.background = '#f0f0f0';
+            document.getElementById('iterator-result').style.color = '#333';
+        }
+        
+        function updateIteratorVisualization() {
+            const listViz = document.getElementById('iterator-visual');
+            listViz.innerHTML = '';
+            
+            if (iteratorValues.length === 0) {
+                const emptyElement = document.createElement('div');
+                emptyElement.className = 'null-node';
+                emptyElement.textContent = 'List is empty';
+                listViz.appendChild(emptyElement);
+                return;
+            }
+            
+            // Add nodes
+            for (let i = 0; i < iteratorValues.length; i++) {
+                const node = document.createElement('div');
+                node.className = 'node';
+                
+                const data = document.createElement('div');
+                data.className = 'data';
+                data.textContent = iteratorValues[i];
+                
+                // Highlight current node
+                if (i === iteratorPosition) {
+                    data.classList.add('current-node');
+                }
+                
+                const pointer = document.createElement('div');
+                pointer.className = 'pointer';
+                
+                node.appendChild(data);
+                
+                // Don't add pointer after the last node
+                if (i < iteratorValues.length - 1) {
+                    node.appendChild(pointer);
+                }
+                
+                listViz.appendChild(node);
+            }
+            
+            // Add null at the end
+            const nullNode = document.createElement('div');
+            nullNode.className = 'null-node';
+            nullNode.textContent = 'null';
+            listViz.appendChild(nullNode);
+        }
+        
+        // Exercise answers toggle
+        function toggleAnswer(id) {
+            const answer = document.getElementById(id);
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+            } else {
+                answer.style.display = 'block';
+            }
+        }
+        
+        // Quiz functionality
+        const quizAnswers = {
+            1: 0, // First option is correct for Q1
+            2: 2, // Third option is correct for Q2
+            3: 0, // First option is correct for Q3
+            4: 1, // Second option is correct for Q4
+            5: 1  // Second option is correct for Q5
+        };
+        
+        let selectedOptions = {};
+        
+        function selectOption(element, questionNum) {
+            // Remove selected class from all options in this question
+            const options = element.parentElement.children;
+            for (let i = 0; i < options.length; i++) {
+                options[i].classList.remove('selected');
+            }
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            
+            // Store the selected option index
+            selectedOptions[questionNum] = Array.from(options).indexOf(element);
+        }
+        
+        function checkQuiz() {
+            let score = 0;
+            const totalQuestions = Object.keys(quizAnswers).length;
+            
+            // Check each question
+            for (let i = 1; i <= totalQuestions; i++) {
+                const feedback = document.getElementById('feedback' + i);
+                const options = document.querySelectorAll('#feedback' + i).previousElementSibling.children;
+                
+                if (selectedOptions[i] === undefined) {
+                    feedback.textContent = 'Please select an answer for question ' + i;
+                    feedback.className = 'feedback incorrect';
+                    feedback.style.display = 'block';
+                    continue;
+                }
+                
+                // Reset all options styling
+                for (let j = 0; j < options.length; j++) {
+                    options[j].classList.remove('correct', 'incorrect');
+                }
+                
+                // Check if answer is correct
+                if (selectedOptions[i] === quizAnswers[i]) {
+                    score++;
+                    options[selectedOptions[i]].classList.add('correct');
+                    feedback.textContent = 'Correct!';
+                    feedback.className = 'feedback correct';
+                } else {
+                    options[selectedOptions[i]].classList.add('incorrect');
+                    options[quizAnswers[i]].classList.add('correct');
+                    feedback.textContent = 'Incorrect. The correct answer is highlighted.';
+                    feedback.className = 'feedback incorrect';
+                }
+                
+                feedback.style.display = 'block';
+            }
+            
+            // Display result
+            const result = document.getElementById('quiz-result');
+            result.textContent = `You scored ${score} out of ${totalQuestions}!`;
+            if (score === totalQuestions) {
+                result.style.color = 'var(--success-color)';
+            } else if (score >= totalQuestions / 2) {
+                result.style.color = 'var(--warning-color)';
+            } else {
+                result.style.color = 'var(--accent-color)';
+            }
+        }
+        
+        // Initialize the presentation
+        document.addEventListener('DOMContentLoaded', function() {
+            showSlide(1);
+            updateLinkedListVisualization();
+            updateDoublyLinkedListVisualization();
+            updateIteratorVisualization();
+            document.getElementById('total-slides').textContent = totalSlides;
+        });
+    </script>
+</body>
+</html>
