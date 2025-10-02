@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacks, Queues & Priority Queues in Java</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --code-bg: #1e1e1e;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: var(--gradient-1);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            font-size: 2.2rem;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-color);
+            display: inline-block;
+        }
+        
+        h3 {
+            font-size: 1.6rem;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h3 i {
+            color: var(--accent-color);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+        }
+        
+        button {
+            background: var(--gradient-3);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .slide {
+            display: none;
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        .code-container {
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95rem;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #444;
+        }
+        
+        .code-title {
+            font-weight: bold;
+            color: #66d9ef;
+        }
+        
+        .copy-btn {
+            background: #444;
+            color: #f8f8f2;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #555;
+        }
+        
+        .code-keyword {
+            color: #f92672;
+        }
+        
+        .code-comment {
+            color: #75715e;
+        }
+        
+        .code-string {
+            color: #e6db74;
+        }
+        
+        .code-class {
+            color: #66d9ef;
+        }
+        
+        .code-method {
+            color: #a6e22e;
+        }
+        
+        .code-number {
+            color: #ae81ff;
+        }
+        
+        .exercise {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            padding: 1.5rem;
+            border-left: 5px solid var(--secondary-color);
+            margin: 1.5rem 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .exercise::before {
+            content: "Exercise";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 0 0 5px 0;
+        }
+        
+        .quiz-question {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s;
+        }
+        
+        .quiz-question:hover {
+            transform: translateY(-5px);
+        }
+        
+        .quiz-options {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+        
+        .quiz-options li {
+            margin-bottom: 0.5rem;
+            padding: 0.75rem 1rem;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quiz-options li:hover {
+            border-color: var(--secondary-color);
+            background-color: #f0f8ff;
+        }
+        
+        .quiz-options li.selected {
+            border-color: var(--secondary-color);
+            background-color: #e3f2fd;
+        }
+        
+        .quiz-options li.correct {
+            border-color: var(--success-color);
+            background-color: #e8f5e9;
+        }
+        
+        .quiz-options li.incorrect {
+            border-color: var(--accent-color);
+            background-color: #ffebee;
+        }
+        
+        .feedback {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-top: 1rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .feedback.correct {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .feedback.incorrect {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 50px;
+            height: 10px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-2);
+            width: 11.11%;
+            transition: width 0.5s ease;
+        }
+        
+        .slide-counter {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .visualization-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .visualization {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .visual-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .stack-visual, .queue-visual, .pq-visual {
+            width: 100%;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .stack-visual {
+            border: 2px dashed var(--secondary-color);
+        }
+        
+        .queue-visual {
+            border: 2px dashed var(--accent-color);
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-x: auto;
+        }
+        
+        .pq-visual {
+            border: 2px dashed var(--success-color);
+        }
+        
+        .element {
+            width: 80%;
+            height: 40px;
+            margin: 3px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            border-radius: 6px;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stack-element {
+            background: var(--secondary-color);
+        }
+        
+        .queue-element {
+            background: var(--accent-color);
+            width: 80px;
+            height: 50px;
+            margin: 0 5px;
+            flex-shrink: 0;
+        }
+        
+        .pq-element {
+            background: var(--success-color);
+            width: 90%;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .operation-result {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 6px;
+            background: #f0f0f0;
+            text-align: center;
+            font-weight: 600;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background-color: #f8f9fa;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .tab-button.active {
+            background-color: white;
+            border-bottom: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .answer {
+            display: none;
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(to right, #e3f2fd, #f3e5f5);
+            border-radius: var(--radius);
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .show-answer {
+            margin-top: 1rem;
+            background: var(--warning-color);
+        }
+        
+        .definition-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .definition-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        
+        .complexity-table th, .complexity-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .complexity-table th {
+            background: var(--gradient-1);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .complexity-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .complexity-table tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .priority-queue-demo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+        
+        .pq-controls {
+            display: flex;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .pq-input {
+            padding: 0.5rem;
+            border: 2px solid var(--secondary-color);
+            border-radius: 4px;
+            width: 120px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .slide {
+                padding: 1.5rem;
+            }
+            
+            .visualization-container {
+                flex-direction: column;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-layer-group"></i> Stacks, Queues & Priority Queues</h1>
+            <p>Interactive Java Data Structures Presentation</p>
+        </header>
+        
+        <div class="slide-counter">
+            Slide <span id="current-slide">1</span> of <span id="total-slides">9</span>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div class="slide active" id="slide1">
+            <h2><i class="fas fa-home"></i> Introduction to Data Structures</h2>
+            <p>Data structures are specialized formats for organizing, processing, retrieving and storing data. They provide a way to manage large amounts of data efficiently for different use cases.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-info-circle"></i> What are Data Structures?</h3>
+                <p>Data structures are containers that hold data in a specific layout. This layout allows certain operations to be performed efficiently while others may be more costly.</p>
+            </div>
+            
+            <p>In this presentation, we'll focus on three fundamental linear data structures:</p>
+            <ul>
+                <li><strong>Stacks</strong> - Last In, First Out (LIFO) structure</li>
+                <li><strong>Queues</strong> - First In, First Out (FIFO) structure</li>
+                <li><strong>Priority Queues</strong> - Elements with priority ordering</li>
+            </ul>
+            
+            <div class="visualization-container">
+                <div class="visualization">
+                    <div class="visual-title">Stack Visualization</div>
+                    <div class="stack-visual">
+                        <div class="element stack-element">Top: 40</div>
+                        <div class="element stack-element">30</div>
+                        <div class="element stack-element">20</div>
+                        <div class="element stack-element">Bottom: 10</div>
+                    </div>
+                    <div class="controls">
+                        <button onclick="stackPush()"><i class="fas fa-plus"></i> Push(50)</button>
+                        <button onclick="stackPop()"><i class="fas fa-minus"></i> Pop()</button>
+                        <button onclick="stackPeek()"><i class="fas fa-eye"></i> Peek()</button>
+                    </div>
+                    <div class="operation-result" id="stack-result">Stack Operations</div>
+                </div>
+                
+                <div class="visualization">
+                    <div class="visual-title">Queue Visualization</div>
+                    <div class="queue-visual">
+                        <div class="element queue-element">Front: 10</div>
+                        <div class="element queue-element">20</div>
+                        <div class="element queue-element">30</div>
+                        <div class="element queue-element">Rear: 40</div>
+                    </div>
+                    <div class="controls">
+                        <button onclick="queueEnqueue()"><i class="fas fa-plus"></i> Enqueue(50)</button>
+                        <button onclick="queueDequeue()"><i class="fas fa-minus"></i> Dequeue()</button>
+                        <button onclick="queuePeek()"><i class="fas fa-eye"></i> Peek()</button>
+                    </div>
+                    <div class="operation-result" id="queue-result">Queue Operations</div>
+                </div>
+            </div>
+            
+            <p>We'll explore their definitions, implementations in Java, practical examples, and practice problems to reinforce your understanding.</p>
+        </div>
+        
+        <div class="slide" id="slide2">
+            <h2><i class="fas fa-layer-group"></i> Stacks: Definition and Properties</h2>
+            <p>A stack is a linear data structure that follows the <strong>Last In, First Out (LIFO)</strong> principle. The last element added to the stack will be the first one to be removed.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-cube"></i> Stack Operations</h3>
+                <ul>
+                    <li><strong>push(element)</strong> - Adds an element to the top of the stack</li>
+                    <li><strong>pop()</strong> - Removes and returns the top element from the stack</li>
+                    <li><strong>peek()</strong> - Returns the top element without removing it</li>
+                    <li><strong>isEmpty()</strong> - Checks if the stack is empty</li>
+                    <li><strong>size()</strong> - Returns the number of elements in the stack</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Common Applications:</h3>
+            <ul>
+                <li>Function call management (call stack)</li>
+                <li>Undo/Redo functionality in applications</li>
+                <li>Expression evaluation and syntax parsing</li>
+                <li>Backtracking algorithms</li>
+                <li>Browser history navigation</li>
+            </ul>
+            
+            <table class="complexity-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Time Complexity</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>push()</td>
+                        <td>O(1)</td>
+                        <td>Adds an element to the top</td>
+                    </tr>
+                    <tr>
+                        <td>pop()</td>
+                        <td>O(1)</td>
+                        <td>Removes the top element</td>
+                    </tr>
+                    <tr>
+                        <td>peek()</td>
+                        <td>O(1)</td>
+                        <td>Returns the top element without removal</td>
+                    </tr>
+                    <tr>
+                        <td>isEmpty()</td>
+                        <td>O(1)</td>
+                        <td>Checks if stack is empty</td>
+                    </tr>
+                    <tr>
+                        <td>search()</td>
+                        <td>O(n)</td>
+                        <td>Searches for an element in the stack</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="slide" id="slide3">
+            <h2><i class="fas fa-code"></i> Stack Implementation in Java</h2>
+            <p>Java provides several ways to implement stacks:</p>
+            
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'stack-array')">Using Array</button>
+                <button class="tab-button" onclick="openTab(event, 'stack-arraylist')">Using ArrayList</button>
+                <button class="tab-button" onclick="openTab(event, 'stack-builtin')">Built-in Stack</button>
+            </div>
+            
+            <div id="stack-array" class="tab-content active">
+                <h3><i class="fas fa-th"></i> Stack Implementation Using Array</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">ArrayStack.java</div>
+                        <button class="copy-btn" onclick="copyCode('code1')">Copy Code</button>
+                    </div>
+                    <pre id="code1"><code><span class="code-keyword">public class</span> <span class="code-class">ArrayStack</span> {
+    <span class="code-keyword">private int</span> maxSize;
+    <span class="code-keyword">private int</span>[] stackArray;
+    <span class="code-keyword">private int</span> top;
+
+    <span class="code-comment">// Constructor to initialize stack</span>
+    <span class="code-keyword">public</span> ArrayStack(<span class="code-keyword">int</span> size) {
+        <span class="code-keyword">this</span>.maxSize = size;
+        <span class="code-keyword">this</span>.stackArray = <span class="code-keyword">new int</span>[maxSize];
+        <span class="code-keyword">this</span>.top = -1;  <span class="code-comment">// Stack is initially empty</span>
+    }
+
+    <span class="code-comment">// Add element to the top of stack</span>
+    <span class="code-keyword">public void</span> <span class="code-method">push</span>(<span class="code-keyword">int</span> value) {
+        <span class="code-keyword">if</span> (isFull()) {
+            System.out.println(<span class="code-string">"Stack is full. Cannot push "</span> + value);
+            <span class="code-keyword">return</span>;
+        }
+        stackArray[++top] = value;  <span class="code-comment">// Increment top then insert</span>
+        System.out.println(<span class="code-string">"Pushed "</span> + value + <span class="code-string">" to stack"</span>);
+    }
+
+    <span class="code-comment">// Remove and return top element from stack</span>
+    <span class="code-keyword">public int</span> <span class="code-method">pop</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty. Cannot pop."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">int</span> value = stackArray[top--];  <span class="code-comment">// Return top then decrement</span>
+        System.out.println(<span class="code-string">"Popped "</span> + value + <span class="code-string">" from stack"</span>);
+        <span class="code-keyword">return</span> value;
+    }
+
+    <span class="code-comment">// Return top element without removing it</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peek</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty. No top element."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> stackArray[top];
+    }
+
+    <span class="code-comment">// Check if stack is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> (top == -<span class="code-number">1</span>);
+    }
+
+    <span class="code-comment">// Check if stack is full</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isFull</span>() {
+        <span class="code-keyword">return</span> (top == maxSize - <span class="code-number">1</span>);
+    }
+
+    <span class="code-comment">// Return the current size of stack</span>
+    <span class="code-keyword">public int</span> <span class="code-method">size</span>() {
+        <span class="code-keyword">return</span> top + <span class="code-number">1</span>;
+    }
+
+    <span class="code-comment">// Display stack contents</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        System.out.print(<span class="code-string">"Stack (top to bottom): "</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = top; i >= <span class="code-number">0</span>; i--) {
+            System.out.print(stackArray[i] + <span class="code-string">" "</span>);
+        }
+        System.out.println();
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> This implementation uses a fixed-size array. The <code>top</code> variable tracks the index of the top element. When the stack is empty, <code>top</code> is -1. The <code>push</code> operation increments <code>top</code> then stores the value, while <code>pop</code> returns the value at <code>top</code> then decrements it.</p>
+            </div>
+            
+            <div id="stack-arraylist" class="tab-content">
+                <h3><i class="fas fa-list"></i> Stack Implementation Using ArrayList</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">ArrayListStack.java</div>
+                        <button class="copy-btn" onclick="copyCode('code2')">Copy Code</button>
+                    </div>
+                    <pre id="code2"><code><span class="code-keyword">import</span> java.util.ArrayList;
+
+<span class="code-keyword">public class</span> <span class="code-class">ArrayListStack</span> {
+    <span class="code-keyword">private</span> ArrayList&lt;Integer&gt; stackList;
+
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> ArrayListStack() {
+        stackList = <span class="code-keyword">new</span> ArrayList&lt;&gt;();
+    }
+
+    <span class="code-comment">// Add element to the top of stack</span>
+    <span class="code-keyword">public void</span> <span class="code-method">push</span>(<span class="code-keyword">int</span> value) {
+        stackList.add(value);
+        System.out.println(<span class="code-string">"Pushed "</span> + value + <span class="code-string">" to stack"</span>);
+    }
+
+    <span class="code-comment">// Remove and return top element from stack</span>
+    <span class="code-keyword">public int</span> <span class="code-method">pop</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty. Cannot pop."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">int</span> value = stackList.remove(stackList.size() - <span class="code-number">1</span>);
+        System.out.println(<span class="code-string">"Popped "</span> + value + <span class="code-string">" from stack"</span>);
+        <span class="code-keyword">return</span> value;
+    }
+
+    <span class="code-comment">// Return top element without removing it</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peek</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty. No top element."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> stackList.get(stackList.size() - <span class="code-number">1</span>);
+    }
+
+    <span class="code-comment">// Check if stack is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> stackList.isEmpty();
+    }
+
+    <span class="code-comment">// Return the current size of stack</span>
+    <span class="code-keyword">public int</span> <span class="code-method">size</span>() {
+        <span class="code-keyword">return</span> stackList.size();
+    }
+
+    <span class="code-comment">// Display stack contents</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Stack is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        System.out.print(<span class="code-string">"Stack (top to bottom): "</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = stackList.size() - <span class="code-number">1</span>; i >= <span class="code-number">0</span>; i--) {
+            System.out.print(stackList.get(i) + <span class="code-string">" "</span>);
+        }
+        System.out.println();
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> This implementation uses an ArrayList, which provides dynamic resizing. The top of the stack is the last element in the ArrayList. This implementation doesn't have a fixed size limit like the array-based version.</p>
+            </div>
+            
+            <div id="stack-builtin" class="tab-content">
+                <h3><i class="fas fa-box"></i> Using Java's Built-in Stack Class</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">BuiltInStackExample.java</div>
+                        <button class="copy-btn" onclick="copyCode('code3')">Copy Code</button>
+                    </div>
+                    <pre id="code3"><code><span class="code-keyword">import</span> java.util.Stack;
+
+<span class="code-keyword">public class</span> <span class="code-class">BuiltInStackExample</span> {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Create a stack using Java's built-in Stack class</span>
+        Stack&lt;Integer&gt; stack = <span class="code-keyword">new</span> Stack&lt;&gt;();
+        
+        <span class="code-comment">// Push elements to the stack</span>
+        stack.push(<span class="code-number">10</span>);
+        stack.push(<span class="code-number">20</span>);
+        stack.push(<span class="code-number">30</span>);
+        
+        <span class="code-comment">// Display the stack</span>
+        System.out.println(<span class="code-string">"Stack: "</span> + stack);
+        
+        <span class="code-comment">// Pop element from the stack</span>
+        <span class="code-keyword">int</span> poppedElement = stack.pop();
+        System.out.println(<span class="code-string">"Popped: "</span> + poppedElement); <span class="code-comment">// Output: 30</span>
+        
+        <span class="code-comment">// Peek at top element</span>
+        <span class="code-keyword">int</span> topElement = stack.peek();
+        System.out.println(<span class="code-string">"Top element: "</span> + topElement); <span class="code-comment">// Output: 20</span>
+        
+        <span class="code-comment">// Check if stack is empty</span>
+        System.out.println(<span class="code-string">"Is stack empty? "</span> + stack.isEmpty()); <span class="code-comment">// Output: false</span>
+        
+        <span class="code-comment">// Get stack size</span>
+        System.out.println(<span class="code-string">"Stack size: "</span> + stack.size()); <span class="code-comment">// Output: 2</span>
+        
+        <span class="code-comment">// Search for an element (returns position from top, 1-based)</span>
+        <span class="code-keyword">int</span> position = stack.search(<span class="code-number">10</span>);
+        System.out.println(<span class="code-string">"Position of 10: "</span> + position); <span class="code-comment">// Output: 2</span>
+        
+        <span class="code-comment">// Display the stack after operations</span>
+        System.out.println(<span class="code-string">"Final stack: "</span> + stack); <span class="code-comment">// Output: [10, 20]</span>
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> Java provides a built-in <code>Stack</code> class in the <code>java.util</code> package. It includes all standard stack operations and extends the <code>Vector</code> class, which provides synchronized methods. This implementation is thread-safe but may have performance overhead in single-threaded environments.</p>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide4">
+            <h2><i class="fas fa-stream"></i> Queues: Definition and Properties</h2>
+            <p>A queue is a linear data structure that follows the <strong>First In, First Out (FIFO)</strong> principle. The first element added to the queue will be the first one to be removed.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-arrows-alt-h"></i> Queue Operations</h3>
+                <ul>
+                    <li><strong>enqueue(element)</strong> - Adds an element to the rear of the queue</li>
+                    <li><strong>dequeue()</strong> - Removes and returns the front element from the queue</li>
+                    <li><strong>peek()</strong> - Returns the front element without removing it</li>
+                    <li><strong>isEmpty()</strong> - Checks if the queue is empty</li>
+                    <li><strong>size()</strong> - Returns the number of elements in the queue</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Common Applications:</h3>
+            <ul>
+                <li>Task scheduling in operating systems</li>
+                <li>Print job management</li>
+                <li>Breadth-First Search (BFS) algorithm</li>
+                <li>Customer service systems</li>
+                <li>Message queues in distributed systems</li>
+            </ul>
+            
+            <table class="complexity-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Time Complexity</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>enqueue()</td>
+                        <td>O(1)</td>
+                        <td>Adds an element to the rear</td>
+                    </tr>
+                    <tr>
+                        <td>dequeue()</td>
+                        <td>O(1)</td>
+                        <td>Removes the front element</td>
+                    </tr>
+                    <tr>
+                        <td>peek()</td>
+                        <td>O(1)</td>
+                        <td>Returns the front element without removal</td>
+                    </tr>
+                    <tr>
+                        <td>isEmpty()</td>
+                        <td>O(1)</td>
+                        <td>Checks if queue is empty</td>
+                    </tr>
+                    <tr>
+                        <td>search()</td>
+                        <td>O(n)</td>
+                        <td>Searches for an element in the queue</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="visualization">
+                <div class="visual-title">Interactive Queue Visualization</div>
+                <div class="queue-visual">
+                    <div class="element queue-element">Front: 10</div>
+                    <div class="element queue-element">20</div>
+                    <div class="element queue-element">30</div>
+                    <div class="element queue-element">Rear: 40</div>
+                </div>
+                <div class="controls">
+                    <button onclick="queueEnqueue()"><i class="fas fa-plus"></i> Enqueue(50)</button>
+                    <button onclick="queueDequeue()"><i class="fas fa-minus"></i> Dequeue()</button>
+                    <button onclick="queuePeek()"><i class="fas fa-eye"></i> Peek()</button>
+                </div>
+                <div class="operation-result" id="queue-result-2">Queue Operations</div>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide5">
+            <h2><i class="fas fa-code"></i> Queue Implementation in Java</h2>
+            <p>Java provides several ways to implement queues:</p>
+            
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'queue-array')">Using Array</button>
+                <button class="tab-button" onclick="openTab(event, 'queue-linkedlist')">Using LinkedList</button>
+                <button class="tab-button" onclick="openTab(event, 'queue-builtin')">Built-in Queue</button>
+            </div>
+            
+            <div id="queue-array" class="tab-content active">
+                <h3><i class="fas fa-th"></i> Queue Implementation Using Circular Array</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">CircularArrayQueue.java</div>
+                        <button class="copy-btn" onclick="copyCode('code4')">Copy Code</button>
+                    </div>
+                    <pre id="code4"><code><span class="code-keyword">public class</span> <span class="code-class">CircularArrayQueue</span> {
+    <span class="code-keyword">private int</span> maxSize;
+    <span class="code-keyword">private int</span>[] queueArray;
+    <span class="code-keyword">private int</span> front;
+    <span class="code-keyword">private int</span> rear;
+    <span class="code-keyword">private int</span> nItems;
+
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> CircularArrayQueue(<span class="code-keyword">int</span> size) {
+        maxSize = size;
+        queueArray = <span class="code-keyword">new int</span>[maxSize];
+        front = <span class="code-number">0</span>;
+        rear = -<span class="code-number">1</span>;
+        nItems = <span class="code-number">0</span>;
+    }
+
+    <span class="code-comment">// Add element to the rear of queue</span>
+    <span class="code-keyword">public void</span> <span class="code-method">enqueue</span>(<span class="code-keyword">int</span> value) {
+        <span class="code-keyword">if</span> (isFull()) {
+            System.out.println(<span class="code-string">"Queue is full. Cannot enqueue "</span> + value);
+            <span class="code-keyword">return</span>;
+        }
+        <span class="code-comment">// Circular queue: wrap around if rear reaches end</span>
+        <span class="code-keyword">if</span> (rear == maxSize - <span class="code-number">1</span>) {
+            rear = -<span class="code-number">1</span>;
+        }
+        queueArray[++rear] = value;
+        nItems++;
+        System.out.println(<span class="code-string">"Enqueued "</span> + value + <span class="code-string">" to queue"</span>);
+    }
+
+    <span class="code-comment">// Remove and return front element from queue</span>
+    <span class="code-keyword">public int</span> <span class="code-method">dequeue</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Queue is empty. Cannot dequeue."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">int</span> temp = queueArray[front++];
+        <span class="code-comment">// Circular queue: wrap around if front reaches end</span>
+        <span class="code-keyword">if</span> (front == maxSize) {
+            front = <span class="code-number">0</span>;
+        }
+        nItems--;
+        System.out.println(<span class="code-string">"Dequeued "</span> + temp + <span class="code-string">" from queue"</span>);
+        <span class="code-keyword">return</span> temp;
+    }
+
+    <span class="code-comment">// Return front element without removing it</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peek</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Queue is empty. No front element."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> queueArray[front];
+    }
+
+    <span class="code-comment">// Check if queue is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> (nItems == <span class="code-number">0</span>);
+    }
+
+    <span class="code-comment">// Check if queue is full</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isFull</span>() {
+        <span class="code-keyword">return</span> (nItems == maxSize);
+    }
+
+    <span class="code-comment">// Return the current size of queue</span>
+    <span class="code-keyword">public int</span> <span class="code-method">size</span>() {
+        <span class="code-keyword">return</span> nItems;
+    }
+
+    <span class="code-comment">// Display queue contents</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Queue is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        System.out.print(<span class="code-string">"Queue (front to rear): "</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = <span class="code-number">0</span>; i &lt; nItems; i++) {
+            <span class="code-keyword">int</span> index = (front + i) % maxSize;
+            System.out.print(queueArray[index] + <span class="code-string">" "</span>);
+        }
+        System.out.println();
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> This implementation uses a circular array to efficiently utilize space. When the rear pointer reaches the end of the array, it wraps around to the beginning. This avoids the need to shift elements when dequeuing.</p>
+            </div>
+            
+            <div id="queue-linkedlist" class="tab-content">
+                <h3><i class="fas fa-link"></i> Queue Implementation Using LinkedList</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">LinkedListQueue.java</div>
+                        <button class="copy-btn" onclick="copyCode('code5')">Copy Code</button>
+                    </div>
+                    <pre id="code5"><code><span class="code-keyword">public class</span> <span class="code-class">LinkedListQueue</span> {
+    <span class="code-keyword">private class</span> <span class="code-class">Node</span> {
+        <span class="code-keyword">int</span> data;
+        Node next;
+        
+        Node(<span class="code-keyword">int</span> data) {
+            <span class="code-keyword">this</span>.data = data;
+            <span class="code-keyword">this</span>.next = <span class="code-keyword">null</span>;
+        }
+    }
+    
+    <span class="code-keyword">private</span> Node front, rear;
+    
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> LinkedListQueue() {
+        <span class="code-keyword">this</span>.front = <span class="code-keyword">this</span>.rear = <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Add element to the rear of queue</span>
+    <span class="code-keyword">public void</span> <span class="code-method">enqueue</span>(<span class="code-keyword">int</span> value) {
+        Node newNode = <span class="code-keyword">new</span> Node(value);
+        
+        <span class="code-comment">// If queue is empty, new node is both front and rear</span>
+        <span class="code-keyword">if</span> (rear == <span class="code-keyword">null</span>) {
+            front = rear = newNode;
+            System.out.println(<span class="code-string">"Enqueued "</span> + value + <span class="code-string">" to queue"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        <span class="code-comment">// Add the new node at the end and change rear</span>
+        rear.next = newNode;
+        rear = newNode;
+        System.out.println(<span class="code-string">"Enqueued "</span> + value + <span class="code-string">" to queue"</span>);
+    }
+    
+    <span class="code-comment">// Remove and return front element from queue</span>
+    <span class="code-keyword">public int</span> <span class="code-method">dequeue</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Queue is empty. Cannot dequeue."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-comment">// Store previous front and move front one node ahead</span>
+        Node temp = front;
+        front = front.next;
+        
+        <span class="code-comment">// If front becomes null, then change rear also to null</span>
+        <span class="code-keyword">if</span> (front == <span class="code-keyword">null</span>) {
+            rear = <span class="code-keyword">null</span>;
+        }
+        
+        System.out.println(<span class="code-string">"Dequeued "</span> + temp.data + <span class="code-string">" from queue"</span>);
+        <span class="code-keyword">return</span> temp.data;
+    }
+    
+    <span class="code-comment">// Return front element without removing it</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peek</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Queue is empty. No front element."</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> front.data;
+    }
+    
+    <span class="code-comment">// Check if queue is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> front == <span class="code-keyword">null</span>;
+    }
+    
+    <span class="code-comment">// Display queue contents</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Queue is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        System.out.print(<span class="code-string">"Queue (front to rear): "</span>);
+        Node current = front;
+        <span class="code-keyword">while</span> (current != <span class="code-keyword">null</span>) {
+            System.out.print(current.data + <span class="code-string">" "</span>);
+            current = current.next;
+        }
+        System.out.println();
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> This implementation uses a linked list with front and rear pointers. The front pointer points to the first element, and the rear pointer points to the last element. Enqueue operations add to the rear, and dequeue operations remove from the front.</p>
+            </div>
+            
+            <div id="queue-builtin" class="tab-content">
+                <h3><i class="fas fa-box"></i> Using Java's Built-in Queue Interface</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">BuiltInQueueExample.java</div>
+                        <button class="copy-btn" onclick="copyCode('code6')">Copy Code</button>
+                    </div>
+                    <pre id="code6"><code><span class="code-keyword">import</span> java.util.LinkedList;
+<span class="code-keyword">import</span> java.util.Queue;
+
+<span class="code-keyword">public class</span> <span class="code-class">BuiltInQueueExample</span> {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Create a queue using LinkedList</span>
+        Queue&lt;Integer&gt; queue = <span class="code-keyword">new</span> LinkedList&lt;&gt;();
+        
+        <span class="code-comment">// Enqueue elements</span>
+        queue.add(<span class="code-number">10</span>);
+        queue.add(<span class="code-number">20</span>);
+        queue.add(<span class="code-number">30</span>);
+        
+        <span class="code-comment">// Display the queue</span>
+        System.out.println(<span class="code-string">"Queue: "</span> + queue);
+        
+        <span class="code-comment">// Dequeue element</span>
+        <span class="code-keyword">int</span> dequeuedElement = queue.remove();
+        System.out.println(<span class="code-string">"Dequeued: "</span> + dequeuedElement); <span class="code-comment">// Output: 10</span>
+        
+        <span class="code-comment">// Peek at front element</span>
+        <span class="code-keyword">int</span> frontElement = queue.peek();
+        System.out.println(<span class="code-string">"Front element: "</span> + frontElement); <span class="code-comment">// Output: 20</span>
+        
+        <span class="code-comment">// Check if queue is empty</span>
+        System.out.println(<span class="code-string">"Is queue empty? "</span> + queue.isEmpty()); <span class="code-comment">// Output: false</span>
+        
+        <span class="code-comment">// Get queue size</span>
+        System.out.println(<span class="code-string">"Queue size: "</span> + queue.size()); <span class="code-comment">// Output: 2</span>
+        
+        <span class="code-comment">// Display the queue after operations</span>
+        System.out.println(<span class="code-string">"Final queue: "</span> + queue); <span class="code-comment">// Output: [20, 30]</span>
+        
+        <span class="code-comment">// Using offer() and poll() methods (safer alternatives)</span>
+        queue.offer(<span class="code-number">40</span>);  <span class="code-comment">// Adds element, returns false if queue is full</span>
+        <span class="code-keyword">int</span> polledElement = queue.poll();  <span class="code-comment">// Removes and returns element, returns null if queue is empty</span>
+        System.out.println(<span class="code-string">"Polled: "</span> + polledElement); <span class="code-comment">// Output: 20</span>
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> Java provides a <code>Queue</code> interface that can be implemented by various classes like <code>LinkedList</code>. The interface defines methods like <code>add()</code>, <code>remove()</code>, <code>element()</code>, as well as the safer alternatives <code>offer()</code>, <code>poll()</code>, and <code>peek()</code> that don't throw exceptions.</p>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide6">
+            <h2><i class="fas fa-sort-amount-up"></i> Priority Queues: Definition and Properties</h2>
+            <p>A priority queue is a special type of queue where each element is associated with a priority. Elements with higher priority are served before elements with lower priority.</p>
+            
+            <div class="definition-card">
+                <h3><i class="fas fa-flag"></i> Priority Queue Operations</h3>
+                <ul>
+                    <li><strong>add(element)</strong> or <strong>offer(element)</strong> - Inserts an element into the priority queue</li>
+                    <li><strong>remove()</strong> or <strong>poll()</strong> - Retrieves and removes the highest priority element</li>
+                    <li><strong>element()</strong> or <strong>peek()</strong> - Retrieves but does not remove the highest priority element</li>
+                    <li><strong>isEmpty()</strong> - Checks if the priority queue is empty</li>
+                    <li><strong>size()</strong> - Returns the number of elements in the priority queue</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-tasks"></i> Common Applications:</h3>
+            <ul>
+                <li>Dijkstra's shortest path algorithm</li>
+                <li>Huffman coding for data compression</li>
+                <li>Task scheduling in operating systems</li>
+                <li>Event-driven simulation</li>
+                <li>Load balancing</li>
+            </ul>
+            
+            <h3><i class="fas fa-sitemap"></i> Implementation Approaches:</h3>
+            <ul>
+                <li><strong>Binary Heap</strong> - Most common implementation (used by Java's PriorityQueue)</li>
+                <li><strong>Fibonacci Heap</strong> - Better for certain algorithms with frequent decrease-key operations</li>
+                <li><strong>Balanced BST</strong> - Can also be used but less efficient than binary heaps</li>
+            </ul>
+            
+            <table class="complexity-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Binary Heap</th>
+                        <th>Fibonacci Heap</th>
+                        <th>Balanced BST</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>insert()</td>
+                        <td>O(log n)</td>
+                        <td>O(1)</td>
+                        <td>O(log n)</td>
+                    </tr>
+                    <tr>
+                        <td>extractMin()</td>
+                        <td>O(log n)</td>
+                        <td>O(log n)</td>
+                        <td>O(log n)</td>
+                    </tr>
+                    <tr>
+                        <td>peek()</td>
+                        <td>O(1)</td>
+                        <td>O(1)</td>
+                        <td>O(1)</td>
+                    </tr>
+                    <tr>
+                        <td>decreaseKey()</td>
+                        <td>O(log n)</td>
+                        <td>O(1)</td>
+                        <td>O(log n)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="priority-queue-demo">
+                <div class="visual-title">Priority Queue Visualization (Min-Heap)</div>
+                <div class="pq-visual" id="pq-visual">
+                    <div class="element pq-element">Priority: 5</div>
+                    <div class="element pq-element">Priority: 10</div>
+                    <div class="element pq-element">Priority: 15</div>
+                    <div class="element pq-element">Priority: 20</div>
+                </div>
+                <div class="pq-controls">
+                    <input type="number" class="pq-input" id="pq-value" placeholder="Enter value" min="1" max="100">
+                    <button onclick="pqInsert()"><i class="fas fa-plus"></i> Insert</button>
+                    <button onclick="pqExtractMin()"><i class="fas fa-minus"></i> Extract Min</button>
+                    <button onclick="pqPeek()"><i class="fas fa-eye"></i> Peek</button>
+                </div>
+                <div class="operation-result" id="pq-result">Priority Queue Operations</div>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide7">
+            <h2><i class="fas fa-code"></i> Priority Queue Implementation in Java</h2>
+            <p>Java provides a built-in PriorityQueue class that uses a binary heap implementation.</p>
+            
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'pq-builtin')">Built-in PriorityQueue</button>
+                <button class="tab-button" onclick="openTab(event, 'pq-custom')">Custom Comparator</button>
+                <button class="tab-button" onclick="openTab(event, 'pq-heap')">Binary Heap Implementation</button>
+            </div>
+            
+            <div id="pq-builtin" class="tab-content active">
+                <h3><i class="fas fa-box"></i> Using Java's Built-in PriorityQueue</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">PriorityQueueExample.java</div>
+                        <button class="copy-btn" onclick="copyCode('code7')">Copy Code</button>
+                    </div>
+                    <pre id="code7"><code><span class="code-keyword">import</span> java.util.PriorityQueue;
+
+<span class="code-keyword">public class</span> <span class="code-class">PriorityQueueExample</span> {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Create a priority queue (min-heap by default)</span>
+        PriorityQueue&lt;Integer&gt; pq = <span class="code-keyword">new</span> PriorityQueue&lt;&gt;();
+        
+        <span class="code-comment">// Add elements</span>
+        pq.add(<span class="code-number">30</span>);
+        pq.add(<span class="code-number">10</span>);
+        pq.add(<span class="code-number">20</span>);
+        pq.add(<span class="code-number">5</span>);
+        
+        <span class="code-comment">// Display the priority queue</span>
+        System.out.println(<span class="code-string">"Priority Queue: "</span> + pq);
+        
+        <span class="code-comment">// Print and remove elements in priority order</span>
+        System.out.println(<span class="code-string">"Elements in priority order:"</span>);
+        <span class="code-keyword">while</span> (!pq.isEmpty()) {
+            System.out.print(pq.poll() + <span class="code-string">" "</span>); <span class="code-comment">// Output: 5 10 20 30</span>
+        }
+        System.out.println();
+        
+        <span class="code-comment">// Using offer() method (alternative to add)</span>
+        pq.offer(<span class="code-number">25</span>);
+        pq.offer(<span class="code-number">15</span>);
+        
+        <span class="code-comment">// Peek at the highest priority element without removing</span>
+        System.out.println(<span class="code-string">"Highest priority element: "</span> + pq.peek()); <span class="code-comment">// Output: 15</span>
+        
+        <span class="code-comment">// Check if priority queue contains an element</span>
+        System.out.println(<span class="code-string">"Contains 20? "</span> + pq.contains(<span class="code-number">20</span>)); <span class="code-comment">// Output: false (we polled all elements earlier)</span>
+        
+        <span class="code-comment">// Get size of priority queue</span>
+        System.out.println(<span class="code-string">"Size: "</span> + pq.size()); <span class="code-comment">// Output: 2</span>
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> By default, PriorityQueue in Java is a min-heap, meaning the smallest element has the highest priority. The <code>poll()</code> method retrieves and removes the highest priority element, while <code>peek()</code> retrieves without removal.</p>
+            </div>
+            
+            <div id="pq-custom" class="tab-content">
+                <h3><i class="fas fa-sort"></i> PriorityQueue with Custom Comparator</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">CustomPriorityQueue.java</div>
+                        <button class="copy-btn" onclick="copyCode('code8')">Copy Code</button>
+                    </div>
+                    <pre id="code8"><code><span class="code-keyword">import</span> java.util.Comparator;
+<span class="code-keyword">import</span> java.util.PriorityQueue;
+
+<span class="code-keyword">public class</span> <span class="code-class">CustomPriorityQueue</span> {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Create a max-heap using custom comparator</span>
+        PriorityQueue&lt;Integer&gt; maxHeap = <span class="code-keyword">new</span> PriorityQueue&lt;&gt;(
+            Comparator.reverseOrder()
+        );
+        
+        <span class="code-comment">// Alternative: Using lambda expression</span>
+        <span class="code-comment">// PriorityQueue&lt;Integer&gt; maxHeap = new PriorityQueue&lt;&gt;((a, b) -&gt; b - a);</span>
+        
+        maxHeap.add(<span class="code-number">30</span>);
+        maxHeap.add(<span class="code-number">10</span>);
+        maxHeap.add(<span class="code-number">20</span>);
+        maxHeap.add(<span class="code-number">5</span>);
+        
+        System.out.println(<span class="code-string">"Max-Heap: "</span> + maxHeap);
+        System.out.println(<span class="code-string">"Elements in descending order:"</span>);
+        <span class="code-keyword">while</span> (!maxHeap.isEmpty()) {
+            System.out.print(maxHeap.poll() + <span class="code-string">" "</span>); <span class="code-comment">// Output: 30 20 10 5</span>
+        }
+        System.out.println();
+        
+        <span class="code-comment">// PriorityQueue with custom objects</span>
+        PriorityQueue&lt;Student&gt; studentPQ = <span class="code-keyword">new</span> PriorityQueue&lt;&gt;(
+            (s1, s2) -&gt; s2.grade - s1.grade  <span class="code-comment">// Higher grades first</span>
+        );
+        
+        studentPQ.add(<span class="code-keyword">new</span> Student(<span class="code-string">"Alice"</span>, <span class="code-number">85</span>));
+        studentPQ.add(<span class="code-keyword">new</span> Student(<span class="code-string">"Bob"</span>, <span class="code-number">92</span>));
+        studentPQ.add(<span class="code-keyword">new</span> Student(<span class="code-string">"Charlie"</span>, <span class="code-number">78</span>));
+        
+        System.out.println(<span class="code-string">"Students by grade (highest first):"</span>);
+        <span class="code-keyword">while</span> (!studentPQ.isEmpty()) {
+            Student s = studentPQ.poll();
+            System.out.println(s.name + <span class="code-string">": "</span> + s.grade);
+        }
+        
+        <span class="code-comment">// PriorityQueue with string length comparator</span>
+        PriorityQueue&lt;String&gt; stringPQ = <span class="code-keyword">new</span> PriorityQueue&lt;&gt;(
+            (s1, s2) -&gt; s1.length() - s2.length()  <span class="code-comment">// Shorter strings first</span>
+        );
+        
+        stringPQ.add(<span class="code-string">"longer string"</span>);
+        stringPQ.add(<span class="code-string">"short"</span>);
+        stringPQ.add(<span class="code-string">"medium"</span>);
+        
+        System.out.println(<span class="code-string">"Strings by length (shortest first):"</span>);
+        <span class="code-keyword">while</span> (!stringPQ.isEmpty()) {
+            System.out.println(stringPQ.poll());
+        }
+    }
+    
+    <span class="code-keyword">static class</span> <span class="code-class">Student</span> {
+        String name;
+        <span class="code-keyword">int</span> grade;
+        
+        Student(String name, <span class="code-keyword">int</span> grade) {
+            <span class="code-keyword">this</span>.name = name;
+            <span class="code-keyword">this</span>.grade = grade;
+        }
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> You can customize the ordering of a PriorityQueue by providing a Comparator. This allows you to create max-heaps or prioritize based on custom criteria like object properties or string length.</p>
+            </div>
+            
+            <div id="pq-heap" class="tab-content">
+                <h3><i class="fas fa-sitemap"></i> Binary Heap Implementation of Priority Queue</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-title">BinaryHeapPQ.java</div>
+                        <button class="copy-btn" onclick="copyCode('code9')">Copy Code</button>
+                    </div>
+                    <pre id="code9"><code><span class="code-keyword">public class</span> <span class="code-class">BinaryHeapPQ</span> {
+    <span class="code-keyword">private int</span>[] heap;
+    <span class="code-keyword">private int</span> size;
+    <span class="code-keyword">private int</span> capacity;
+    
+    <span class="code-comment">// Constructor</span>
+    <span class="code-keyword">public</span> BinaryHeapPQ(<span class="code-keyword">int</span> capacity) {
+        <span class="code-keyword">this</span>.capacity = capacity;
+        <span class="code-keyword">this</span>.size = <span class="code-number">0</span>;
+        <span class="code-keyword">this</span>.heap = <span class="code-keyword">new int</span>[capacity + <span class="code-number">1</span>]; <span class="code-comment">// Index 0 is not used</span>
+    }
+    
+    <span class="code-comment">// Insert a new value into the priority queue</span>
+    <span class="code-keyword">public void</span> <span class="code-method">insert</span>(<span class="code-keyword">int</span> value) {
+        <span class="code-keyword">if</span> (size == capacity) {
+            System.out.println(<span class="code-string">"Priority queue is full"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        
+        size++;
+        heap[size] = value;
+        heapifyUp(size);
+        System.out.println(<span class="code-string">"Inserted "</span> + value + <span class="code-string">" into priority queue"</span>);
+    }
+    
+    <span class="code-comment">// Extract the minimum element (highest priority)</span>
+    <span class="code-keyword">public int</span> <span class="code-method">extractMin</span>() {
+        <span class="code-keyword">if</span> (size == <span class="code-number">0</span>) {
+            System.out.println(<span class="code-string">"Priority queue is empty"</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        
+        <span class="code-keyword">int</span> min = heap[<span class="code-number">1</span>];
+        heap[<span class="code-number">1</span>] = heap[size];
+        size--;
+        heapifyDown(<span class="code-number">1</span>);
+        System.out.println(<span class="code-string">"Extracted minimum: "</span> + min);
+        <span class="code-keyword">return</span> min;
+    }
+    
+    <span class="code-comment">// Peek at the minimum element without removing</span>
+    <span class="code-keyword">public int</span> <span class="code-method">peek</span>() {
+        <span class="code-keyword">if</span> (size == <span class="code-number">0</span>) {
+            System.out.println(<span class="code-string">"Priority queue is empty"</span>);
+            <span class="code-keyword">return</span> -<span class="code-number">1</span>;
+        }
+        <span class="code-keyword">return</span> heap[<span class="code-number">1</span>];
+    }
+    
+    <span class="code-comment">// Maintain heap property from bottom to top</span>
+    <span class="code-keyword">private void</span> <span class="code-method">heapifyUp</span>(<span class="code-keyword">int</span> index) {
+        <span class="code-keyword">while</span> (index > <span class="code-number">1</span> && heap[parent(index)] > heap[index]) {
+            swap(index, parent(index));
+            index = parent(index);
+        }
+    }
+    
+    <span class="code-comment">// Maintain heap property from top to bottom</span>
+    <span class="code-keyword">private void</span> <span class="code-method">heapifyDown</span>(<span class="code-keyword">int</span> index) {
+        <span class="code-keyword">int</span> minIndex = index;
+        <span class="code-keyword">int</span> left = leftChild(index);
+        <span class="code-keyword">int</span> right = rightChild(index);
+        
+        <span class="code-keyword">if</span> (left <= size && heap[left] < heap[minIndex]) {
+            minIndex = left;
+        }
+        
+        <span class="code-keyword">if</span> (right <= size && heap[right] < heap[minIndex]) {
+            minIndex = right;
+        }
+        
+        <span class="code-keyword">if</span> (index != minIndex) {
+            swap(index, minIndex);
+            heapifyDown(minIndex);
+        }
+    }
+    
+    <span class="code-comment">// Helper methods for navigating the heap</span>
+    <span class="code-keyword">private int</span> <span class="code-method">parent</span>(<span class="code-keyword">int</span> index) {
+        <span class="code-keyword">return</span> index / <span class="code-number">2</span>;
+    }
+    
+    <span class="code-keyword">private int</span> <span class="code-method">leftChild</span>(<span class="code-keyword">int</span> index) {
+        <span class="code-keyword">return</span> <span class="code-number">2</span> * index;
+    }
+    
+    <span class="code-keyword">private int</span> <span class="code-method">rightChild</span>(<span class="code-keyword">int</span> index) {
+        <span class="code-keyword">return</span> <span class="code-number">2</span> * index + <span class="code-number">1</span>;
+    }
+    
+    <span class="code-comment">// Swap two elements in the heap</span>
+    <span class="code-keyword">private void</span> <span class="code-method">swap</span>(<span class="code-keyword">int</span> i, <span class="code-keyword">int</span> j) {
+        <span class="code-keyword">int</span> temp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = temp;
+    }
+    
+    <span class="code-comment">// Check if priority queue is empty</span>
+    <span class="code-keyword">public boolean</span> <span class="code-method">isEmpty</span>() {
+        <span class="code-keyword">return</span> size == <span class="code-number">0</span>;
+    }
+    
+    <span class="code-comment">// Get the size of priority queue</span>
+    <span class="code-keyword">public int</span> <span class="code-method">size</span>() {
+        <span class="code-keyword">return</span> size;
+    }
+    
+    <span class="code-comment">// Display the heap</span>
+    <span class="code-keyword">public void</span> <span class="code-method">display</span>() {
+        <span class="code-keyword">if</span> (isEmpty()) {
+            System.out.println(<span class="code-string">"Priority queue is empty"</span>);
+            <span class="code-keyword">return</span>;
+        }
+        System.out.print(<span class="code-string">"Priority Queue: "</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = <span class="code-number">1</span>; i <= size; i++) {
+            System.out.print(heap[i] + <span class="code-string">" "</span>);
+        }
+        System.out.println();
+    }
+}</code></pre>
+                </div>
+                <p><strong>Explanation:</strong> This is a custom implementation of a min-heap using an array. The heap property is maintained where each parent node is smaller than its children. The <code>heapifyUp</code> and <code>heapifyDown</code> methods ensure the heap property is preserved after insertions and extractions.</p>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide8">
+            <h2><i class="fas fa-laptop-code"></i> Practice Exercises</h2>
+            <p>Test your understanding with these practice problems:</p>
+            
+            <div class="exercise">
+                <h3>Exercise 1: Balanced Parentheses</h3>
+                <p>Write a Java function that uses a stack to check if a string containing parentheses, brackets, and braces is balanced.</p>
+                <p><strong>Example:</strong> </p>
+                <ul>
+                    <li>Input: "({[]})" → Output: true</li>
+                    <li>Input: "({[})" → Output: false</li>
+                    <li>Input: "((()))" → Output: true</li>
+                    <li>Input: "((())" → Output: false</li>
+                </ul>
+                <button class="show-answer" onclick="toggleAnswer('answer1')">Show Solution</button>
+                <div class="answer" id="answer1">
+                    <div class="code-container">
+                        <pre><code><span class="code-keyword">import</span> java.util.Stack;
+
+<span class="code-keyword">public class</span> <span class="code-class">BalancedParentheses</span> {
+    <span class="code-keyword">public static boolean</span> <span class="code-method">isBalanced</span>(String s) {
+        Stack&lt;Character&gt; stack = <span class="code-keyword">new</span> Stack&lt;&gt;();
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">char</span> c : s.toCharArray()) {
+            <span class="code-comment">// If opening bracket, push to stack</span>
+            <span class="code-keyword">if</span> (c == <span class="code-string">'('</span> || c == <span class="code-string">'{'</span> || c == <span class="code-string">'['</span>) {
+                stack.push(c);
+            } 
+            <span class="code-comment">// If closing bracket, check if it matches the top of stack</span>
+            <span class="code-keyword">else if</span> (c == <span class="code-string">')'</span> && !stack.isEmpty() && stack.peek() == <span class="code-string">'('</span>) {
+                stack.pop();
+            } <span class="code-keyword">else if</span> (c == <span class="code-string">'}'</span> && !stack.isEmpty() && stack.peek() == <span class="code-string">'{'</span>) {
+                stack.pop();
+            } <span class="code-keyword">else if</span> (c == <span class="code-string">']'</span> && !stack.isEmpty() && stack.peek() == <span class="code-string">'['</span>) {
+                stack.pop();
+            } <span class="code-keyword">else</span> {
+                <span class="code-comment">// If it's a closing bracket without matching opening bracket</span>
+                <span class="code-keyword">return</span> <span class="code-keyword">false</span>;
+            }
+        }
+        
+        <span class="code-comment">// If stack is empty, all brackets were properly matched</span>
+        <span class="code-keyword">return</span> stack.isEmpty();
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        System.out.println(isBalanced(<span class="code-string">"({[]})"</span>)); <span class="code-comment">// true</span>
+        System.out.println(isBalanced(<span class="code-string">"({[})"</span>));  <span class="code-comment">// false</span>
+        System.out.println(isBalanced(<span class="code-string">"((()))"</span>)); <span class="code-comment">// true</span>
+        System.out.println(isBalanced(<span class="code-string">"((())"</span>));  <span class="code-comment">// false</span>
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>Exercise 2: Reverse a Queue</h3>
+                <p>Write a Java function to reverse a queue using a stack.</p>
+                <p><strong>Example:</strong></p>
+                <ul>
+                    <li>Input: [1, 2, 3, 4] → Output: [4, 3, 2, 1]</li>
+                </ul>
+                <button class="show-answer" onclick="toggleAnswer('answer2')">Show Solution</button>
+                <div class="answer" id="answer2">
+                    <div class="code-container">
+                        <pre><code><span class="code-keyword">import</span> java.util.LinkedList;
+<span class="code-keyword">import</span> java.util.Queue;
+<span class="code-keyword">import</span> java.util.Stack;
+
+<span class="code-keyword">public class</span> <span class="code-class">ReverseQueue</span> {
+    <span class="code-keyword">public static</span> Queue&lt;Integer&gt; <span class="code-method">reverse</span>(Queue&lt;Integer&gt; queue) {
+        Stack&lt;Integer&gt; stack = <span class="code-keyword">new</span> Stack&lt;&gt;();
+        
+        <span class="code-comment">// Transfer all elements from queue to stack</span>
+        <span class="code-keyword">while</span> (!queue.isEmpty()) {
+            stack.push(queue.remove());
+        }
+        
+        <span class="code-comment">// Transfer all elements back from stack to queue (now reversed)</span>
+        <span class="code-keyword">while</span> (!stack.isEmpty()) {
+            queue.add(stack.pop());
+        }
+        
+        <span class="code-keyword">return</span> queue;
+    }
+    
+    <span class="code-comment">// Alternative implementation using recursion</span>
+    <span class="code-keyword">public static void</span> <span class="code-method">reverseRecursive</span>(Queue&lt;Integer&gt; queue) {
+        <span class="code-keyword">if</span> (queue.isEmpty()) {
+            <span class="code-keyword">return</span>;
+        }
+        
+        <span class="code-comment">// Remove front element</span>
+        <span class="code-keyword">int</span> data = queue.remove();
+        
+        <span class="code-comment">// Reverse remaining queue</span>
+        reverseRecursive(queue);
+        
+        <span class="code-comment">// Add the element back to the rear</span>
+        queue.add(data);
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        Queue&lt;Integer&gt; queue = <span class="code-keyword">new</span> LinkedList&lt;&gt;();
+        queue.add(<span class="code-number">1</span>);
+        queue.add(<span class="code-number">2</span>);
+        queue.add(<span class="code-number">3</span>);
+        queue.add(<span class="code-number">4</span>);
+        
+        System.out.println(<span class="code-string">"Original queue: "</span> + queue); <span class="code-comment">// [1, 2, 3, 4]</span>
+        reverse(queue);
+        System.out.println(<span class="code-string">"Reversed queue: "</span> + queue); <span class="code-comment">// [4, 3, 2, 1]</span>
+        
+        <span class="code-comment">// Test recursive version</span>
+        Queue&lt;Integer&gt; queue2 = <span class="code-keyword">new</span> LinkedList&lt;&gt;();
+        queue2.add(<span class="code-number">5</span>);
+        queue2.add(<span class="code-number">6</span>);
+        queue2.add(<span class="code-number">7</span>);
+        queue2.add(<span class="code-number">8</span>);
+        
+        System.out.println(<span class="code-string">"Original queue: "</span> + queue2); <span class="code-comment">// [5, 6, 7, 8]</span>
+        reverseRecursive(queue2);
+        System.out.println(<span class="code-string">"Reversed queue (recursive): "</span> + queue2); <span class="code-comment">// [8, 7, 6, 5]</span>
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>Exercise 3: Kth Largest Element</h3>
+                <p>Write a Java function to find the kth largest element in an array using a priority queue.</p>
+                <p><strong>Example:</strong></p>
+                <ul>
+                    <li>Input: [3, 2, 1, 5, 6, 4], k = 2 → Output: 5</li>
+                    <li>Input: [3, 2, 3, 1, 2, 4, 5, 5, 6], k = 4 → Output: 4</li>
+                </ul>
+                <button class="show-answer" onclick="toggleAnswer('answer3')">Show Solution</button>
+                <div class="answer" id="answer3">
+                    <div class="code-container">
+                        <pre><code><span class="code-keyword">import</span> java.util.PriorityQueue;
+
+<span class="code-keyword">public class</span> <span class="code-class">KthLargest</span> {
+    <span class="code-comment">// Method to find kth largest element using min-heap</span>
+    <span class="code-keyword">public static int</span> <span class="code-method">findKthLargest</span>(<span class="code-keyword">int</span>[] nums, <span class="code-keyword">int</span> k) {
+        <span class="code-comment">// Min-heap to keep track of k largest elements</span>
+        PriorityQueue&lt;Integer&gt; minHeap = <span class="code-keyword">new</span> PriorityQueue&lt;&gt;();
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> num : nums) {
+            minHeap.add(num);
+            
+            <span class="code-comment">// If heap size exceeds k, remove the smallest element</span>
+            <span class="code-keyword">if</span> (minHeap.size() > k) {
+                minHeap.poll();
+            }
+        }
+        
+        <span class="code-comment">// The root of the heap is the kth largest element</span>
+        <span class="code-keyword">return</span> minHeap.peek();
+    }
+    
+    <span class="code-comment">// Alternative method using max-heap</span>
+    <span class="code-keyword">public static int</span> <span class="code-method">findKthLargestMaxHeap</span>(<span class="code-keyword">int</span>[] nums, <span class="code-keyword">int</span> k) {
+        <span class="code-comment">// Max-heap (using custom comparator)</span>
+        PriorityQueue&lt;Integer&gt; maxHeap = <span class="code-keyword">new</span> PriorityQueue&lt;&gt;((a, b) -&gt; b - a);
+        
+        <span class="code-comment">// Add all elements to max-heap</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> num : nums) {
+            maxHeap.add(num);
+        }
+        
+        <span class="code-comment">// Extract k-1 largest elements</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = <span class="code-number">0</span>; i &lt; k - <span class="code-number">1</span>; i++) {
+            maxHeap.poll();
+        }
+        
+        <span class="code-comment">// The next element is the kth largest</span>
+        <span class="code-keyword">return</span> maxHeap.peek();
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-keyword">int</span>[] nums1 = {<span class="code-number">3</span>, <span class="code-number">2</span>, <span class="code-number">1</span>, <span class="code-number">5</span>, <span class="code-number">6</span>, <span class="code-number">4</span>};
+        <span class="code-keyword">int</span> k1 = <span class="code-number">2</span>;
+        System.out.println(<span class="code-string">"The "</span> + k1 + <span class="code-string">"nd largest element is: "</span> + 
+            findKthLargest(nums1, k1)); <span class="code-comment">// 5</span>
+        
+        <span class="code-keyword">int</span>[] nums2 = {<span class="code-number">3</span>, <span class="code-number">2</span>, <span class="code-number">3</span>, <span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">4</span>, <span class="code-number">5</span>, <span class="code-number">5</span>, <span class="code-number">6</span>};
+        <span class="code-keyword">int</span> k2 = <span class="code-number">4</span>;
+        System.out.println(<span class="code-string">"The "</span> + k2 + <span class="code-string">"th largest element is: "</span> + 
+            findKthLargest(nums2, k2)); <span class="code-comment">// 4</span>
+        
+        <span class="code-comment">// Test with max-heap approach</span>
+        System.out.println(<span class="code-string">"Using max-heap - The "</span> + k1 + <span class="code-string">"nd largest element is: "</span> + 
+            findKthLargestMaxHeap(nums1, k1)); <span class="code-comment">// 5</span>
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slide" id="slide9">
+            <h2><i class="fas fa-question-circle"></i> Multiple Choice Quiz</h2>
+            <p>Test your knowledge with this multiple choice quiz:</p>
+            
+            <div class="quiz-question">
+                <h3>Question 1: What is the time complexity of push and pop operations in a stack implemented using a linked list?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 1)">O(1) for both</li>
+                    <li onclick="selectOption(this, 1)">O(n) for push, O(1) for pop</li>
+                    <li onclick="selectOption(this, 1)">O(1) for push, O(n) for pop</li>
+                    <li onclick="selectOption(this, 1)">O(n) for both</li>
+                </ul>
+                <div class="feedback" id="feedback1"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2: Which data structure would be most appropriate for implementing an undo feature in a text editor?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 2)">Queue</li>
+                    <li onclick="selectOption(this, 2)">Priority Queue</li>
+                    <li onclick="selectOption(this, 2)">Stack</li>
+                    <li onclick="selectOption(this, 2)">Linked List</li>
+                </ul>
+                <div class="feedback" id="feedback2"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3: In a priority queue implemented as a binary min-heap, what is the time complexity of inserting an element?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 3)">O(1)</li>
+                    <li onclick="selectOption(this, 3)">O(log n)</li>
+                    <li onclick="selectOption(this, 3)">O(n)</li>
+                    <li onclick="selectOption(this, 3)">O(n log n)</li>
+                </ul>
+                <div class="feedback" id="feedback3"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: Which operation in a queue removes and returns the front element?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 4)">enqueue()</li>
+                    <li onclick="selectOption(this, 4)">dequeue()</li>
+                    <li onclick="selectOption(this, 4)">peek()</li>
+                    <li onclick="selectOption(this, 4)">pop()</li>
+                </ul>
+                <div class="feedback" id="feedback4"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5: What is the default ordering in Java's PriorityQueue class?</h3>
+                <ul class="quiz-options">
+                    <li onclick="selectOption(this, 5)">Max-heap (largest element has highest priority)</li>
+                    <li onclick="selectOption(this, 5)">Min-heap (smallest element has highest priority)</li>
+                    <li onclick="selectOption(this, 5)">FIFO (first in, first out)</li>
+                    <li onclick="selectOption(this, 5)">LIFO (last in, first out)</li>
+                </ul>
+                <div class="feedback" id="feedback5"></div>
+            </div>
+            
+            <button onclick="checkQuiz()">Check Answers</button>
+            <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
+        </div>
+        
+        <div class="nav-buttons">
+            <button id="prev-btn" onclick="prevSlide()" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+            <button id="next-btn" onclick="nextSlide()">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Slide management
+        let currentSlide = 1;
+        const totalSlides = 9;
+        
+        function showSlide(n) {
+            // Hide all slides
+            const slides = document.getElementsByClassName('slide');
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            
+            // Show the current slide
+            document.getElementById('slide' + n).classList.add('active');
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = (n === 1);
+            document.getElementById('next-btn').disabled = (n === totalSlides);
+            
+            // Update progress bar
+            const progress = (n / totalSlides) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            
+            // Update slide counter
+            document.getElementById('current-slide').textContent = n;
+            
+            currentSlide = n;
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+            
+            const tabbuttons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+        
+        // Copy code to clipboard
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show feedback
+            const copyBtn = event.target;
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }
+        
+        // Stack visualization
+        let stackElements = [10, 20, 30, 40];
+        
+        function stackPush() {
+            const newValue = Math.floor(Math.random() * 100) + 50;
+            stackElements.push(newValue);
+            updateStackVisualization();
+            document.getElementById('stack-result').textContent = `Pushed ${newValue} to stack`;
+            document.getElementById('stack-result').style.background = '#e8f5e9';
+            document.getElementById('stack-result').style.color = '#2e7d32';
+        }
+        
+        function stackPop() {
+            if (stackElements.length > 0) {
+                const popped = stackElements.pop();
+                updateStackVisualization();
+                document.getElementById('stack-result').textContent = `Popped ${popped} from stack`;
+                document.getElementById('stack-result').style.background = '#ffebee';
+                document.getElementById('stack-result').style.color = '#c62828';
+            } else {
+                document.getElementById('stack-result').textContent = 'Stack is empty!';
+                document.getElementById('stack-result').style.background = '#fff3e0';
+                document.getElementById('stack-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function stackPeek() {
+            if (stackElements.length > 0) {
+                const top = stackElements[stackElements.length - 1];
+                document.getElementById('stack-result').textContent = `Top element is ${top}`;
+                document.getElementById('stack-result').style.background = '#e3f2fd';
+                document.getElementById('stack-result').style.color = '#1565c0';
+            } else {
+                document.getElementById('stack-result').textContent = 'Stack is empty!';
+                document.getElementById('stack-result').style.background = '#fff3e0';
+                document.getElementById('stack-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function updateStackVisualization() {
+            const stackViz = document.querySelector('.stack-visual');
+            stackViz.innerHTML = '';
+            
+            if (stackElements.length === 0) {
+                const emptyElement = document.createElement('div');
+                emptyElement.className = 'element stack-element';
+                emptyElement.textContent = 'Stack is empty';
+                emptyElement.style.background = '#bdbdbd';
+                stackViz.appendChild(emptyElement);
+                return;
+            }
+            
+            // Add elements in reverse order (top to bottom)
+            for (let i = stackElements.length - 1; i >= 0; i--) {
+                const element = document.createElement('div');
+                element.className = 'element stack-element';
+                element.textContent = i === stackElements.length - 1 ? `Top: ${stackElements[i]}` : 
+                                    i === 0 ? `Bottom: ${stackElements[i]}` : 
+                                    stackElements[i];
+                stackViz.appendChild(element);
+            }
+        }
+        
+        // Queue visualization
+        let queueElements = [10, 20, 30, 40];
+        
+        function queueEnqueue() {
+            const newValue = Math.floor(Math.random() * 100) + 50;
+            queueElements.push(newValue);
+            updateQueueVisualization();
+            document.getElementById('queue-result').textContent = `Enqueued ${newValue} to queue`;
+            document.getElementById('queue-result-2').textContent = `Enqueued ${newValue} to queue`;
+            document.getElementById('queue-result').style.background = '#e8f5e9';
+            document.getElementById('queue-result').style.color = '#2e7d32';
+            document.getElementById('queue-result-2').style.background = '#e8f5e9';
+            document.getElementById('queue-result-2').style.color = '#2e7d32';
+        }
+        
+        function queueDequeue() {
+            if (queueElements.length > 0) {
+                const dequeued = queueElements.shift();
+                updateQueueVisualization();
+                document.getElementById('queue-result').textContent = `Dequeued ${dequeued} from queue`;
+                document.getElementById('queue-result-2').textContent = `Dequeued ${dequeued} from queue`;
+                document.getElementById('queue-result').style.background = '#ffebee';
+                document.getElementById('queue-result').style.color = '#c62828';
+                document.getElementById('queue-result-2').style.background = '#ffebee';
+                document.getElementById('queue-result-2').style.color = '#c62828';
+            } else {
+                document.getElementById('queue-result').textContent = 'Queue is empty!';
+                document.getElementById('queue-result-2').textContent = 'Queue is empty!';
+                document.getElementById('queue-result').style.background = '#fff3e0';
+                document.getElementById('queue-result').style.color = '#ef6c00';
+                document.getElementById('queue-result-2').style.background = '#fff3e0';
+                document.getElementById('queue-result-2').style.color = '#ef6c00';
+            }
+        }
+        
+        function queuePeek() {
+            if (queueElements.length > 0) {
+                const front = queueElements[0];
+                document.getElementById('queue-result').textContent = `Front element is ${front}`;
+                document.getElementById('queue-result-2').textContent = `Front element is ${front}`;
+                document.getElementById('queue-result').style.background = '#e3f2fd';
+                document.getElementById('queue-result').style.color = '#1565c0';
+                document.getElementById('queue-result-2').style.background = '#e3f2fd';
+                document.getElementById('queue-result-2').style.color = '#1565c0';
+            } else {
+                document.getElementById('queue-result').textContent = 'Queue is empty!';
+                document.getElementById('queue-result-2').textContent = 'Queue is empty!';
+                document.getElementById('queue-result').style.background = '#fff3e0';
+                document.getElementById('queue-result').style.color = '#ef6c00';
+                document.getElementById('queue-result-2').style.background = '#fff3e0';
+                document.getElementById('queue-result-2').style.color = '#ef6c00';
+            }
+        }
+        
+        function updateQueueVisualization() {
+            const queueViz = document.querySelector('.queue-visual');
+            queueViz.innerHTML = '';
+            
+            if (queueElements.length === 0) {
+                const emptyElement = document.createElement('div');
+                emptyElement.className = 'element queue-element';
+                emptyElement.textContent = 'Queue is empty';
+                emptyElement.style.background = '#bdbdbd';
+                queueViz.appendChild(emptyElement);
+                return;
+            }
+            
+            // Add front indicator
+            const frontElement = document.createElement('div');
+            frontElement.className = 'element queue-element';
+            frontElement.textContent = `Front: ${queueElements[0]}`;
+            frontElement.style.background = '#e74c3c';
+            queueViz.appendChild(frontElement);
+            
+            // Add middle elements
+            for (let i = 1; i < queueElements.length - 1; i++) {
+                const element = document.createElement('div');
+                element.className = 'element queue-element';
+                element.textContent = queueElements[i];
+                queueViz.appendChild(element);
+            }
+            
+            // Add rear indicator if queue has more than one element
+            if (queueElements.length > 1) {
+                const rearElement = document.createElement('div');
+                rearElement.className = 'element queue-element';
+                rearElement.textContent = `Rear: ${queueElements[queueElements.length - 1]}`;
+                rearElement.style.background = '#e74c3c';
+                queueViz.appendChild(rearElement);
+            }
+        }
+        
+        // Priority Queue visualization
+        let pqElements = [5, 10, 15, 20];
+        
+        function pqInsert() {
+            const input = document.getElementById('pq-value');
+            const value = parseInt(input.value);
+            
+            if (isNaN(value) || value < 1 || value > 100) {
+                document.getElementById('pq-result').textContent = 'Please enter a valid number between 1 and 100';
+                document.getElementById('pq-result').style.background = '#fff3e0';
+                document.getElementById('pq-result').style.color = '#ef6c00';
+                return;
+            }
+            
+            pqElements.push(value);
+            // Sort to maintain min-heap visualization (simplified)
+            pqElements.sort((a, b) => a - b);
+            updatePQVisualization();
+            document.getElementById('pq-result').textContent = `Inserted ${value} into priority queue`;
+            document.getElementById('pq-result').style.background = '#e8f5e9';
+            document.getElementById('pq-result').style.color = '#2e7d32';
+            input.value = '';
+        }
+        
+        function pqExtractMin() {
+            if (pqElements.length > 0) {
+                const min = pqElements.shift();
+                updatePQVisualization();
+                document.getElementById('pq-result').textContent = `Extracted minimum: ${min}`;
+                document.getElementById('pq-result').style.background = '#ffebee';
+                document.getElementById('pq-result').style.color = '#c62828';
+            } else {
+                document.getElementById('pq-result').textContent = 'Priority queue is empty!';
+                document.getElementById('pq-result').style.background = '#fff3e0';
+                document.getElementById('pq-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function pqPeek() {
+            if (pqElements.length > 0) {
+                const min = pqElements[0];
+                document.getElementById('pq-result').textContent = `Minimum element is ${min}`;
+                document.getElementById('pq-result').style.background = '#e3f2fd';
+                document.getElementById('pq-result').style.color = '#1565c0';
+            } else {
+                document.getElementById('pq-result').textContent = 'Priority queue is empty!';
+                document.getElementById('pq-result').style.background = '#fff3e0';
+                document.getElementById('pq-result').style.color = '#ef6c00';
+            }
+        }
+        
+        function updatePQVisualization() {
+            const pqViz = document.getElementById('pq-visual');
+            pqViz.innerHTML = '';
+            
+            if (pqElements.length === 0) {
+                const emptyElement = document.createElement('div');
+                emptyElement.className = 'element pq-element';
+                emptyElement.textContent = 'Priority queue is empty';
+                emptyElement.style.background = '#bdbdbd';
+                pqViz.appendChild(emptyElement);
+                return;
+            }
+            
+            // Add elements in priority order
+            for (let i = 0; i < pqElements.length; i++) {
+                const element = document.createElement('div');
+                element.className = 'element pq-element';
+                element.textContent = `Priority: ${pqElements[i]}`;
+                if (i === 0) {
+                    element.style.background = '#2ecc71'; // Highlight the minimum
+                }
+                pqViz.appendChild(element);
+            }
+        }
+        
+        // Exercise answers toggle
+        function toggleAnswer(id) {
+            const answer = document.getElementById(id);
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+            } else {
+                answer.style.display = 'block';
+            }
+        }
+        
+        // Quiz functionality
+        const quizAnswers = {
+            1: 0, // First option is correct for Q1
+            2: 2, // Third option is correct for Q2
+            3: 1, // Second option is correct for Q3
+            4: 1, // Second option is correct for Q4
+            5: 1  // Second option is correct for Q5
+        };
+        
+        let selectedOptions = {};
+        
+        function selectOption(element, questionNum) {
+            // Remove selected class from all options in this question
+            const options = element.parentElement.children;
+            for (let i = 0; i < options.length; i++) {
+                options[i].classList.remove('selected');
+            }
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            
+            // Store the selected option index
+            selectedOptions[questionNum] = Array.from(options).indexOf(element);
+        }
+        
+        function checkQuiz() {
+            let score = 0;
+            const totalQuestions = Object.keys(quizAnswers).length;
+            
+            // Check each question
+            for (let i = 1; i <= totalQuestions; i++) {
+                const feedback = document.getElementById('feedback' + i);
+                const options = document.querySelectorAll('#feedback' + i).previousElementSibling.children;
+                
+                if (selectedOptions[i] === undefined) {
+                    feedback.textContent = 'Please select an answer for question ' + i;
+                    feedback.className = 'feedback incorrect';
+                    feedback.style.display = 'block';
+                    continue;
+                }
+                
+                // Reset all options styling
+                for (let j = 0; j < options.length; j++) {
+                    options[j].classList.remove('correct', 'incorrect');
+                }
+                
+                // Check if answer is correct
+                if (selectedOptions[i] === quizAnswers[i]) {
+                    score++;
+                    options[selectedOptions[i]].classList.add('correct');
+                    feedback.textContent = 'Correct!';
+                    feedback.className = 'feedback correct';
+                } else {
+                    options[selectedOptions[i]].classList.add('incorrect');
+                    options[quizAnswers[i]].classList.add('correct');
+                    feedback.textContent = 'Incorrect. The correct answer is highlighted.';
+                    feedback.className = 'feedback incorrect';
+                }
+                
+                feedback.style.display = 'block';
+            }
+            
+            // Display result
+            const result = document.getElementById('quiz-result');
+            result.textContent = `You scored ${score} out of ${totalQuestions}!`;
+            if (score === totalQuestions) {
+                result.style.color = 'var(--success-color)';
+            } else if (score >= totalQuestions / 2) {
+                result.style.color = 'var(--warning-color)';
+            } else {
+                result.style.color = 'var(--accent-color)';
+            }
+        }
+        
+        // Initialize the presentation
+        document.addEventListener('DOMContentLoaded', function() {
+            showSlide(1);
+            updateStackVisualization();
+            updateQueueVisualization();
+            updatePQVisualization();
+            document.getElementById('total-slides').textContent = totalSlides;
+        });
+    </script>
+</body>
+</html>
