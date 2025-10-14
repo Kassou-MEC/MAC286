@@ -1,0 +1,2566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Binary Trees - Complete Guide</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --code-bg: #1e1e1e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            min-width: 120px;
+        }
+        
+        .tab:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .tab.active {
+            color: var(--secondary);
+            border-bottom: 3px solid var(--secondary);
+        }
+        
+        .content-section {
+            display: none;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 1.5rem 0 1rem;
+        }
+        
+        h4 {
+            color: var(--accent);
+            margin: 1rem 0 0.5rem;
+        }
+        
+        .definition-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .definition-box h3 {
+            margin-top: 0;
+            color: var(--secondary);
+        }
+        
+        .code-container {
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            border-radius: 5px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #ccc;
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            margin: 0;
+            line-height: 1.5;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .tree-visualization {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .tree-level {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        
+        .tree-node {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 15px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        .tree-node.root {
+            background-color: var(--accent);
+        }
+        
+        .tree-node.leaf {
+            background-color: var(--success);
+        }
+        
+        .tree-connector {
+            position: absolute;
+            background-color: var(--dark);
+            height: 2px;
+            top: 25px;
+            z-index: 0;
+        }
+        
+        .tree-connector.vertical {
+            width: 2px;
+            height: 20px;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .explanation {
+            background-color: #e8f4fc;
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .explanation h4 {
+            color: var(--secondary);
+            margin-top: 0;
+        }
+        
+        .exercise {
+            background-color: #fef9e7;
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .exercise h3 {
+            color: var(--warning);
+            margin-top: 0;
+        }
+        
+        .quiz-container {
+            margin: 1.5rem 0;
+        }
+        
+        .quiz-question {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        .quiz-options {
+            list-style-type: none;
+        }
+        
+        .quiz-option {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quiz-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .quiz-option.selected {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .quiz-option.correct {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-check {
+            background-color: var(--warning);
+            margin-top: 1rem;
+        }
+        
+        .btn-check:hover {
+            background-color: #e67e22;
+        }
+        
+        .answer {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #e8f4fc;
+            border-radius: 5px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .show-answer {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .result.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .complexity-table th, .complexity-table td {
+            border: 1px solid #ddd;
+            padding: 0.8rem;
+            text-align: left;
+        }
+        
+        .complexity-table th {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .complexity-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .tree-level {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tree-node {
+                margin: 10px 0;
+            }
+            
+            .tree-connector {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MAC286 Prof. Khalid Kassou</h1>
+            <h1>Java Binary Trees</h1>
+            <p class="subtitle">Complete Guide with Detailed Examples, Exercises, and Quizzes</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <div class="tab active" data-target="terminology">Terminology</div>
+            <div class="tab" data-target="structure">Tree Structure</div>
+            <div class="tab" data-target="finding">Finding Nodes</div>
+            <div class="tab" data-target="inserting">Inserting Nodes</div>
+            <div class="tab" data-target="traversing">Tree Traversal</div>
+            <div class="tab" data-target="max-min">Max/Min Values</div>
+            <div class="tab" data-target="deleting">Deleting Nodes</div>
+            <div class="tab" data-target="arrays">Trees as Arrays</div>
+            <div class="tab" data-target="exercises">Exercises</div>
+            <div class="tab" data-target="quiz">Quiz</div>
+        </div>
+        
+        <!-- Terminology Section -->
+        <section id="terminology" class="content-section active">
+            <h2>Binary Tree Terminology</h2>
+            
+            <div class="definition-box">
+                <h3>What is a Binary Tree?</h3>
+                <p>A binary tree is a hierarchical data structure in which each node has at most two children, referred to as the left child and the right child. This structure allows for efficient searching, insertion, and deletion operations when organized properly.</p>
+            </div>
+            
+            <h3>Key Terminology</h3>
+            <ul>
+                <li><strong>Root:</strong> The top node in a tree (has no parent)</li>
+                <li><strong>Parent:</strong> A node that has one or more children</li>
+                <li><strong>Child:</strong> A node that has a parent</li>
+                <li><strong>Leaf:</strong> A node with no children</li>
+                <li><strong>Internal Node:</strong> A node that has at least one child</li>
+                <li><strong>Edge:</strong> The connection between two nodes</li>
+                <li><strong>Path:</strong> A sequence of nodes connected by edges</li>
+                <li><strong>Depth:</strong> The number of edges from the root to the node</li>
+                <li><strong>Height:</strong> The number of edges on the longest path from the node to a leaf</li>
+                <li><strong>Subtree:</strong> A tree consisting of a node and its descendants</li>
+                <li><strong>Binary Search Tree (BST):</strong> A binary tree where for each node, all values in the left subtree are less than or equal to the node's value, and all values in the right subtree are greater than the node's value</li>
+            </ul>
+            
+            <div class="tree-visualization">
+                <div class="tree-level">
+                    <div class="tree-node root">50</div>
+                </div>
+                <div class="tree-level">
+                    <div class="tree-connector vertical" style="left: 50%;"></div>
+                    <div class="tree-node">30</div>
+                    <div class="tree-node">70</div>
+                </div>
+                <div class="tree-level">
+                    <div class="tree-connector vertical" style="left: 25%;"></div>
+                    <div class="tree-connector vertical" style="left: 75%;"></div>
+                    <div class="tree-node leaf">20</div>
+                    <div class="tree-node leaf">40</div>
+                    <div class="tree-node leaf">60</div>
+                    <div class="tree-node leaf">80</div>
+                </div>
+            </div>
+            
+            <div class="explanation">
+                <h4>Visual Explanation</h4>
+                <p>In the tree visualization above:</p>
+                <ul>
+                    <li><span style="color: #e74c3c; font-weight: bold;">Red node (50)</span> is the <strong>root</strong></li>
+                    <li><span style="color: #3498db; font-weight: bold;">Blue nodes (30, 70)</span> are <strong>internal nodes</strong> with children</li>
+                    <li><span style="color: #2ecc71; font-weight: bold;">Green nodes (20, 40, 60, 80)</span> are <strong>leaf nodes</strong> with no children</li>
+                    <li>The lines connecting nodes represent <strong>edges</strong></li>
+                    <li>The <strong>height</strong> of this tree is 2 (longest path from root to leaf)</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Tree Structure Section -->
+        <section id="structure" class="content-section">
+            <h2>Binary Tree Structure in Java</h2>
+            
+            <div class="definition-box">
+                <h3>TreeNode Class</h3>
+                <p>The fundamental building block of a binary tree is the TreeNode class, which contains the data and references to its left and right children.</p>
+            </div>
+            
+            <h3>Basic TreeNode Implementation</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - TreeNode.java</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>// TreeNode class represents a node in the binary tree
+public class TreeNode {
+    // Data stored in the node
+    public int data;
+    
+    // Reference to left child
+    public TreeNode left;
+    
+    // Reference to right child
+    public TreeNode right;
+    
+    // Constructor to initialize a node with data
+    public TreeNode(int data) {
+        this.data = data;
+        this.left = null;
+        this.right = null;
+    }
+    
+    // Method to display node information
+    @Override
+    public String toString() {
+        return "TreeNode{" + "data=" + data + '}';
+    }
+}</code></pre>
+            </div>
+            
+            <h3>Complete Binary Tree Implementation</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - BinaryTree.java</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>// BinaryTree class encapsulates the tree structure and operations
+public class BinaryTree {
+    // Root of the binary tree
+    private TreeNode root;
+    
+    // Constructor to initialize an empty tree
+    public BinaryTree() {
+        this.root = null;
+    }
+    
+    // Check if the tree is empty
+    public boolean isEmpty() {
+        return root == null;
+    }
+    
+    // Get the root of the tree
+    public TreeNode getRoot() {
+        return root;
+    }
+    
+    // Set the root of the tree
+    public void setRoot(TreeNode root) {
+        this.root = root;
+    }
+    
+    // Main method to demonstrate the tree structure
+    public static void main(String[] args) {
+        // Create a binary tree
+        BinaryTree tree = new BinaryTree();
+        
+        // Create nodes
+        TreeNode root = new TreeNode(50);
+        TreeNode node30 = new TreeNode(30);
+        TreeNode node70 = new TreeNode(70);
+        TreeNode node20 = new TreeNode(20);
+        TreeNode node40 = new TreeNode(40);
+        TreeNode node60 = new TreeNode(60);
+        TreeNode node80 = new TreeNode(80);
+        
+        // Build the tree structure
+        tree.setRoot(root);
+        root.left = node30;
+        root.right = node70;
+        node30.left = node20;
+        node30.right = node40;
+        node70.left = node60;
+        node70.right = node80;
+        
+        // Print the tree structure
+        System.out.println("Binary Tree Structure:");
+        System.out.println("        " + root.data);
+        System.out.println("      /    \\");
+        System.out.println("    " + node30.data + "      " + node70.data);
+        System.out.println("   /  \\    /  \\");
+        System.out.println(" " + node20.data + "   " + node40.data + "  " + node60.data + "   " + node80.data);
+        
+        // Check if tree is empty
+        System.out.println("\nIs tree empty? " + tree.isEmpty());
+    }
+}</code></pre>
+            </div>
+            
+            <div class="explanation">
+                <h4>Code Explanation</h4>
+                <p>The BinaryTree class provides:</p>
+                <ul>
+                    <li>A <code>root</code> field that points to the top of the tree</li>
+                    <li>An <code>isEmpty()</code> method to check if the tree has no nodes</li>
+                    <li>Getter and setter methods for the root node</li>
+                    <li>A <code>main</code> method that demonstrates how to create and structure a binary tree</li>
+                </ul>
+                <p>When you run this program, it will output:</p>
+                <div class="code-container">
+                    <pre><code>Binary Tree Structure:
+        50
+      /    \
+    30      70
+   /  \    /  \
+ 20   40  60   80
+
+Is tree empty? false</code></pre>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Finding a Node Section -->
+        <section id="finding" class="content-section">
+            <h2>Finding a Node in a Binary Tree</h2>
+            
+            <div class="definition-box">
+                <h3>Node Search</h3>
+                <p>Searching in a binary tree typically uses a recursive approach to traverse the tree and find a node with the specified value. In a Binary Search Tree (BST), this operation is more efficient due to the ordering property.</p>
+            </div>
+            
+            <h3>Search Algorithm for Regular Binary Tree</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Search in Binary Tree</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>public class BinaryTreeSearch {
+    // Search for a value in a regular binary tree (not necessarily BST)
+    public TreeNode findNode(TreeNode root, int value) {
+        // Base case: root is null or value is found at root
+        if (root == null || root.data == value) {
+            return root;
+        }
+        
+        // Recursively search in left subtree
+        TreeNode leftResult = findNode(root.left, value);
+        if (leftResult != null) {
+            return leftResult;
+        }
+        
+        // If not found in left, search in right subtree
+        return findNode(root.right, value);
+    }
+    
+    // Search for a value in a Binary Search Tree (more efficient)
+    public TreeNode findNodeBST(TreeNode root, int value) {
+        // Base case: root is null or value is found at root
+        if (root == null || root.data == value) {
+            return root;
+        }
+        
+        // If value is less than root's data, search left subtree
+        if (value < root.data) {
+            return findNodeBST(root.left, value);
+        }
+        // If value is greater than root's data, search right subtree
+        else {
+            return findNodeBST(root.right, value);
+        }
+    }
+    
+    // Main method to test the search functionality
+    public static void main(String[] args) {
+        // Create a binary search tree
+        TreeNode root = new TreeNode(50);
+        root.left = new TreeNode(30);
+        root.right = new TreeNode(70);
+        root.left.left = new TreeNode(20);
+        root.left.right = new TreeNode(40);
+        root.right.left = new TreeNode(60);
+        root.right.right = new TreeNode(80);
+        
+        BinaryTreeSearch searcher = new BinaryTreeSearch();
+        
+        // Test searching in BST
+        int searchValue = 40;
+        TreeNode result = searcher.findNodeBST(root, searchValue);
+        
+        if (result != null) {
+            System.out.println("Value " + searchValue + " found in the BST!");
+        } else {
+            System.out.println("Value " + searchValue + " not found in the BST.");
+        }
+        
+        // Test searching for non-existent value
+        searchValue = 90;
+        result = searcher.findNodeBST(root, searchValue);
+        
+        if (result != null) {
+            System.out.println("Value " + searchValue + " found in the BST!");
+        } else {
+            System.out.println("Value " + searchValue + " not found in the BST.");
+        }
+    }
+}</code></pre>
+            </div>
+            
+            <div class="explanation">
+                <h4>Algorithm Explanation</h4>
+                <p>The search algorithms work as follows:</p>
+                <ul>
+                    <li><strong>Regular Binary Tree Search:</strong>
+                        <ul>
+                            <li>Check if current node is null or contains target value</li>
+                            <li>If not, recursively search the left subtree</li>
+                            <li>If not found in left subtree, recursively search the right subtree</li>
+                            <li>Return the node if found, otherwise return null</li>
+                        </ul>
+                    </li>
+                    <li><strong>Binary Search Tree (BST) Search:</strong>
+                        <ul>
+                            <li>Check if current node is null or contains target value</li>
+                            <li>If target value is less than current node's value, search left subtree</li>
+                            <li>If target value is greater than current node's value, search right subtree</li>
+                            <li>This is more efficient as it eliminates half the tree at each step</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <h3>Time Complexity Analysis</h3>
+            <table class="complexity-table">
+                <tr>
+                    <th>Tree Type</th>
+                    <th>Average Case</th>
+                    <th>Worst Case</th>
+                    <th>Explanation</th>
+                </tr>
+                <tr>
+                    <td>Regular Binary Tree</td>
+                    <td>O(n)</td>
+                    <td>O(n)</td>
+                    <td>May need to visit all nodes in worst case</td>
+                </tr>
+                <tr>
+                    <td>Balanced BST</td>
+                    <td>O(log n)</td>
+                    <td>O(log n)</td>
+                    <td>Height of balanced tree is log(n)</td>
+                </tr>
+                <tr>
+                    <td>Unbalanced BST</td>
+                    <td>O(log n)</td>
+                    <td>O(n)</td>
+                    <td>Degenerates to linked list in worst case</td>
+                </tr>
+            </table>
+            
+            <div class="exercise">
+                <h3>Practice Exercise</h3>
+                <p>Given the following binary tree, write a method to count how many nodes have a value greater than a given threshold.</p>
+                <div class="code-container">
+                    <pre><code>public int countNodesGreaterThan(TreeNode root, int threshold) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public int countNodesGreaterThan(TreeNode root, int threshold) {
+    // Base case: if root is null, return 0
+    if (root == null) {
+        return 0;
+    }
+    
+    // Count current node if its value is greater than threshold
+    int count = (root.data > threshold) ? 1 : 0;
+    
+    // Recursively count in left and right subtrees
+    count += countNodesGreaterThan(root.left, threshold);
+    count += countNodesGreaterThan(root.right, threshold);
+    
+    return count;
+}
+
+// Example usage in main method:
+public static void main(String[] args) {
+    TreeNode root = new TreeNode(50);
+    root.left = new TreeNode(30);
+    root.right = new TreeNode(70);
+    root.left.left = new TreeNode(20);
+    root.left.right = new TreeNode(40);
+    root.right.left = new TreeNode(60);
+    root.right.right = new TreeNode(80);
+    
+    int threshold = 45;
+    int count = countNodesGreaterThan(root, threshold);
+    System.out.println("Number of nodes greater than " + threshold + ": " + count);
+    // Output: Number of nodes greater than 45: 4 (50, 70, 60, 80)
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Inserting a Node Section -->
+        <section id="inserting" class="content-section">
+            <h2>Inserting a Node in a Binary Tree</h2>
+            
+            <div class="definition-box">
+                <h3>Node Insertion</h3>
+                <p>Insertion in a binary tree typically follows a level-order approach to find the first available position, maintaining the completeness property. In a Binary Search Tree (BST), insertion follows the ordering property to place nodes in the correct position.</p>
+            </div>
+            
+            <h3>Insertion in Regular Binary Tree (Level Order)</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Insertion in Binary Tree</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>import java.util.LinkedList;
+import java.util.Queue;
+
+public class BinaryTreeInsertion {
+    
+    // Insert a node in a regular binary tree using level order traversal
+    public void insert(TreeNode root, int value) {
+        // Create the new node to insert
+        TreeNode newNode = new TreeNode(value);
+        
+        // If tree is empty, new node becomes root
+        if (root == null) {
+            root = newNode;
+            return;
+        }
+        
+        // Use queue for level order traversal
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        // Traverse the tree level by level
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            
+            // Check if left child is available
+            if (current.left == null) {
+                current.left = newNode;
+                break;
+            } else {
+                queue.add(current.left);
+            }
+            
+            // Check if right child is available
+            if (current.right == null) {
+                current.right = newNode;
+                break;
+            } else {
+                queue.add(current.right);
+            }
+        }
+    }
+    
+    // Insert a node in a Binary Search Tree
+    public TreeNode insertBST(TreeNode root, int value) {
+        // If tree is empty, return a new node
+        if (root == null) {
+            return new TreeNode(value);
+        }
+        
+        // Otherwise, recur down the tree
+        if (value < root.data) {
+            root.left = insertBST(root.left, value);
+        } else if (value > root.data) {
+            root.right = insertBST(root.right, value);
+        }
+        // If value is equal, we don't insert duplicates (can modify as needed)
+        
+        // Return the unchanged node pointer
+        return root;
+    }
+    
+    // Main method to test insertion
+    public static void main(String[] args) {
+        BinaryTreeInsertion inserter = new BinaryTreeInsertion();
+        
+        // Test BST insertion
+        TreeNode bstRoot = null;
+        bstRoot = inserter.insertBST(bstRoot, 50);
+        inserter.insertBST(bstRoot, 30);
+        inserter.insertBST(bstRoot, 70);
+        inserter.insertBST(bstRoot, 20);
+        inserter.insertBST(bstRoot, 40);
+        inserter.insertBST(bstRoot, 60);
+        inserter.insertBST(bstRoot, 80);
+        
+        System.out.println("BST after insertion:");
+        printInOrder(bstRoot); // Should print: 20 30 40 50 60 70 80
+        
+        // Test regular binary tree insertion
+        TreeNode regularRoot = new TreeNode(10);
+        inserter.insert(regularRoot, 11);
+        inserter.insert(regularRoot, 9);
+        inserter.insert(regularRoot, 7);
+        inserter.insert(regularRoot, 15);
+        inserter.insert(regularRoot, 8);
+        
+        System.out.println("\nRegular binary tree after insertion:");
+        printLevelOrder(regularRoot);
+    }
+    
+    // Helper method to print tree in-order (for BST)
+    public static void printInOrder(TreeNode root) {
+        if (root != null) {
+            printInOrder(root.left);
+            System.out.print(root.data + " ");
+            printInOrder(root.right);
+        }
+    }
+    
+    // Helper method to print tree level order
+    public static void printLevelOrder(TreeNode root) {
+        if (root == null) return;
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            System.out.print(current.data + " ");
+            
+            if (current.left != null) {
+                queue.add(current.left);
+            }
+            if (current.right != null) {
+                queue.add(current.right);
+            }
+        }
+    }
+}</code></pre>
+            </div>
+            
+            <div class="explanation">
+                <h4>Algorithm Explanation</h4>
+                <p>The insertion algorithms work as follows:</p>
+                <ul>
+                    <li><strong>Regular Binary Tree Insertion:</strong>
+                        <ul>
+                            <li>Uses a queue to perform level-order traversal</li>
+                            <li>Finds the first available position (left child first, then right child)</li>
+                            <li>Inserts the new node at that position</li>
+                            <li>Maintains the completeness property of the tree</li>
+                        </ul>
+                    </li>
+                    <li><strong>Binary Search Tree (BST) Insertion:</strong>
+                        <ul>
+                            <li>Recursively finds the correct position based on value comparison</li>
+                            <li>If value is less than current node, go to left subtree</li>
+                            <li>If value is greater than current node, go to right subtree</li>
+                            <li>Insert the new node when a null position is found</li>
+                            <li>Maintains the BST property (left ≤ parent ≤ right)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="exercise">
+                <h3>Practice Exercise</h3>
+                <p>Implement a method to check if a binary tree is a valid Binary Search Tree (BST). A valid BST has all left descendants ≤ node < all right descendants.</p>
+                <div class="code-container">
+                    <pre><code>public boolean isValidBST(TreeNode root) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public boolean isValidBST(TreeNode root) {
+    return isValidBSTHelper(root, Long.MIN_VALUE, Long.MAX_VALUE);
+}
+
+private boolean isValidBSTHelper(TreeNode node, long min, long max) {
+    // An empty tree is a valid BST
+    if (node == null) {
+        return true;
+    }
+    
+    // Check if current node's value is within the allowed range
+    if (node.data <= min || node.data >= max) {
+        return false;
+    }
+    
+    // Recursively check left and right subtrees with updated ranges
+    // For left subtree, the maximum value is the current node's value
+    // For right subtree, the minimum value is the current node's value
+    return isValidBSTHelper(node.left, min, node.data) && 
+           isValidBSTHelper(node.right, node.data, max);
+}
+
+// Example usage in main method:
+public static void main(String[] args) {
+    TreeNode validBST = new TreeNode(50);
+    validBST.left = new TreeNode(30);
+    validBST.right = new TreeNode(70);
+    validBST.left.left = new TreeNode(20);
+    validBST.left.right = new TreeNode(40);
+    validBST.right.left = new TreeNode(60);
+    validBST.right.right = new TreeNode(80);
+    
+    TreeNode invalidBST = new TreeNode(50);
+    invalidBST.left = new TreeNode(30);
+    invalidBST.right = new TreeNode(70);
+    invalidBST.left.left = new TreeNode(20);
+    invalidBST.left.right = new TreeNode(60); // Invalid: 60 > 50 but in left subtree
+    
+    System.out.println("Is validBST a valid BST? " + isValidBST(validBST));
+    System.out.println("Is invalidBST a valid BST? " + isValidBST(invalidBST));
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Traversing the Tree Section -->
+        <section id="traversing" class="content-section">
+            <h2>Traversing a Binary Tree</h2>
+            
+            <div class="definition-box">
+                <h3>Tree Traversal</h3>
+                <p>Tree traversal refers to the process of visiting each node in a tree exactly once in a specific order. Different traversal methods serve different purposes and have various applications.</p>
+            </div>
+            
+            <h3>Depth-First Traversal Methods</h3>
+            
+            <h4>1. Inorder Traversal (Left, Root, Right)</h4>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Inorder Traversal</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>public class TreeTraversal {
+    
+    // Inorder traversal: Left -> Root -> Right
+    // For BST, this returns nodes in ascending order
+    public void inorder(TreeNode root) {
+        if (root != null) {
+            inorder(root.left);
+            System.out.print(root.data + " ");
+            inorder(root.right);
+        }
+    }
+    
+    // Preorder traversal: Root -> Left -> Right
+    // Useful for creating a copy of the tree
+    public void preorder(TreeNode root) {
+        if (root != null) {
+            System.out.print(root.data + " ");
+            preorder(root.left);
+            preorder(root.right);
+        }
+    }
+    
+    // Postorder traversal: Left -> Right -> Root
+    // Useful for deleting the tree
+    public void postorder(TreeNode root) {
+        if (root != null) {
+            postorder(root.left);
+            postorder(root.right);
+            System.out.print(root.data + " ");
+        }
+    }
+    
+    // Main method to test traversals
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(50);
+        root.left = new TreeNode(30);
+        root.right = new TreeNode(70);
+        root.left.left = new TreeNode(20);
+        root.left.right = new TreeNode(40);
+        root.right.left = new TreeNode(60);
+        root.right.right = new TreeNode(80);
+        
+        TreeTraversal traversal = new TreeTraversal();
+        
+        System.out.print("Inorder traversal: ");
+        traversal.inorder(root); // Output: 20 30 40 50 60 70 80
+        
+        System.out.print("\nPreorder traversal: ");
+        traversal.preorder(root); // Output: 50 30 20 40 70 60 80
+        
+        System.out.print("\nPostorder traversal: ");
+        traversal.postorder(root); // Output: 20 40 30 60 80 70 50
+    }
+}</code></pre>
+            </div>
+            
+            <h3>Breadth-First (Level Order) Traversal</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Level Order Traversal</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>import java.util.LinkedList;
+import java.util.Queue;
+
+public class LevelOrderTraversal {
+    
+    // Level order traversal using a queue
+    public void levelOrder(TreeNode root) {
+        if (root == null) return;
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            System.out.print(current.data + " ");
+            
+            if (current.left != null) {
+                queue.add(current.left);
+            }
+            if (current.right != null) {
+                queue.add(current.right);
+            }
+        }
+    }
+    
+    // Level order traversal with level separation
+    public void levelOrderWithLevels(TreeNode root) {
+        if (root == null) return;
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode current = queue.poll();
+                System.out.print(current.data + " ");
+                
+                if (current.left != null) {
+                    queue.add(current.left);
+                }
+                if (current.right != null) {
+                    queue.add(current.right);
+                }
+            }
+            System.out.println(); // New line after each level
+        }
+    }
+    
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(50);
+        root.left = new TreeNode(30);
+        root.right = new TreeNode(70);
+        root.left.left = new TreeNode(20);
+        root.left.right = new TreeNode(40);
+        root.right.left = new TreeNode(60);
+        root.right.right = new TreeNode(80);
+        
+        LevelOrderTraversal traversal = new LevelOrderTraversal();
+        
+        System.out.println("Level order traversal:");
+        traversal.levelOrder(root); // Output: 50 30 70 20 40 60 80
+        
+        System.out.println("\nLevel order traversal with levels:");
+        traversal.levelOrderWithLevels(root);
+        // Output:
+        // 50
+        // 30 70
+        // 20 40 60 80
+    }
+}</code></pre>
+            </div>
+            
+            <div class="explanation">
+                <h4>Traversal Applications</h4>
+                <ul>
+                    <li><strong>Inorder:</strong> Gets values in sorted order (for BST), used in expression trees</li>
+                    <li><strong>Preorder:</strong> Creates a copy of the tree, serialization, prefix expressions</li>
+                    <li><strong>Postorder:</strong> Deletes the tree, postfix expressions, bottom-up calculations</li>
+                    <li><strong>Level Order:</strong> Finds the shortest path, level-by-level processing</li>
+                </ul>
+            </div>
+            
+            <div class="exercise">
+                <h3>Practice Exercise</h3>
+                <p>Implement a method that returns a list of nodes visited in zigzag (spiral) order: first level left to right, second level right to left, and so on.</p>
+                <div class="code-container">
+                    <pre><code>import java.util.*;
+
+public List<Integer> zigzagTraversal(TreeNode root) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>import java.util.*;
+
+public List<Integer> zigzagTraversal(TreeNode root) {
+    List<Integer> result = new ArrayList<>();
+    if (root == null) return result;
+    
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.add(root);
+    boolean leftToRight = true;
+    
+    while (!queue.isEmpty()) {
+        int levelSize = queue.size();
+        List<Integer> level = new ArrayList<>();
+        
+        for (int i = 0; i < levelSize; i++) {
+            TreeNode current = queue.poll();
+            level.add(current.data);
+            
+            if (current.left != null) queue.add(current.left);
+            if (current.right != null) queue.add(current.right);
+        }
+        
+        // Reverse the level if we're going right to left
+        if (!leftToRight) {
+            Collections.reverse(level);
+        }
+        
+        result.addAll(level);
+        leftToRight = !leftToRight; // Toggle direction for next level
+    }
+    
+    return result;
+}
+
+// Example usage in main method:
+public static void main(String[] args) {
+    TreeNode root = new TreeNode(50);
+    root.left = new TreeNode(30);
+    root.right = new TreeNode(70);
+    root.left.left = new TreeNode(20);
+    root.left.right = new TreeNode(40);
+    root.right.left = new TreeNode(60);
+    root.right.right = new TreeNode(80);
+    
+    List<Integer> zigzag = zigzagTraversal(root);
+    System.out.println("Zigzag traversal: " + zigzag);
+    // Output: [50, 70, 30, 20, 40, 60, 80]
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Max/Min Values Section -->
+        <section id="max-min" class="content-section">
+            <h2>Finding Maximum and Minimum Values</h2>
+            
+            <div class="definition-box">
+                <h3>Finding Extremes</h3>
+                <p>Finding the maximum or minimum value in a binary tree requires different approaches depending on whether the tree is a regular binary tree or a Binary Search Tree (BST).</p>
+            </div>
+            
+            <h3>Finding Maximum and Minimum in Regular Binary Tree</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Max/Min in Regular Binary Tree</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>public class TreeMinMax {
+    
+    // Find maximum value in a regular binary tree
+    public int findMax(TreeNode root) {
+        if (root == null) {
+            return Integer.MIN_VALUE;
+        }
+        
+        // Get max from current node, left subtree, and right subtree
+        int max = root.data;
+        int leftMax = findMax(root.left);
+        int rightMax = findMax(root.right);
+        
+        if (leftMax > max) {
+            max = leftMax;
+        }
+        if (rightMax > max) {
+            max = rightMax;
+        }
+        
+        return max;
+    }
+    
+    // Find minimum value in a regular binary tree
+    public int findMin(TreeNode root) {
+        if (root == null) {
+            return Integer.MAX_VALUE;
+        }
+        
+        // Get min from current node, left subtree, and right subtree
+        int min = root.data;
+        int leftMin = findMin(root.left);
+        int rightMin = findMin(root.right);
+        
+        if (leftMin < min) {
+            min = leftMin;
+        }
+        if (rightMin < min) {
+            min = rightMin;
+        }
+        
+        return min;
+    }
+    
+    // Main method to test max/min finding
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(50);
+        root.left = new TreeNode(30);
+        root.right = new TreeNode(70);
+        root.left.left = new TreeNode(20);
+        root.left.right = new TreeNode(40);
+        root.right.left = new TreeNode(60);
+        root.right.right = new TreeNode(80);
+        
+        TreeMinMax finder = new TreeMinMax();
+        
+        System.out.println("Maximum value: " + finder.findMax(root)); // Output: 80
+        System.out.println("Minimum value: " + finder.findMin(root)); // Output: 20
+    }
+}</code></pre>
+            </div>
+            
+            <h3>Finding Maximum and Minimum in Binary Search Tree</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Max/Min in BST</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>public class BSTMinMax {
+    
+    // Minimum in BST is the leftmost node
+    public TreeNode findMinBST(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        
+        while (root.left != null) {
+            root = root.left;
+        }
+        return root;
+    }
+    
+    // Maximum in BST is the rightmost node
+    public TreeNode findMaxBST(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        
+        while (root.right != null) {
+            root = root.right;
+        }
+        return root;
+    }
+    
+    // Recursive version to find min in BST
+    public TreeNode findMinBSTRecursive(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        
+        if (root.left == null) {
+            return root;
+        }
+        
+        return findMinBSTRecursive(root.left);
+    }
+    
+    // Recursive version to find max in BST
+    public TreeNode findMaxBSTRecursive(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        
+        if (root.right == null) {
+            return root;
+        }
+        
+        return findMaxBSTRecursive(root.right);
+    }
+    
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(50);
+        root.left = new TreeNode(30);
+        root.right = new TreeNode(70);
+        root.left.left = new TreeNode(20);
+        root.left.right = new TreeNode(40);
+        root.right.left = new TreeNode(60);
+        root.right.right = new TreeNode(80);
+        
+        BSTMinMax finder = new BSTMinMax();
+        
+        TreeNode minNode = finder.findMinBST(root);
+        TreeNode maxNode = finder.findMaxBST(root);
+        
+        if (minNode != null) {
+            System.out.println("Minimum value in BST: " + minNode.data); // Output: 20
+        }
+        
+        if (maxNode != null) {
+            System.out.println("Maximum value in BST: " + maxNode.data); // Output: 80
+        }
+    }
+}</code></pre>
+            </div>
+            
+            <div class="explanation">
+                <h4>Algorithm Comparison</h4>
+                <ul>
+                    <li><strong>Regular Binary Tree:</strong> Must check every node (O(n) time complexity)</li>
+                    <li><strong>Binary Search Tree:</strong> Can follow leftmost/rightmost path (O(h) time complexity, where h is height)</li>
+                    <li>For balanced BSTs, h = log(n), making BST operations much faster</li>
+                    <li>For unbalanced BSTs, h = n, making operations similar to regular trees</li>
+                </ul>
+            </div>
+            
+            <div class="exercise">
+                <h3>Practice Exercise</h3>
+                <p>Implement a method to find the second largest value in a binary search tree.</p>
+                <div class="code-container">
+                    <pre><code>public int findSecondLargest(TreeNode root) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public int findSecondLargest(TreeNode root) {
+    if (root == null || (root.left == null && root.right == null)) {
+        throw new IllegalArgumentException("Tree must have at least 2 nodes");
+    }
+    
+    TreeNode parent = null;
+    TreeNode current = root;
+    
+    // Find the largest node (rightmost node)
+    while (current.right != null) {
+        parent = current;
+        current = current.right;
+    }
+    
+    // If largest node has a left subtree, second largest is the largest in that subtree
+    if (current.left != null) {
+        return findMaxBST(current.left).data;
+    } else {
+        // Otherwise, second largest is the parent
+        return parent.data;
+    }
+}
+
+// Helper method to find maximum in a subtree
+private TreeNode findMaxBST(TreeNode root) {
+    while (root.right != null) {
+        root = root.right;
+    }
+    return root;
+}
+
+// Example usage in main method:
+public static void main(String[] args) {
+    TreeNode root = new TreeNode(50);
+    root.left = new TreeNode(30);
+    root.right = new TreeNode(70);
+    root.left.left = new TreeNode(20);
+    root.left.right = new TreeNode(40);
+    root.right.left = new TreeNode(60);
+    root.right.right = new TreeNode(80);
+    
+    try {
+        int secondLargest = findSecondLargest(root);
+        System.out.println("Second largest value: " + secondLargest); // Output: 70
+    } catch (IllegalArgumentException e) {
+        System.out.println(e.getMessage());
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Deleting a Node Section -->
+        <section id="deleting" class="content-section">
+            <h2>Deleting a Node from a Binary Tree</h2>
+            
+            <div class="definition-box">
+                <h3>Node Deletion</h3>
+                <p>Deleting a node from a binary tree involves finding the node, then handling different cases based on the node's children. The process differs between regular binary trees and Binary Search Trees.</p>
+            </div>
+            
+            <h3>Deletion from Binary Search Tree</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Deletion from BST</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>public class BSTDeletion {
+    
+    // Delete a node from BST
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null) return null;
+        
+        // Find the node to be deleted
+        if (key < root.data) {
+            root.left = deleteNode(root.left, key);
+        } else if (key > root.data) {
+            root.right = deleteNode(root.right, key);
+        } else {
+            // Node with only one child or no child
+            if (root.left == null) {
+                return root.right;
+            } else if (root.right == null) {
+                return root.left;
+            }
+            
+            // Node with two children: Get inorder successor
+            root.data = minValue(root.right);
+            
+            // Delete the inorder successor
+            root.right = deleteNode(root.right, root.data);
+        }
+        
+        return root;
+    }
+    
+    // Find minimum value in a subtree
+    private int minValue(TreeNode root) {
+        int minValue = root.data;
+        while (root.left != null) {
+            root = root.left;
+            minValue = root.data;
+        }
+        return minValue;
+    }
+    
+    // Alternative: Using inorder predecessor for deletion
+    public TreeNode deleteNodeWithPredecessor(TreeNode root, int key) {
+        if (root == null) return null;
+        
+        if (key < root.data) {
+            root.left = deleteNodeWithPredecessor(root.left, key);
+        } else if (key > root.data) {
+            root.right = deleteNodeWithPredecessor(root.right, key);
+        } else {
+            // Node with only one child or no child
+            if (root.left == null) {
+                return root.right;
+            } else if (root.right == null) {
+                return root.left;
+            }
+            
+            // Node with two children: Get inorder predecessor
+            root.data = maxValue(root.left);
+            
+            // Delete the inorder predecessor
+            root.left = deleteNodeWithPredecessor(root.left, root.data);
+        }
+        
+        return root;
+    }
+    
+    // Find maximum value in a subtree
+    private int maxValue(TreeNode root) {
+        int maxValue = root.data;
+        while (root.right != null) {
+            root = root.right;
+            maxValue = root.data;
+        }
+        return maxValue;
+    }
+    
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(50);
+        root.left = new TreeNode(30);
+        root.right = new TreeNode(70);
+        root.left.left = new TreeNode(20);
+        root.left.right = new TreeNode(40);
+        root.right.left = new TreeNode(60);
+        root.right.right = new TreeNode(80);
+        
+        BSTDeletion deletion = new BSTDeletion();
+        
+        System.out.println("Original tree (inorder):");
+        printInOrder(root); // Output: 20 30 40 50 60 70 80
+        
+        // Delete leaf node (20)
+        root = deletion.deleteNode(root, 20);
+        System.out.println("\nAfter deleting 20:");
+        printInOrder(root); // Output: 30 40 50 60 70 80
+        
+        // Delete node with one child (70)
+        root = deletion.deleteNode(root, 70);
+        System.out.println("\nAfter deleting 70:");
+        printInOrder(root); // Output: 30 40 50 60 80
+        
+        // Delete node with two children (50)
+        root = deletion.deleteNode(root, 50);
+        System.out.println("\nAfter deleting 50:");
+        printInOrder(root); // Output: 30 40 60 80
+    }
+    
+    // Helper method to print tree in-order
+    public static void printInOrder(TreeNode root) {
+        if (root != null) {
+            printInOrder(root.left);
+            System.out.print(root.data + " ");
+            printInOrder(root.right);
+        }
+    }
+}</code></pre>
+            </div>
+            
+            <div class="explanation">
+                <h4>Deletion Cases in BST</h4>
+                <ul>
+                    <li><strong>Leaf Node:</strong> Simply remove it by setting parent's reference to null</li>
+                    <li><strong>Node with One Child:</strong> Replace the node with its child</li>
+                    <li><strong>Node with Two Children:</strong>
+                        <ul>
+                            <li>Find the inorder successor (smallest in right subtree) or inorder predecessor (largest in left subtree)</li>
+                            <li>Copy the value to the node to be deleted</li>
+                            <li>Delete the inorder successor/predecessor (which will be case 1 or 2)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <h3>Deletion from Regular Binary Tree</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - Deletion from Regular Binary Tree</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>import java.util.LinkedList;
+import java.util.Queue;
+
+public class BinaryTreeDeletion {
+    
+    // Delete a node from regular binary tree by replacing it with deepest node
+    public void deleteNode(TreeNode root, int key) {
+        if (root == null) return;
+        
+        if (root.left == null && root.right == null) {
+            if (root.data == key) {
+                root = null;
+                return;
+            } else {
+                return;
+            }
+        }
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        TreeNode keyNode = null;
+        TreeNode current = null;
+        
+        // Do level order traversal to find the node to delete
+        // and the deepest node
+        while (!queue.isEmpty()) {
+            current = queue.poll();
+            
+            if (current.data == key) {
+                keyNode = current;
+            }
+            
+            if (current.left != null) {
+                queue.add(current.left);
+            }
+            
+            if (current.right != null) {
+                queue.add(current.right);
+            }
+        }
+        
+        if (keyNode != null) {
+            // Replace key node's data with deepest node's data
+            int x = current.data;
+            deleteDeepest(root, current);
+            keyNode.data = x;
+        }
+    }
+    
+    // Delete the deepest node in the tree
+    private void deleteDeepest(TreeNode root, TreeNode delNode) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        TreeNode current;
+        while (!queue.isEmpty()) {
+            current = queue.poll();
+            
+            if (current == delNode) {
+                current = null;
+                return;
+            }
+            
+            if (current.left != null) {
+                if (current.left == delNode) {
+                    current.left = null;
+                    return;
+                } else {
+                    queue.add(current.left);
+                }
+            }
+            
+            if (current.right != null) {
+                if (current.right == delNode) {
+                    current.right = null;
+                    return;
+                } else {
+                    queue.add(current.right);
+                }
+            }
+        }
+    }
+    
+    public static void main(String[] args) {
+        TreeNode root = new TreeNode(10);
+        root.left = new TreeNode(11);
+        root.right = new TreeNode(9);
+        root.left.left = new TreeNode(7);
+        root.left.right = new TreeNode(12);
+        root.right.left = new TreeNode(15);
+        root.right.right = new TreeNode(8);
+        
+        BinaryTreeDeletion deletion = new BinaryTreeDeletion();
+        
+        System.out.println("Original tree (level order):");
+        printLevelOrder(root); // Output: 10 11 9 7 12 15 8
+        
+        deletion.deleteNode(root, 11);
+        System.out.println("\nAfter deleting 11:");
+        printLevelOrder(root); // Output: 10 8 9 7 12 15
+        
+        deletion.deleteNode(root, 9);
+        System.out.println("\nAfter deleting 9:");
+        printLevelOrder(root); // Output: 10 8 15 7 12
+    }
+    
+    // Helper method to print tree level order
+    public static void printLevelOrder(TreeNode root) {
+        if (root == null) return;
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            System.out.print(current.data + " ");
+            
+            if (current.left != null) {
+                queue.add(current.left);
+            }
+            if (current.right != null) {
+                queue.add(current.right);
+            }
+        }
+    }
+}</code></pre>
+            </div>
+            
+            <div class="exercise">
+                <h3>Practice Exercise</h3>
+                <p>Implement a method to delete all leaf nodes from a binary tree.</p>
+                <div class="code-container">
+                    <pre><code>public TreeNode deleteLeaves(TreeNode root) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public TreeNode deleteLeaves(TreeNode root) {
+    if (root == null) {
+        return null;
+    }
+    
+    // If current node is a leaf, return null (delete it)
+    if (root.left == null && root.right == null) {
+        return null;
+    }
+    
+    // Recursively delete leaves in left and right subtrees
+    root.left = deleteLeaves(root.left);
+    root.right = deleteLeaves(root.right);
+    
+    return root;
+}
+
+// Example usage in main method:
+public static void main(String[] args) {
+    TreeNode root = new TreeNode(50);
+    root.left = new TreeNode(30);
+    root.right = new TreeNode(70);
+    root.left.left = new TreeNode(20);
+    root.left.right = new TreeNode(40);
+    root.right.left = new TreeNode(60);
+    root.right.right = new TreeNode(80);
+    
+    System.out.println("Original tree (level order):");
+    printLevelOrder(root); // Output: 50 30 70 20 40 60 80
+    
+    root = deleteLeaves(root);
+    System.out.println("\nAfter deleting leaves:");
+    printLevelOrder(root); // Output: 50 30 70
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Trees as Arrays Section -->
+        <section id="arrays" class="content-section">
+            <h2>Representing Trees as Arrays</h2>
+            
+            <div class="definition-box">
+                <h3>Array Representation</h3>
+                <p>Binary trees can be efficiently represented using arrays, where the parent-child relationships are determined by indices. This representation is memory-efficient and allows for easy traversal.</p>
+            </div>
+            
+            <h3>Array Representation Rules</h3>
+            <ul>
+                <li>Root is at index 0</li>
+                <li>For a node at index i:
+                    <ul>
+                        <li>Left child is at index 2*i + 1</li>
+                        <li>Right child is at index 2*i + 2</li>
+                    </ul>
+                </li>
+                <li>Parent of a node at index i is at floor((i-1)/2)</li>
+                <li>This representation is most efficient for complete binary trees</li>
+            </ul>
+            
+            <h3>Example: Tree [1, 2, 3, 4, 5, 6, 7]</h3>
+            <div class="tree-visualization">
+                <div class="tree-level">
+                    <div class="tree-node root">1</div>
+                </div>
+                <div class="tree-level">
+                    <div class="tree-connector vertical" style="left: 50%;"></div>
+                    <div class="tree-node">2</div>
+                    <div class="tree-node">3</div>
+                </div>
+                <div class="tree-level">
+                    <div class="tree-connector vertical" style="left: 25%;"></div>
+                    <div class="tree-connector vertical" style="left: 75%;"></div>
+                    <div class="tree-node leaf">4</div>
+                    <div class="tree-node leaf">5</div>
+                    <div class="tree-node leaf">6</div>
+                    <div class="tree-node leaf">7</div>
+                </div>
+            </div>
+            
+            <h3>Array-Based Binary Tree Implementation</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span>Java - ArrayBinaryTree.java</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code>import java.util.ArrayList;
+import java.util.List;
+
+public class ArrayBinaryTree {
+    private Integer[] tree;
+    private int size;
+    private int capacity;
+    
+    // Constructor to initialize tree with given capacity
+    public ArrayBinaryTree(int capacity) {
+        this.capacity = capacity;
+        this.tree = new Integer[capacity];
+        this.size = 0;
+    }
+    
+    // Insert a value in the tree (level order)
+    public void insert(int value) {
+        if (size >= capacity) {
+            resize();
+        }
+        tree[size] = value;
+        size++;
+    }
+    
+    // Get the value at specific index
+    public Integer getValue(int index) {
+        if (index < 0 || index >= size) {
+            return null;
+        }
+        return tree[index];
+    }
+    
+    // Get left child of node at index
+    public Integer getLeftChild(int index) {
+        int leftIndex = 2 * index + 1;
+        return (leftIndex < size) ? tree[leftIndex] : null;
+    }
+    
+    // Get right child of node at index
+    public Integer getRightChild(int index) {
+        int rightIndex = 2 * index + 2;
+        return (rightIndex < size) ? tree[rightIndex] : null;
+    }
+    
+    // Get parent of node at index
+    public Integer getParent(int index) {
+        if (index == 0) return null;
+        int parentIndex = (index - 1) / 2;
+        return tree[parentIndex];
+    }
+    
+    // Get the index of parent
+    public int getParentIndex(int index) {
+        if (index == 0) return -1; // Root has no parent
+        return (index - 1) / 2;
+    }
+    
+    // Get the index of left child
+    public int getLeftChildIndex(int index) {
+        int leftIndex = 2 * index + 1;
+        return (leftIndex < size) ? leftIndex : -1;
+    }
+    
+    // Get the index of right child
+    public int getRightChildIndex(int index) {
+        int rightIndex = 2 * index + 2;
+        return (rightIndex < size) ? rightIndex : -1;
+    }
+    
+    // Check if node at index is a leaf
+    public boolean isLeaf(int index) {
+        return getLeftChildIndex(index) == -1 && getRightChildIndex(index) == -1;
+    }
+    
+    // Get the height of the tree
+    public int getHeight() {
+        if (size == 0) return 0;
+        return (int) (Math.log(size) / Math.log(2)) + 1;
+    }
+    
+    // Inorder traversal of array-based tree
+    public List<Integer> inorder() {
+        List<Integer> result = new ArrayList<>();
+        inorderHelper(0, result);
+        return result;
+    }
+    
+    private void inorderHelper(int index, List<Integer> result) {
+        if (index >= size || tree[index] == null) {
+            return;
+        }
+        
+        // Left child
+        inorderHelper(2 * index + 1, result);
+        
+        // Current node
+        result.add(tree[index]);
+        
+        // Right child
+        inorderHelper(2 * index + 2, result);
+    }
+    
+    // Preorder traversal of array-based tree
+    public List<Integer> preorder() {
+        List<Integer> result = new ArrayList<>();
+        preorderHelper(0, result);
+        return result;
+    }
+    
+    private void preorderHelper(int index, List<Integer> result) {
+        if (index >= size || tree[index] == null) {
+            return;
+        }
+        
+        // Current node
+        result.add(tree[index]);
+        
+        // Left child
+        preorderHelper(2 * index + 1, result);
+        
+        // Right child
+        preorderHelper(2 * index + 2, result);
+    }
+    
+    // Resize the array when capacity is reached
+    private void resize() {
+        capacity *= 2;
+        Integer[] newTree = new Integer[capacity];
+        System.arraycopy(tree, 0, newTree, 0, tree.length);
+        tree = newTree;
+    }
+    
+    // Print the tree structure
+    public void printTree() {
+        System.out.println("Array representation: " + java.util.Arrays.toString(tree));
+        
+        int height = getHeight();
+        for (int level = 0; level < height; level++) {
+            int start = (int) Math.pow(2, level) - 1;
+            int end = (int) Math.pow(2, level + 1) - 1;
+            
+            for (int i = start; i < Math.min(end, size); i++) {
+                if (tree[i] != null) {
+                    System.out.print(tree[i] + " ");
+                }
+            }
+            System.out.println();
+        }
+    }
+    
+    public static void main(String[] args) {
+        ArrayBinaryTree arrayTree = new ArrayBinaryTree(10);
+        
+        // Insert values in level order
+        arrayTree.insert(1);
+        arrayTree.insert(2);
+        arrayTree.insert(3);
+        arrayTree.insert(4);
+        arrayTree.insert(5);
+        arrayTree.insert(6);
+        arrayTree.insert(7);
+        
+        System.out.println("Tree structure:");
+        arrayTree.printTree();
+        
+        System.out.println("\nInorder traversal: " + arrayTree.inorder());
+        System.out.println("Preorder traversal: " + arrayTree.preorder());
+        
+        System.out.println("\nParent of node at index 3: " + arrayTree.getParent(3));
+        System.out.println("Left child of node at index 1: " + arrayTree.getLeftChild(1));
+        System.out.println("Right child of node at index 1: " + arrayTree.getRightChild(1));
+        System.out.println("Is node at index 3 a leaf? " + arrayTree.isLeaf(3));
+    }
+}</code></pre>
+            </div>
+            
+            <div class="explanation">
+                <h4>Advantages and Disadvantages</h4>
+                <ul>
+                    <li><strong>Advantages:</strong>
+                        <ul>
+                            <li>Memory efficient (no pointers needed)</li>
+                            <li>Easy to implement level-order traversal</li>
+                            <li>Cache-friendly due to contiguous memory</li>
+                        </ul>
+                    </li>
+                    <li><strong>Disadvantages:</strong>
+                        <ul>
+                            <li>Wasteful for non-complete trees (many null entries)</li>
+                            <li>Resizing can be expensive</li>
+                            <li>Not suitable for trees that change frequently</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="exercise">
+                <h3>Practice Exercise</h3>
+                <p>Implement a method to check if a binary tree represented as an array is a complete binary tree.</p>
+                <div class="code-container">
+                    <pre><code>public boolean isCompleteBinaryTree(Integer[] tree, int size) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public boolean isCompleteBinaryTree(Integer[] tree, int size) {
+    // A complete binary tree has all levels filled except possibly the last,
+    // and all nodes in the last level are as far left as possible
+    
+    for (int i = 0; i < size; i++) {
+        // If we find a null node before reaching the end
+        if (tree[i] == null) {
+            // All subsequent nodes must also be null
+            for (int j = i + 1; j < size; j++) {
+                if (tree[j] != null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    return true;
+}
+
+// Alternative implementation using the property of complete binary trees
+public boolean isCompleteBinaryTree2(Integer[] tree, int size) {
+    if (size == 0) return true;
+    
+    // For a complete binary tree, if a node at index i has a right child,
+    // it must also have a left child
+    for (int i = 0; i < size; i++) {
+        if (tree[i] == null) continue;
+        
+        int leftChildIndex = 2 * i + 1;
+        int rightChildIndex = 2 * i + 2;
+        
+        // If right child exists but left child doesn't, it's not complete
+        if (rightChildIndex < size && tree[rightChildIndex] != null) {
+            if (leftChildIndex >= size || tree[leftChildIndex] == null) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Example usage in main method:
+public static void main(String[] args) {
+    Integer[] completeTree = {1, 2, 3, 4, 5, 6, 7};
+    Integer[] incompleteTree = {1, 2, 3, 4, null, 6, 7};
+    
+    System.out.println("Is completeTree complete? " + 
+                      isCompleteBinaryTree(completeTree, completeTree.length));
+    System.out.println("Is incompleteTree complete? " + 
+                      isCompleteBinaryTree(incompleteTree, incompleteTree.length));
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Exercises Section -->
+        <section id="exercises" class="content-section">
+            <h2>Practice Exercises</h2>
+            
+            <div class="exercise">
+                <h3>Exercise 1: Count Leaf Nodes</h3>
+                <p>Write a method to count the number of leaf nodes in a binary tree.</p>
+                <div class="code-container">
+                    <pre><code>public int countLeaves(TreeNode root) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public int countLeaves(TreeNode root) {
+    if (root == null) {
+        return 0;
+    }
+    
+    // A node is a leaf if it has no children
+    if (root.left == null && root.right == null) {
+        return 1;
+    }
+    
+    // Recursively count leaves in left and right subtrees
+    return countLeaves(root.left) + countLeaves(root.right);
+}
+
+// Example usage:
+public static void main(String[] args) {
+    TreeNode root = new TreeNode(50);
+    root.left = new TreeNode(30);
+    root.right = new TreeNode(70);
+    root.left.left = new TreeNode(20);
+    root.left.right = new TreeNode(40);
+    root.right.left = new TreeNode(60);
+    root.right.right = new TreeNode(80);
+    
+    int leafCount = countLeaves(root);
+    System.out.println("Number of leaf nodes: " + leafCount); // Output: 4
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>Exercise 2: Check if Two Trees are Identical</h3>
+                <p>Write a method to check if two binary trees are identical in structure and values.</p>
+                <div class="code-container">
+                    <pre><code>public boolean areIdentical(TreeNode root1, TreeNode root2) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public boolean areIdentical(TreeNode root1, TreeNode root2) {
+    // Both trees are empty
+    if (root1 == null && root2 == null) {
+        return true;
+    }
+    
+    // One tree is empty, the other is not
+    if (root1 == null || root2 == null) {
+        return false;
+    }
+    
+    // Check if current nodes have same value and recursively check subtrees
+    return (root1.data == root2.data) &&
+           areIdentical(root1.left, root2.left) &&
+           areIdentical(root1.right, root2.right);
+}
+
+// Example usage:
+public static void main(String[] args) {
+    TreeNode tree1 = new TreeNode(50);
+    tree1.left = new TreeNode(30);
+    tree1.right = new TreeNode(70);
+    tree1.left.left = new TreeNode(20);
+    
+    TreeNode tree2 = new TreeNode(50);
+    tree2.left = new TreeNode(30);
+    tree2.right = new TreeNode(70);
+    tree2.left.left = new TreeNode(20);
+    
+    TreeNode tree3 = new TreeNode(50);
+    tree3.left = new TreeNode(30);
+    tree3.right = new TreeNode(70);
+    tree3.left.left = new TreeNode(25); // Different value
+    
+    System.out.println("Are tree1 and tree2 identical? " + areIdentical(tree1, tree2));
+    System.out.println("Are tree1 and tree3 identical? " + areIdentical(tree1, tree3));
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>Exercise 3: Find the Diameter of a Binary Tree</h3>
+                <p>The diameter of a binary tree is the length of the longest path between any two nodes. Write a method to find the diameter.</p>
+                <div class="code-container">
+                    <pre><code>public int diameter(TreeNode root) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>// Helper class to return multiple values from diameter calculation
+class TreeInfo {
+    int diameter;
+    int height;
+    
+    TreeInfo(int diameter, int height) {
+        this.diameter = diameter;
+        this.height = height;
+    }
+}
+
+public int diameter(TreeNode root) {
+    return diameterHelper(root).diameter;
+}
+
+private TreeInfo diameterHelper(TreeNode root) {
+    if (root == null) {
+        return new TreeInfo(0, 0);
+    }
+    
+    // Get information from left and right subtrees
+    TreeInfo left = diameterHelper(root.left);
+    TreeInfo right = diameterHelper(root.right);
+    
+    // Calculate height of current node
+    int height = Math.max(left.height, right.height) + 1;
+    
+    // Calculate diameter passing through current node
+    int throughRoot = left.height + right.height;
+    
+    // Diameter is max of: diameter in left subtree, diameter in right subtree,
+    // or path through current node
+    int diameter = Math.max(throughRoot, Math.max(left.diameter, right.diameter));
+    
+    return new TreeInfo(diameter, height);
+}
+
+// Example usage:
+public static void main(String[] args) {
+    TreeNode root = new TreeNode(1);
+    root.left = new TreeNode(2);
+    root.right = new TreeNode(3);
+    root.left.left = new TreeNode(4);
+    root.left.right = new TreeNode(5);
+    root.left.right.right = new TreeNode(6);
+    root.left.right.right.right = new TreeNode(7);
+    
+    int treeDiameter = diameter(root);
+    System.out.println("Diameter of the tree: " + treeDiameter); // Output: 5
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>Exercise 4: Check if a Tree is Balanced</h3>
+                <p>A balanced binary tree is one where the height difference between left and right subtrees of any node is at most 1.</p>
+                <div class="code-container">
+                    <pre><code>public boolean isBalanced(TreeNode root) {
+    // Your implementation here
+}</code></pre>
+                </div>
+                <button class="show-answer">Show Solution</button>
+                <div class="answer">
+                    <div class="code-container">
+                        <pre><code>public boolean isBalanced(TreeNode root) {
+    return checkHeight(root) != -1;
+}
+
+private int checkHeight(TreeNode root) {
+    if (root == null) {
+        return 0;
+    }
+    
+    // Check if left subtree is balanced
+    int leftHeight = checkHeight(root.left);
+    if (leftHeight == -1) {
+        return -1; // Left subtree is not balanced
+    }
+    
+    // Check if right subtree is balanced
+    int rightHeight = checkHeight(root.right);
+    if (rightHeight == -1) {
+        return -1; // Right subtree is not balanced
+    }
+    
+    // Check if current node is balanced
+    if (Math.abs(leftHeight - rightHeight) > 1) {
+        return -1; // Current node is not balanced
+    }
+    
+    // Return height of current node
+    return Math.max(leftHeight, rightHeight) + 1;
+}
+
+// Example usage:
+public static void main(String[] args) {
+    TreeNode balancedTree = new TreeNode(1);
+    balancedTree.left = new TreeNode(2);
+    balancedTree.right = new TreeNode(3);
+    balancedTree.left.left = new TreeNode(4);
+    balancedTree.left.right = new TreeNode(5);
+    
+    TreeNode unbalancedTree = new TreeNode(1);
+    unbalancedTree.left = new TreeNode(2);
+    unbalancedTree.left.left = new TreeNode(3);
+    unbalancedTree.left.left.left = new TreeNode(4);
+    
+    System.out.println("Is balancedTree balanced? " + isBalanced(balancedTree));
+    System.out.println("Is unbalancedTree balanced? " + isBalanced(unbalancedTree));
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Quiz Section -->
+        <section id="quiz" class="content-section">
+            <h2>Multiple Choice Quiz</h2>
+            
+            <div class="quiz-container">
+                <div class="quiz-question">
+                    <h3>1. What is the time complexity of searching for a node in a balanced binary search tree?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) O(1)</li>
+                        <li class="quiz-option">B) O(log n)</li>
+                        <li class="quiz-option">C) O(n)</li>
+                        <li class="quiz-option">D) O(n log n)</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>2. In a complete binary tree with n nodes, what is the height of the tree?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) O(1)</li>
+                        <li class="quiz-option">B) O(log n)</li>
+                        <li class="quiz-option">C) O(n)</li>
+                        <li class="quiz-option">D) O(n log n)</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>3. Which traversal visits nodes in the order: left, root, right?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) Preorder</li>
+                        <li class="quiz-option">B) Inorder</li>
+                        <li class="quiz-option">C) Postorder</li>
+                        <li class="quiz-option">D) Level order</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>4. In a binary tree represented as an array, what is the index of the left child of a node at index i?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) i + 1</li>
+                        <li class="quiz-option">B) 2i</li>
+                        <li class="quiz-option">C) 2i + 1</li>
+                        <li class="quiz-option">D) 2i + 2</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>5. What is the maximum number of nodes in a binary tree of height h?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) 2^h</li>
+                        <li class="quiz-option">B) 2^h - 1</li>
+                        <li class="quiz-option">C) 2^(h+1) - 1</li>
+                        <li class="quiz-option">D) h^2</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>6. Which of the following is NOT a property of a Binary Search Tree?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) Left subtree contains values less than or equal to root</li>
+                        <li class="quiz-option">B) Right subtree contains values greater than root</li>
+                        <li class="quiz-option">C) Both subtrees must be balanced</li>
+                        <li class="quiz-option">D) All of the above are BST properties</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>7. What is the worst-case time complexity of inserting a node in a binary search tree?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) O(1)</li>
+                        <li class="quiz-option">B) O(log n)</li>
+                        <li class="quiz-option">C) O(n)</li>
+                        <li class="quiz-option">D) O(n log n)</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>8. Which traversal would you use to create a copy of a binary tree?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) Inorder</li>
+                        <li class="quiz-option">B) Preorder</li>
+                        <li class="quiz-option">C) Postorder</li>
+                        <li class="quiz-option">D) Level order</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>9. In a binary tree, a node with no children is called:</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) Root</li>
+                        <li class="quiz-option">B) Internal node</li>
+                        <li class="quiz-option">C) Leaf</li>
+                        <li class="quiz-option">D) Branch</li>
+                    </ul>
+                </div>
+                
+                <div class="quiz-question">
+                    <h3>10. What is the time complexity of finding the minimum value in a BST?</h3>
+                    <ul class="quiz-options">
+                        <li class="quiz-option">A) O(1)</li>
+                        <li class="quiz-option">B) O(log n)</li>
+                        <li class="quiz-option">C) O(n)</li>
+                        <li class="quiz-option">D) O(n log n)</li>
+                    </ul>
+                </div>
+                
+                <button class="btn btn-check" id="check-answers">Check Answers</button>
+                <div id="quiz-result"></div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Java Binary Trees Complete Guide &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        // Tab navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and sections
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding section
+                tab.classList.add('active');
+                const targetId = tab.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+        
+        // Copy code functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const codeContainer = btn.closest('.code-container');
+                const code = codeContainer.querySelector('pre code').textContent;
+                
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+        
+        // Show/hide answers
+        document.querySelectorAll('.show-answer').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const answer = btn.nextElementSibling;
+                if (answer.style.display === 'block') {
+                    answer.style.display = 'none';
+                    btn.textContent = 'Show Solution';
+                } else {
+                    answer.style.display = 'block';
+                    btn.textContent = 'Hide Solution';
+                }
+            });
+        });
+        
+        // Quiz functionality
+        document.getElementById('check-answers').addEventListener('click', () => {
+            const correctAnswers = ['B', 'B', 'B', 'C', 'B', 'C', 'C', 'B', 'C', 'B'];
+            let score = 0;
+            
+            document.querySelectorAll('.quiz-question').forEach((question, index) => {
+                const options = question.querySelectorAll('.quiz-option');
+                let selectedOption = -1;
+                
+                options.forEach((option, optIndex) => {
+                    if (option.classList.contains('selected')) {
+                        selectedOption = optIndex;
+                    }
+                    option.classList.remove('correct', 'incorrect');
+                });
+                
+                if (selectedOption !== -1) {
+                    const optionLetter = String.fromCharCode(65 + selectedOption);
+                    if (optionLetter === correctAnswers[index]) {
+                        score++;
+                        options[selectedOption].classList.add('correct');
+                    } else {
+                        options[selectedOption].classList.add('incorrect');
+                        // Also show the correct answer
+                        const correctIndex = correctAnswers[index].charCodeAt(0) - 65;
+                        options[correctIndex].classList.add('correct');
+                    }
+                } else {
+                    // If no option selected, show correct answer
+                    const correctIndex = correctAnswers[index].charCodeAt(0) - 65;
+                    options[correctIndex].classList.add('correct');
+                }
+            });
+            
+            const resultElement = document.getElementById('quiz-result');
+            const percentage = (score / correctAnswers.length) * 100;
+            resultElement.textContent = `You scored ${score} out of ${correctAnswers.length} (${percentage.toFixed(1)}%)`;
+            resultElement.className = 'result ' + (score === correctAnswers.length ? 'correct' : 'incorrect');
+        });
+        
+        // Select quiz options
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const question = option.closest('.quiz-question');
+                question.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                option.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>
