@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java BST Library Management - Interactive Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tabs-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #2c5aa0;
+        }
+
+        .content {
+            display: none;
+            padding: 0;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .code-section {
+            display: flex;
+            height: 80vh;
+        }
+
+        .code-panel {
+            flex: 1;
+            background: #2d3748;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .code-content {
+            padding: 20px;
+        }
+
+        .line-number {
+            display: inline-block;
+            width: 40px;
+            color: #718096;
+            text-align: right;
+            margin-right: 15px;
+            user-select: none;
+        }
+
+        .code-line {
+            display: block;
+            padding: 2px 0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .code-line:hover {
+            background-color: rgba(66, 153, 225, 0.1);
+        }
+
+        .code-line.highlighted {
+            background-color: rgba(66, 153, 225, 0.2);
+            border-left: 3px solid #4299e1;
+        }
+
+        .explanation-panel {
+            flex: 1;
+            background: #f7fafc;
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .explanation-content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .explanation-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a90e2;
+        }
+
+        .default-explanation {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            margin-top: 50px;
+        }
+
+        /* Syntax Highlighting */
+        .keyword { color: #f56565; font-weight: bold; }
+        .string { color: #68d391; }
+        .comment { color: #a0aec0; font-style: italic; }
+        .type { color: #4fd1c7; font-weight: bold; }
+        .method { color: #fbb6ce; }
+        .number { color: #f6e05e; }
+        .operator { color: #fc8181; }
+        .annotation { color: #b794f6; }
+
+        .concept-box {
+            background: #edf2f7;
+            border-left: 4px solid #4a90e2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .concept-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .bst-visualization {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .tree-node {
+            display: inline-block;
+            background: #4a90e2;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 50%;
+            margin: 5px;
+            font-weight: bold;
+        }
+
+        .scrollbar-style::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollbar-style::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .scrollbar-style::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .scrollbar-style::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @media (max-width: 768px) {
+            .code-section {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .code-panel, .explanation-panel {
+                flex: none;
+                height: 50vh;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: none;
+                min-width: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌳 Java Binary Search Tree</h1>
+            <p>Interactive Library Management System Tutorial</p>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('book')">📖 Book.java</button>
+                <button class="tab" onclick="showTab('node')">🔗 BookTreeNode.java</button>
+                <button class="tab" onclick="showTab('bst')">🌳 BookBST.java</button>
+                <button class="tab" onclick="showTab('test')">🧪 Test.java</button>
+            </div>
+
+            <div id="book" class="content active">
+                <div class="code-section">
+                    <div class="code-panel scrollbar-style">
+                        <div class="code-content" id="book-code"></div>
+                    </div>
+                    <div class="explanation-panel scrollbar-style">
+                        <div class="explanation-content">
+                            <div class="explanation-title">Book Class Overview</div>
+                            <div class="concept-box">
+                                <div class="concept-title">📚 What is this class?</div>
+                                The Book class represents a single book in our library system. It implements Comparable interface to enable sorting and comparison operations in the BST.
+                            </div>
+                            <div id="book-explanation" class="default-explanation">
+                                Click on any line of code to see detailed explanation!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="node" class="content">
+                <div class="code-section">
+                    <div class="code-panel scrollbar-style">
+                        <div class="code-content" id="node-code"></div>
+                    </div>
+                    <div class="explanation-panel scrollbar-style">
+                        <div class="explanation-content">
+                            <div class="explanation-title">Tree Node Structure</div>
+                            <div class="concept-box">
+                                <div class="concept-title">🔗 BST Node Concept</div>
+                                Each node in a Binary Search Tree contains data and references to left and right children. This simple structure enables the tree's hierarchical organization.
+                            </div>
+                            <div class="bst-visualization">
+                                <div>Tree Node Structure:</div>
+                                <div style="margin: 20px 0;">
+                                    <div class="tree-node">Book</div>
+                                    <div style="margin: 10px 0;">↙ ↘</div>
+                                    <div class="tree-node">Left</div>
+                                    <div class="tree-node">Right</div>
+                                </div>
+                            </div>
+                            <div id="node-explanation" class="default-explanation">
+                                Click on any line of code to see detailed explanation!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bst" class="content">
+                <div class="code-section">
+                    <div class="code-panel scrollbar-style">
+                        <div class="code-content" id="bst-code"></div>
+                    </div>
+                    <div class="explanation-panel scrollbar-style">
+                        <div class="explanation-content">
+                            <div class="explanation-title">Binary Search Tree Implementation</div>
+                            <div class="concept-box">
+                                <div class="concept-title">🌳 BST Properties</div>
+                                • Left subtree contains nodes with keys less than root<br>
+                                • Right subtree contains nodes with keys greater than root<br>
+                                • Both subtrees are also BSTs<br>
+                                • Enables O(log n) search, insert, and delete operations
+                            </div>
+                            <div id="bst-explanation" class="default-explanation">
+                                Click on any line of code to see detailed explanation!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="test" class="content">
+                <div class="code-section">
+                    <div class="code-panel scrollbar-style">
+                        <div class="code-content" id="test-code"></div>
+                    </div>
+                    <div class="explanation-panel scrollbar-style">
+                        <div class="explanation-content">
+                            <div class="explanation-title">Testing the Library System</div>
+                            <div class="concept-box">
+                                <div class="concept-title">🧪 Testing Strategy</div>
+                                This test demonstrates all BST operations: insertion, traversal, search, update, and deletion. It shows how the tree maintains order and handles various scenarios.
+                            </div>
+                            <div id="test-explanation" class="default-explanation">
+                                Click on any line of code to see detailed explanation!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Code content with syntax highlighting
+        const codeData = {
+            book: {
+                content: `/**
+ * Represents a book in the library system.
+ * Implements Comparable so books can be ordered by ID.
+ */
+<span class="keyword">public class</span> <span class="type">Book</span> <span class="keyword">implements</span> <span class="type">Comparable</span>&lt;<span class="type">Book</span>&gt; {
+    <span class="keyword">private</span> <span class="type">int</span> bookId;
+    <span class="keyword">private</span> <span class="type">String</span> title;
+    <span class="keyword">private</span> <span class="type">String</span> author;
+    <span class="keyword">private</span> <span class="type">String</span> genre;
+    <span class="keyword">private</span> <span class="type">double</span> price;
+    <span class="keyword">private</span> <span class="type">boolean</span> available;
+
+    <span class="keyword">public</span> <span class="method">Book</span>(<span class="type">int</span> bookId, <span class="type">String</span> title, <span class="type">String</span> author, <span class="type">String</span> genre, <span class="type">double</span> price, <span class="type">boolean</span> available) {
+        <span class="keyword">this</span>.bookId = bookId;
+        <span class="keyword">this</span>.title = title;
+        <span class="keyword">this</span>.author = author;
+        <span class="keyword">this</span>.genre = genre;
+        <span class="keyword">this</span>.price = price;
+        <span class="keyword">this</span>.available = available;
+    }
+
+    <span class="comment">// Getters and setters</span>
+    <span class="keyword">public</span> <span class="type">int</span> <span class="method">getBookId</span>() { <span class="keyword">return</span> bookId; }
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">setBookId</span>(<span class="type">int</span> bookId) { <span class="keyword">this</span>.bookId = bookId; }
+
+    <span class="keyword">public</span> <span class="type">String</span> <span class="method">getTitle</span>() { <span class="keyword">return</span> title; }
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">setTitle</span>(<span class="type">String</span> title) { <span class="keyword">this</span>.title = title; }
+
+    <span class="keyword">public</span> <span class="type">String</span> <span class="method">getAuthor</span>() { <span class="keyword">return</span> author; }
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">setAuthor</span>(<span class="type">String</span> author) { <span class="keyword">this</span>.author = author; }
+
+    <span class="keyword">public</span> <span class="type">String</span> <span class="method">getGenre</span>() { <span class="keyword">return</span> genre; }
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">setGenre</span>(<span class="type">String</span> genre) { <span class="keyword">this</span>.genre = genre; }
+
+    <span class="keyword">public</span> <span class="type">double</span> <span class="method">getPrice</span>() { <span class="keyword">return</span> price; }
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">setPrice</span>(<span class="type">double</span> price) {
+        <span class="keyword">if</span> (price &lt; <span class="number">0</span>) <span class="keyword">throw new</span> <span class="type">IllegalArgumentException</span>(<span class="string">"Price cannot be negative"</span>);
+        <span class="keyword">this</span>.price = price;
+    }
+
+    <span class="keyword">public</span> <span class="type">boolean</span> <span class="method">isAvailable</span>() { <span class="keyword">return</span> available; }
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">setAvailable</span>(<span class="type">boolean</span> available) { <span class="keyword">this</span>.available = available; }
+
+    <span class="annotation">@Override</span>
+    <span class="keyword">public</span> <span class="type">String</span> <span class="method">toString</span>() {
+        <span class="keyword">return</span> <span class="string">"ID: "</span> <span class="operator">+</span> bookId <span class="operator">+</span> <span class="string">" | "</span> <span class="operator">+</span> title <span class="operator">+</span> <span class="string">" by "</span> <span class="operator">+</span> author <span class="operator">+</span>
+                <span class="string">" | Genre: "</span> <span class="operator">+</span> genre <span class="operator">+</span> <span class="string">" | $"</span> <span class="operator">+</span> price <span class="operator">+</span>
+                <span class="string">" | Available: "</span> <span class="operator">+</span> available;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="keyword">public</span> <span class="type">boolean</span> <span class="method">equals</span>(<span class="type">Object</span> obj) {
+        <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> <span class="type">Book</span>) {
+            <span class="keyword">return</span> <span class="keyword">this</span>.bookId <span class="operator">==</span> ((<span class="type">Book</span>) obj).bookId;
+        }
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="keyword">public</span> <span class="type">int</span> <span class="method">hashCode</span>() {
+        <span class="keyword">return</span> <span class="type">Integer</span>.<span class="method">hashCode</span>(bookId);
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="keyword">public</span> <span class="type">int</span> <span class="method">compareTo</span>(<span class="type">Book</span> other) {
+        <span class="keyword">return</span> <span class="type">Integer</span>.<span class="method">compare</span>(<span class="keyword">this</span>.bookId, other.<span class="method">getBookId</span>());
+    }
+}`,
+                explanations: {
+                    1: "This is a Javadoc comment explaining the purpose of the Book class",
+                    2: "Documents that the class implements Comparable for sorting functionality",
+                    3: "Closes the multi-line comment block",
+                    4: "Class declaration: 'public' means accessible from anywhere, 'implements Comparable<Book>' allows sorting",
+                    5: "Private instance variable to store the unique book identifier",
+                    6: "Private instance variable to store the book's title",
+                    7: "Private instance variable to store the author's name",
+                    8: "Private instance variable to store the book's genre/category",
+                    9: "Private instance variable to store the book's price",
+                    10: "Private instance variable to track if the book is available for checkout",
+                    11: "Empty line for code readability",
+                    12: "Constructor method that initializes a new Book object with all required parameters",
+                    13: "Initialize the bookId field with the provided parameter",
+                    14: "Initialize the title field with the provided parameter",
+                    15: "Initialize the author field with the provided parameter",
+                    16: "Initialize the genre field with the provided parameter",
+                    17: "Initialize the price field with the provided parameter",
+                    18: "Initialize the available field with the provided parameter",
+                    19: "End of constructor method",
+                    20: "Empty line for code organization",
+                    21: "Comment indicating the start of getter and setter methods",
+                    22: "Getter method that returns the book's ID (public access, returns int)",
+                    23: "Setter method to update the book's ID (public access, takes int parameter)",
+                    24: "Empty line for readability",
+                    25: "Getter method that returns the book's title",
+                    26: "Setter method to update the book's title",
+                    27: "Empty line for readability",
+                    28: "Getter method that returns the book's author",
+                    29: "Setter method to update the book's author",
+                    30: "Empty line for readability",
+                    31: "Getter method that returns the book's genre",
+                    32: "Setter method to update the book's genre",
+                    33: "Empty line for readability",
+                    34: "Getter method that returns the book's price",
+                    35: "Setter method with validation - starts the method definition",
+                    36: "Input validation: throws exception if price is negative",
+                    37: "If validation passes, set the price field to the new value",
+                    38: "End of setPrice method",
+                    39: "Empty line for readability",
+                    40: "Getter method that returns the availability status (note: uses 'is' prefix for boolean)",
+                    41: "Setter method to update the availability status",
+                    42: "Empty line for readability",
+                    43: "@Override annotation indicates we're overriding a method from Object class",
+                    44: "toString method provides a string representation of the Book object",
+                    45: "Returns a formatted string with all book information concatenated",
+                    46: "Continuation of the string concatenation with genre and price",
+                    47: "Final part of the string with availability status",
+                    48: "End of toString method",
+                    49: "Empty line for readability",
+                    50: "@Override annotation for the equals method from Object class",
+                    51: "equals method to compare two Book objects for equality",
+                    52: "Check if the passed object is an instance of Book class",
+                    53: "If it's a Book, compare the bookId fields (books are equal if IDs match)",
+                    54: "End of the if statement",
+                    55: "If not a Book object, return false (not equal)",
+                    56: "End of equals method",
+                    57: "Empty line for readability",
+                    58: "@Override annotation for the hashCode method from Object class",
+                    59: "hashCode method returns a hash value based on the bookId",
+                    60: "Uses Integer.hashCode() utility method to generate hash from bookId",
+                    61: "End of hashCode method",
+                    62: "Empty line for readability",
+                    63: "@Override annotation for the compareTo method from Comparable interface",
+                    64: "compareTo method enables sorting - compares this book with another book",
+                    65: "Uses Integer.compare() to compare bookId values, returns negative/0/positive for less/equal/greater",
+                    66: "End of compareTo method",
+                    67: "End of the Book class"
+                }
+            },
+            node: {
+                content: `<span class="keyword">public class</span> <span class="type">BookTreeNode</span> {
+    <span class="type">Book</span> book;
+    <span class="type">BookTreeNode</span> left, right;
+
+    <span class="keyword">public</span> <span class="method">BookTreeNode</span>(<span class="type">Book</span> book) {
+        <span class="keyword">this</span>.book = book;
+        <span class="keyword">this</span>.left = <span class="keyword">null</span>;
+        <span class="keyword">this</span>.right = <span class="keyword">null</span>;
+    }
+}`,
+                explanations: {
+                    1: "Class declaration for BookTreeNode - represents a single node in the binary search tree",
+                    2: "Instance variable to store the Book object (the data part of the node)",
+                    3: "References to left and right child nodes (both are BookTreeNode type)",
+                    4: "Empty line for code readability",
+                    5: "Constructor that takes a Book object as parameter to create a new tree node",
+                    6: "Initialize the book field with the provided Book object",
+                    7: "Initialize left child reference to null (no left child initially)",
+                    8: "Initialize right child reference to null (no right child initially)",
+                    9: "End of constructor",
+                    10: "End of BookTreeNode class"
+                }
+            },
+            bst: {
+                content: `<span class="keyword">import</span> java.util.LinkedList;
+<span class="keyword">import</span> java.util.Queue;
+
+<span class="keyword">public class</span> <span class="type">BookBST</span> {
+    <span class="keyword">private</span> <span class="type">BookTreeNode</span> root;   <span class="comment">// root of the tree</span>
+
+    <span class="comment">// -----------------------------</span>
+    <span class="comment">// Insert a new book into the BST</span>
+    <span class="comment">// -----------------------------</span>
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">addBook</span>(<span class="type">Book</span> b) {
+        root = <span class="method">insertRecursive</span>(root, b);
+    }
+
+    <span class="keyword">private</span> <span class="type">BookTreeNode</span> <span class="method">insertRecursive</span>(<span class="type">BookTreeNode</span> node, <span class="type">Book</span> b) {
+        <span class="keyword">if</span> (node <span class="operator">==</span> <span class="keyword">null</span>) {
+            <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"Added: "</span> <span class="operator">+</span> b);
+            <span class="keyword">return new</span> <span class="type">BookTreeNode</span>(b);
+        }
+        <span class="keyword">if</span> (b.<span class="method">getBookId</span>() <span class="operator">&lt;</span> node.book.<span class="method">getBookId</span>()) {
+            node.left = <span class="method">insertRecursive</span>(node.left, b);
+        } <span class="keyword">else if</span> (b.<span class="method">getBookId</span>() <span class="operator">&gt;</span> node.book.<span class="method">getBookId</span>()) {
+            node.right = <span class="method">insertRecursive</span>(node.right, b);
+        } <span class="keyword">else</span> {
+            <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"Duplicate ID: "</span> <span class="operator">+</span> b.<span class="method">getBookId</span>());
+        }
+        <span class="keyword">return</span> node;
+    }
+
+    <span class="comment">// -----------------------------</span>
+    <span class="comment">// Search for a book by ID</span>
+    <span class="comment">// -----------------------------</span>
+    <span class="keyword">public</span> <span class="type">Book</span> <span class="method">findBook</span>(<span class="type">int</span> id) {
+        <span class="keyword">return</span> <span class="method">searchRecursive</span>(root, id);
+    }
+
+    <span class="keyword">private</span> <span class="type">Book</span> <span class="method">searchRecursive</span>(<span class="type">BookTreeNode</span> node, <span class="type">int</span> id) {
+        <span class="keyword">if</span> (node <span class="operator">==</span> <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;
+        <span class="keyword">if</span> (id <span class="operator">==</span> node.book.<span class="method">getBookId</span>()) <span class="keyword">return</span> node.book;
+        <span class="keyword">if</span> (id <span class="operator">&lt;</span> node.book.<span class="method">getBookId</span>()) <span class="keyword">return</span> <span class="method">searchRecursive</span>(node.left, id);
+        <span class="keyword">return</span> <span class="method">searchRecursive</span>(node.right, id);
+    }
+
+    <span class="comment">// -----------------------------</span>
+    <span class="comment">// Update availability of a book</span>
+    <span class="comment">// -----------------------------</span>
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">updateAvailability</span>(<span class="type">int</span> id, <span class="type">boolean</span> status) {
+        <span class="type">Book</span> b = <span class="method">findBook</span>(id);
+        <span class="keyword">if</span> (b <span class="operator">!=</span> <span class="keyword">null</span>) {
+            b.<span class="method">setAvailable</span>(status);
+            <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"Updated availability: "</span> <span class="operator">+</span> b);
+        } <span class="keyword">else</span> {
+            <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"Book not found!"</span>);
+        }
+    }
+
+    <span class="comment">// -----------------------------</span>
+    <span class="comment">// Traversals</span>
+    <span class="comment">// -----------------------------</span>
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">inOrderTraversal</span>() {
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"CATALOG (In-Order):"</span>);
+        <span class="method">inOrderRecursive</span>(root);
+    }
+    <span class="keyword">private</span> <span class="type">void</span> <span class="method">inOrderRecursive</span>(<span class="type">BookTreeNode</span> node) {
+        <span class="keyword">if</span> (node <span class="operator">!=</span> <span class="keyword">null</span>) {
+            <span class="method">inOrderRecursive</span>(node.left);
+            <span class="type">System</span>.out.<span class="method">println</span>(node.book);
+            <span class="method">inOrderRecursive</span>(node.right);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">preOrderTraversal</span>() {
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"PRE-ORDER (Hierarchy):"</span>);
+        <span class="method">preOrderRecursive</span>(root, <span class="number">0</span>);
+    }
+    <span class="keyword">private</span> <span class="type">void</span> <span class="method">preOrderRecursive</span>(<span class="type">BookTreeNode</span> node, <span class="type">int</span> level) {
+        <span class="keyword">if</span> (node <span class="operator">!=</span> <span class="keyword">null</span>) {
+            <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"  "</span>.<span class="method">repeat</span>(level) <span class="operator">+</span> node.book.<span class="method">getTitle</span>());
+            <span class="method">preOrderRecursive</span>(node.left, level <span class="operator">+</span> <span class="number">1</span>);
+            <span class="method">preOrderRecursive</span>(node.right, level <span class="operator">+</span> <span class="number">1</span>);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">postOrderTraversal</span>() {
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"POST-ORDER (Batch Processing):"</span>);
+        <span class="method">postOrderRecursive</span>(root);
+    }
+    <span class="keyword">private</span> <span class="type">void</span> <span class="method">postOrderRecursive</span>(<span class="type">BookTreeNode</span> node) {
+        <span class="keyword">if</span> (node <span class="operator">!=</span> <span class="keyword">null</span>) {
+            <span class="method">postOrderRecursive</span>(node.left);
+            <span class="method">postOrderRecursive</span>(node.right);
+            <span class="type">System</span>.out.<span class="method">println</span>(node.book);
+        }
+    }
+
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">levelOrderTraversal</span>() {
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"LEVEL-ORDER (By Levels):"</span>);
+        <span class="keyword">if</span> (root <span class="operator">==</span> <span class="keyword">null</span>) <span class="keyword">return</span>;
+        <span class="type">Queue</span>&lt;<span class="type">BookTreeNode</span>&gt; q = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;&gt;();
+        q.<span class="method">add</span>(root);
+        <span class="keyword">while</span> (!q.<span class="method">isEmpty</span>()) {
+            <span class="type">int</span> size = q.<span class="method">size</span>();
+            <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; i++) {
+                <span class="type">BookTreeNode</span> node = q.<span class="method">poll</span>();
+                <span class="type">System</span>.out.<span class="method">print</span>(node.book.<span class="method">getTitle</span>() <span class="operator">+</span> <span class="string">"  "</span>);
+                <span class="keyword">if</span> (node.left <span class="operator">!=</span> <span class="keyword">null</span>) q.<span class="method">add</span>(node.left);
+                <span class="keyword">if</span> (node.right <span class="operator">!=</span> <span class="keyword">null</span>) q.<span class="method">add</span>(node.right);
+            }
+            <span class="type">System</span>.out.<span class="method">println</span>();
+        }
+    }
+
+    <span class="comment">// -----------------------------</span>
+    <span class="comment">// Find Min and Max</span>
+    <span class="comment">// -----------------------------</span>
+    <span class="keyword">public</span> <span class="type">Book</span> <span class="method">findMin</span>() {
+        <span class="type">BookTreeNode</span> current = root;
+        <span class="keyword">if</span> (current <span class="operator">==</span> <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;
+        <span class="keyword">while</span> (current.left <span class="operator">!=</span> <span class="keyword">null</span>) current = current.left;
+        <span class="keyword">return</span> current.book;
+    }
+
+    <span class="keyword">public</span> <span class="type">Book</span> <span class="method">findMax</span>() {
+        <span class="type">BookTreeNode</span> current = root;
+        <span class="keyword">if</span> (current <span class="operator">==</span> <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;
+        <span class="keyword">while</span> (current.right <span class="operator">!=</span> <span class="keyword">null</span>) current = current.right;
+        <span class="keyword">return</span> current.book;
+    }
+
+    <span class="comment">// -----------------------------</span>
+    <span class="comment">// Delete a book by ID</span>
+    <span class="comment">// -----------------------------</span>
+    <span class="keyword">public</span> <span class="type">void</span> <span class="method">deleteBook</span>(<span class="type">int</span> id) {
+        root = <span class="method">deleteRecursive</span>(root, id);
+    }
+
+    <span class="keyword">private</span> <span class="type">BookTreeNode</span> <span class="method">deleteRecursive</span>(<span class="type">BookTreeNode</span> node, <span class="type">int</span> id) {
+        <span class="keyword">if</span> (node <span class="operator">==</span> <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;
+
+        <span class="keyword">if</span> (id &lt; node.book.<span class="method">getBookId</span>()) {
+            node.left = <span class="method">deleteRecursive</span>(node.left, id);
+        } <span class="keyword">else if</span> (id &gt; node.book.<span class="method">getBookId</span>()) {
+            node.right = <span class="method">deleteRecursive</span>(node.right, id);
+        } <span class="keyword">else</span> {
+            <span class="comment">// Case 1: no child</span>
+            <span class="keyword">if</span> (node.left <span class="operator">==</span> <span class="keyword">null</span> <span class="operator">&&</span> node.right <span class="operator">==</span> <span class="keyword">null</span>) {
+                <span class="keyword">return</span> <span class="keyword">null</span>;
+            }
+            <span class="comment">// Case 2: one child</span>
+            <span class="keyword">else if</span> (node.left <span class="operator">==</span> <span class="keyword">null</span>) {
+                <span class="keyword">return</span> node.right;
+            } <span class="keyword">else if</span> (node.right <span class="operator">==</span> <span class="keyword">null</span>) {
+                <span class="keyword">return</span> node.left;
+            }
+            <span class="comment">// Case 3: two children</span>
+            <span class="keyword">else</span> {
+                <span class="type">BookTreeNode</span> successor = <span class="method">findMinNode</span>(node.right);
+                node.book = successor.book;
+                node.right = <span class="method">deleteRecursive</span>(node.right, successor.book.<span class="method">getBookId</span>());
+            }
+        }
+        <span class="keyword">return</span> node;
+    }
+
+    <span class="keyword">private</span> <span class="type">BookTreeNode</span> <span class="method">findMinNode</span>(<span class="type">BookTreeNode</span> node) {
+        <span class="keyword">while</span> (node.left <span class="operator">!=</span> <span class="keyword">null</span>) node = node.left;
+        <span class="keyword">return</span> node;
+    }
+}`,
+                explanations: {
+                    1: "Import statement for LinkedList class, needed for level-order traversal",
+                    2: "Import statement for Queue interface, used in breadth-first traversal",
+                    3: "Empty line for code organization",
+                    4: "Class declaration for BookBST - the main Binary Search Tree implementation",
+                    5: "Private instance variable storing the root node of the tree",
+                    6: "Empty line for readability",
+                    7: "Comment divider for the insertion section",
+                    8: "Comment describing the purpose of the following methods",
+                    9: "Comment divider closing the insertion section",
+                    10: "Public method to add a book - entry point for insertion operation",
+                    11: "Calls private recursive method and updates root reference",
+                    12: "End of addBook method",
+                    13: "Empty line for organization",
+                    14: "Private recursive method that performs the actual insertion logic",
+                    15: "Base case: if current node is null, create new node here",
+                    16: "Print confirmation message when book is successfully added",
+                    17: "Return new BookTreeNode containing the book",
+                    18: "End of base case",
+                    19: "If new book's ID is less than current node's ID, go left",
+                    20: "Recursively insert in left subtree",
+                    21: "If new book's ID is greater than current node's ID, go right",
+                    22: "Recursively insert in right subtree",
+                    23: "Else case: duplicate ID found",
+                    24: "Print warning message about duplicate ID",
+                    25: "End of else block",
+                    26: "Return the current node (maintains tree structure)",
+                    27: "End of insertRecursive method",
+                    28: "Empty line for organization",
+                    29: "Comment divider for search section",
+                    30: "Comment describing search functionality",
+                    31: "Comment divider closing search section",
+                    32: "Public method to find a book by ID - entry point for search",
+                    33: "Calls private recursive search method starting from root",
+                    34: "End of findBook method",
+                    35: "Empty line for organization",
+                    36: "Private recursive method that performs the actual search logic",
+                    37: "Base case: if node is null, book not found, return null",
+                    38: "If ID matches current node's book ID, return the book",
+                    39: "If target ID is less than current node's ID, search left subtree",
+                    40: "Otherwise, search right subtree (target ID must be greater)",
+                    41: "End of searchRecursive method",
+                    42: "Empty line for organization",
+                    43: "Comment divider for update section",
+                    44: "Comment describing update functionality",
+                    45: "Comment divider closing update section",
+                    46: "Public method to update a book's availability status",
+                    47: "First, find the book using existing search method",
+                    48: "If book was found (not null)",
+                    49: "Update the book's availability status",
+                    50: "Print confirmation message showing updated book",
+                    51: "Else block: book not found",
+                    52: "Print error message",
+                    53: "End of else block",
+                    54: "End of updateAvailability method",
+                    55: "Empty line for organization",
+                    56: "Comment divider for traversal section",
+                    57: "Comment describing traversal methods",
+                    58: "Comment divider closing traversal section",
+                    59: "Public method for in-order traversal (gives sorted output)",
+                    60: "Print header for in-order traversal",
+                    61: "Call private recursive method starting from root",
+                    62: "End of inOrderTraversal method",
+                    63: "Private recursive method for in-order traversal implementation",
+                    64: "If current node is not null",
+                    65: "First, traverse left subtree",
+                    66: "Then, process current node (print book)",
+                    67: "Finally, traverse right subtree",
+                    68: "End of if block",
+                    69: "End of inOrderRecursive method",
+                    70: "Empty line for organization",
+                    71: "Public method for pre-order traversal (shows hierarchy)",
+                    72: "Print header for pre-order traversal",
+                    73: "Call private recursive method with level 0",
+                    74: "End of preOrderTraversal method",
+                    75: "Private recursive method for pre-order traversal with indentation",
+                    76: "If current node is not null",
+                    77: "Print current node with indentation based on level",
+                    78: "Recursively traverse left subtree with increased level",
+                    79: "Recursively traverse right subtree with increased level",
+                    80: "End of if block",
+                    81: "End of preOrderRecursive method",
+                    82: "Empty line for organization",
+                    83: "Public method for post-order traversal",
+                    84: "Print header for post-order traversal",
+                    85: "Call private recursive method starting from root",
+                    86: "End of postOrderTraversal method",
+                    87: "Private recursive method for post-order traversal implementation",
+                    88: "If current node is not null",
+                    89: "First, traverse left subtree",
+                    90: "Then, traverse right subtree",
+                    91: "Finally, process current node (print book)",
+                    92: "End of if block",
+                    93: "End of postOrderRecursive method",
+                    94: "Empty line for organization",
+                    95: "Public method for level-order (breadth-first) traversal",
+                    96: "Print header for level-order traversal",
+                    97: "Check if tree is empty, return if so",
+                    98: "Create a queue to store nodes for level-by-level processing",
+                    99: "Add root node to queue to start the process",
+                    100: "Continue while there are nodes to process",
+                    101: "Get current level size (number of nodes at this level)",
+                    102: "Process all nodes at current level",
+                    103: "Remove and get next node from queue",
+                    104: "Print the book title with spacing",
+                    105: "Add left child to queue if it exists",
+                    106: "Add right child to queue if it exists",
+                    107: "End of for loop",
+                    108: "Print newline to separate levels",
+                    109: "End of while loop",
+                    110: "End of levelOrderTraversal method",
+                    111: "Empty line for organization",
+                    112: "Comment divider for min/max section",
+                    113: "Comment describing min/max functionality",
+                    114: "Comment divider closing min/max section",
+                    115: "Public method to find book with minimum ID",
+                    116: "Start from root node",
+                    117: "If tree is empty, return null",
+                    118: "Keep going left until leftmost node (minimum in BST)",
+                    119: "Return the book in the leftmost node",
+                    120: "End of findMin method",
+                    121: "Empty line for organization",
+                    122: "Public method to find book with maximum ID",
+                    123: "Start from root node",
+                    124: "If tree is empty, return null",
+                    125: "Keep going right until rightmost node (maximum in BST)",
+                    126: "Return the book in the rightmost node",
+                    127: "End of findMax method",
+                    128: "Empty line for organization",
+                    129: "Comment divider for deletion section",
+                    130: "Comment describing deletion functionality",
+                    131: "Comment divider closing deletion section",
+                    132: "Public method to delete a book by ID",
+                    133: "Call private recursive deletion method and update root",
+                    134: "End of deleteBook method",
+                    135: "Empty line for organization",
+                    136: "Private recursive method that performs actual deletion logic",
+                    137: "Base case: if node is null, nothing to delete",
+                    138: "Empty line for readability",
+                    139: "If target ID is less than current node's ID, search left",
+                    140: "Recursively delete from left subtree",
+                    141: "If target ID is greater than current node's ID, search right",
+                    142: "Recursively delete from right subtree",
+                    143: "Else: found the node to delete",
+                    144: "Comment for deletion case 1",
+                    145: "Case 1: Node has no children (leaf node)",
+                    146: "Simply remove the node by returning null",
+                    147: "End of case 1",
+                    148: "Comment for deletion case 2",
+                    149: "Case 2a: Node has only right child",
+                    150: "Replace node with its right child",
+                    151: "Case 2b: Node has only left child",
+                    152: "Replace node with its left child",
+                    153: "End of case 2",
+                    154: "Comment for deletion case 3",
+                    155: "Case 3: Node has two children (most complex)",
+                    156: "Find the inorder successor (smallest node in right subtree)",
+                    157: "Replace current node's data with successor's data",
+                    158: "Delete the successor node from right subtree",
+                    159: "End of case 3",
+                    160: "End of else block",
+                    161: "Return the modified node",
+                    162: "End of deleteRecursive method",
+                    163: "Empty line for organization",
+                    164: "Helper method to find the leftmost node in a subtree",
+                    165: "Keep going left until reaching leftmost node",
+                    166: "Return the leftmost node",
+                    167: "End of findMinNode method",
+                    168: "End of BookBST class"
+                }
+            },
+            test: {
+                content: `<span class="keyword">public class</span> <span class="type">LibraryManagementTest</span> {
+    <span class="keyword">public static</span> <span class="type">void</span> <span class="method">main</span>(<span class="type">String</span>[] args) {
+        <span class="type">BookBST</span> library = <span class="keyword">new</span> <span class="type">BookBST</span>();
+
+        <span class="comment">// Add books</span>
+        library.<span class="method">addBook</span>(<span class="keyword">new</span> <span class="type">Book</span>(<span class="number">500</span>, <span class="string">"Clean Code"</span>, <span class="string">"Robert C. Martin"</span>, <span class="string">"Programming"</span>, <span class="number">45.0</span>, <span class="keyword">true</span>));
+        library.<span class="method">addBook</span>(<span class="keyword">new</span> <span class="type">Book</span>(<span class="number">200</span>, <span class="string">"The Pragmatic Programmer"</span>, <span class="string">"Andrew Hunt"</span>, <span class="string">"Programming"</span>, <span class="number">50.0</span>, <span class="keyword">true</span>));
+        library.<span class="method">addBook</span>(<span class="keyword">new</span> <span class="type">Book</span>(<span class="number">800</span>, <span class="string">"Design Patterns"</span>, <span class="string">"Erich Gamma"</span>, <span class="string">"Software Engineering"</span>, <span class="number">60.0</span>, <span class="keyword">true</span>));
+        library.<span class="method">addBook</span>(<span class="keyword">new</span> <span class="type">Book</span>(<span class="number">300</span>, <span class="string">"Effective Java"</span>, <span class="string">"Joshua Bloch"</span>, <span class="string">"Programming"</span>, <span class="number">55.0</span>, <span class="keyword">true</span>));
+        library.<span class="method">addBook</span>(<span class="keyword">new</span> <span class="type">Book</span>(<span class="number">700</span>, <span class="string">"Introduction to Algorithms"</span>, <span class="string">"Cormen"</span>, <span class="string">"Algorithms"</span>, <span class="number">70.0</span>, <span class="keyword">true</span>));
+
+        <span class="comment">// Traversals</span>
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nIn-Order Traversal (sorted by ID):"</span>);
+        library.<span class="method">inOrderTraversal</span>();
+
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nPre-Order Traversal:"</span>);
+        library.<span class="method">preOrderTraversal</span>();
+
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nPost-Order Traversal:"</span>);
+        library.<span class="method">postOrderTraversal</span>();
+
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nLevel-Order Traversal:"</span>);
+        library.<span class="method">levelOrderTraversal</span>();
+
+        <span class="comment">// Search</span>
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nSearching for book ID 300:"</span>);
+        <span class="type">Book</span> found = library.<span class="method">findBook</span>(<span class="number">300</span>);
+        <span class="type">System</span>.out.<span class="method">println</span>(found <span class="operator">!=</span> <span class="keyword">null</span> <span class="operator">?</span> found : <span class="string">"Not found"</span>);
+
+        <span class="comment">// Update availability</span>
+        library.<span class="method">updateAvailability</span>(<span class="number">300</span>, <span class="keyword">false</span>);
+
+        <span class="comment">// 🔹 NEW: Find Min and Max</span>
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nMinimum Book ID in Library:"</span>);
+        <span class="type">System</span>.out.<span class="method">println</span>(library.<span class="method">findMin</span>());
+
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nMaximum Book ID in Library:"</span>);
+        <span class="type">System</span>.out.<span class="method">println</span>(library.<span class="method">findMax</span>());
+
+        <span class="comment">// 🔹 NEW: Delete a book</span>
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nDeleting book ID 500 (Clean Code):"</span>);
+        library.<span class="method">deleteBook</span>(<span class="number">500</span>);
+
+        <span class="comment">// Show tree again after deletion</span>
+        <span class="type">System</span>.out.<span class="method">println</span>(<span class="string">"\\nIn-Order Traversal after deletion:"</span>);
+        library.<span class="method">inOrderTraversal</span>();
+    }
+}`,
+                explanations: {
+                    1: "Class declaration for the test class that demonstrates BST functionality",
+                    2: "Main method - entry point of the program where execution begins",
+                    3: "Create a new BookBST object to represent our library system",
+                    4: "Empty line for code organization",
+                    5: "Comment indicating the start of book insertion section",
+                    6: "Add first book with ID 500 - 'Clean Code' by Robert C. Martin",
+                    7: "Add second book with ID 200 - creates left child of root",
+                    8: "Add third book with ID 800 - creates right child of root",
+                    9: "Add fourth book with ID 300 - goes into left subtree",
+                    10: "Add fifth book with ID 700 - goes into right subtree",
+                    11: "Empty line for organization",
+                    12: "Comment indicating the start of traversal demonstrations",
+                    13: "Print header and perform in-order traversal (shows books sorted by ID)",
+                    14: "Call in-order traversal method to display sorted catalog",
+                    15: "Empty line for readability",
+                    16: "Print header and perform pre-order traversal",
+                    17: "Call pre-order traversal method to show tree hierarchy",
+                    18: "Empty line for readability",
+                    19: "Print header and perform post-order traversal",
+                    20: "Call post-order traversal method for batch processing view",
+                    21: "Empty line for readability",
+                    22: "Print header and perform level-order traversal",
+                    23: "Call level-order traversal method to show tree by levels",
+                    24: "Empty line for organization",
+                    25: "Comment indicating the start of search demonstration",
+                    26: "Print search operation description",
+                    27: "Search for book with ID 300 and store result",
+                    28: "Use ternary operator to print found book or 'Not found' message",
+                    29: "Empty line for organization",
+                    30: "Comment indicating availability update demonstration",
+                    31: "Update the availability of book ID 300 to false (not available)",
+                    32: "Empty line for organization",
+                    33: "Comment indicating new min/max functionality demonstration",
+                    34: "Print header for minimum book finding",
+                    35: "Find and print the book with minimum ID (leftmost node)",
+                    36: "Empty line for readability",
+                    37: "Print header for maximum book finding",
+                    38: "Find and print the book with maximum ID (rightmost node)",
+                    39: "Empty line for organization",
+                    40: "Comment indicating deletion functionality demonstration",
+                    41: "Print deletion operation description",
+                    42: "Delete the book with ID 500 from the tree",
+                    43: "Empty line for organization",
+                    44: "Comment describing final tree display",
+                    45: "Print header for post-deletion tree state",
+                    46: "Show the tree structure after deletion to confirm removal",
+                    47: "End of main method",
+                    48: "End of LibraryManagementTest class"
+                }
+            }
+        };
+
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content and activate tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load code content
+            loadCodeContent(tabName);
+        }
+
+        function loadCodeContent(tabName) {
+            const codeContainer = document.getElementById(tabName + '-code');
+            const explanationContainer = document.getElementById(tabName + '-explanation');
+            
+            const lines = codeData[tabName].content.split('\n');
+            let codeHTML = '';
+            
+            lines.forEach((line, index) => {
+                const lineNumber = index + 1;
+                codeHTML += `<span class="code-line" data-line="${lineNumber}" onclick="showExplanation('${tabName}', ${lineNumber})">`;
+                codeHTML += `<span class="line-number">${lineNumber}</span>`;
+                codeHTML += line || '&nbsp;'; // Handle empty lines
+                codeHTML += '</span>\n';
+            });
+            
+            codeContainer.innerHTML = codeHTML;
+            
+            // Reset explanation
+            if (tabName === 'book') {
+                explanationContainer.innerHTML = `<div class="default-explanation">Click on any line of code to see detailed explanation!</div>`;
+            } else if (tabName === 'node') {
+                explanationContainer.innerHTML = `<div class="default-explanation">Click on any line of code to see detailed explanation!</div>`;
+            } else if (tabName === 'bst') {
+                explanationContainer.innerHTML = `<div class="default-explanation">Click on any line of code to see detailed explanation!</div>`;
+            } else if (tabName === 'test') {
+                explanationContainer.innerHTML = `<div class="default-explanation">Click on any line of code to see detailed explanation!</div>`;
+            }
+        }
+
+        function showExplanation(tabName, lineNumber) {
+            // Remove previous highlights
+            document.querySelectorAll('.code-line').forEach(line => {
+                line.classList.remove('highlighted');
+            });
+            
+            // Highlight current line
+            document.querySelector(`[data-line="${lineNumber}"]`).classList.add('highlighted');
+            
+            // Show explanation
+            const explanation = codeData[tabName].explanations[lineNumber];
+            const explanationContainer = document.getElementById(tabName + '-explanation');
+            
+            if (explanation) {
+                let contextInfo = '';
+                
+                // Add context-specific information
+                if (tabName === 'book') {
+                    if (lineNumber >= 5 && lineNumber <= 10) {
+                        contextInfo = '<div class="concept-box"><div class="concept-title">💡 Instance Variables</div>These private fields encapsulate the book\'s data. Making them private enforces data hiding and requires getter/setter methods for access.</div>';
+                    } else if (lineNumber >= 12 && lineNumber <= 19) {
+                        contextInfo = '<div class="concept-box"><div class="concept-title">🏗️ Constructor</div>The constructor initializes all instance variables when a new Book object is created. This ensures every book has all required data.</div>';
+                    } else if (lineNumber >= 63 && lineNumber <= 65) {
+                        contextInfo = '<div class="concept-box"><div class="concept-title">🔄 Comparable Interface</div>The compareTo method enables automatic sorting of books. It returns negative/zero/positive values for less-than/equal/greater-than comparisons.</div>';
+                    }
+                } else if (tabName === 'bst') {
+                    if (lineNumber >= 14 && lineNumber <= 27) {
+                        contextInfo = '<div class="concept-box"><div class="concept-title">➕ BST Insertion</div>Insertion maintains BST property: smaller values go left, larger go right. This recursive approach naturally finds the correct position.</div>';
+                    } else if (lineNumber >= 59 && lineNumber <= 69) {
+                        contextInfo = '<div class="concept-box"><div class="concept-title">🔄 In-Order Traversal</div>In-order traversal visits nodes in sorted order: Left → Root → Right. Perfect for displaying a sorted catalog!</div>';
+                    } else if (lineNumber >= 136 && lineNumber <= 162) {
+                        contextInfo = '<div class="concept-box"><div class="concept-title">🗑️ BST Deletion</div>Deletion has 3 cases: no children (simple), one child (replace with child), two children (replace with successor).</div>';
+                    }
+                }
+                
+                explanationContainer.innerHTML = `
+                    ${contextInfo}
+                    <div class="explanation-title">Line ${lineNumber} Explanation</div>
+                    <p>${explanation}</p>
+                `;
+            } else {
+                explanationContainer.innerHTML = `
+                    <div class="explanation-title">Line ${lineNumber}</div>
+                    <p>This line contains formatting or spacing for code readability.</p>
+                `;
+            }
+        }
+
+        // Initialize the first tab
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCodeContent('book');
+        });
+    </script>
+</body>
+</html>
