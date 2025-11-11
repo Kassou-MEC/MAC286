@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Probing Hash Tables – Interactive Presentation</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333}
+        .presentation-container{max-width:1200px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column}
+        .scroll-indicator{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(52,152,219,.8);color:#fff;padding:5px 15px;border-radius:20px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:10}
+        .scroll-indicator.show{opacity:1}
+        .slide{background:#fff;border-radius:15px;padding:40px;margin-bottom:30px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(30px);transition:all .6s;min-height:calc(100vh - 100px);max-height:calc(100vh - 100px);overflow-y:auto;display:none;position:relative}
+        .slide.active{opacity:1;transform:translateY(0);display:block}
+        .slide::-webkit-scrollbar{width:8px}
+        .slide::-webkit-scrollbar-track{background:#f1f1f1;border-radius:4px}
+        .slide::-webkit-scrollbar-thumb{background:#3498db;border-radius:4px}
+        .slide::-webkit-scrollbar-thumb:hover{background:#2980b9}
+        h1{font-size:2.5em;color:#2c3e50;text-align:center;margin-bottom:30px;background:linear-gradient(45deg,#3498db,#9b59b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        h2{font-size:2em;color:#34495e;margin-bottom:20px;border-bottom:3px solid #3498db;padding-bottom:10px}
+        h3{font-size:1.5em;color:#2980b9;margin:20px 0 15px}
+        .definition-box{background:linear-gradient(135deg,#74b9ff,#0984e3);color:#fff;padding:25px;border-radius:10px;margin:20px 0;border-left:5px solid #00b894}
+        .real-life-example{background:linear-gradient(135deg,#fd79a8,#e84393);color:#fff;padding:25px;border-radius:10px;margin:20px 0;position:relative;overflow:hidden}
+        .real-life-example::before{content:'P';position:absolute;top:10px;right:15px;font-size:2em;opacity:.3}
+        .hash-table-visual{display:flex;justify-content:center;margin:30px 0;flex-wrap:wrap;gap:10px}
+        .hash-slot{width:80px;height:60px;border:2px solid #3498db;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#ecf0f1;transition:all .3s;position:relative}
+        .hash-slot.occupied{background:linear-gradient(135deg,#55efc4,#00b894);color:#fff;font-weight:bold}
+        .hash-slot.collision{background:linear-gradient(135deg,#fd79a8,#e84393);color:#fff;animation:pulse 1s infinite}
+        .hash-slot .index{font-size:.8em;color:#7f8c8d;position:absolute;top:2px;left:5px}
+        .hash-slot.occupied .index{color:rgba(255,255,255,.7)}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+        .code-container{background:#2c3e50;color:#ecf0f1;padding:25px;border-radius:10px;margin:20px 0;font-family:'Courier New',monospace;font-size:14px;line-height:1.6;overflow-x:auto;position:relative}
+        .code-container::before{content:'Java Code';position:absolute;top:5px;right:15px;background:#e74c3c;color:#fff;padding:2px 8px;border-radius:4px;font-size:.8em}
+        .copy-btn{position:absolute;top:5px;right:100px;background:#27ae60;color:#fff;padding:5px 10px;border:none;border-radius:4px;font-size:12px;cursor:pointer}
+        .copy-btn:hover{background:#1e8449}
+        .keyword{color:#e74c3c;font-weight:bold}
+        .string{color:#2ecc71}
+        .comment{color:#95a5a6;font-style:italic}
+        .method{color:#f39c12}
+        .interactive-demo{background:#f8f9fa;padding:25px;border-radius:10px;margin:20px 0;border:2px dashed #3498db}
+        .demo-controls{display:flex;gap:15px;margin-bottom:20px;flex-wrap:wrap}
+        .demo-input{padding:10px;border:2px solid #bdc3c7;border-radius:5px;font-size:16px;outline:none;transition:border-color .3s}
+        .demo-input:focus{border-color:#3498db}
+        .demo-button{background:linear-gradient(135deg,#74b9ff,#0984e3);color:#fff;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;font-size:16px;font-weight:bold;transition:transform .2s}
+        .demo-button:hover{transform:translateY(-2px)}
+        .demo-button:active{transform:translateY(0)}
+        .step-log{background:#34495e;color:#ecf0f1;padding:15px;border-radius:8px;margin-top:15px;font-family:'Courier New',monospace;font-size:13px;max-height:200px;overflow-y:auto}
+        .navigation{position:fixed;bottom:30px;right:30px;display:flex;gap:15px;z-index:1000}
+        .nav-button{background:#3498db;color:#fff;border:none;padding:15px 20px;border-radius:50px;cursor:pointer;font-size:18px;font-weight:bold;transition:all .3s;box-shadow:0 4px 15px rgba(52,152,219,.4);min-width:50px;min-height:50px;display:flex;align-items:center;justify-content:center}
+        .nav-button:hover{background:#2980b9;transform:translateY(-2px);box-shadow:0 6px 20px rgba(52,152,219,.6)}
+        .nav-button:active{transform:translateY(0)}
+        .nav-button:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+        .progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#3498db,#9b59b6);transition:width .3s;z-index:1000}
+        .advantages-disadvantages{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
+        .advantage{background:linear-gradient(135deg,#00b894,#55efc4);color:#fff;padding:20px;border-radius:10px;position:relative}
+        .advantage::before{content:'Check';position:absolute;top:10px;right:15px;font-size:1.5em;font-weight:bold}
+        .disadvantage{background:linear-gradient(135deg,#e17055,#fdcb6e);color:#fff;padding:20px;border-radius:10px;position:relative}
+        .disadvantage::before{content:'Cross';position:absolute;top:10px;right:15px;font-size:1.5em}
+        .complexity-table{width:100%;border-collapse:collapse;margin:20px 0;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,.1)}
+        .complexity-table th,.complexity-table td{padding:15px;text-align:left;border-bottom:1px solid #ecf0f1}
+        .complexity-table th{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:bold}
+        .complexity-table tr:nth-child(even){background:#f8f9fa}
+        @media(max-width:768px){
+            .presentation-container{padding:10px}
+            .slide{padding:20px}
+            h1{font-size:2em}
+            h2{font-size:1.5em}
+            .advantages-disadvantages{grid-template-columns:1fr}
+            .demo-controls{flex-direction:column}
+        }
+        .highlight-animation{animation:highlight 2s ease-in-out}
+        @keyframes highlight{0%,100%{background-color:transparent}50%{background-color:rgba(52,152,219,.3)}}
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="presentation-container">
+
+        <!-- ==================== SLIDE 1 – Title ==================== -->
+        <div class="slide active">
+            <h1>Linear Probing Hash Tables</h1>
+            <div style="text-align:center;font-size:1.2em;color:#7f8c8d;margin:30px 0">
+                <p>A Comprehensive Interactive Guide</p>
+                <p style="margin-top:20px;font-size:.9em">Understanding collision resolution through sequential search</p>
+            </div>
+            <div style="text-align:center;margin-top:40px">
+                <div style="display:inline-block;background:linear-gradient(135deg,#74b9ff,#0984e3);padding:20px 40px;border-radius:50px;color:#fff;font-size:1.1em">
+                    Click <strong>Next</strong> to Begin Learning!
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 2 – Definition ==================== -->
+        <div class="slide">
+            <h2>What is Linear Probing?</h2>
+            <div class="definition-box">
+                <h3 style="color:#fff;margin-top:0">Simple Definition:</h3>
+                <p style="font-size:1.2em;line-height:1.6">
+                    <strong>Linear Probing</strong> is a collision-resolution technique in hash tables where,
+                    if a collision occurs at index <em>i</em>, we sequentially check <em>i+1, i+2, i+3 …</em>
+                    until we find an empty slot.
+                </p>
+            </div>
+            <h3>Key Concepts:</h3>
+            <ul style="font-size:1.1em;line-height:1.8;margin:20px 0;padding-left:30px">
+                <li><strong>Hash Function:</strong> Determines the initial position</li>
+                <li><strong>Collision:</strong> Two keys map to the same index</li>
+                <li><strong>Probing:</strong> Sequential search for the next free slot</li>
+                <li><strong>Wrap-around:</strong> Continue from index 0 when the end is reached</li>
+            </ul>
+            <div class="scroll-indicator">Scroll down for more content</div>
+        </div>
+
+        <!-- ==================== SLIDE 3 – Real-Life: Parking Garage ==================== -->
+        <div class="slide">
+            <h2>Real-Life Example: Parking Garage</h2>
+            <div class="real-life-example">
+                <h3 style="color: white; margin-top: 0;">The Parking Garage Analogy</h3>
+                <p style="font-size: 1.1em; line-height: 1.7;">
+                    Imagine a parking garage with numbered spaces (0, 1, 2, 3, 4...). 
+                    When you arrive, you have a preferred parking spot based on your license plate number.
+                </p>
+                <br>
+                <p style="font-size: 1.1em; line-height: 1.7;">
+                    <strong>Your Strategy:</strong><br>
+                    1. Go to your calculated preferred spot<br>
+                    2. If it's occupied, try the next spot<br>
+                    3. Keep moving forward until you find an empty space<br>
+                    4. If you reach the end, wrap around to the beginning
+                </p>
+            </div>
+            <div style="background: #ecf0f1; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h3>Example Scenario:</h3>
+                <div style="font-family: 'Courier New', monospace; background: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                    License "ABC123" → Spot 3 (calculated)<br>
+                    Spot 3: OCCUPIED [X] → Check Spot 4<br>
+                    Spot 4: OCCUPIED [X] → Check Spot 5<br>
+                    Spot 5: EMPTY [Check] → Park here!
+                </div>
+            </div>
+            <div class="scroll-indicator">Scroll down for more content</div>
+        </div>
+
+        <!-- ==================== SLIDE 4 – Real-Life: Movie Theater ==================== -->
+        <div class="slide">
+            <h2>Real-Life Example: Movie Theater Seats</h2>
+            <div class="real-life-example">
+                <h3 style="color: white; margin-top: 0;">The Movie Theater Analogy</h3>
+                <p style="font-size: 1.1em; line-height: 1.7;">
+                    <strong>The Scenario:</strong><br>
+                    You and your friends buy tickets online. The website assigns you "preferred seats" based on your ticket numbers.
+                    But when you arrive, some of those seats might already be taken by people who came earlier.
+                </p>
+                <br>
+                <p style="font-size: 1.1em; line-height: 1.7;">
+                    <strong>How Linear Probing works in the theater:</strong><br>
+                    1. <strong>Step 1:</strong> Your ticket says "Seat 15" but someone's already sitting there → You check seat 16<br>
+                    2. <strong>Step 2:</strong> If seat 16 is taken too, you check seat 17, then 18, then 19...<br>
+                    3. <strong>Step 3:</strong> When you find an empty seat, you sit down!<br>
+                </p>
+                <br>
+                <p style="font-size: 1.1em;">
+                    <strong>Visual Example:</strong><br>
+                    [12] [13] [14] [15] [16] [17] [18] [19] [20]<br>
+                    ...X...X....X....TAKEN...?.....?......?.....?......?<br><br>
+                    <strong>Your assigned seat:</strong> 15 (occupied)<br>
+                    <strong>Check seat 16:</strong> taken<br>
+                    <strong>Check seat 17:</strong> taken<br>
+                    <strong>Check seat 18:</strong> EMPTY! → Sit here
+                </p>
+            </div>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h3>Why This Example Works Great:</h3>
+                <ul style="line-height: 1.8; margin-top: 10px;">
+                    <li><strong>Sequential checking</strong> – You don’t randomly jump around the theater</li>
+                    <li><strong>Politeness</strong> – You check one seat at a time, just like checking one array index</li>
+                    <li><strong>Persistence</strong> – You keep looking until you find an empty seat</li>
+                    <li><strong>Real consequence</strong> – If the theater is too crowded, you might not find a seat (table full!)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 5 – Visual Animation ==================== -->
+        <div class="slide">
+            <h2>Visual Hash Table Animation</h2>
+            <div class="hash-table-visual" id="visualDemo"></div>
+            <div style="text-align:center;margin-top:20px">
+                <button class="demo-button" onclick="startVisualDemo()">Start Animation Demo</button>
+                <button class="demo-button" onclick="resetVisualDemo()" style="margin-left:10px;background:linear-gradient(135deg,#e74c3c,#c0392b)">Reset</button>
+            </div>
+            <div id="visualSteps" style="margin-top:20px;padding:15px;background:#34495e;color:#ecf0f1;border-radius:8px;font-family:'Courier New',monospace;font-size:13px">
+                Click “Start Animation Demo” to see linear probing in action!
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 6 – Interactive Demo ==================== -->
+        <div class="slide">
+            <h2>Interactive Demo</h2>
+            <div class="interactive-demo">
+                <div class="demo-controls">
+                    <input type="text" id="demoKey" class="demo-input" placeholder="Key (string)">
+                    <input type="number" id="demoValue" class="demo-input" placeholder="Value (number)">
+                    <button class="demo-button" onclick="insertDemo()">Insert</button>
+                    <button class="demo-button" onclick="searchDemo()">Search</button>
+                    <button class="demo-button" onclick="clearDemo()" style="background:linear-gradient(135deg,#e74c3c,#c0392b)">Clear</button>
+                </div>
+                <div class="hash-table-visual" id="interactiveTable"></div>
+                <div id="interactiveLog" class="step-log">Ready – insert some key/value pairs!</div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 7 – Java Code (FULLY WORKING) ==================== -->
+        <div class="slide">
+            <h2>Java Implementation</h2>
+            <p style="margin-bottom:20px">A <strong>complete, runnable</strong> demo. Click <strong>Copy</strong> and paste into <a href="https://www.jdoodle.com/online-java-compiler/" target="_blank" style="color:#3498db">JDoodle</a>, <a href="https://replit.com/languages/java" target="_blank" style="color:#3498db">Replit</a>, etc.</p>
+            <div class="code-container" style="position:relative">
+                <button class="copy-btn" onclick="copyJavaCode()">Copy Code</button>
+<pre id="javaCode"><code><span class="comment">// ---------------------------------------------------------------
+// Linear Probing – Ready-to-run demo
+// ---------------------------------------------------------------</span>
+<span class="keyword">public class</span> LinearProbingDemo {
+
+    <span class="keyword">private final</span> String[] keys;
+    <span class="keyword">private final</span> Integer[] values;
+    <span class="keyword">private final int</span> capacity;
+
+    <span class="keyword">public</span> <span class="method">LinearProbingDemo</span>(<span class="keyword">int</span> capacity) {
+        <span class="keyword">this</span>.capacity = capacity;
+        <span class="keyword">this</span>.keys   = <span class="keyword">new</span> String[capacity];
+        <span class="keyword">this</span>.values = <span class="keyword">new</span> Integer[capacity];
+    }
+
+    <span class="comment">// ----- hash function ------------------------------------------------</span>
+    <span class="keyword">private int</span> <span class="method">hash</span>(String key) {
+        <span class="keyword">return</span> Math.abs(key.hashCode()) % capacity;
+    }
+
+    <span class="comment">// ----- insert -------------------------------------------------------</span>
+    <span class="keyword">public void</span> <span class="method">put</span>(String key, <span class="keyword">int</span> value) {
+        <span class="keyword">int</span> idx = hash(key);
+        System.out.println(<span class="string">"Inserting \""</span> + key + <span class="string">"\" → hash = "</span> + idx);
+
+        <span class="keyword">while</span> (keys[idx] != <span class="keyword">null</span> && !keys[idx].equals(key)) {
+            System.out.println(<span class="string">"  Collision at "</span> + idx + <span class="string">" (has \""</span> + keys[idx] + <span class="string">"\"), trying "</span> + (idx + 1) % capacity);
+            idx = (idx + 1) % capacity;
+        }
+
+        keys[idx]   = key;
+        values[idx] = value;
+        System.out.println(<span class="string">"  Stored at index "</span> + idx + <span class="string">"\n"</span>);
+    }
+
+    <span class="comment">// ----- search -------------------------------------------------------</span>
+    <span class="keyword">public</span> Integer <span class="method">get</span>(String key) {
+        <span class="keyword">int</span> idx = hash(key);
+        System.out.println(<span class="string">"Searching \""</span> + key + <span class="string">"\" → hash = "</span> + idx);
+
+        <span class="keyword">while</span> (keys[idx] != <span class="keyword">null</span>) {
+            <span class="keyword">if</span> (keys[idx].equals(key)) {
+                System.out.println(<span class="string">"  Found at index "</span> + idx + <span class="string">" → value = "</span> + values[idx] + <span class="string">"\n"</span>);
+                <span class="keyword">return</span> values[idx];
+            }
+            System.out.println(<span class="string">"  Not at "</span> + idx + <span class="string">", trying "</span> + (idx + 1) % capacity);
+            idx = (idx + 1) % capacity;
+        }
+
+        System.out.println(<span class="string">"  Not found\n"</span>);
+        <span class="keyword">return null</span>;
+    }
+
+    <span class="comment">// ----- display ------------------------------------------------------</span>
+    <span class="keyword">public void</span> <span class="method">display</span>() {
+        System.out.println(<span class="string">"=== Hash Table (size = "</span> + capacity + <span class="string">") ==="</span>);
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i < capacity; i++) {
+            <span class="keyword">if</span> (keys[i] == <span class="keyword">null</span>) {
+                System.out.println(i + <span class="string">": [EMPTY]"</span>);
+            } <span class="keyword">else</span> {
+                System.out.println(i + <span class="string">": "</span> + keys[i] + <span class="string">" = "</span> + values[i]);
+            }
+        }
+        System.out.println();
+    }
+
+    <span class="comment">// --------------------------------------------------------------- main</span>
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        System.out.println(<span class="string">"LINEAR PROBING DEMO\n"</span>);
+
+        LinearProbingDemo table = <span class="keyword">new</span> LinearProbingDemo(7);
+
+        table.put(<span class="string">"cat"</span>, 10);
+        table.put(<span class="string">"dog"</span>, 20);
+        table.put(<span class="string">"rat"</span>, 30);
+        table.put(<span class="string">"bat"</span>, 40);
+        table.put(<span class="string">"hat"</span>, 50);
+
+        table.display();
+
+        table.get(<span class="string">"dog"</span>);
+        table.get(<span class="string">"rat"</span>);
+        table.get(<span class="string">"lion"</span>);
+    }
+}</code></pre>
+            </div>
+            <div class="scroll-indicator">Scroll to copy the full code</div>
+        </div>
+
+        <!-- ==================== SLIDE 8 – Advantages / Disadvantages ==================== -->
+        <div class="slide">
+            <h2>Advantages & Disadvantages</h2>
+            <div class="advantages-disadvantages">
+                <div class="advantage">
+                    <h3>Advantages</h3>
+                    <ul style="margin-top:15px;line-height:1.6">
+                        <li><strong>Simplicity</strong> – easy to code & understand</li>
+                        <li><strong>Cache-friendly</strong> – sequential memory access</li>
+                        <li><strong>No extra structures</strong></li>
+                        <li><strong>Deterministic probing</strong></li>
+                    </ul>
+                </div>
+                <div class="disadvantage">
+                    <h3>Disadvantages</h3>
+                    <ul style="margin-top:15px;line-height:1.6">
+                        <li><strong>Primary clustering</strong></li>
+                        <li><strong>Performance degrades as load ↑</strong></li>
+                        <li><strong>Deletion is tricky</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 9 – Time Complexity ==================== -->
+        <div class="slide">
+            <h2>Time Complexity</h2>
+            <table class="complexity-table">
+                <thead><tr><th>Operation</th><th>Best</th><th>Avg</th><th>Worst</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Insert</strong></td><td>O(1)</td><td>O(1)</td><td>O(n)</td><td>long probe sequence</td></tr>
+                    <tr><td><strong>Search</strong></td><td>O(1)</td><td>O(1)</td><td>O(n)</td><td>key at end of cluster</td></tr>
+                    <tr><td><strong>Delete</strong></td><td>O(1)</td><td>O(1)</td><td>O(n)</td><td>may need shifting</td></tr>
+                </tbody>
+            </table>
+            <h3 style="margin-top:20px">Load-Factor Impact</h3>
+            <div style="background:#f8f9fa;padding:20px;border-radius:10px">
+                <p><strong>α = occupied / total</strong></p>
+                <ul style="line-height:1.8">
+                    <li>α ≤ 0.5 → excellent</li>
+                    <li>0.5 < α ≤ 0.7 → good</li>
+                    <li>α > 0.7 → clustering, slowdown</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 10 – Summary ==================== -->
+        <div class="slide">
+            <h2>Summary & Key Takeaways</h2>
+            <div style="background:linear-gradient(135deg,#74b9ff,#0984e3);color:#fff;padding:25px;border-radius:10px">
+                <h3 style="color:#fff;margin-top:0">What We Learned</h3>
+                <ul style="font-size:1.1em;line-height:1.8;margin-top:15px">
+                    <li>Linear probing = sequential search after collision</li>
+                    <li>Super simple to implement</li>
+                    <li>Real-world analogies: parking garage & movie theater</li>
+                    <li>Trade-off: clustering → performance drops at high load</li>
+                </ul>
+            </div>
+            <h3 style="margin-top:20px">Next Steps</h3>
+            <div style="background:#f8f9fa;padding:20px;border-radius:10px">
+                <ol style="line-height:1.8;font-size:1.1em">
+                    <li>Copy the Java code and run it online</li>
+                    <li>Try changing table size or adding more keys</li>
+                    <li>Explore quadratic probing / double hashing</li>
+                </ol>
+            </div>
+            <div style="text-align:center;margin-top:30px">
+                <div style="display:inline-block;background:linear-gradient(135deg,#00b894,#55efc4);padding:20px 40px;border-radius:50px;color:#fff;font-size:1.2em;font-weight:bold">
+                    Congratulations! You’ve mastered Linear Probing!
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==================== NAVIGATION ==================== -->
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="previousSlide()">Prev</button>
+        <div id="slideCounter" style="background:rgba(52,73,94,.9);color:#fff;padding:15px 20px;border-radius:50px;display:flex;align-items:center;font-weight:bold;box-shadow:0 4px 15px rgba(52,73,94,.4)">
+            1 / 10
+        </div>
+        <button class="nav-button" id="nextBtn" onclick="nextSlide()">Next</button>
+    </div>
+
+    <script>
+        /* ---------- GLOBAL STATE ---------- */
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+
+        const demoTable = {
+            capacity: 5,
+            keys:   Array(5).fill(null),
+            values: Array(5).fill(null)
+        };
+
+        /* ---------- COPY JAVA CODE ---------- */
+        function copyJavaCode() {
+            const code = document.getElementById('javaCode').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const original = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#27ae60';
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        /* ---------- UI HELPERS ---------- */
+        function updateProgress() {
+            const pct = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+        }
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            updateProgress();
+            document.getElementById('slideCounter').textContent = `${currentSlide+1} / ${totalSlides}`;
+
+            const prev = document.getElementById('prevBtn');
+            const next = document.getElementById('nextBtn');
+            prev.disabled = currentSlide === 0;
+            next.disabled = currentSlide === totalSlides - 1;
+
+            setTimeout(() => {
+                const active = document.querySelector('.slide.active');
+                const ind = active.querySelector('.scroll-indicator');
+                if (ind && active.scrollHeight > active.clientHeight) ind.classList.add('show');
+            }, 150);
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides-1) showSlide(currentSlide+1); }
+        function previousSlide() { if (currentSlide > 0) showSlide(currentSlide-1); }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        /* ---------- HASH FUNCTION (demo) ---------- */
+        function demoHash(key) {
+            let h = 0;
+            for (let i = 0; i < key.length; i++) {
+                h = ((h << 5) - h) + key.charCodeAt(i);
+                h = h & h;
+            }
+            return Math.abs(h) % demoTable.capacity;
+        }
+
+        /* ---------- VISUAL DEMO (Slide 5) ---------- */
+        function initVisualTable(id) {
+            const cont = document.getElementById(id);
+            cont.innerHTML = '';
+            for (let i = 0; i < demoTable.capacity; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'hash-slot';
+                slot.innerHTML = `<div class="index">${i}</div><div>Empty</div>`;
+                cont.appendChild(slot);
+            }
+        }
+
+        function startVisualDemo() {
+            resetVisualDemo();
+            const stepsDiv = document.getElementById('visualSteps');
+            const slots = document.querySelectorAll('#visualDemo .hash-slot');
+            const data = [{key:'cat',val:10},{key:'dog',val:20},{key:'rat',val:30}];
+            let i = 0;
+
+            function animate() {
+                if (i >= data.length) {
+                    stepsDiv.innerHTML = 'Animation complete! Notice how “rat” had to probe.';
+                    return;
+                }
+                const {key,val} = data[i];
+                const start = demoHash(key);
+                let pos = start;
+                stepsDiv.innerHTML = `Step ${i+1}: Inserting "${key}" → hash = ${start}`;
+
+                while (demoTable.keys[pos] !== null) pos = (pos + 1) % demoTable.capacity;
+
+                let probe = start;
+                const highlight = () => {
+                    if (probe !== pos && demoTable.keys[probe] !== null) {
+                        slots[probe].classList.add('collision');
+                        setTimeout(() => {
+                            slots[probe].classList.remove('collision');
+                            probe = (probe + 1) % demoTable.capacity;
+                            if (probe !== pos) highlight();
+                            else finalize();
+                        }, 800);
+                    } else finalize();
+                };
+                const finalize = () => {
+                    demoTable.keys[pos] = key;
+                    demoTable.values[pos] = val;
+                    slots[pos].classList.add('occupied');
+                    slots[pos].innerHTML = `<div class="index">${pos}</div><div>${key}=${val}</div>`;
+                    stepsDiv.innerHTML += (pos===start ? '<br>No collision!' : `<br>Probed to slot ${pos}`);
+                    i++;
+                    setTimeout(animate, 1500);
+                };
+                if (demoTable.keys[start] !== null) highlight();
+                else finalize();
+            }
+            animate();
+        }
+
+        function resetVisualDemo() {
+            demoTable.keys.fill(null);
+            demoTable.values.fill(null);
+            initVisualTable('visualDemo');
+            document.getElementById('visualSteps').innerHTML = 'Click “Start Animation Demo” to watch linear probing.';
+        }
+
+        /* ---------- INTERACTIVE DEMO (Slide 6) ---------- */
+        function initInteractiveTable() { initVisualTable('interactiveTable'); }
+        function updateInteractiveTable() {
+            const slots = document.querySelectorAll('#interactiveTable .hash-slot');
+            slots.forEach((s, i) => {
+                s.className = 'hash-slot';
+                if (demoTable.keys[i] !== null) {
+                    s.classList.add('occupied');
+                    s.innerHTML = `<div class="index">${i}</div><div>${demoTable.keys[i]}=${demoTable.values[i]}</div>`;
+                } else {
+                    s.innerHTML = `<div class="index">${i}</div><div>Empty</div>`;
+                }
+            });
+        }
+
+        function insertDemo() {
+            const key = document.getElementById('demoKey').value.trim();
+            const val = parseInt(document.getElementById('demoValue').value);
+            const log = document.getElementById('interactiveLog');
+            if (!key || isNaN(val)) { log.textContent='Enter key & numeric value'; return; }
+
+            let idx = demoHash(key);
+            const steps = [`Insert "${key}" → hash=${idx}`];
+            while (demoTable.keys[idx] !== null && demoTable.keys[idx] !== key) {
+                steps.push(`Collision @${idx} (“${demoTable.keys[idx]}”), try ${(idx+1)%demoTable.capacity}`);
+                idx = (idx + 1) % demoTable.capacity;
+            }
+            demoTable.keys[idx] = key;
+            demoTable.values[idx] = val;
+            steps.push(`Stored @${idx}`);
+            updateInteractiveTable();
+            log.innerHTML = steps.join('<br>');
+            document.getElementById('demoKey').value = '';
+            document.getElementById('demoValue').value = '';
+        }
+
+        function searchDemo() {
+            const key = document.getElementById('demoKey').value.trim();
+            const log = document.getElementById('interactiveLog');
+            if (!key) { log.textContent='Enter a key to search'; return; }
+
+            let idx = demoHash(key);
+            const steps = [`Search "${key}" → hash=${idx}`];
+            while (demoTable.keys[idx] !== null) {
+                if (demoTable.keys[idx] === key) {
+                    steps.push(`Found @${idx} = ${demoTable.values[idx]}`);
+                    log.innerHTML = steps.join('<br>');
+                    highlightSlot(idx, '#interactiveTable');
+                    return;
+                }
+                steps.push(`Check ${idx} (“${demoTable.keys[idx]}”), try ${(idx+1)%demoTable.capacity}`);
+                idx = (idx + 1) % demoTable.capacity;
+            }
+            steps.push(`"${key}" not found`);
+            log.innerHTML = steps.join('<br>');
+        }
+
+        function clearDemo() {
+            demoTable.keys.fill(null);
+            demoTable.values.fill(null);
+            updateInteractiveTable();
+            document.getElementById('interactiveLog').textContent = 'Table cleared!';
+        }
+
+        function highlightSlot(idx, container) {
+            const slot = document.querySelectorAll(`${container} .hash-slot`)[idx];
+            slot.classList.add('highlight-animation');
+            setTimeout(() => slot.classList.remove('highlight-animation'), 2000);
+        }
+
+        /* ---------- INITIALISATION ---------- */
+        initVisualTable('visualDemo');
+        initInteractiveTable();
+        updateProgress();
+        showSlide(0);
+    </script>
+</body>
+</html>
