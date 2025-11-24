@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heaps & HeapSort - Classroom Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --accent-green: #00ff88;
+            --accent-blue: #4488ff;
+            --accent-orange: #ff6b35;
+            --text-light: #e0e0e0;
+            --text-dim: #999999;
+            --surface-dark: #1a1a1a;
+            --surface-darker: #121212;
+            --border-subtle: #333333;
+            --heap-node: #2d4a3e;
+            --heap-highlight: #4ade80;
+            --warning: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--surface-darker) 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 2px;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: var(--surface-dark);
+            border: 2px solid var(--border-subtle);
+            color: var(--text-light);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: var(--accent-green);
+            color: var(--primary-dark);
+            border-color: var(--accent-green);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--accent-green);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .content-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: var(--surface-darker);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 2rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            margin: 1rem 0;
+            position: relative;
+            white-space: pre;
+            letter-spacing: 0.3px;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: -12px;
+            right: 4rem;
+            background: var(--accent-orange);
+            color: var(--primary-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--accent-green);
+            color: var(--primary-dark);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-blue);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--warning);
+            animation: copySuccess 0.5s ease;
+        }
+
+        @keyframes copySuccess {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .keyword { color: var(--accent-blue); }
+        .string { color: var(--accent-green); }
+        .comment { color: var(--text-dim); font-style: italic; }
+        .number { color: var(--accent-orange); }
+        .type { color: #ff79c6; }
+
+        .heap-visualization {
+            background: var(--surface-darker);
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .heap-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .heap-level {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .heap-node {
+            width: 50px;
+            height: 50px;
+            background: var(--heap-node);
+            border: 2px solid var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .heap-node:hover {
+            background: var(--heap-highlight);
+            transform: scale(1.1);
+        }
+
+        .heap-node.highlight {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            color: var(--primary-dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+        }
+
+        .array-view {
+            background: var(--surface-darker);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .array-elements {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .array-element {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-subtle);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            min-width: 40px;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .array-element.highlight {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .input-field {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-light);
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            width: 100px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .definition-box {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(68, 136, 255, 0.1));
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .definition-box::before {
+            content: "DEFINITION";
+            position: absolute;
+            top: -12px;
+            left: 2rem;
+            background: var(--accent-green);
+            color: var(--primary-dark);
+            padding: 0.25rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .interactive-demo {
+            background: var(--surface-dark);
+            border: 2px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .demo-title {
+            color: var(--accent-blue);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .single-column {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .array-elements {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">HEAPS & HEAPSORT</h1>
+            <p class="subtitle">Classroom Edition - Simplified for Teaching</p>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
+            <button class="nav-btn" onclick="showSection('insertion')">Insertion</button>
+            <button class="nav-btn" onclick="showSection('removal')">Removal</button>
+            <button class="nav-btn" onclick="showSection('heapsort')">HeapSort</button>
+        </div>
+
+        <!-- Introduction Section -->
+        <div id="intro" class="section active">
+            <h2 class="section-title">Introduction to Heaps</h2>
+            
+            <div class="definition-box">
+                <h3>What is a Heap?</h3>
+                <p>A <strong>heap</strong> is a specialized tree-based data structure that satisfies the heap property. It's a complete binary tree where each parent node is either greater than or equal to (max-heap) or less than or equal to (min-heap) its children.</p><br>
+                <p>A heap is a binary tree with these characteristics:</p><br>
+                <li>It’s complete. This means it’s completely filled in, reading from left to right across each row,
+although the last row need not be full.</li>
+                <li>It’s (usually) implemented as an array.</li>
+                <li>Each node in a heap satisfies the heap condition, which states that every nodes key is larger
+than (or equal to) the keys of its children.</li>
+                <li>• A priority queue based on such a heap is a descending-priority queue.</li>
+                
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3 class="card-title">Heap Properties</h3>
+                    <ul>
+                        <li><strong>Complete Binary Tree:</strong> All levels are completely filled except possibly the last level</li>
+                        <li><strong>Heap Property:</strong> Parent-child relationship constraint</li>
+                        <li><strong>Array Implementation:</strong> Efficiently stored in arrays</li>
+                    </ul>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Types of Heaps</h3>
+                    <ul>
+                        <li><strong>Max-Heap:</strong> Parent ≥ Children</li>
+                        <li><strong>Min-Heap:</strong> Parent ≤ Children</li>
+                    </ul>
+
+                    <div class="array-view">
+                        <h4>Array Index Relationships:</h4>
+                        <p style="font-family: 'Fira Code', monospace;">
+                            Parent(i) = (i-1)/2<br>
+                            Left Child(i) = 2*i + 1<br>
+                            Right Child(i) = 2*i + 2<br><br>
+                            Let's take node at index 1:<br>
+                            <li>Parent: (1-1)/2 = 0</li>
+                            <li>Left child: 2*1+1 = 3</li>
+                            <li>Right child: 2*1+2 = 4</li><br>
+                            For node at index 2:<br>
+                            <link>Parent: (2-1)/2 = 0 (integer division)</link>
+                            <li>Left child: 2*2+1 = 5</li>
+                            <li>Right child: 2*2+2 = 6</li>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card single-column">
+                <h3 class="card-title">Simple MaxHeap Implementation</h3>
+                <div class="code-block" data-lang="java">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="keyword">public class</span> <span class="type">MaxHeap</span> {
+    <span class="keyword">private</span> <span class="type">int</span>[] heap;
+    <span class="keyword">private</span> <span class="type">int</span> size;
+    
+    <span class="keyword">public</span> <span class="type">MaxHeap</span>(<span class="type">int</span> capacity) {
+        heap = <span class="keyword">new</span> <span class="type">int</span>[capacity];
+        size = <span class="number">0</span>;
+    }
+    
+    <span class="comment">// Helper methods</span>
+    <span class="keyword">private</span> <span class="type">int</span> parent(<span class="type">int</span> i) { <span class="keyword">return</span> (i-<span class="number">1</span>)/<span class="number">2</span>; }
+    <span class="keyword">private</span> <span class="type">int</span> left(<span class="type">int</span> i) { <span class="keyword">return</span> <span class="number">2</span>*i+<span class="number">1</span>; }
+    <span class="keyword">private</span> <span class="type">int</span> right(<span class="type">int</span> i) { <span class="keyword">return</span> <span class="number">2</span>*i+<span class="number">2</span>; }
+    
+    <span class="keyword">public</span> <span class="type">void</span> insert(<span class="type">int</span> value) {
+        <span class="keyword">if</span> (size == heap.length) <span class="keyword">throw new</span> RuntimeException(<span class="string">"Heap full"</span>);
+        
+        heap[size] = value;
+        heapifyUp(size);
+        size++;
+    }
+    
+    <span class="keyword">private</span> <span class="type">void</span> heapifyUp(<span class="type">int</span> index) {
+        <span class="keyword">while</span> (index > <span class="number">0</span> && heap[parent(index)] < heap[index]) {
+            swap(index, parent(index));
+            index = parent(index);
+        }
+    }
+    
+    <span class="keyword">public</span> <span class="type">int</span> extractMax() {
+        <span class="keyword">if</span> (size == <span class="number">0</span>) <span class="keyword">throw new</span> RuntimeException(<span class="string">"Heap empty"</span>);
+        
+        <span class="type">int</span> max = heap[<span class="number">0</span>];
+        heap[<span class="number">0</span>] = heap[size-<span class="number">1</span>];
+        size--;
+        heapifyDown(<span class="number">0</span>);
+        <span class="keyword">return</span> max;
+    }
+    
+    <span class="keyword">private</span> <span class="type">void</span> heapifyDown(<span class="type">int</span> index) {
+        <span class="keyword">while</span> (left(index) < size) {
+            <span class="type">int</span> maxChild = left(index);
+            <span class="keyword">if</span> (right(index) < size && heap[right(index)] > heap[left(index)]) {
+                maxChild = right(index);
+            }
+            
+            <span class="keyword">if</span> (heap[index] >= heap[maxChild]) <span class="keyword">break</span>;
+            
+            swap(index, maxChild);
+            index = maxChild;
+        }
+    }
+    
+    <span class="keyword">private</span> <span class="type">void</span> swap(<span class="type">int</span> i, <span class="type">int</span> j) {
+        <span class="type">int</span> temp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = temp;
+    }
+    
+    <span class="keyword">public</span> <span class="type">void</span> print() {
+        System.out.print(<span class="string">"Heap: "</span>);
+        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i < size; i++) {
+            System.out.print(heap[i] + <span class="string">" "</span>);
+        }
+        System.out.println();
+    }
+    
+    <span class="keyword">public static</span> <span class="type">void</span> main(<span class="type">String</span>[] args) {
+        <span class="type">MaxHeap</span> heap = <span class="keyword">new</span> <span class="type">MaxHeap</span>(<span class="number">10</span>);
+        
+        <span class="comment">// Insert some values</span>
+        <span class="type">int</span>[] values = {<span class="number">90</span>, <span class="number">85</span>, <span class="number">75</span>, <span class="number">60</span>, <span class="number">70</span>, <span class="number">45</span>, <span class="number">50</span>};
+        <span class="keyword">for</span> (<span class="type">int</span> value : values) {
+            heap.insert(value);
+        }
+        
+        heap.print();
+        
+        <span class="comment">// Extract max values</span>
+        System.out.println(<span class="string">"Extracting: "</span> + heap.extractMax());
+        heap.print();
+    }
+}</div>
+            </div>
+        </div>
+
+        <!-- Insertion Section -->
+        <div id="insertion" class="section">
+            <h2 class="section-title">Heap Insertion</h2>
+            
+            <div class="definition-box">
+                <h3>Insertion Process</h3>
+                <p>Insert new element at the end of the heap and then "bubble up" to maintain heap property.</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3 class="card-title">Insertion Steps</h3>
+                    <ol>
+                        <li>Add element at the next available position</li>
+                        <li>Compare with parent</li>
+                        <li>If heap property violated, swap with parent</li>
+                        <li>Repeat until heap property satisfied</li>
+                    </ol>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Time Complexity</h3>
+                    <p><strong>O(log n)</strong> - height of the tree</p>
+                    <p>In worst case, bubble up from leaf to root</p>
+                </div>
+            </div>
+
+            <div class="content-card single-column">
+                <h3 class="card-title">Simple Insertion Demo</h3>
+                <div class="code-block" data-lang="java">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="keyword">public class</span> <span class="type">InsertionDemo</span> {
+    
+    <span class="keyword">public static</span> <span class="type">void</span> main(<span class="type">String</span>[] args) {
+        <span class="type">MaxHeap</span> heap = <span class="keyword">new</span> <span class="type">MaxHeap</span>(<span class="number">10</span>);
+        
+        <span class="comment">// Build initial heap</span>
+        <span class="type">int</span>[] initial = {<span class="number">90</span>, <span class="number">85</span>, <span class="number">75</span>, <span class="number">60</span>, <span class="number">70</span>, <span class="number">45</span>, <span class="number">50</span>};
+        <span class="keyword">for</span> (<span class="type">int</span> value : initial) {
+            heap.insert(value);
+        }
+        
+        System.out.println(<span class="string">"Initial heap:"</span>);
+        heap.print();
+        
+        <span class="comment">// Insert new value</span>
+        System.out.println(<span class="string">"\nInserting 95..."</span>);
+        heap.insert(<span class="number">95</span>);
+        heap.print();
+        
+        System.out.println(<span class="string">"\nInserting 80..."</span>);
+        heap.insert(<span class="number">80</span>);
+        heap.print();
+    }
+    
+    <span class="keyword">static class</span> <span class="type">MaxHeap</span> {
+        <span class="keyword">private</span> <span class="type">int</span>[] heap;
+        <span class="keyword">private</span> <span class="type">int</span> size;
+        
+        <span class="keyword">public</span> <span class="type">MaxHeap</span>(<span class="type">int</span> capacity) {
+            heap = <span class="keyword">new</span> <span class="type">int</span>[capacity];
+            size = <span class="number">0</span>;
+        }
+        
+        <span class="keyword">public</span> <span class="type">void</span> insert(<span class="type">int</span> value) {
+            <span class="keyword">if</span> (size == heap.length) <span class="keyword">throw new</span> RuntimeException(<span class="string">"Heap full"</span>);
+            
+            heap[size] = value;
+            heapifyUp(size);
+            size++;
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> heapifyUp(<span class="type">int</span> index) {
+            <span class="keyword">while</span> (index > <span class="number">0</span>) {
+                <span class="type">int</span> parent = (index-<span class="number">1</span>)/<span class="number">2</span>;
+                <span class="keyword">if</span> (heap[parent] >= heap[index]) <span class="keyword">break</span>;
+                
+                swap(parent, index);
+                index = parent;
+            }
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> swap(<span class="type">int</span> i, <span class="type">int</span> j) {
+            <span class="type">int</span> temp = heap[i];
+            heap[i] = heap[j];
+            heap[j] = temp;
+        }
+        
+        <span class="keyword">public</span> <span class="type">void</span> print() {
+            System.out.print(<span class="string">"Heap: "</span>);
+            <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i < size; i++) {
+                System.out.print(heap[i] + <span class="string">" "</span>);
+            }
+            System.out.println();
+        }
+    }
+}</div>
+            </div>
+        </div>
+
+        <!-- Removal Section -->
+        <div id="removal" class="section">
+            <h2 class="section-title">Heap Removal</h2>
+            
+            <div class="definition-box">
+                <h3>Removal Process</h3>
+                <p>Remove the root element, replace it with the last element, and then "heapify down" to restore heap property.</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3 class="card-title">Removal Steps</h3>
+                    <ol>
+                        <li>Store the root value</li>
+                        <li>Move last element to root position</li>
+                        <li>Decrease heap size</li>
+                        <li>Heapify down from root</li>
+                    </ol>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Heapify Down</h3>
+                    <ol>
+                        <li>Compare parent with both children</li>
+                        <li>Find the largest among the three</li>
+                        <li>If parent is not largest, swap with larger child</li>
+                        <li>Continue until heap property satisfied</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="content-card single-column">
+                <h3 class="card-title">Simple Removal Demo</h3>
+                <div class="code-block" data-lang="java">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="keyword">public class</span> <span class="type">RemovalDemo</span> {
+    
+    <span class="keyword">public static</span> <span class="type">void</span> main(<span class="type">String</span>[] args) {
+        <span class="type">MaxHeap</span> heap = <span class="keyword">new</span> <span class="type">MaxHeap</span>(<span class="number">10</span>);
+        
+        <span class="comment">// Build initial heap</span>
+        <span class="type">int</span>[] initial = {<span class="number">95</span>, <span class="number">85</span>, <span class="number">90</span>, <span class="number">60</span>, <span class="number">70</span>, <span class="number">45</span>, <span class="number">50</span>, <span class="number">75</span>};
+        <span class="keyword">for</span> (<span class="type">int</span> value : initial) {
+            heap.insert(value);
+        }
+        
+        System.out.println(<span class="string">"Initial heap:"</span>);
+        heap.print();
+        
+        <span class="comment">// Extract max values</span>
+        System.out.println(<span class="string">"\nExtracting max: "</span> + heap.extractMax());
+        heap.print();
+        
+        System.out.println(<span class="string">"\nExtracting max: "</span> + heap.extractMax());
+        heap.print();
+        
+        System.out.println(<span class="string">"\nExtracting max: "</span> + heap.extractMax());
+        heap.print();
+    }
+    
+    <span class="keyword">static class</span> <span class="type">MaxHeap</span> {
+        <span class="keyword">private</span> <span class="type">int</span>[] heap;
+        <span class="keyword">private</span> <span class="type">int</span> size;
+        
+        <span class="keyword">public</span> <span class="type">MaxHeap</span>(<span class="type">int</span> capacity) {
+            heap = <span class="keyword">new</span> <span class="type">int</span>[capacity];
+            size = <span class="number">0</span>;
+        }
+        
+        <span class="keyword">public</span> <span class="type">void</span> insert(<span class="type">int</span> value) {
+            <span class="keyword">if</span> (size == heap.length) <span class="keyword">throw new</span> RuntimeException(<span class="string">"Heap full"</span>);
+            
+            heap[size] = value;
+            heapifyUp(size);
+            size++;
+        }
+        
+        <span class="keyword">public</span> <span class="type">int</span> extractMax() {
+            <span class="keyword">if</span> (size == <span class="number">0</span>) <span class="keyword">throw new</span> RuntimeException(<span class="string">"Heap empty"</span>);
+            
+            <span class="type">int</span> max = heap[<span class="number">0</span>];
+            heap[<span class="number">0</span>] = heap[size-<span class="number">1</span>];
+            size--;
+            heapifyDown(<span class="number">0</span>);
+            <span class="keyword">return</span> max;
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> heapifyUp(<span class="type">int</span> index) {
+            <span class="keyword">while</span> (index > <span class="number">0</span>) {
+                <span class="type">int</span> parent = (index-<span class="number">1</span>)/<span class="number">2</span>;
+                <span class="keyword">if</span> (heap[parent] >= heap[index]) <span class="keyword">break</span>;
+                
+                swap(parent, index);
+                index = parent;
+            }
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> heapifyDown(<span class="type">int</span> index) {
+            <span class="keyword">while</span> (<span class="keyword">true</span>) {
+                <span class="type">int</span> left = <span class="number">2</span>*index+<span class="number">1</span>;
+                <span class="type">int</span> right = <span class="number">2</span>*index+<span class="number">2</span>;
+                <span class="type">int</span> largest = index;
+                
+                <span class="keyword">if</span> (left < size && heap[left] > heap[largest]) {
+                    largest = left;
+                }
+                
+                <span class="keyword">if</span> (right < size && heap[right] > heap[largest]) {
+                    largest = right;
+                }
+                
+                <span class="keyword">if</span> (largest == index) <span class="keyword">break</span>;
+                
+                swap(index, largest);
+                index = largest;
+            }
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> swap(<span class="type">int</span> i, <span class="type">int</span> j) {
+            <span class="type">int</span> temp = heap[i];
+            heap[i] = heap[j];
+            heap[j] = temp;
+        }
+        
+        <span class="keyword">public</span> <span class="type">void</span> print() {
+            System.out.print(<span class="string">"Heap: "</span>);
+            <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i < size; i++) {
+                System.out.print(heap[i] + <span class="string">" "</span>);
+            }
+            System.out.println();
+        }
+    }
+}</div>
+            </div>
+        </div>
+
+        <!-- HeapSort Section -->
+        <div id="heapsort" class="section">
+            <h2 class="section-title">HeapSort Algorithm</h2>
+            
+            <div class="definition-box">
+                <h3>HeapSort Overview</h3>
+                <p>HeapSort is a comparison-based sorting algorithm that uses a binary heap data structure. It divides the input into sorted and unsorted regions, and iteratively shrinks the unsorted region by extracting the largest element.</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3 class="card-title">HeapSort Steps</h3>
+                    <ol>
+                        <li><strong>Build Max Heap:</strong> Convert array into max-heap</li>
+                        <li><strong>Extract Max:</strong> Move root to end of array</li>
+                        <li><strong>Heapify:</strong> Restore heap property</li>
+                        <li><strong>Repeat:</strong> Continue until heap size is 1</li>
+                    </ol>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Key Characteristics</h3>
+                    <ul>
+                        <li><strong>In-place:</strong> Sorts with O(1) extra space</li>
+                        <li><strong>Not stable:</strong> Equal elements may change order</li>
+                        <li><strong>Consistent:</strong> Always O(n log n) time</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card single-column">
+                <h3 class="card-title">Simple HeapSort Implementation</h3>
+                <div class="code-block" data-lang="java">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="keyword">public class</span> <span class="type">HeapSort</span> {
+    
+    <span class="keyword">public static</span> <span class="type">void</span> main(<span class="type">String</span>[] args) {
+        <span class="type">int</span>[] arr = {<span class="number">64</span>, <span class="number">34</span>, <span class="number">25</span>, <span class="number">12</span>, <span class="number">22</span>, <span class="number">11</span>, <span class="number">90</span>};
+        
+        System.out.println(<span class="string">"Original array:"</span>);
+        printArray(arr);
+        
+        heapSort(arr);
+        
+        System.out.println(<span class="string">"\nSorted array:"</span>);
+        printArray(arr);
+    }
+    
+    <span class="keyword">public static</span> <span class="type">void</span> heapSort(<span class="type">int</span>[] arr) {
+        <span class="type">int</span> n = arr.length;
+        
+        <span class="comment">// Build max heap</span>
+        <span class="keyword">for</span> (<span class="type">int</span> i = n/<span class="number">2</span>-<span class="number">1</span>; i >= <span class="number">0</span>; i--) {
+            heapify(arr, n, i);
+        }
+        
+        <span class="comment">// Extract elements one by one</span>
+        <span class="keyword">for</span> (<span class="type">int</span> i = n-<span class="number">1</span>; i > <span class="number">0</span>; i--) {
+            <span class="comment">// Move current root to end</span>
+            swap(arr, <span class="number">0</span>, i);
+            
+            <span class="comment">// Heapify the reduced heap</span>
+            heapify(arr, i, <span class="number">0</span>);
+        }
+    }
+    
+    <span class="keyword">private static</span> <span class="type">void</span> heapify(<span class="type">int</span>[] arr, <span class="type">int</span> n, <span class="type">int</span> i) {
+        <span class="type">int</span> largest = i;
+        <span class="type">int</span> left = <span class="number">2</span>*i+<span class="number">1</span>;
+        <span class="type">int</span> right = <span class="number">2</span>*i+<span class="number">2</span>;
+        
+        <span class="keyword">if</span> (left < n && arr[left] > arr[largest]) {
+            largest = left;
+        }
+        
+        <span class="keyword">if</span> (right < n && arr[right] > arr[largest]) {
+            largest = right;
+        }
+        
+        <span class="keyword">if</span> (largest != i) {
+            swap(arr, i, largest);
+            heapify(arr, n, largest);
+        }
+    }
+    
+    <span class="keyword">private static</span> <span class="type">void</span> swap(<span class="type">int</span>[] arr, <span class="type">int</span> i, <span class="type">int</span> j) {
+        <span class="type">int</span> temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    
+    <span class="keyword">private static</span> <span class="type">void</span> printArray(<span class="type">int</span>[] arr) {
+        <span class="keyword">for</span> (<span class="type">int</span> value : arr) {
+            System.out.print(value + <span class="string">" "</span>);
+        }
+        System.out.println();
+    }
+}</div>
+            </div>
+
+            <div class="content-card single-column">
+                <h3 class="card-title">Complete Classroom Example</h3>
+                <div class="code-block" data-lang="java">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="keyword">public class</span> <span class="type">HeapClassroom</span> {
+    
+    <span class="keyword">public static</span> <span class="type">void</span> main(<span class="type">String</span>[] args) {
+        System.out.println(<span class="string">"=== HEAP CLASSROOM DEMO ===\n"</span>);
+        
+        <span class="comment">// 1. Heap basics</span>
+        System.out.println(<span class="string">"1. Heap Basics:"</span>);
+        <span class="type">SimpleHeap</span> heap = <span class="keyword">new</span> <span class="type">SimpleHeap</span>(<span class="number">10</span>);
+        heap.insert(<span class="number">10</span>);
+        heap.insert(<span class="number">30</span>);
+        heap.insert(<span class="number">20</span>);
+        heap.insert(<span class="number">40</span>);
+        heap.print();
+        
+        <span class="comment">// 2. Insertion demo</span>
+        System.out.println(<span class="string">"\n2. Insertion Demo:"</span>);
+        heap.insert(<span class="number">50</span>);
+        heap.print();
+        
+        <span class="comment">// 3. Removal demo</span>
+        System.out.println(<span class="string">"\n3. Removal Demo:"</span>);
+        System.out.println(<span class="string">"Removed: "</span> + heap.extractMax());
+        heap.print();
+        
+        <span class="comment">// 4. HeapSort demo</span>
+        System.out.println(<span class="string">"\n4. HeapSort Demo:"</span>);
+        <span class="type">int</span>[] arr = {<span class="number">5</span>, <span class="number">2</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">3</span>};
+        System.out.print(<span class="string">"Before: "</span>);
+        printArray(arr);
+        
+        heapSort(arr);
+        System.out.print(<span class="string">"After:  "</span>);
+        printArray(arr);
+    }
+    
+    <span class="keyword">static class</span> <span class="type">SimpleHeap</span> {
+        <span class="keyword">private</span> <span class="type">int</span>[] heap;
+        <span class="keyword">private</span> <span class="type">int</span> size;
+        
+        <span class="keyword">public</span> <span class="type">SimpleHeap</span>(<span class="type">int</span> capacity) {
+            heap = <span class="keyword">new</span> <span class="type">int</span>[capacity];
+            size = <span class="number">0</span>;
+        }
+        
+        <span class="keyword">public</span> <span class="type">void</span> insert(<span class="type">int</span> value) {
+            heap[size] = value;
+            heapifyUp(size);
+            size++;
+        }
+        
+        <span class="keyword">public</span> <span class="type">int</span> extractMax() {
+            <span class="type">int</span> max = heap[<span class="number">0</span>];
+            heap[<span class="number">0</span>] = heap[size-<span class="number">1</span>];
+            size--;
+            heapifyDown(<span class="number">0</span>);
+            <span class="keyword">return</span> max;
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> heapifyUp(<span class="type">int</span> index) {
+            <span class="keyword">while</span> (index > <span class="number">0</span>) {
+                <span class="type">int</span> parent = (index-<span class="number">1</span>)/<span class="number">2</span>;
+                <span class="keyword">if</span> (heap[parent] >= heap[index]) <span class="keyword">break</span>;
+                swap(parent, index);
+                index = parent;
+            }
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> heapifyDown(<span class="type">int</span> index) {
+            <span class="keyword">while</span> (<span class="keyword">true</span>) {
+                <span class="type">int</span> left = <span class="number">2</span>*index+<span class="number">1</span>;
+                <span class="type">int</span> right = <span class="number">2</span>*index+<span class="number">2</span>;
+                <span class="type">int</span> largest = index;
+                
+                <span class="keyword">if</span> (left < size && heap[left] > heap[largest]) largest = left;
+                <span class="keyword">if</span> (right < size && heap[right] > heap[largest]) largest = right;
+                <span class="keyword">if</span> (largest == index) <span class="keyword">break</span>;
+                
+                swap(index, largest);
+                index = largest;
+            }
+        }
+        
+        <span class="keyword">private</span> <span class="type">void</span> swap(<span class="type">int</span> i, <span class="type">int</span> j) {
+            <span class="type">int</span> temp = heap[i];
+            heap[i] = heap[j];
+            heap[j] = temp;
+        }
+        
+        <span class="keyword">public</span> <span class="type">void</span> print() {
+            System.out.print(<span class="string">"Heap: "</span>);
+            <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i < size; i++) {
+                System.out.print(heap[i] + <span class="string">" "</span>);
+            }
+            System.out.println();
+        }
+    }
+    
+    <span class="keyword">public static</span> <span class="type">void</span> heapSort(<span class="type">int</span>[] arr) {
+        <span class="type">int</span> n = arr.length;
+        
+        <span class="comment">// Build max heap</span>
+        <span class="keyword">for</span> (<span class="type">int</span> i = n/<span class="number">2</span>-<span class="number">1</span>; i >= <span class="number">0</span>; i--) {
+            heapify(arr, n, i);
+        }
+        
+        <span class="comment">// Extract elements</span>
+        <span class="keyword">for</span> (<span class="type">int</span> i = n-<span class="number">1</span>; i > <span class="number">0</span>; i--) {
+            swap(arr, <span class="number">0</span>, i);
+            heapify(arr, i, <span class="number">0</span>);
+        }
+    }
+    
+    <span class="keyword">private static</span> <span class="type">void</span> heapify(<span class="type">int</span>[] arr, <span class="type">int</span> n, <span class="type">int</span> i) {
+        <span class="type">int</span> largest = i;
+        <span class="type">int</span> left = <span class="number">2</span>*i+<span class="number">1</span>;
+        <span class="type">int</span> right = <span class="number">2</span>*i+<span class="number">2</span>;
+        
+        <span class="keyword">if</span> (left < n && arr[left] > arr[largest]) largest = left;
+        <span class="keyword">if</span> (right < n && arr[right] > arr[largest]) largest = right;
+        <span class="keyword">if</span> (largest != i) {
+            swap(arr, i, largest);
+            heapify(arr, n, largest);
+        }
+    }
+    
+    <span class="keyword">private static</span> <span class="type">void</span> swap(<span class="type">int</span>[] arr, <span class="type">int</span> i, <span class="type">int</span> j) {
+        <span class="type">int</span> temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    
+    <span class="keyword">private static</span> <span class="type">void</span> printArray(<span class="type">int</span>[] arr) {
+        <span class="keyword">for</span> (<span class="type">int</span> value : arr) {
+            System.out.print(value + <span class="string">" "</span>);
+        }
+        System.out.println();
+    }
+}</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const codeText = codeBlock.innerText.replace('Copy', '').trim();
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = codeText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
