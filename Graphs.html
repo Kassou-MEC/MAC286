@@ -1,0 +1,3537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Algorithms in Java</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f0f8ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a8d0e6;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .presentation-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .sidebar {
+            flex: 1;
+            min-width: 280px;
+            background: rgba(15, 32, 39, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+        
+        .content {
+            flex: 2;
+            min-width: 300px;
+            background: rgba(15, 32, 39, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+        
+        .topics-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .topic-item {
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            background: rgba(32, 58, 67, 0.6);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .topic-item:hover {
+            background: rgba(32, 58, 67, 0.9);
+            transform: translateX(5px);
+        }
+        
+        .topic-item.active {
+            background: rgba(32, 58, 67, 0.9);
+            border-left: 4px solid #4facfe;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2);
+        }
+        
+        .topic-icon {
+            color: #4facfe;
+            font-size: 1.2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            color: #4facfe;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(79, 172, 254, 0.3);
+        }
+        
+        .definition {
+            background: rgba(32, 58, 67, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+        
+        .example-section {
+            background: rgba(32, 58, 67, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .code-block {
+            background: #0a1929;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+        
+        .code-keyword {
+            color: #569cd6;
+        }
+        
+        .code-comment {
+            color: #6a9955;
+        }
+        
+        .code-string {
+            color: #ce9178;
+        }
+        
+        .code-class {
+            color: #4ec9b0;
+        }
+        
+        .visualization {
+            background: rgba(32, 58, 67, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .graph-canvas {
+            width: 100%;
+            height: 300px;
+            background: #0a1929;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border: none;
+            border-radius: 8px;
+            color: #0f2027;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(79, 172, 254, 0.2);
+            color: #f0f8ff;
+        }
+        
+        .practice-section, .quiz-section {
+            background: rgba(32, 58, 67, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .exercise {
+            background: rgba(15, 32, 39, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .question {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .options {
+            margin: 15px 0;
+        }
+        
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(15, 32, 39, 0.8);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option:hover {
+            background: rgba(32, 58, 67, 0.9);
+        }
+        
+        .option.selected {
+            background: rgba(79, 172, 254, 0.3);
+            border: 1px solid #4facfe;
+        }
+        
+        .option.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4caf50;
+        }
+        
+        .option.incorrect {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid #f44336;
+        }
+        
+        .quiz-result {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: bold;
+        }
+        
+        .quiz-result.show {
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #a8d0e6;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(79, 172, 254, 0.2);
+        }
+        
+        .knight-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px solid #4facfe;
+        }
+        
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .cell.light {
+            background-color: #f0d9b5;
+            color: #000;
+        }
+        
+        .cell.dark {
+            background-color: #b58863;
+            color: #fff;
+        }
+        
+        .cell.active {
+            background-color: rgba(79, 172, 254, 0.7);
+        }
+        
+        .cell.path {
+            background-color: rgba(76, 175, 80, 0.7);
+        }
+        
+        .cell.start {
+            background-color: rgba(255, 193, 7, 0.8);
+        }
+        
+        .cell.end {
+            background-color: rgba(244, 67, 54, 0.8);
+        }
+        
+        .knight {
+            color: #d32f2f;
+            font-size: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .presentation-area {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .knight-board {
+                width: 300px;
+                height: 300px;
+            }
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(79, 172, 254, 0.3);
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #4facfe;
+            color: #4facfe;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .algorithm-step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(15, 32, 39, 0.6);
+            border-radius: 8px;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: #4facfe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            color: #0f2027;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(32, 58, 67, 0.6);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Graph Algorithms in Java</h1>
+            <p class="subtitle">An interactive presentation covering Graphs, Searches, Directed & Weighted Graphs, Shortest-Path Problem, and The Knight's Tour. Includes definitions, examples, practice exercises, and quizzes.</p>
+        </header>
+        
+        <div class="presentation-area">
+            <div class="sidebar">
+                <h2 class="section-title">Topics</h2>
+                <ul class="topics-list">
+                    <li class="topic-item active" data-topic="graphs">
+                        <i class="topic-icon fas fa-project-diagram"></i>
+                        <span>Graphs Fundamentals</span>
+                    </li>
+                    <li class="topic-item" data-topic="searches">
+                        <i class="topic-icon fas fa-search"></i>
+                        <span>Graph Searches (BFS & DFS)</span>
+                    </li>
+                    <li class="topic-item" data-topic="directed">
+                        <i class="topic-icon fas fa-arrow-right"></i>
+                        <span>Directed Graphs</span>
+                    </li>
+                    <li class="topic-item" data-topic="weighted">
+                        <i class="topic-icon fas fa-weight-hanging"></i>
+                        <span>Weighted Graphs</span>
+                    </li>
+                    <li class="topic-item" data-topic="shortest">
+                        <i class="topic-icon fas fa-route"></i>
+                        <span>Shortest-Path Problem</span>
+                    </li>
+                    <li class="topic-item" data-topic="knight">
+                        <i class="topic-icon fas fa-chess-knight"></i>
+                        <span>The Knight's Tour</span>
+                    </li>
+                </ul>
+                
+                <div class="visualization" style="margin-top: 30px;">
+                    <h3>Quick Stats</h3>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress-bar"></div>
+                    </div>
+                    <p>Presentation Progress: <span id="progress-text">0%</span></p>
+                    <p>Topics Completed: <span id="topics-completed">1</span>/6</p>
+                    <button class="btn" id="reset-progress" style="margin-top: 15px; width: 100%;">
+                        <i class="fas fa-redo"></i> Reset Progress
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="tab-container">
+                    <div class="tab active" data-tab="definition">Definition</div>
+                    <div class="tab" data-tab="example">Example</div>
+                    <div class="tab" data-tab="practice">Practice</div>
+                    <div class="tab" data-tab="quiz">Quiz</div>
+                </div>
+                
+                <!-- Graphs Fundamentals Content -->
+                <div id="graphs" class="topic-content">
+                    <!-- Definition Tab -->
+                    <div class="tab-content active" data-tab-content="definition">
+                        <h2 class="section-title">Graphs Fundamentals</h2>
+                        <div class="definition">
+                            <p>A <strong>graph</strong> is a non-linear data structure consisting of nodes (vertices) and edges that connect these vertices. Graphs are used to represent networks such as social connections, computer networks, navigation systems, and more.</p>
+                            <br>
+                            <p><strong>Key Components:</strong></p>
+                            <div class="algorithm-step">
+                                <div class="step-number">1</div>
+                                <div><strong>Vertex (Node):</strong> A fundamental unit of a graph that can have a name (key) and additional information (payload).</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">2</div>
+                                <div><strong>Edge (Link):</strong> A connection between two vertices. Can be directed or undirected.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">3</div>
+                                <div><strong>Weight:</strong> A numerical value assigned to an edge (for weighted graphs).</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">4</div>
+                                <div><strong>Path:</strong> A sequence of vertices connected by edges.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">5</div>
+                                <div><strong>Cycle:</strong> A path that starts and ends at the same vertex.</div>
+                            </div>
+                        </div>
+                        <div class="visualization">
+                            <h3>Graph Visualization</h3>
+                            <div class="graph-canvas" id="graph-visualization">
+                                <!-- Graph will be drawn here with JavaScript -->
+                            </div>
+                            <div class="controls">
+                                <button class="btn" id="generate-graph">
+                                    <i class="fas fa-sync-alt"></i> Generate New Graph
+                                </button>
+                                <button class="btn btn-secondary" id="add-node">
+                                    <i class="fas fa-plus-circle"></i> Add Node
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Tab -->
+                    <div class="tab-content" data-tab-content="example">
+                        <h2 class="section-title">Graph Implementation in Java</h2>
+                        <div class="example-section">
+                            <p>Here's a basic implementation of a Graph in Java using an adjacency list:</p>
+                            <div class="code-block">
+                                <pre><code><span class="code-keyword">import</span> java.util.*;
+
+<span class="code-keyword">public class</span> <span class="code-class">Graph</span> {
+    <span class="code-keyword">private</span> Map&lt;Integer, List&lt;Integer&gt;&gt; adjList;
+    
+    <span class="code-keyword">public</span> <span class="code-class">Graph</span>() {
+        adjList = <span class="code-keyword">new</span> HashMap<>();
+    }
+    
+    <span class="code-comment">// Add a vertex to the graph</span>
+    <span class="code-keyword">public void</span> <span class="code-class">addVertex</span>(<span class="code-keyword">int</span> vertex) {
+        adjList.putIfAbsent(vertex, <span class="code-keyword">new</span> ArrayList<>());
+    }
+    
+    <span class="code-comment">// Add an edge between two vertices</span>
+    <span class="code-keyword">public void</span> <span class="code-class">addEdge</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+        adjList.get(src).add(dest);
+        <span class="code-comment">// For undirected graph, add the reverse edge</span>
+        adjList.get(dest).add(src);
+    }
+    
+    <span class="code-comment">// Get neighbors of a vertex</span>
+    <span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">getNeighbors</span>(<span class="code-keyword">int</span> vertex) {
+        <span class="code-keyword">return</span> adjList.get(vertex);
+    }
+    
+    <span class="code-comment">// Display the graph</span>
+    <span class="code-keyword">public void</span> <span class="code-class">display</span>() {
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> vertex : adjList.keySet()) {
+            System.out.print(vertex + <span class="code-string">" -> "</span>);
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adjList.get(vertex)) {
+                System.out.print(neighbor + <span class="code-string">" "</span>);
+            }
+            System.out.println();
+        }
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-class">main</span>(String[] args) {
+        Graph graph = <span class="code-keyword">new</span> Graph();
+        
+        <span class="code-comment">// Add vertices</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 5; i++) {
+            graph.addVertex(i);
+        }
+        
+        <span class="code-comment">// Add edges</span>
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 4);
+        graph.addEdge(1, 2);
+        graph.addEdge(1, 3);
+        graph.addEdge(1, 4);
+        graph.addEdge(2, 3);
+        graph.addEdge(3, 4);
+        
+        <span class="code-comment">// Display the graph</span>
+        graph.display();
+    }
+}</code></pre>
+                            </div>
+                            <p>This implementation creates an undirected graph with 5 vertices and several edges. The adjacency list representation is efficient for sparse graphs.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice Tab -->
+                    <div class="tab-content" data-tab-content="practice">
+                        <h2 class="section-title">Practice Exercises</h2>
+                        <div class="practice-section">
+                            <div class="exercise">
+                                <p class="question">1. Implement a method to count the number of vertices in the graph.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public int</span> <span class="code-class">countVertices</span>() {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">2. Implement a method to check if there's an edge between two vertices.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public boolean</span> <span class="code-class">hasEdge</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">3. Implement a method to remove a vertex from the graph (and all edges connected to it).</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public void</span> <span class="code-class">removeVertex</span>(<span class="code-keyword">int</span> vertex) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" id="show-answers-1">
+                                <i class="fas fa-lightbulb"></i> Show Sample Solutions
+                            </button>
+                            
+                            <div id="answers-1" style="display: none; margin-top: 20px;">
+                                <div class="code-block">
+                                    <pre><code><span class="code-comment">// Solution for Exercise 1</span>
+<span class="code-keyword">public int</span> <span class="code-class">countVertices</span>() {
+    <span class="code-keyword">return</span> adjList.size();
+}
+
+<span class="code-comment">// Solution for Exercise 2</span>
+<span class="code-keyword">public boolean</span> <span class="code-class">hasEdge</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+    <span class="code-keyword">if</span> (!adjList.containsKey(src)) {
+        <span class="code-keyword">return</span> false;
+    }
+    <span class="code-keyword">return</span> adjList.get(src).contains(dest);
+}
+
+<span class="code-comment">// Solution for Exercise 3</span>
+<span class="code-keyword">public void</span> <span class="code-class">removeVertex</span>(<span class="code-keyword">int</span> vertex) {
+    <span class="code-comment">// Remove edges from neighbors to this vertex</span>
+    List&lt;Integer&gt; neighbors = adjList.get(vertex);
+    <span class="code-keyword">if</span> (neighbors != null) {
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : neighbors) {
+            adjList.get(neighbor).remove(Integer.valueOf(vertex));
+        }
+    }
+    
+    <span class="code-comment">// Remove the vertex itself</span>
+    adjList.remove(vertex);
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Tab -->
+                    <div class="tab-content" data-tab-content="quiz">
+                        <h2 class="section-title">Graphs Fundamentals Quiz</h2>
+                        <div class="quiz-section">
+                            <div class="question">1. Which of the following is NOT a component of a graph?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Vertex</div>
+                                <div class="option" data-correct="false">B. Edge</div>
+                                <div class="option" data-correct="true">C. Stack</div>
+                                <div class="option" data-correct="false">D. Weight</div>
+                            </div>
+                            
+                            <div class="question">2. In an adjacency list representation of a graph with V vertices and E edges, what is the space complexity?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. O(V²)</div>
+                                <div class="option" data-correct="true">B. O(V + E)</div>
+                                <div class="option" data-correct="false">C. O(E)</div>
+                                <div class="option" data-correct="false">D. O(V)</div>
+                            </div>
+                            
+                            <div class="question">3. What is the maximum number of edges in a simple undirected graph with n vertices?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. n</div>
+                                <div class="option" data-correct="false">B. n²</div>
+                                <div class="option" data-correct="true">C. n(n-1)/2</div>
+                                <div class="option" data-correct="false">D. 2n</div>
+                            </div>
+                            
+                            <div class="question">4. Which graph representation is most efficient for sparse graphs?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Adjacency Matrix</div>
+                                <div class="option" data-correct="true">B. Adjacency List</div>
+                                <div class="option" data-correct="false">C. Incidence Matrix</div>
+                                <div class="option" data-correct="false">D. Edge List</div>
+                            </div>
+                            
+                            <button class="btn" id="submit-quiz-1">
+                                <i class="fas fa-check-circle"></i> Submit Quiz
+                            </button>
+                            
+                            <div class="quiz-result" id="quiz-result-1"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Graph Searches Content -->
+                <div id="searches" class="topic-content" style="display: none;">
+                    <!-- Definition Tab -->
+                    <div class="tab-content active" data-tab-content="definition">
+                        <h2 class="section-title">Graph Searches (BFS & DFS)</h2>
+                        <div class="definition">
+                            <p><strong>Graph traversal</strong> algorithms are used to visit all the vertices of a graph in a systematic way. The two most fundamental graph traversal algorithms are Breadth-First Search (BFS) and Depth-First Search (DFS).</p>
+                            <br>
+                            <p><strong>Breadth-First Search (BFS):</strong> Explores all neighbors at the present depth before moving on to nodes at the next depth level. Uses a queue data structure.</p>
+                            <div class="algorithm-step">
+                                <div class="step-number">1</div>
+                                <div>Start at the root node and explore all neighboring nodes at the present depth.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">2</div>
+                                <div>Move to the next depth level and repeat until all nodes are visited.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">3</div>
+                                <div>BFS finds the shortest path in an unweighted graph.</div>
+                            </div>
+                            
+                            <br>
+                            <p><strong>Depth-First Search (DFS):</strong> Explores as far as possible along each branch before backtracking. Uses a stack data structure (or recursion).</p>
+                            <div class="algorithm-step">
+                                <div class="step-number">1</div>
+                                <div>Start at the root node and explore as far as possible along each branch before backtracking.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">2</div>
+                                <div>DFS is useful for topological sorting, connected components, and solving puzzles.</div>
+                            </div>
+                        </div>
+                        <div class="visualization">
+                            <h3>BFS vs DFS Visualization</h3>
+                            <div class="graph-canvas" id="search-visualization">
+                                <!-- Search visualization will be drawn here -->
+                            </div>
+                            <div class="controls">
+                                <button class="btn" id="run-bfs">
+                                    <i class="fas fa-play"></i> Run BFS
+                                </button>
+                                <button class="btn" id="run-dfs">
+                                    <i class="fas fa-play"></i> Run DFS
+                                </button>
+                                <button class="btn btn-secondary" id="reset-search">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Tab -->
+                    <div class="tab-content" data-tab-content="example">
+                        <h2 class="section-title">BFS and DFS Implementation in Java</h2>
+                        <div class="example-section">
+                            <p>Here's the implementation of both BFS and DFS in Java:</p>
+                            <div class="code-block">
+                                <pre><code><span class="code-keyword">import</span> java.util.*;
+
+<span class="code-keyword">public class</span> <span class="code-class">GraphTraversal</span> {
+    <span class="code-keyword">private</span> Map&lt;Integer, List&lt;Integer&gt;&gt; adjList;
+    
+    <span class="code-keyword">public</span> <span class="code-class">GraphTraversal</span>() {
+        adjList = <span class="code-keyword">new</span> HashMap<>();
+    }
+    
+    <span class="code-comment">// Add edge to the graph</span>
+    <span class="code-keyword">public void</span> <span class="code-class">addEdge</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+        adjList.putIfAbsent(src, <span class="code-keyword">new</span> ArrayList<>());
+        adjList.putIfAbsent(dest, <span class="code-keyword">new</span> ArrayList<>());
+        adjList.get(src).add(dest);
+        adjList.get(dest).add(src); <span class="code-comment">// For undirected graph</span>
+    }
+    
+    <span class="code-comment">// Breadth-First Search</span>
+    <span class="code-keyword">public void</span> <span class="code-class">BFS</span>(<span class="code-keyword">int</span> start) {
+        Set&lt;Integer&gt; visited = <span class="code-keyword">new</span> HashSet<>();
+        Queue&lt;Integer&gt; queue = <span class="code-keyword">new</span> LinkedList<>();
+        
+        visited.add(start);
+        queue.offer(start);
+        
+        System.out.print(<span class="code-string">"BFS Traversal: "</span>);
+        
+        <span class="code-keyword">while</span> (!queue.isEmpty()) {
+            <span class="code-keyword">int</span> vertex = queue.poll();
+            System.out.print(vertex + <span class="code-string">" "</span>);
+            
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adjList.get(vertex)) {
+                <span class="code-keyword">if</span> (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.offer(neighbor);
+                }
+            }
+        }
+        System.out.println();
+    }
+    
+    <span class="code-comment">// Depth-First Search (Recursive)</span>
+    <span class="code-keyword">public void</span> <span class="code-class">DFS</span>(<span class="code-keyword">int</span> start) {
+        Set&lt;Integer&gt; visited = <span class="code-keyword">new</span> HashSet<>();
+        System.out.print(<span class="code-string">"DFS Traversal: "</span>);
+        DFSUtil(start, visited);
+        System.out.println();
+    }
+    
+    <span class="code-keyword">private void</span> <span class="code-class">DFSUtil</span>(<span class="code-keyword">int</span> vertex, Set&lt;Integer&gt; visited) {
+        visited.add(vertex);
+        System.out.print(vertex + <span class="code-string">" "</span>);
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adjList.get(vertex)) {
+            <span class="code-keyword">if</span> (!visited.contains(neighbor)) {
+                DFSUtil(neighbor, visited);
+            }
+        }
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-class">main</span>(String[] args) {
+        GraphTraversal graph = <span class="code-keyword">new</span> GraphTraversal();
+        
+        <span class="code-comment">// Create a sample graph</span>
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 3);
+        graph.addEdge(1, 4);
+        graph.addEdge(2, 5);
+        graph.addEdge(2, 6);
+        
+        graph.BFS(0); <span class="code-comment">// Output: 0 1 2 3 4 5 6</span>
+        graph.DFS(0); <span class="code-comment">// Output: 0 1 3 4 2 5 6</span>
+    }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice Tab -->
+                    <div class="tab-content" data-tab-content="practice">
+                        <h2 class="section-title">Practice Exercises</h2>
+                        <div class="practice-section">
+                            <div class="exercise">
+                                <p class="question">1. Implement an iterative version of DFS using a stack.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public void</span> <span class="code-class">DFSIterative</span>(<span class="code-keyword">int</span> start) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">2. Modify BFS to find the shortest path between two nodes in an unweighted graph.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">shortestPathBFS</span>(<span class="code-keyword">int</span> start, <span class="code-keyword">int</span> end) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">3. Implement a method to detect cycles in an undirected graph using DFS.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public boolean</span> <span class="code-class">hasCycle</span>() {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" id="show-answers-2">
+                                <i class="fas fa-lightbulb"></i> Show Sample Solutions
+                            </button>
+                            
+                            <div id="answers-2" style="display: none; margin-top: 20px;">
+                                <div class="code-block">
+                                    <pre><code><span class="code-comment">// Solution for Exercise 1: Iterative DFS</span>
+<span class="code-keyword">public void</span> <span class="code-class">DFSIterative</span>(<span class="code-keyword">int</span> start) {
+    Set&lt;Integer&gt; visited = <span class="code-keyword">new</span> HashSet<>();
+    Stack&lt;Integer&gt; stack = <span class="code-keyword">new</span> Stack<>();
+    
+    stack.push(start);
+    
+    System.out.print(<span class="code-string">"DFS Iterative: "</span>);
+    
+    <span class="code-keyword">while</span> (!stack.isEmpty()) {
+        <span class="code-keyword">int</span> vertex = stack.pop();
+        
+        <span class="code-keyword">if</span> (!visited.contains(vertex)) {
+            System.out.print(vertex + <span class="code-string">" "</span>);
+            visited.add(vertex);
+            
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adjList.get(vertex)) {
+                <span class="code-keyword">if</span> (!visited.contains(neighbor)) {
+                    stack.push(neighbor);
+                }
+            }
+        }
+    }
+    System.out.println();
+}
+
+<span class="code-comment">// Solution for Exercise 2: Shortest Path BFS</span>
+<span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">shortestPathBFS</span>(<span class="code-keyword">int</span> start, <span class="code-keyword">int</span> end) {
+    Map&lt;Integer, Integer&gt; parent = <span class="code-keyword">new</span> HashMap<>();
+    Queue&lt;Integer&gt; queue = <span class="code-keyword">new</span> LinkedList<>();
+    Set&lt;Integer&gt; visited = <span class="code-keyword">new</span> HashSet<>();
+    
+    queue.offer(start);
+    visited.add(start);
+    parent.put(start, -1);
+    
+    <span class="code-keyword">while</span> (!queue.isEmpty()) {
+        <span class="code-keyword">int</span> current = queue.poll();
+        
+        <span class="code-keyword">if</span> (current == end) {
+            <span class="code-keyword">break</span>;
+        }
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adjList.get(current)) {
+            <span class="code-keyword">if</span> (!visited.contains(neighbor)) {
+                visited.add(neighbor);
+                parent.put(neighbor, current);
+                queue.offer(neighbor);
+            }
+        }
+    }
+    
+    <span class="code-comment">// Reconstruct path</span>
+    List&lt;Integer&gt; path = <span class="code-keyword">new</span> ArrayList<>();
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> at = end; at != -1; at = parent.get(at)) {
+        path.add(at);
+    }
+    Collections.reverse(path);
+    
+    <span class="code-keyword">return</span> path;
+}
+
+<span class="code-comment">// Solution for Exercise 3: Cycle Detection</span>
+<span class="code-keyword">public boolean</span> <span class="code-class">hasCycle</span>() {
+    Set&lt;Integer&gt; visited = <span class="code-keyword">new</span> HashSet<>();
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> vertex : adjList.keySet()) {
+        <span class="code-keyword">if</span> (!visited.contains(vertex)) {
+            <span class="code-keyword">if</span> (hasCycleUtil(vertex, -1, visited)) {
+                <span class="code-keyword">return</span> true;
+            }
+        }
+    }
+    <span class="code-keyword">return</span> false;
+}
+
+<span class="code-keyword">private boolean</span> <span class="code-class">hasCycleUtil</span>(<span class="code-keyword">int</span> vertex, <span class="code-keyword">int</span> parent, Set&lt;Integer&gt; visited) {
+    visited.add(vertex);
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adjList.get(vertex)) {
+        <span class="code-keyword">if</span> (!visited.contains(neighbor)) {
+            <span class="code-keyword">if</span> (hasCycleUtil(neighbor, vertex, visited)) {
+                <span class="code-keyword">return</span> true;
+            }
+        } <span class="code-keyword">else if</span> (neighbor != parent) {
+            <span class="code-keyword">return</span> true;
+        }
+    }
+    <span class="code-keyword">return</span> false;
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Tab -->
+                    <div class="tab-content" data-tab-content="quiz">
+                        <h2 class="section-title">Graph Searches Quiz</h2>
+                        <div class="quiz-section">
+                            <div class="question">1. Which data structure does BFS primarily use?</div>
+                            <div class="options">
+                                <div class="option" data-correct="true">A. Queue</div>
+                                <div class="option" data-correct="false">B. Stack</div>
+                                <div class="option" data-correct="false">C. Heap</div>
+                                <div class="option" data-correct="false">D. Tree</div>
+                            </div>
+                            
+                            <div class="question">2. What is the time complexity of BFS and DFS on a graph with V vertices and E edges?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. O(V)</div>
+                                <div class="option" data-correct="false">B. O(E)</div>
+                                <div class="option" data-correct="true">C. O(V + E)</div>
+                                <div class="option" data-correct="false">D. O(V * E)</div>
+                            </div>
+                            
+                            <div class="question">3. Which algorithm is better for finding the shortest path in an unweighted graph?</div>
+                            <div class="options">
+                                <div class="option" data-correct="true">A. BFS</div>
+                                <div class="option" data-correct="false">B. DFS</div>
+                                <div class="option" data-correct="false">C. Both are equally good</div>
+                                <div class="option" data-correct="false">D. Neither</div>
+                            </div>
+                            
+                            <div class="question">4. In DFS, when we visit a node, we mark it as visited and then:</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Visit all its siblings first</div>
+                                <div class="option" data-correct="true">B. Recursively visit all its unvisited neighbors</div>
+                                <div class="option" data-correct="false">C. Visit the parent node</div>
+                                <div class="option" data-correct="false">D. Visit a random neighbor</div>
+                            </div>
+                            
+                            <button class="btn" id="submit-quiz-2">
+                                <i class="fas fa-check-circle"></i> Submit Quiz
+                            </button>
+                            
+                            <div class="quiz-result" id="quiz-result-2"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Directed Graphs Content -->
+                <div id="directed" class="topic-content" style="display: none;">
+                    <!-- Definition Tab -->
+                    <div class="tab-content active" data-tab-content="definition">
+                        <h2 class="section-title">Directed Graphs</h2>
+                        <div class="definition">
+                            <p>A <strong>directed graph</strong> (or digraph) is a graph where edges have directions. Each edge goes from one vertex to another, and the direction matters. The edge (u, v) is different from the edge (v, u).</p>
+                            <br>
+                            <p><strong>Key Concepts:</strong></p>
+                            <div class="algorithm-step">
+                                <div class="step-number">1</div>
+                                <div><strong>In-degree:</strong> Number of incoming edges to a vertex.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">2</div>
+                                <div><strong>Out-degree:</strong> Number of outgoing edges from a vertex.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">3</div>
+                                <div><strong>Strongly Connected:</strong> A directed graph is strongly connected if there's a path from every vertex to every other vertex.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">4</div>
+                                <div><strong>Topological Sorting:</strong> A linear ordering of vertices such that for every directed edge (u, v), vertex u comes before v in the ordering (only possible for Directed Acyclic Graphs - DAGs).</div>
+                            </div>
+                        </div>
+                        <div class="visualization">
+                            <h3>Directed Graph Visualization</h3>
+                            <div class="graph-canvas" id="directed-visualization">
+                                <!-- Directed graph will be drawn here -->
+                            </div>
+                            <div class="controls">
+                                <button class="btn" id="generate-directed">
+                                    <i class="fas fa-sync-alt"></i> Generate New Directed Graph
+                                </button>
+                                <button class="btn btn-secondary" id="topological-sort">
+                                    <i class="fas fa-sort-alpha-down"></i> Topological Sort
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Tab -->
+                    <div class="tab-content" data-tab-content="example">
+                        <h2 class="section-title">Directed Graph Implementation in Java</h2>
+                        <div class="example-section">
+                            <p>Here's an implementation of a directed graph with topological sort:</p>
+                            <div class="code-block">
+                                <pre><code><span class="code-keyword">import</span> java.util.*;
+
+<span class="code-keyword">public class</span> <span class="code-class">DirectedGraph</span> {
+    <span class="code-keyword">private</span> <span class="code-keyword">int</span> V; <span class="code-comment">// Number of vertices</span>
+    <span class="code-keyword">private</span> List&lt;List&lt;Integer&gt;&gt; adj;
+    
+    <span class="code-keyword">public</span> <span class="code-class">DirectedGraph</span>(<span class="code-keyword">int</span> v) {
+        V = v;
+        adj = <span class="code-keyword">new</span> ArrayList<>(v);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < v; i++) {
+            adj.add(<span class="code-keyword">new</span> ArrayList<>());
+        }
+    }
+    
+    <span class="code-comment">// Add directed edge from v to w</span>
+    <span class="code-keyword">public void</span> <span class="code-class">addEdge</span>(<span class="code-keyword">int</span> v, <span class="code-keyword">int</span> w) {
+        adj.get(v).add(w);
+    }
+    
+    <span class="code-comment">// Topological Sort using Kahn's Algorithm</span>
+    <span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">topologicalSort</span>() {
+        <span class="code-comment">// Calculate in-degree of each vertex</span>
+        <span class="code-keyword">int</span>[] inDegree = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adj.get(i)) {
+                inDegree[neighbor]++;
+            }
+        }
+        
+        <span class="code-comment">// Queue for vertices with 0 in-degree</span>
+        Queue&lt;Integer&gt; queue = <span class="code-keyword">new</span> LinkedList<>();
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+            <span class="code-keyword">if</span> (inDegree[i] == 0) {
+                queue.add(i);
+            }
+        }
+        
+        List&lt;Integer&gt; result = <span class="code-keyword">new</span> ArrayList<>();
+        <span class="code-keyword">int</span> visited = 0;
+        
+        <span class="code-keyword">while</span> (!queue.isEmpty()) {
+            <span class="code-keyword">int</span> vertex = queue.poll();
+            result.add(vertex);
+            
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adj.get(vertex)) {
+                inDegree[neighbor]--;
+                <span class="code-keyword">if</span> (inDegree[neighbor] == 0) {
+                    queue.add(neighbor);
+                }
+            }
+            visited++;
+        }
+        
+        <span class="code-comment">// Check for cycle</span>
+        <span class="code-keyword">if</span> (visited != V) {
+            System.out.println(<span class="code-string">"Graph contains a cycle! Topological sort not possible."</span>);
+            <span class="code-keyword">return</span> <span class="code-keyword">new</span> ArrayList<>();
+        }
+        
+        <span class="code-keyword">return</span> result;
+    }
+    
+    <span class="code-comment">// DFS-based topological sort (alternative method)</span>
+    <span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">topologicalSortDFS</span>() {
+        Stack&lt;Integer&gt; stack = <span class="code-keyword">new</span> Stack<>();
+        boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+            <span class="code-keyword">if</span> (!visited[i]) {
+                topologicalSortUtil(i, visited, stack);
+            }
+        }
+        
+        List&lt;Integer&gt; result = <span class="code-keyword">new</span> ArrayList<>();
+        <span class="code-keyword">while</span> (!stack.isEmpty()) {
+            result.add(stack.pop());
+        }
+        
+        <span class="code-keyword">return</span> result;
+    }
+    
+    <span class="code-keyword">private void</span> <span class="code-class">topologicalSortUtil</span>(<span class="code-keyword">int</span> v, boolean[] visited, Stack&lt;Integer&gt; stack) {
+        visited[v] = true;
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adj.get(v)) {
+            <span class="code-keyword">if</span> (!visited[neighbor]) {
+                topologicalSortUtil(neighbor, visited, stack);
+            }
+        }
+        
+        stack.push(v);
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-class">main</span>(String[] args) {
+        DirectedGraph g = <span class="code-keyword">new</span> DirectedGraph(6);
+        
+        <span class="code-comment">// Add directed edges</span>
+        g.addEdge(5, 2);
+        g.addEdge(5, 0);
+        g.addEdge(4, 0);
+        g.addEdge(4, 1);
+        g.addEdge(2, 3);
+        g.addEdge(3, 1);
+        
+        System.out.println(<span class="code-string">"Topological sort (Kahn's): "</span> + g.topologicalSort());
+        System.out.println(<span class="code-string">"Topological sort (DFS): "</span> + g.topologicalSortDFS());
+    }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice Tab -->
+                    <div class="tab-content" data-tab-content="practice">
+                        <h2 class="section-title">Practice Exercises</h2>
+                        <div class="practice-section">
+                            <div class="exercise">
+                                <p class="question">1. Implement a method to check if a directed graph is strongly connected.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public boolean</span> <span class="code-class">isStronglyConnected</span>() {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">2. Implement a method to detect cycles in a directed graph.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public boolean</span> <span class="code-class">hasCycleDirected</span>() {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">3. Implement a method to find all vertices reachable from a given vertex in a directed graph.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">reachableVertices</span>(<span class="code-keyword">int</span> start) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" id="show-answers-3">
+                                <i class="fas fa-lightbulb"></i> Show Sample Solutions
+                            </button>
+                            
+                            <div id="answers-3" style="display: none; margin-top: 20px;">
+                                <div class="code-block">
+                                    <pre><code><span class="code-comment">// Solution for Exercise 1: Strongly Connected Check</span>
+<span class="code-keyword">public boolean</span> <span class="code-class">isStronglyConnected</span>() {
+    <span class="code-comment">// Do DFS from first vertex</span>
+    boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+    DFSUtil(0, visited);
+    
+    <span class="code-comment">// If any vertex not visited, graph is not strongly connected</span>
+    <span class="code-keyword">for</span> (boolean v : visited) {
+        <span class="code-keyword">if</span> (!v) <span class="code-keyword">return</span> false;
+    }
+    
+    <span class="code-comment">// Create transpose of the graph</span>
+    DirectedGraph transpose = <span class="code-keyword">this</span>.getTranspose();
+    
+    <span class="code-comment">// Reset visited array</span>
+    Arrays.fill(visited, false);
+    
+    <span class="code-comment">// Do DFS on transpose from first vertex</span>
+    transpose.DFSUtil(0, visited);
+    
+    <span class="code-keyword">for</span> (boolean v : visited) {
+        <span class="code-keyword">if</span> (!v) <span class="code-keyword">return</span> false;
+    }
+    
+    <span class="code-keyword">return</span> true;
+}
+
+<span class="code-keyword">private</span> <span class="code-class">DirectedGraph</span> <span class="code-class">getTranspose</span>() {
+    DirectedGraph transpose = <span class="code-keyword">new</span> DirectedGraph(V);
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> v = 0; v < V; v++) {
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adj.get(v)) {
+            transpose.addEdge(neighbor, v);
+        }
+    }
+    <span class="code-keyword">return</span> transpose;
+}
+
+<span class="code-comment">// Solution for Exercise 2: Cycle Detection in Directed Graph</span>
+<span class="code-keyword">public boolean</span> <span class="code-class">hasCycleDirected</span>() {
+    boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+    boolean[] recStack = <span class="code-keyword">new</span> boolean[V];
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+        <span class="code-keyword">if</span> (hasCycleUtil(i, visited, recStack)) {
+            <span class="code-keyword">return</span> true;
+        }
+    }
+    <span class="code-keyword">return</span> false;
+}
+
+<span class="code-keyword">private boolean</span> <span class="code-class">hasCycleUtil</span>(<span class="code-keyword">int</span> v, boolean[] visited, boolean[] recStack) {
+    <span class="code-keyword">if</span> (recStack[v]) <span class="code-keyword">return</span> true;
+    <span class="code-keyword">if</span> (visited[v]) <span class="code-keyword">return</span> false;
+    
+    visited[v] = true;
+    recStack[v] = true;
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adj.get(v)) {
+        <span class="code-keyword">if</span> (hasCycleUtil(neighbor, visited, recStack)) {
+            <span class="code-keyword">return</span> true;
+        }
+    }
+    
+    recStack[v] = false;
+    <span class="code-keyword">return</span> false;
+}
+
+<span class="code-comment">// Solution for Exercise 3: Reachable Vertices</span>
+<span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">reachableVertices</span>(<span class="code-keyword">int</span> start) {
+    List&lt;Integer&gt; result = <span class="code-keyword">new</span> ArrayList<>();
+    boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+    
+    Queue&lt;Integer&gt; queue = <span class="code-keyword">new</span> LinkedList<>();
+    visited[start] = true;
+    queue.add(start);
+    
+    <span class="code-keyword">while</span> (!queue.isEmpty()) {
+        <span class="code-keyword">int</span> v = queue.poll();
+        result.add(v);
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> neighbor : adj.get(v)) {
+            <span class="code-keyword">if</span> (!visited[neighbor]) {
+                visited[neighbor] = true;
+                queue.add(neighbor);
+            }
+        }
+    }
+    
+    <span class="code-keyword">return</span> result;
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Tab -->
+                    <div class="tab-content" data-tab-content="quiz">
+                        <h2 class="section-title">Directed Graphs Quiz</h2>
+                        <div class="quiz-section">
+                            <div class="question">1. In a directed graph, if there's an edge from A to B, can we travel from B to A?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Always</div>
+                                <div class="option" data-correct="false">B. Never</div>
+                                <div class="option" data-correct="true">C. Only if there's also an edge from B to A</div>
+                                <div class="option" data-correct="false">D. Only in weighted graphs</div>
+                            </div>
+                            
+                            <div class="question">2. What is the maximum number of edges in a directed graph with n vertices?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. n</div>
+                                <div class="option" data-correct="false">B. n(n-1)/2</div>
+                                <div class="option" data-correct="true">C. n(n-1)</div>
+                                <div class="option" data-correct="false">D. 2n</div>
+                            </div>
+                            
+                            <div class="question">3. Topological sorting is possible for which type of graphs?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. All directed graphs</div>
+                                <div class="option" data-correct="true">B. Directed Acyclic Graphs (DAGs)</div>
+                                <div class="option" data-correct="false">C. Undirected graphs</div>
+                                <div class="option" data-correct="false">D. Weighted graphs</div>
+                            </div>
+                            
+                            <div class="question">4. What is the in-degree of a vertex in a directed graph?</div>
+                            <div class="options">
+                                <div class="option" data-correct="true">A. Number of edges coming into the vertex</div>
+                                <div class="option" data-correct="false">B. Number of edges going out of the vertex</div>
+                                <div class="option" data-correct="false">C. Total number of edges connected to the vertex</div>
+                                <div class="option" data-correct="false">D. Weight of all incoming edges</div>
+                            </div>
+                            
+                            <button class="btn" id="submit-quiz-3">
+                                <i class="fas fa-check-circle"></i> Submit Quiz
+                            </button>
+                            
+                            <div class="quiz-result" id="quiz-result-3"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Weighted Graphs Content -->
+                <div id="weighted" class="topic-content" style="display: none;">
+                    <!-- Definition Tab -->
+                    <div class="tab-content active" data-tab-content="definition">
+                        <h2 class="section-title">Weighted Graphs</h2>
+                        <div class="definition">
+                            <p>A <strong>weighted graph</strong> is a graph where each edge has a numerical value (weight) associated with it. Weights can represent distances, costs, capacities, or any other metric relevant to the problem.</p>
+                            <br>
+                            <p><strong>Key Concepts:</strong></p>
+                            <div class="algorithm-step">
+                                <div class="step-number">1</div>
+                                <div><strong>Weight:</strong> A numerical value assigned to an edge, representing cost, distance, time, etc.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">2</div>
+                                <div><strong>Shortest Path:</strong> The path between two vertices with the minimum total weight.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">3</div>
+                                <div><strong>Minimum Spanning Tree (MST):</strong> A subset of edges that connects all vertices with the minimum total edge weight.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">4</div>
+                                <div><strong>Negative Weights:</strong> Some algorithms can't handle negative weights (Dijkstra), while others can (Bellman-Ford).</div>
+                            </div>
+                        </div>
+                        <div class="visualization">
+                            <h3>Weighted Graph Visualization</h3>
+                            <div class="graph-canvas" id="weighted-visualization">
+                                <!-- Weighted graph will be drawn here -->
+                            </div>
+                            <div class="controls">
+                                <button class="btn" id="generate-weighted">
+                                    <i class="fas fa-sync-alt"></i> Generate New Weighted Graph
+                                </button>
+                                <button class="btn btn-secondary" id="find-mst">
+                                    <i class="fas fa-tree"></i> Find MST (Prim's)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Tab -->
+                    <div class="tab-content" data-tab-content="example">
+                        <h2 class="section-title">Weighted Graph Implementation in Java</h2>
+                        <div class="example-section">
+                            <p>Here's an implementation of a weighted graph using adjacency list with edge objects:</p>
+                            <div class="code-block">
+                                <pre><code><span class="code-keyword">import</span> java.util.*;
+
+<span class="code-keyword">class</span> <span class="code-class">Edge</span> {
+    <span class="code-keyword">int</span> destination;
+    <span class="code-keyword">int</span> weight;
+    
+    <span class="code-keyword">public</span> <span class="code-class">Edge</span>(<span class="code-keyword">int</span> destination, <span class="code-keyword">int</span> weight) {
+        <span class="code-keyword">this</span>.destination = destination;
+        <span class="code-keyword">this</span>.weight = weight;
+    }
+}
+
+<span class="code-keyword">public class</span> <span class="code-class">WeightedGraph</span> {
+    <span class="code-keyword">private</span> <span class="code-keyword">int</span> V;
+    <span class="code-keyword">private</span> List&lt;List&lt;Edge&gt;&gt; adj;
+    
+    <span class="code-keyword">public</span> <span class="code-class">WeightedGraph</span>(<span class="code-keyword">int</span> v) {
+        V = v;
+        adj = <span class="code-keyword">new</span> ArrayList<>(v);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < v; i++) {
+            adj.add(<span class="code-keyword">new</span> ArrayList<>());
+        }
+    }
+    
+    <span class="code-comment">// Add an undirected weighted edge</span>
+    <span class="code-keyword">public void</span> <span class="code-class">addEdge</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest, <span class="code-keyword">int</span> weight) {
+        adj.get(src).add(<span class="code-keyword">new</span> Edge(dest, weight));
+        adj.get(dest).add(<span class="code-keyword">new</span> Edge(src, weight));
+    }
+    
+    <span class="code-comment">// Prim's algorithm for Minimum Spanning Tree</span>
+    <span class="code-keyword">public void</span> <span class="code-class">primMST</span>() {
+        boolean[] inMST = <span class="code-keyword">new</span> boolean[V];
+        <span class="code-keyword">int</span>[] parent = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+        <span class="code-keyword">int</span>[] key = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+        
+        Arrays.fill(key, Integer.MAX_VALUE);
+        key[0] = 0;
+        parent[0] = -1;
+        
+        <span class="code-comment">// Priority queue to select minimum key vertex</span>
+        PriorityQueue&lt;Edge&gt; pq = <span class="code-keyword">new</span> PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+        pq.add(<span class="code-keyword">new</span> Edge(0, 0));
+        
+        <span class="code-keyword">while</span> (!pq.isEmpty()) {
+            <span class="code-keyword">int</span> u = pq.poll().destination;
+            inMST[u] = true;
+            
+            <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+                <span class="code-keyword">int</span> v = edge.destination;
+                <span class="code-keyword">int</span> weight = edge.weight;
+                
+                <span class="code-keyword">if</span> (!inMST[v] && weight < key[v]) {
+                    key[v] = weight;
+                    parent[v] = u;
+                    pq.add(<span class="code-keyword">new</span> Edge(v, key[v]));
+                }
+            }
+        }
+        
+        <span class="code-comment">// Print MST</span>
+        System.out.println(<span class="code-string">"Minimum Spanning Tree (Prim's Algorithm):"</span>);
+        <span class="code-keyword">int</span> totalWeight = 0;
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 1; i < V; i++) {
+            System.out.println(parent[i] + <span class="code-string">" - "</span> + i + <span class="code-string">" (weight: "</span> + key[i] + <span class="code-string">")"</span>);
+            totalWeight += key[i];
+        }
+        System.out.println(<span class="code-string">"Total weight of MST: "</span> + totalWeight);
+    }
+    
+    <span class="code-comment">// Kruskal's algorithm for MST (alternative)</span>
+    <span class="code-keyword">public void</span> <span class="code-class">kruskalMST</span>() {
+        <span class="code-comment">// Sort all edges by weight</span>
+        List&lt;Edge&gt; edges = <span class="code-keyword">new</span> ArrayList<>();
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> u = 0; u < V; u++) {
+            <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+                <span class="code-keyword">if</span> (u < edge.destination) { <span class="code-comment">// Add each edge only once</span>
+                    edges.add(<span class="code-keyword">new</span> Edge(u * V + edge.destination, edge.weight));
+                }
+            }
+        }
+        
+        edges.sort(Comparator.comparingInt(e -> e.weight));
+        
+        <span class="code-comment">// Union-Find data structure</span>
+        <span class="code-keyword">int</span>[] parent = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) parent[i] = i;
+        
+        List&lt;Edge&gt; mst = <span class="code-keyword">new</span> ArrayList<>();
+        <span class="code-keyword">int</span> totalWeight = 0;
+        
+        <span class="code-keyword">for</span> (Edge edge : edges) {
+            <span class="code-keyword">int</span> u = edge.destination / V;
+            <span class="code-keyword">int</span> v = edge.destination % V;
+            
+            <span class="code-keyword">if</span> (find(parent, u) != find(parent, v)) {
+                mst.add(edge);
+                totalWeight += edge.weight;
+                union(parent, u, v);
+            }
+        }
+        
+        System.out.println(<span class="code-string">"Minimum Spanning Tree (Kruskal's Algorithm):"</span>);
+        <span class="code-keyword">for</span> (Edge edge : mst) {
+            <span class="code-keyword">int</span> u = edge.destination / V;
+            <span class="code-keyword">int</span> v = edge.destination % V;
+            System.out.println(u + <span class="code-string">" - "</span> + v + <span class="code-string">" (weight: "</span> + edge.weight + <span class="code-string">")"</span>);
+        }
+        System.out.println(<span class="code-string">"Total weight of MST: "</span> + totalWeight);
+    }
+    
+    <span class="code-keyword">private int</span> <span class="code-class">find</span>(<span class="code-keyword">int</span>[] parent, <span class="code-keyword">int</span> i) {
+        <span class="code-keyword">if</span> (parent[i] != i) {
+            parent[i] = find(parent, parent[i]);
+        }
+        <span class="code-keyword">return</span> parent[i];
+    }
+    
+    <span class="code-keyword">private void</span> <span class="code-class">union</span>(<span class="code-keyword">int</span>[] parent, <span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y) {
+        <span class="code-keyword">int</span> rootX = find(parent, x);
+        <span class="code-keyword">int</span> rootY = find(parent, y);
+        parent[rootX] = rootY;
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-class">main</span>(String[] args) {
+        WeightedGraph g = <span class="code-keyword">new</span> WeightedGraph(5);
+        
+        g.addEdge(0, 1, 2);
+        g.addEdge(0, 3, 6);
+        g.addEdge(1, 2, 3);
+        g.addEdge(1, 3, 8);
+        g.addEdge(1, 4, 5);
+        g.addEdge(2, 4, 7);
+        g.addEdge(3, 4, 9);
+        
+        g.primMST();
+        System.out.println();
+        g.kruskalMST();
+    }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice Tab -->
+                    <div class="tab-content" data-tab-content="practice">
+                        <h2 class="section-title">Practice Exercises</h2>
+                        <div class="practice-section">
+                            <div class="exercise">
+                                <p class="question">1. Implement Dijkstra's algorithm to find the shortest path from a source vertex to all other vertices.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public</span> <span class="code-keyword">int</span>[] <span class="code-class">dijkstra</span>(<span class="code-keyword">int</span> src) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">2. Implement Bellman-Ford algorithm that can handle negative weights (but not negative cycles).</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public</span> <span class="code-keyword">int</span>[] <span class="code-class">bellmanFord</span>(<span class="code-keyword">int</span> src) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">3. Find the maximum weight edge in the Minimum Spanning Tree.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public int</span> <span class="code-class">maxWeightInMST</span>() {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" id="show-answers-4">
+                                <i class="fas fa-lightbulb"></i> Show Sample Solutions
+                            </button>
+                            
+                            <div id="answers-4" style="display: none; margin-top: 20px;">
+                                <div class="code-block">
+                                    <pre><code><span class="code-comment">// Solution for Exercise 1: Dijkstra's Algorithm</span>
+<span class="code-keyword">public</span> <span class="code-keyword">int</span>[] <span class="code-class">dijkstra</span>(<span class="code-keyword">int</span> src) {
+    <span class="code-keyword">int</span>[] dist = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+    
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[src] = 0;
+    
+    PriorityQueue&lt;Edge&gt; pq = <span class="code-keyword">new</span> PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+    pq.add(<span class="code-keyword">new</span> Edge(src, 0));
+    
+    <span class="code-keyword">while</span> (!pq.isEmpty()) {
+        <span class="code-keyword">int</span> u = pq.poll().destination;
+        
+        <span class="code-keyword">if</span> (visited[u]) <span class="code-keyword">continue</span>;
+        visited[u] = true;
+        
+        <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+            <span class="code-keyword">int</span> v = edge.destination;
+            <span class="code-keyword">int</span> weight = edge.weight;
+            
+            <span class="code-keyword">if</span> (!visited[v] && dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                pq.add(<span class="code-keyword">new</span> Edge(v, dist[v]));
+            }
+        }
+    }
+    
+    <span class="code-keyword">return</span> dist;
+}
+
+<span class="code-comment">// Solution for Exercise 2: Bellman-Ford Algorithm</span>
+<span class="code-keyword">public</span> <span class="code-keyword">int</span>[] <span class="code-class">bellmanFord</span>(<span class="code-keyword">int</span> src) {
+    <span class="code-keyword">int</span>[] dist = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[src] = 0;
+    
+    <span class="code-comment">// Get all edges</span>
+    List&lt;Edge&gt; edges = <span class="code-keyword">new</span> ArrayList<>();
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> u = 0; u < V; u++) {
+        <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+            edges.add(<span class="code-keyword">new</span> Edge(u * V + edge.destination, edge.weight));
+        }
+    }
+    
+    <span class="code-comment">// Relax all edges V-1 times</span>
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 1; i < V; i++) {
+        <span class="code-keyword">for</span> (Edge edge : edges) {
+            <span class="code-keyword">int</span> u = edge.destination / V;
+            <span class="code-keyword">int</span> v = edge.destination % V;
+            <span class="code-keyword">int</span> weight = edge.weight;
+            
+            <span class="code-keyword">if</span> (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+            }
+        }
+    }
+    
+    <span class="code-comment">// Check for negative-weight cycles</span>
+    <span class="code-keyword">for</span> (Edge edge : edges) {
+        <span class="code-keyword">int</span> u = edge.destination / V;
+        <span class="code-keyword">int</span> v = edge.destination % V;
+        <span class="code-keyword">int</span> weight = edge.weight;
+        
+        <span class="code-keyword">if</span> (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+            System.out.println(<span class="code-string">"Graph contains negative weight cycle"</span>);
+            <span class="code-keyword">return</span> null;
+        }
+    }
+    
+    <span class="code-keyword">return</span> dist;
+}
+
+<span class="code-comment">// Solution for Exercise 3: Max Weight in MST</span>
+<span class="code-keyword">public int</span> <span class="code-class">maxWeightInMST</span>() {
+    <span class="code-comment">// Using Prim's algorithm to build MST</span>
+    boolean[] inMST = <span class="code-keyword">new</span> boolean[V];
+    <span class="code-keyword">int</span>[] key = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    Arrays.fill(key, Integer.MAX_VALUE);
+    key[0] = 0;
+    
+    PriorityQueue&lt;Edge&gt; pq = <span class="code-keyword">new</span> PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+    pq.add(<span class="code-keyword">new</span> Edge(0, 0));
+    
+    <span class="code-keyword">int</span> maxWeight = 0;
+    
+    <span class="code-keyword">while</span> (!pq.isEmpty()) {
+        <span class="code-keyword">int</span> u = pq.poll().destination;
+        inMST[u] = true;
+        
+        <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+            <span class="code-keyword">int</span> v = edge.destination;
+            <span class="code-keyword">int</span> weight = edge.weight;
+            
+            <span class="code-keyword">if</span> (!inMST[v] && weight < key[v]) {
+                key[v] = weight;
+                pq.add(<span class="code-keyword">new</span> Edge(v, key[v]));
+            }
+        }
+    }
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+        <span class="code-keyword">if</span> (key[i] != Integer.MAX_VALUE && key[i] > maxWeight) {
+            maxWeight = key[i];
+        }
+    }
+    
+    <span class="code-keyword">return</span> maxWeight;
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Tab -->
+                    <div class="tab-content" data-tab-content="quiz">
+                        <h2 class="section-title">Weighted Graphs Quiz</h2>
+                        <div class="quiz-section">
+                            <div class="question">1. Which algorithm finds the Minimum Spanning Tree of a weighted graph?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Dijkstra's</div>
+                                <div class="option" data-correct="false">B. Bellman-Ford</div>
+                                <div class="option" data-correct="true">C. Prim's</div>
+                                <div class="option" data-correct="false">D. Floyd-Warshall</div>
+                            </div>
+                            
+                            <div class="question">2. What is the time complexity of Prim's algorithm using a binary heap?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. O(V²)</div>
+                                <div class="option" data-correct="true">B. O(E log V)</div>
+                                <div class="option" data-correct="false">C. O(V log E)</div>
+                                <div class="option" data-correct="false">D. O(V + E)</div>
+                            </div>
+                            
+                            <div class="question">3. Which algorithm can handle negative weight edges?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Dijkstra's</div>
+                                <div class="option" data-correct="true">B. Bellman-Ford</div>
+                                <div class="option" data-correct="false">C. Prim's</div>
+                                <div class="option" data-correct="false">D. Kruskal's</div>
+                            </div>
+                            
+                            <div class="question">4. In a weighted graph, the shortest path between two vertices always includes:</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. The minimum number of edges</div>
+                                <div class="option" data-correct="false">B. All vertices of the graph</div>
+                                <div class="option" data-correct="true">C. The minimum total weight</div>
+                                <div class="option" data-correct="false">D. The maximum weight edge</div>
+                            </div>
+                            
+                            <button class="btn" id="submit-quiz-4">
+                                <i class="fas fa-check-circle"></i> Submit Quiz
+                            </button>
+                            
+                            <div class="quiz-result" id="quiz-result-4"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Shortest-Path Problem Content -->
+                <div id="shortest" class="topic-content" style="display: none;">
+                    <!-- Definition Tab -->
+                    <div class="tab-content active" data-tab-content="definition">
+                        <h2 class="section-title">Shortest-Path Problem</h2>
+                        <div class="definition">
+                            <p>The <strong>shortest-path problem</strong> is about finding a path between two vertices in a graph such that the sum of the weights of its constituent edges is minimized. This is a fundamental problem in graph theory with many real-world applications.</p>
+                            <br>
+                            <p><strong>Common Algorithms:</strong></p>
+                            <div class="algorithm-step">
+                                <div class="step-number">1</div>
+                                <div><strong>Dijkstra's Algorithm:</strong> Finds shortest paths from a source to all other vertices in a graph with non-negative edge weights. Time complexity: O((V+E) log V) with priority queue.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">2</div>
+                                <div><strong>Bellman-Ford Algorithm:</strong> Can handle graphs with negative edge weights (but not negative cycles). Time complexity: O(VE).</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">3</div>
+                                <div><strong>Floyd-Warshall Algorithm:</strong> Finds shortest paths between all pairs of vertices. Time complexity: O(V³).</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">4</div>
+                                <div><strong>A* Search Algorithm:</strong> An extension of Dijkstra's that uses heuristics to improve performance.</div>
+                            </div>
+                        </div>
+                        <div class="visualization">
+                            <h3>Shortest Path Visualization</h3>
+                            <div class="graph-canvas" id="shortest-visualization">
+                                <!-- Shortest path visualization will be drawn here -->
+                            </div>
+                            <div class="controls">
+                                <button class="btn" id="run-dijkstra">
+                                    <i class="fas fa-play"></i> Run Dijkstra's
+                                </button>
+                                <button class="btn" id="run-floyd">
+                                    <i class="fas fa-play"></i> Run Floyd-Warshall
+                                </button>
+                                <button class="btn btn-secondary" id="reset-shortest">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Tab -->
+                    <div class="tab-content" data-tab-content="example">
+                        <h2 class="section-title">Shortest Path Algorithms in Java</h2>
+                        <div class="example-section">
+                            <p>Here's an implementation of Dijkstra's and Floyd-Warshall algorithms:</p>
+                            <div class="code-block">
+                                <pre><code><span class="code-keyword">import</span> java.util.*;
+
+<span class="code-keyword">public class</span> <span class="code-class">ShortestPath</span> {
+    <span class="code-keyword">private</span> <span class="code-keyword">int</span> V;
+    <span class="code-keyword">private</span> List&lt;List&lt;Edge&gt;&gt; adj;
+    
+    <span class="code-keyword">public</span> <span class="code-class">ShortestPath</span>(<span class="code-keyword">int</span> v) {
+        V = v;
+        adj = <span class="code-keyword">new</span> ArrayList<>(v);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < v; i++) {
+            adj.add(<span class="code-keyword">new</span> ArrayList<>());
+        }
+    }
+    
+    <span class="code-keyword">public void</span> <span class="code-class">addEdge</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest, <span class="code-keyword">int</span> weight) {
+        adj.get(src).add(<span class="code-keyword">new</span> Edge(dest, weight));
+        <span class="code-comment">// For undirected graph, add the reverse edge</span>
+        adj.get(dest).add(<span class="code-keyword">new</span> Edge(src, weight));
+    }
+    
+    <span class="code-comment">// Dijkstra's Algorithm</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">int</span>[] <span class="code-class">dijkstra</span>(<span class="code-keyword">int</span> src) {
+        <span class="code-keyword">int</span>[] dist = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+        boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+        
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+        
+        PriorityQueue&lt;Edge&gt; pq = <span class="code-keyword">new</span> PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+        pq.add(<span class="code-keyword">new</span> Edge(src, 0));
+        
+        <span class="code-keyword">while</span> (!pq.isEmpty()) {
+            <span class="code-keyword">int</span> u = pq.poll().destination;
+            
+            <span class="code-keyword">if</span> (visited[u]) <span class="code-keyword">continue</span>;
+            visited[u] = true;
+            
+            <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+                <span class="code-keyword">int</span> v = edge.destination;
+                <span class="code-keyword">int</span> weight = edge.weight;
+                
+                <span class="code-keyword">if</span> (!visited[v] && dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    pq.add(<span class="code-keyword">new</span> Edge(v, dist[v]));
+                }
+            }
+        }
+        
+        <span class="code-keyword">return</span> dist;
+    }
+    
+    <span class="code-comment">// Floyd-Warshall Algorithm for all-pairs shortest path</span>
+    <span class="code-keyword">public</span> <span class="code-keyword">int</span>[][] <span class="code-class">floydWarshall</span>() {
+        <span class="code-comment">// Create adjacency matrix</span>
+        <span class="code-keyword">int</span>[][] dist = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V][V];
+        
+        <span class="code-comment">// Initialize distances</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
+            dist[i][i] = 0;
+            
+            <span class="code-keyword">for</span> (Edge edge : adj.get(i)) {
+                dist[i][edge.destination] = edge.weight;
+            }
+        }
+        
+        <span class="code-comment">// Floyd-Warshall algorithm</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> k = 0; k < V; k++) {
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+                <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < V; j++) {
+                    <span class="code-keyword">if</span> (dist[i][k] != Integer.MAX_VALUE && dist[k][j] != Integer.MAX_VALUE
+                            && dist[i][k] + dist[k][j] < dist[i][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
+                }
+            }
+        }
+        
+        <span class="code-keyword">return</span> dist;
+    }
+    
+    <span class="code-comment">// Print shortest path from source to destination</span>
+    <span class="code-keyword">public void</span> <span class="code-class">printShortestPath</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+        <span class="code-keyword">int</span>[] dist = dijkstra(src);
+        <span class="code-keyword">int</span>[] parent = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+        Arrays.fill(parent, -1);
+        
+        <span class="code-comment">// Reconstruct path using BFS-like approach</span>
+        Queue&lt;Integer&gt; queue = <span class="code-keyword">new</span> LinkedList<>();
+        boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+        
+        queue.add(src);
+        visited[src] = true;
+        
+        <span class="code-keyword">while</span> (!queue.isEmpty()) {
+            <span class="code-keyword">int</span> u = queue.poll();
+            
+            <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+                <span class="code-keyword">int</span> v = edge.destination;
+                <span class="code-keyword">int</span> weight = edge.weight;
+                
+                <span class="code-keyword">if</span> (dist[u] != Integer.MAX_VALUE && dist[u] + weight == dist[v]) {
+                    <span class="code-keyword">if</span> (parent[v] == -1) {
+                        parent[v] = u;
+                    }
+                    <span class="code-keyword">if</span> (!visited[v]) {
+                        visited[v] = true;
+                        queue.add(v);
+                    }
+                }
+            }
+        }
+        
+        <span class="code-comment">// Print path</span>
+        <span class="code-keyword">if</span> (dist[dest] == Integer.MAX_VALUE) {
+            System.out.println(<span class="code-string">"No path from "</span> + src + <span class="code-string">" to "</span> + dest);
+        } <span class="code-keyword">else</span> {
+            List&lt;Integer&gt; path = <span class="code-keyword">new</span> ArrayList<>();
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> v = dest; v != -1; v = parent[v]) {
+                path.add(v);
+            }
+            Collections.reverse(path);
+            
+            System.out.println(<span class="code-string">"Shortest path from "</span> + src + <span class="code-string">" to "</span> + dest + <span class="code-string">": "</span> + path);
+            System.out.println(<span class="code-string">"Total distance: "</span> + dist[dest]);
+        }
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-class">main</span>(String[] args) {
+        ShortestPath g = <span class="code-keyword">new</span> ShortestPath(6);
+        
+        g.addEdge(0, 1, 4);
+        g.addEdge(0, 2, 3);
+        g.addEdge(1, 2, 1);
+        g.addEdge(1, 3, 2);
+        g.addEdge(2, 3, 4);
+        g.addEdge(3, 4, 2);
+        g.addEdge(4, 5, 6);
+        
+        <span class="code-keyword">int</span> src = 0;
+        <span class="code-keyword">int</span>[] distances = g.dijkstra(src);
+        
+        System.out.println(<span class="code-string">"Dijkstra's Algorithm - Distances from vertex "</span> + src + <span class="code-string">":"</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < distances.length; i++) {
+            System.out.println(<span class="code-string">"To vertex "</span> + i + <span class="code-string">": "</span> + 
+                (distances[i] == Integer.MAX_VALUE ? <span class="code-string">"INF"</span> : distances[i]));
+        }
+        
+        System.out.println(<span class="code-string">"\nFloyd-Warshall Algorithm - All pairs shortest path:"</span>);
+        <span class="code-keyword">int</span>[][] allPairs = g.floydWarshall();
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < allPairs.length; i++) {
+            System.out.print(<span class="code-string">"From vertex "</span> + i + <span class="code-string">": "</span>);
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < allPairs[i].length; j++) {
+                System.out.print((allPairs[i][j] == Integer.MAX_VALUE ? <span class="code-string">"INF"</span> : allPairs[i][j]) + <span class="code-string">" "</span>);
+            }
+            System.out.println();
+        }
+        
+        System.out.println();
+        g.printShortestPath(0, 5);
+    }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice Tab -->
+                    <div class="tab-content" data-tab-content="practice">
+                        <h2 class="section-title">Practice Exercises</h2>
+                        <div class="practice-section">
+                            <div class="exercise">
+                                <p class="question">1. Implement a method to find the shortest path between all pairs of vertices using repeated Dijkstra's algorithm.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public</span> <span class="code-keyword">int</span>[][] <span class="code-class">allPairsDijkstra</span>() {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">2. Modify Dijkstra's algorithm to also store the path, not just the distance.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">dijkstraWithPath</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">3. Implement the A* search algorithm with a heuristic function.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">aStarSearch</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" id="show-answers-5">
+                                <i class="fas fa-lightbulb"></i> Show Sample Solutions
+                            </button>
+                            
+                            <div id="answers-5" style="display: none; margin-top: 20px;">
+                                <div class="code-block">
+                                    <pre><code><span class="code-comment">// Solution for Exercise 1: All Pairs Dijkstra</span>
+<span class="code-keyword">public</span> <span class="code-keyword">int</span>[][] <span class="code-class">allPairsDijkstra</span>() {
+    <span class="code-keyword">int</span>[][] allPairs = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V][V];
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < V; i++) {
+        <span class="code-keyword">int</span>[] dist = dijkstra(i);
+        allPairs[i] = dist;
+    }
+    
+    <span class="code-keyword">return</span> allPairs;
+}
+
+<span class="code-comment">// Solution for Exercise 2: Dijkstra with Path Reconstruction</span>
+<span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">dijkstraWithPath</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+    <span class="code-keyword">int</span>[] dist = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    <span class="code-keyword">int</span>[] parent = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    boolean[] visited = <span class="code-keyword">new</span> boolean[V];
+    
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    Arrays.fill(parent, -1);
+    dist[src] = 0;
+    
+    PriorityQueue&lt;Edge&gt; pq = <span class="code-keyword">new</span> PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+    pq.add(<span class="code-keyword">new</span> Edge(src, 0));
+    
+    <span class="code-keyword">while</span> (!pq.isEmpty()) {
+        <span class="code-keyword">int</span> u = pq.poll().destination;
+        
+        <span class="code-keyword">if</span> (visited[u]) <span class="code-keyword">continue</span>;
+        visited[u] = true;
+        
+        <span class="code-keyword">if</span> (u == dest) {
+            <span class="code-keyword">break</span>;
+        }
+        
+        <span class="code-keyword">for</span> (Edge edge : adj.get(u)) {
+            <span class="code-keyword">int</span> v = edge.destination;
+            <span class="code-keyword">int</span> weight = edge.weight;
+            
+            <span class="code-keyword">if</span> (!visited[v] && dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                parent[v] = u;
+                pq.add(<span class="code-keyword">new</span> Edge(v, dist[v]));
+            }
+        }
+    }
+    
+    <span class="code-comment">// Reconstruct path</span>
+    List&lt;Integer&gt; path = <span class="code-keyword">new</span> ArrayList<>();
+    <span class="code-keyword">if</span> (dist[dest] == Integer.MAX_VALUE) {
+        <span class="code-keyword">return</span> path; <span class="code-comment">// Empty list if no path</span>
+    }
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> v = dest; v != -1; v = parent[v]) {
+        path.add(v);
+    }
+    Collections.reverse(path);
+    
+    <span class="code-keyword">return</span> path;
+}
+
+<span class="code-comment">// Solution for Exercise 3: A* Search Algorithm</span>
+<span class="code-keyword">public</span> List&lt;Integer&gt; <span class="code-class">aStarSearch</span>(<span class="code-keyword">int</span> src, <span class="code-keyword">int</span> dest) {
+    <span class="code-comment">// Heuristic function (Euclidean distance for grid, or 0 for general graph)</span>
+    <span class="code-keyword">int</span>[] heuristic = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    <span class="code-comment">// For simplicity, we use 0 heuristic (A* becomes Dijkstra)</span>
+    <span class="code-comment">// In practice, you'd implement an appropriate heuristic</span>
+    
+    <span class="code-keyword">int</span>[] gScore = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    <span class="code-keyword">int</span>[] fScore = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    <span class="code-keyword">int</span>[] parent = <span class="code-keyword">new</span> <span class="code-keyword">int</span>[V];
+    
+    Arrays.fill(gScore, Integer.MAX_VALUE);
+    Arrays.fill(fScore, Integer.MAX_VALUE);
+    Arrays.fill(parent, -1);
+    
+    gScore[src] = 0;
+    fScore[src] = heuristic[src];
+    
+    PriorityQueue&lt;Node&gt; openSet = <span class="code-keyword">new</span> PriorityQueue<>(Comparator.comparingInt(n -> n.fScore));
+    openSet.add(<span class="code-keyword">new</span> Node(src, fScore[src]));
+    
+    <span class="code-keyword">while</span> (!openSet.isEmpty()) {
+        Node current = openSet.poll();
+        
+        <span class="code-keyword">if</span> (current.vertex == dest) {
+            <span class="code-comment">// Reconstruct path</span>
+            List&lt;Integer&gt; path = <span class="code-keyword">new</span> ArrayList<>();
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> v = dest; v != -1; v = parent[v]) {
+                path.add(v);
+            }
+            Collections.reverse(path);
+            <span class="code-keyword">return</span> path;
+        }
+        
+        <span class="code-keyword">for</span> (Edge edge : adj.get(current.vertex)) {
+            <span class="code-keyword">int</span> neighbor = edge.destination;
+            <span class="code-keyword">int</span> tentativeGScore = gScore[current.vertex] + edge.weight;
+            
+            <span class="code-keyword">if</span> (tentativeGScore < gScore[neighbor]) {
+                parent[neighbor] = current.vertex;
+                gScore[neighbor] = tentativeGScore;
+                fScore[neighbor] = gScore[neighbor] + heuristic[neighbor];
+                
+                <span class="code-comment">// Check if neighbor is in openSet</span>
+                <span class="code-keyword">boolean</span> inOpenSet = openSet.stream().anyMatch(n -> n.vertex == neighbor);
+                <span class="code-keyword">if</span> (!inOpenSet) {
+                    openSet.add(<span class="code-keyword">new</span> Node(neighbor, fScore[neighbor]));
+                }
+            }
+        }
+    }
+    
+    <span class="code-keyword">return</span> <span class="code-keyword">new</span> ArrayList<>(); <span class="code-comment">// No path found</span>
+}
+
+<span class="code-keyword">class</span> <span class="code-class">Node</span> {
+    <span class="code-keyword">int</span> vertex;
+    <span class="code-keyword">int</span> fScore;
+    
+    <span class="code-keyword">public</span> <span class="code-class">Node</span>(<span class="code-keyword">int</span> vertex, <span class="code-keyword">int</span> fScore) {
+        <span class="code-keyword">this</span>.vertex = vertex;
+        <span class="code-keyword">this</span>.fScore = fScore;
+    }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Tab -->
+                    <div class="tab-content" data-tab-content="quiz">
+                        <h2 class="section-title">Shortest-Path Problem Quiz</h2>
+                        <div class="quiz-section">
+                            <div class="question">1. Which algorithm is best for finding shortest paths in a graph with negative weights?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Dijkstra's</div>
+                                <div class="option" data-correct="true">B. Bellman-Ford</div>
+                                <div class="option" data-correct="false">C. Prim's</div>
+                                <div class="option" data-correct="false">D. Kruskal's</div>
+                            </div>
+                            
+                            <div class="question">2. What is the time complexity of Floyd-Warshall algorithm?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. O(V²)</div>
+                                <div class="option" data-correct="false">B. O(V log V)</div>
+                                <div class="option" data-correct="true">C. O(V³)</div>
+                                <div class="option" data-correct="false">D. O(V² log V)</div>
+                            </div>
+                            
+                            <div class="question">3. Which algorithm uses a heuristic to improve performance over Dijkstra's?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Bellman-Ford</div>
+                                <div class="option" data-correct="false">B. Floyd-Warshall</div>
+                                <div class="option" data-correct="true">C. A* Search</div>
+                                <div class="option" data-correct="false">D. Johnson's</div>
+                            </div>
+                            
+                            <div class="question">4. What is the main limitation of Dijkstra's algorithm?</div>
+                            <div class="options">
+                                <div class="option" data-correct="true">A. It doesn't work with negative weight edges</div>
+                                <div class="option" data-correct="false">B. It's too slow for large graphs</div>
+                                <div class="option" data-correct="false">C. It only works for directed graphs</div>
+                                <div class="option" data-correct="false">D. It requires the graph to be a tree</div>
+                            </div>
+                            
+                            <button class="btn" id="submit-quiz-5">
+                                <i class="fas fa-check-circle"></i> Submit Quiz
+                            </button>
+                            
+                            <div class="quiz-result" id="quiz-result-5"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- The Knight's Tour Content -->
+                <div id="knight" class="topic-content" style="display: none;">
+                    <!-- Definition Tab -->
+                    <div class="tab-content active" data-tab-content="definition">
+                        <h2 class="section-title">The Knight's Tour Problem</h2>
+                        <div class="definition">
+                            <p>The <strong>Knight's Tour</strong> is a chess puzzle where the knight must visit every square on a chessboard exactly once. This is a classic example of a Hamiltonian path problem in graph theory, where each square is a vertex and the knight's legal moves are edges.</p>
+                            <br>
+                            <p><strong>Key Concepts:</strong></p>
+                            <div class="algorithm-step">
+                                <div class="step-number">1</div>
+                                <div><strong>Hamiltonian Path:</strong> A path in a graph that visits each vertex exactly once.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">2</div>
+                                <div><strong>Backtracking:</strong> A recursive algorithm that builds candidates to the solution and abandons a candidate (backtracks) when it determines the candidate cannot lead to a valid solution.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">3</div>
+                                <div><strong>Warnsdorff's Rule:</strong> A heuristic for the Knight's Tour: always move to the square with the fewest onward moves.</div>
+                            </div>
+                            <div class="algorithm-step">
+                                <div class="step-number">4</div>
+                                <div><strong>Closed vs Open Tour:</strong> A closed tour ends on a square that is a knight's move away from the starting square, forming a cycle.</div>
+                            </div>
+                        </div>
+                        <div class="visualization">
+                            <h3>Knight's Tour Visualization</h3>
+                            <div class="knight-board" id="knight-board">
+                                <!-- Chessboard will be drawn here -->
+                            </div>
+                            <div class="controls">
+                                <button class="btn" id="start-tour">
+                                    <i class="fas fa-play"></i> Start Knight's Tour
+                                </button>
+                                <button class="btn" id="reset-tour">
+                                    <i class="fas fa-redo"></i> Reset Board
+                                </button>
+                                <button class="btn btn-secondary" id="step-tour">
+                                    <i class="fas fa-step-forward"></i> Step by Step
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Tab -->
+                    <div class="tab-content" data-tab-content="example">
+                        <h2 class="section-title">Knight's Tour Implementation in Java</h2>
+                        <div class="example-section">
+                            <p>Here's an implementation of the Knight's Tour problem using backtracking:</p>
+                            <div class="code-block">
+                                <pre><code><span class="code-keyword">public class</span> <span class="code-class">KnightsTour</span> {
+    <span class="code-keyword">private static final int</span> BOARD_SIZE = 8;
+    <span class="code-keyword">private</span> <span class="code-keyword">int</span>[][] board;
+    <span class="code-keyword">private</span> <span class="code-keyword">int</span>[] moveX = {2, 1, -1, -2, -2, -1, 1, 2};
+    <span class="code-keyword">private</span> <span class="code-keyword">int</span>[] moveY = {1, 2, 2, 1, -1, -2, -2, -1};
+    
+    <span class="code-keyword">public</span> <span class="code-class">KnightsTour</span>() {
+        board = <span class="code-keyword">new int</span>[BOARD_SIZE][BOARD_SIZE];
+        <span class="code-comment">// Initialize board with -1 (unvisited)</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < BOARD_SIZE; i++) {
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < BOARD_SIZE; j++) {
+                board[i][j] = -1;
+            }
+        }
+    }
+    
+    <span class="code-comment">// Check if the move is valid</span>
+    <span class="code-keyword">private boolean</span> <span class="code-class">isValidMove</span>(<span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y) {
+        <span class="code-keyword">return</span> (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE && board[x][y] == -1);
+    }
+    
+    <span class="code-comment">// Solve Knight's Tour using backtracking</span>
+    <span class="code-keyword">public boolean</span> <span class="code-class">solveKT</span>() {
+        <span class="code-comment">// Start from cell (0, 0)</span>
+        board[0][0] = 0;
+        
+        <span class="code-keyword">if</span> (!solveKTUtil(0, 0, 1)) {
+            System.out.println(<span class="code-string">"Solution does not exist"</span>);
+            <span class="code-keyword">return</span> false;
+        } <span class="code-keyword">else</span> {
+            printSolution();
+            <span class="code-keyword">return</span> true;
+        }
+    }
+    
+    <span class="code-keyword">private boolean</span> <span class="code-class">solveKTUtil</span>(<span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y, <span class="code-keyword">int</span> moveCount) {
+        <span class="code-keyword">if</span> (moveCount == BOARD_SIZE * BOARD_SIZE) {
+            <span class="code-keyword">return</span> true;
+        }
+        
+        <span class="code-comment">// Try all next moves from the current coordinate</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 8; i++) {
+            <span class="code-keyword">int</span> nextX = x + moveX[i];
+            <span class="code-keyword">int</span> nextY = y + moveY[i];
+            
+            <span class="code-keyword">if</span> (isValidMove(nextX, nextY)) {
+                board[nextX][nextY] = moveCount;
+                
+                <span class="code-keyword">if</span> (solveKTUtil(nextX, nextY, moveCount + 1)) {
+                    <span class="code-keyword">return</span> true;
+                } <span class="code-keyword">else</span> {
+                    <span class="code-comment">// Backtracking</span>
+                    board[nextX][nextY] = -1;
+                }
+            }
+        }
+        
+        <span class="code-keyword">return</span> false;
+    }
+    
+    <span class="code-comment">// Solve using Warnsdorff's rule (heuristic)</span>
+    <span class="code-keyword">public boolean</span> <span class="code-class">solveKTWarnsdorff</span>() {
+        <span class="code-comment">// Initialize board</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < BOARD_SIZE; i++) {
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < BOARD_SIZE; j++) {
+                board[i][j] = -1;
+            }
+        }
+        
+        <span class="code-comment">// Start from a random position</span>
+        <span class="code-keyword">int</span> startX = (<span class="code-keyword">int</span>)(Math.random() * BOARD_SIZE);
+        <span class="code-keyword">int</span> startY = (<span class="code-keyword">int</span>)(Math.random() * BOARD_SIZE);
+        
+        board[startX][startY] = 0;
+        
+        <span class="code-comment">// Make moves according to Warnsdorff's rule</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 1; i < BOARD_SIZE * BOARD_SIZE; i++) {
+            <span class="code-keyword">int</span>[] nextMove = selectNextMove(startX, startY);
+            
+            <span class="code-keyword">if</span> (nextMove == null) {
+                System.out.println(<span class="code-string">"Warnsdorff's rule failed at move "</span> + i);
+                <span class="code-keyword">return</span> false;
+            }
+            
+            startX = nextMove[0];
+            startY = nextMove[1];
+            board[startX][startY] = i;
+        }
+        
+        printSolution();
+        <span class="code-keyword">return</span> true;
+    }
+    
+    <span class="code-keyword">private int</span>[] <span class="code-class">selectNextMove</span>(<span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y) {
+        <span class="code-keyword">int</span> minDegree = BOARD_SIZE + 1;
+        <span class="code-keyword">int</span> minX = -1, minY = -1;
+        
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 8; i++) {
+            <span class="code-keyword">int</span> nextX = x + moveX[i];
+            <span class="code-keyword">int</span> nextY = y + moveY[i];
+            
+            <span class="code-keyword">if</span> (isValidMove(nextX, nextY)) {
+                <span class="code-keyword">int</span> degree = getDegree(nextX, nextY);
+                
+                <span class="code-keyword">if</span> (degree < minDegree) {
+                    minDegree = degree;
+                    minX = nextX;
+                    minY = nextY;
+                }
+            }
+        }
+        
+        <span class="code-keyword">if</span> (minX == -1) {
+            <span class="code-keyword">return</span> null;
+        }
+        
+        <span class="code-keyword">return new int</span>[]{minX, minY};
+    }
+    
+    <span class="code-keyword">private int</span> <span class="code-class">getDegree</span>(<span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y) {
+        <span class="code-keyword">int</span> count = 0;
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 8; i++) {
+            <span class="code-keyword">int</span> nextX = x + moveX[i];
+            <span class="code-keyword">int</span> nextY = y + moveY[i];
+            
+            <span class="code-keyword">if</span> (isValidMove(nextX, nextY)) {
+                count++;
+            }
+        }
+        <span class="code-keyword">return</span> count;
+    }
+    
+    <span class="code-keyword">private void</span> <span class="code-class">printSolution</span>() {
+        System.out.println(<span class="code-string">"Knight's Tour Solution:"</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < BOARD_SIZE; i++) {
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < BOARD_SIZE; j++) {
+                System.out.print(board[i][j] + <span class="code-string">"\t"</span>);
+            }
+            System.out.println();
+        }
+    }
+    
+    <span class="code-keyword">public static void</span> <span class="code-class">main</span>(String[] args) {
+        KnightsTour kt = <span class="code-keyword">new</span> KnightsTour();
+        
+        System.out.println(<span class="code-string">"Solving Knight's Tour using backtracking:"</span>);
+        long startTime = System.currentTimeMillis();
+        kt.solveKT();
+        long endTime = System.currentTimeMillis();
+        System.out.println(<span class="code-string">"Time taken: "</span> + (endTime - startTime) + <span class="code-string">" ms"</span>);
+        
+        System.out.println(<span class="code-string">"\nSolving Knight's Tour using Warnsdorff's rule:"</span>);
+        startTime = System.currentTimeMillis();
+        kt.solveKTWarnsdorff();
+        endTime = System.currentTimeMillis();
+        System.out.println(<span class="code-string">"Time taken: "</span> + (endTime - startTime) + <span class="code-string">" ms"</span>);
+    }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice Tab -->
+                    <div class="tab-content" data-tab-content="practice">
+                        <h2 class="section-title">Practice Exercises</h2>
+                        <div class="practice-section">
+                            <div class="exercise">
+                                <p class="question">1. Modify the Knight's Tour to find a closed tour (ending position is a knight's move away from the starting position).</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public boolean</span> <span class="code-class">solveClosedTour</span>() {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">2. Implement the Knight's Tour for an N×N board where N is given as input.</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public boolean</span> <span class="code-class">solveKT</span>(<span class="code-keyword">int</span> n) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="exercise">
+                                <p class="question">3. Count all possible Knight's Tours on a smaller board (e.g., 5×5).</p>
+                                <div class="code-block">
+                                    <pre><code><span class="code-keyword">public int</span> <span class="code-class">countAllTours</span>(<span class="code-keyword">int</span> boardSize) {
+    <span class="code-comment">// Your code here</span>
+}</code></pre>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" id="show-answers-6">
+                                <i class="fas fa-lightbulb"></i> Show Sample Solutions
+                            </button>
+                            
+                            <div id="answers-6" style="display: none; margin-top: 20px;">
+                                <div class="code-block">
+                                    <pre><code><span class="code-comment">// Solution for Exercise 1: Closed Knight's Tour</span>
+<span class="code-keyword">public boolean</span> <span class="code-class">solveClosedTour</span>() {
+    <span class="code-comment">// Try starting from each position</span>
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> startX = 0; startX < BOARD_SIZE; startX++) {
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> startY = 0; startY < BOARD_SIZE; startY++) {
+            <span class="code-comment">// Reset board</span>
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < BOARD_SIZE; i++) {
+                <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < BOARD_SIZE; j++) {
+                    board[i][j] = -1;
+                }
+            }
+            
+            board[startX][startY] = 0;
+            
+            <span class="code-keyword">if</span> (solveClosedTourUtil(startX, startY, 1, startX, startY)) {
+                printSolution();
+                System.out.println(<span class="code-string">"Closed tour starting from ("</span> + startX + <span class="code-string">", "</span> + startY + <span class="code-string">")"</span>);
+                <span class="code-keyword">return</span> true;
+            }
+        }
+    }
+    
+    System.out.println(<span class="code-string">"No closed tour exists"</span>);
+    <span class="code-keyword">return</span> false;
+}
+
+<span class="code-keyword">private boolean</span> <span class="code-class">solveClosedTourUtil</span>(<span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y, <span class="code-keyword">int</span> moveCount, <span class="code-keyword">int</span> startX, <span class="code-keyword">int</span> startY) {
+    <span class="code-keyword">if</span> (moveCount == BOARD_SIZE * BOARD_SIZE) {
+        <span class="code-comment">// Check if last position is a knight's move away from start</span>
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 8; i++) {
+            <span class="code-keyword">if</span> (x + moveX[i] == startX && y + moveY[i] == startY) {
+                <span class="code-keyword">return</span> true;
+            }
+        }
+        <span class="code-keyword">return</span> false;
+    }
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 8; i++) {
+        <span class="code-keyword">int</span> nextX = x + moveX[i];
+        <span class="code-keyword">int</span> nextY = y + moveY[i];
+        
+        <span class="code-keyword">if</span> (isValidMove(nextX, nextY)) {
+            board[nextX][nextY] = moveCount;
+            
+            <span class="code-keyword">if</span> (solveClosedTourUtil(nextX, nextY, moveCount + 1, startX, startY)) {
+                <span class="code-keyword">return</span> true;
+            } <span class="code-keyword">else</span> {
+                board[nextX][nextY] = -1;
+            }
+        }
+    }
+    
+    <span class="code-keyword">return</span> false;
+}
+
+<span class="code-comment">// Solution for Exercise 2: N×N Knight's Tour</span>
+<span class="code-keyword">public boolean</span> <span class="code-class">solveKT</span>(<span class="code-keyword">int</span> n) {
+    <span class="code-keyword">int</span>[][] customBoard = <span class="code-keyword">new int</span>[n][n];
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < n; i++) {
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < n; j++) {
+            customBoard[i][j] = -1;
+        }
+    }
+    
+    <span class="code-comment">// Start from (0, 0)</span>
+    customBoard[0][0] = 0;
+    
+    <span class="code-keyword">return</span> solveKTUtil(customBoard, 0, 0, 1, n);
+}
+
+<span class="code-keyword">private boolean</span> <span class="code-class">solveKTUtil</span>(<span class="code-keyword">int</span>[][] board, <span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y, <span class="code-keyword">int</span> moveCount, <span class="code-keyword">int</span> n) {
+    <span class="code-keyword">if</span> (moveCount == n * n) {
+        <span class="code-comment">// Print solution</span>
+        System.out.println(<span class="code-string">"Solution for "</span> + n + <span class="code-string">"x"</span> + n + <span class="code-string">" board:"</span>);
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < n; i++) {
+            <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < n; j++) {
+                System.out.print(board[i][j] + <span class="code-string">"\t"</span>);
+            }
+            System.out.println();
+        }
+        <span class="code-keyword">return</span> true;
+    }
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 8; i++) {
+        <span class="code-keyword">int</span> nextX = x + moveX[i];
+        <span class="code-keyword">int</span> nextY = y + moveY[i];
+        
+        <span class="code-keyword">if</span> (nextX >= 0 && nextX < n && nextY >= 0 && nextY < n && board[nextX][nextY] == -1) {
+            board[nextX][nextY] = moveCount;
+            
+            <span class="code-keyword">if</span> (solveKTUtil(board, nextX, nextY, moveCount + 1, n)) {
+                <span class="code-keyword">return</span> true;
+            } <span class="code-keyword">else</span> {
+                board[nextX][nextY] = -1;
+            }
+        }
+    }
+    
+    <span class="code-keyword">return</span> false;
+}
+
+<span class="code-comment">// Solution for Exercise 3: Count All Tours</span>
+<span class="code-keyword">public int</span> <span class="code-class">countAllTours</span>(<span class="code-keyword">int</span> boardSize) {
+    <span class="code-keyword">int</span>[][] board = <span class="code-keyword">new int</span>[boardSize][boardSize];
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < boardSize; i++) {
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j < boardSize; j++) {
+            board[i][j] = -1;
+        }
+    }
+    
+    <span class="code-comment">// Start counting from (0,0) - you could also count from all starting positions</span>
+    board[0][0] = 0;
+    
+    <span class="code-keyword">return</span> countAllToursUtil(board, 0, 0, 1, boardSize);
+}
+
+<span class="code-keyword">private int</span> <span class="code-class">countAllToursUtil</span>(<span class="code-keyword">int</span>[][] board, <span class="code-keyword">int</span> x, <span class="code-keyword">int</span> y, <span class="code-keyword">int</span> moveCount, <span class="code-keyword">int</span> n) {
+    <span class="code-keyword">if</span> (moveCount == n * n) {
+        <span class="code-keyword">return</span> 1;
+    }
+    
+    <span class="code-keyword">int</span> count = 0;
+    
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < 8; i++) {
+        <span class="code-keyword">int</span> nextX = x + moveX[i];
+        <span class="code-keyword">int</span> nextY = y + moveY[i];
+        
+        <span class="code-keyword">if</span> (nextX >= 0 && nextX < n && nextY >= 0 && nextY < n && board[nextX][nextY] == -1) {
+            board[nextX][nextY] = moveCount;
+            count += countAllToursUtil(board, nextX, nextY, moveCount + 1, n);
+            board[nextX][nextY] = -1;
+        }
+    }
+    
+    <span class="code-keyword">return</span> count;
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quiz Tab -->
+                    <div class="tab-content" data-tab-content="quiz">
+                        <h2 class="section-title">Knight's Tour Quiz</h2>
+                        <div class="quiz-section">
+                            <div class="question">1. What type of graph problem is the Knight's Tour?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Shortest Path Problem</div>
+                                <div class="option" data-correct="true">B. Hamiltonian Path Problem</div>
+                                <div class="option" data-correct="false">C. Minimum Spanning Tree</div>
+                                <div class="option" data-correct="false">D. Graph Coloring</div>
+                            </div>
+                            
+                            <div class="question">2. What is Warnsdorff's rule for the Knight's Tour?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. Always move to the center of the board</div>
+                                <div class="option" data-correct="true">B. Move to the square with the fewest onward moves</div>
+                                <div class="option" data-correct="false">C. Always move clockwise</div>
+                                <div class="option" data-correct="false">D. Always move to the edge first</div>
+                            </div>
+                            
+                            <div class="question">3. How many possible moves does a knight have from any position (assuming it's not near the edge)?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. 4</div>
+                                <div class="option" data-correct="false">B. 6</div>
+                                <div class="option" data-correct="true">C. 8</div>
+                                <div class="option" data-correct="false">D. 10</div>
+                            </div>
+                            
+                            <div class="question">4. What's the time complexity of the backtracking solution for Knight's Tour on an N×N board?</div>
+                            <div class="options">
+                                <div class="option" data-correct="false">A. O(N)</div>
+                                <div class="option" data-correct="false">B. O(N²)</div>
+                                <div class="option" data-correct="true">C. O(8^(N²))</div>
+                                <div class="option" data-correct="false">D. O(N log N)</div>
+                            </div>
+                            
+                            <button class="btn" id="submit-quiz-6">
+                                <i class="fas fa-check-circle"></i> Submit Quiz
+                            </button>
+                            
+                            <div class="quiz-result" id="quiz-result-6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Graph Algorithms Presentation in Java | Created with HTML, CSS, and JavaScript</p>
+            <p>© 2023 Graph Algorithms Interactive Tutorial</p>
+        </div>
+    </div>
+
+    <script>
+        // Track which topic is active
+        let activeTopic = 'graphs';
+        let completedTopics = new Set(['graphs']);
+        let progress = 1; // Start with 1 topic completed (graphs is default)
+        
+        // Initialize the presentation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Draw initial chessboard for Knight's Tour
+            drawChessboard();
+            
+            // Draw initial graph visualization
+            drawGraph();
+            
+            // Set up topic switching
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const topic = this.getAttribute('data-topic');
+                    switchTopic(topic);
+                });
+            });
+            
+            // Set up tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            // Set up buttons
+            document.getElementById('generate-graph').addEventListener('click', drawGraph);
+            document.getElementById('add-node').addEventListener('click', addNode);
+            document.getElementById('run-bfs').addEventListener('click', runBFS);
+            document.getElementById('run-dfs').addEventListener('click', runDFS);
+            document.getElementById('reset-search').addEventListener('click', resetSearch);
+            document.getElementById('generate-directed').addEventListener('click', drawDirectedGraph);
+            document.getElementById('topological-sort').addEventListener('click', runTopologicalSort);
+            document.getElementById('generate-weighted').addEventListener('click', drawWeightedGraph);
+            document.getElementById('find-mst').addEventListener('click', runMST);
+            document.getElementById('run-dijkstra').addEventListener('click', runDijkstra);
+            document.getElementById('run-floyd').addEventListener('click', runFloyd);
+            document.getElementById('reset-shortest').addEventListener('click', resetShortest);
+            document.getElementById('start-tour').addEventListener('click', startKnightTour);
+            document.getElementById('step-tour').addEventListener('click', stepKnightTour);
+            document.getElementById('reset-tour').addEventListener('click', resetKnightTour);
+            
+            // Set up quiz buttons
+            document.getElementById('submit-quiz-1').addEventListener('click', () => submitQuiz(1));
+            document.getElementById('submit-quiz-2').addEventListener('click', () => submitQuiz(2));
+            document.getElementById('submit-quiz-3').addEventListener('click', () => submitQuiz(3));
+            document.getElementById('submit-quiz-4').addEventListener('click', () => submitQuiz(4));
+            document.getElementById('submit-quiz-5').addEventListener('click', () => submitQuiz(5));
+            document.getElementById('submit-quiz-6').addEventListener('click', () => submitQuiz(6));
+            
+            // Set up answer buttons
+            document.getElementById('show-answers-1').addEventListener('click', () => toggleAnswers(1));
+            document.getElementById('show-answers-2').addEventListener('click', () => toggleAnswers(2));
+            document.getElementById('show-answers-3').addEventListener('click', () => toggleAnswers(3));
+            document.getElementById('show-answers-4').addEventListener('click', () => toggleAnswers(4));
+            document.getElementById('show-answers-5').addEventListener('click', () => toggleAnswers(5));
+            document.getElementById('show-answers-6').addEventListener('click', () => toggleAnswers(6));
+            
+            // Set up reset progress button
+            document.getElementById('reset-progress').addEventListener('click', resetProgress);
+            
+            // Initialize progress
+            updateProgress();
+        });
+        
+        function switchTopic(topic) {
+            // Update active topic in sidebar
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-topic') === topic) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Hide all topic contents
+            document.querySelectorAll('.topic-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected topic content
+            document.getElementById(topic).style.display = 'block';
+            
+            // Reset tabs to definition
+            switchTab('definition');
+            
+            // Update active topic
+            activeTopic = topic;
+            
+            // Mark topic as completed if not already
+            if (!completedTopics.has(topic)) {
+                completedTopics.add(topic);
+                progress = completedTopics.size;
+                updateProgress();
+            }
+            
+            // Update visualizations based on topic
+            if (topic === 'knight') {
+                drawChessboard();
+            } else if (topic === 'graphs') {
+                drawGraph();
+            } else if (topic === 'searches') {
+                drawSearchGraph();
+            } else if (topic === 'directed') {
+                drawDirectedGraph();
+            } else if (topic === 'weighted') {
+                drawWeightedGraph();
+            } else if (topic === 'shortest') {
+                drawShortestPathGraph();
+            }
+        }
+        
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.querySelectorAll(`[data-tab-content="${tabName}"]`).forEach(content => {
+                content.classList.add('active');
+            });
+        }
+        
+        function updateProgress() {
+            const progressPercent = (progress / 6) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+            document.getElementById('progress-text').textContent = `${Math.round(progressPercent)}%`;
+            document.getElementById('topics-completed').textContent = progress;
+        }
+        
+        function resetProgress() {
+            completedTopics = new Set(['graphs']);
+            progress = 1;
+            updateProgress();
+            
+            // Reset all quizzes
+            for (let i = 1; i <= 6; i++) {
+                const resultElement = document.getElementById(`quiz-result-${i}`);
+                resultElement.classList.remove('show');
+                resultElement.textContent = '';
+                
+                // Reset options
+                const options = document.querySelectorAll(`#quiz-${i} .option`);
+                options.forEach(option => {
+                    option.classList.remove('selected', 'correct', 'incorrect');
+                });
+            }
+            
+            // Reset answers visibility
+            for (let i = 1; i <= 6; i++) {
+                const answersElement = document.getElementById(`answers-${i}`);
+                if (answersElement) {
+                    answersElement.style.display = 'none';
+                }
+            }
+        }
+        
+        // Graph visualization functions
+        function drawGraph() {
+            const canvas = document.getElementById('graph-visualization');
+            canvas.innerHTML = '';
+            
+            // Create an SVG element
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", "0 0 400 300");
+            
+            // Create nodes
+            const nodes = [
+                {id: 0, x: 100, y: 150},
+                {id: 1, x: 200, y: 100},
+                {id: 2, x: 300, y: 150},
+                {id: 3, x: 200, y: 200},
+                {id: 4, x: 150, y: 250}
+            ];
+            
+            // Create edges
+            const edges = [
+                {source: 0, target: 1},
+                {source: 0, target: 3},
+                {source: 1, target: 2},
+                {source: 1, target: 3},
+                {source: 2, target: 3},
+                {source: 3, target: 4}
+            ];
+            
+            // Draw edges
+            edges.forEach(edge => {
+                const source = nodes[edge.source];
+                const target = nodes[edge.target];
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", source.x);
+                line.setAttribute("y1", source.y);
+                line.setAttribute("x2", target.x);
+                line.setAttribute("y2", target.y);
+                line.setAttribute("stroke", "#4facfe");
+                line.setAttribute("stroke-width", "2");
+                svg.appendChild(line);
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", node.x);
+                circle.setAttribute("cy", node.y);
+                circle.setAttribute("r", "20");
+                circle.setAttribute("fill", "#203a43");
+                circle.setAttribute("stroke", "#4facfe");
+                circle.setAttribute("stroke-width", "3");
+                svg.appendChild(circle);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x);
+                text.setAttribute("y", node.y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#f0f8ff");
+                text.setAttribute("font-size", "16");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = node.id;
+                svg.appendChild(text);
+            });
+            
+            canvas.appendChild(svg);
+        }
+        
+        function addNode() {
+            // Simple implementation - just redraw the graph with an extra node
+            drawGraph();
+        }
+        
+        function drawSearchGraph() {
+            const canvas = document.getElementById('search-visualization');
+            canvas.innerHTML = '';
+            
+            // Similar to drawGraph but with a tree structure for BFS/DFS
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", "0 0 400 300");
+            
+            // Create a tree structure
+            const nodes = [
+                {id: 0, x: 200, y: 50},
+                {id: 1, x: 100, y: 120},
+                {id: 2, x: 300, y: 120},
+                {id: 3, x: 50, y: 190},
+                {id: 4, x: 150, y: 190},
+                {id: 5, x: 250, y: 190},
+                {id: 6, x: 350, y: 190}
+            ];
+            
+            const edges = [
+                {source: 0, target: 1},
+                {source: 0, target: 2},
+                {source: 1, target: 3},
+                {source: 1, target: 4},
+                {source: 2, target: 5},
+                {source: 2, target: 6}
+            ];
+            
+            // Draw edges
+            edges.forEach(edge => {
+                const source = nodes[edge.source];
+                const target = nodes[edge.target];
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", source.x);
+                line.setAttribute("y1", source.y);
+                line.setAttribute("x2", target.x);
+                line.setAttribute("y2", target.y);
+                line.setAttribute("stroke", "#4facfe");
+                line.setAttribute("stroke-width", "2");
+                svg.appendChild(line);
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", node.x);
+                circle.setAttribute("cy", node.y);
+                circle.setAttribute("r", "18");
+                circle.setAttribute("fill", "#203a43");
+                circle.setAttribute("stroke", "#4facfe");
+                circle.setAttribute("stroke-width", "3");
+                circle.setAttribute("id", `search-node-${node.id}`);
+                svg.appendChild(circle);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x);
+                text.setAttribute("y", node.y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#f0f8ff");
+                text.setAttribute("font-size", "14");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = node.id;
+                svg.appendChild(text);
+            });
+            
+            canvas.appendChild(svg);
+        }
+        
+        function runBFS() {
+            const nodes = [0, 1, 2, 3, 4, 5, 6];
+            let delay = 0;
+            
+            nodes.forEach(nodeId => {
+                setTimeout(() => {
+                    const node = document.getElementById(`search-node-${nodeId}`);
+                    if (node) {
+                        node.setAttribute("fill", "#00f2fe");
+                        
+                        // Reset after a moment
+                        setTimeout(() => {
+                            node.setAttribute("fill", "#4caf50");
+                        }, 500);
+                    }
+                }, delay * 500);
+                delay++;
+            });
+        }
+        
+        function runDFS() {
+            const traversalOrder = [0, 1, 3, 4, 2, 5, 6];
+            let delay = 0;
+            
+            traversalOrder.forEach(nodeId => {
+                setTimeout(() => {
+                    const node = document.getElementById(`search-node-${nodeId}`);
+                    if (node) {
+                        node.setAttribute("fill", "#ff9800");
+                        
+                        // Reset after a moment
+                        setTimeout(() => {
+                            node.setAttribute("fill", "#4caf50");
+                        }, 500);
+                    }
+                }, delay * 500);
+                delay++;
+            });
+        }
+        
+        function resetSearch() {
+            drawSearchGraph();
+        }
+        
+        function drawDirectedGraph() {
+            const canvas = document.getElementById('directed-visualization');
+            canvas.innerHTML = '';
+            
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", "0 0 400 300");
+            
+            const nodes = [
+                {id: 0, x: 100, y: 150},
+                {id: 1, x: 300, y: 100},
+                {id: 2, x: 300, y: 200},
+                {id: 3, x: 200, y: 250}
+            ];
+            
+            // Directed edges with arrows
+            const edges = [
+                {source: 0, target: 1},
+                {source: 0, target: 2},
+                {source: 1, target: 2},
+                {source: 2, target: 3},
+                {source: 3, target: 0}
+            ];
+            
+            // Draw edges with arrow markers
+            edges.forEach(edge => {
+                const source = nodes[edge.source];
+                const target = nodes[edge.target];
+                
+                // Calculate angle for arrow
+                const dx = target.x - source.x;
+                const dy = target.y - source.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx);
+                
+                // Adjust start and end points to not overlap with node circles
+                const startX = source.x + (dx / length) * 20;
+                const startY = source.y + (dy / length) * 20;
+                const endX = target.x - (dx / length) * 20;
+                const endY = target.y - (dy / length) * 20;
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", startX);
+                line.setAttribute("y1", startY);
+                line.setAttribute("x2", endX);
+                line.setAttribute("y2", endY);
+                line.setAttribute("stroke", "#4facfe");
+                line.setAttribute("stroke-width", "2");
+                line.setAttribute("marker-end", "url(#arrow)");
+                svg.appendChild(line);
+                
+                // Draw arrowhead
+                const arrowSize = 8;
+                const arrowX = endX - arrowSize * Math.cos(angle);
+                const arrowY = endY - arrowSize * Math.sin(angle);
+                
+                const arrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                const points = [
+                    `${endX},${endY}`,
+                    `${arrowX - arrowSize * Math.cos(angle - Math.PI/6)},${arrowY - arrowSize * Math.sin(angle - Math.PI/6)}`,
+                    `${arrowX - arrowSize * Math.cos(angle + Math.PI/6)},${arrowY - arrowSize * Math.sin(angle + Math.PI/6)}`
+                ].join(" ");
+                arrow.setAttribute("points", points);
+                arrow.setAttribute("fill", "#4facfe");
+                svg.appendChild(arrow);
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", node.x);
+                circle.setAttribute("cy", node.y);
+                circle.setAttribute("r", "20");
+                circle.setAttribute("fill", "#203a43");
+                circle.setAttribute("stroke", "#4facfe");
+                circle.setAttribute("stroke-width", "3");
+                circle.setAttribute("id", `directed-node-${node.id}`);
+                svg.appendChild(circle);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x);
+                text.setAttribute("y", node.y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#f0f8ff");
+                text.setAttribute("font-size", "16");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = node.id;
+                svg.appendChild(text);
+            });
+            
+            canvas.appendChild(svg);
+        }
+        
+        function runTopologicalSort() {
+            // Visualize topological sort on the directed graph
+            const order = [0, 1, 2, 3];
+            let delay = 0;
+            
+            order.forEach(nodeId => {
+                setTimeout(() => {
+                    const node = document.getElementById(`directed-node-${nodeId}`);
+                    if (node) {
+                        node.setAttribute("fill", "#4caf50");
+                    }
+                }, delay * 800);
+                delay++;
+            });
+        }
+        
+        function drawWeightedGraph() {
+            const canvas = document.getElementById('weighted-visualization');
+            canvas.innerHTML = '';
+            
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", "0 0 400 300");
+            
+            const nodes = [
+                {id: 0, x: 100, y: 150},
+                {id: 1, x: 200, y: 100},
+                {id: 2, x: 300, y: 150},
+                {id: 3, x: 200, y: 200},
+                {id: 4, x: 150, y: 250}
+            ];
+            
+            const edges = [
+                {source: 0, target: 1, weight: 2},
+                {source: 0, target: 3, weight: 6},
+                {source: 1, target: 2, weight: 3},
+                {source: 1, target: 3, weight: 8},
+                {source: 1, target: 4, weight: 5},
+                {source: 2, target: 4, weight: 7},
+                {source: 3, target: 4, weight: 9}
+            ];
+            
+            // Draw edges with weights
+            edges.forEach(edge => {
+                const source = nodes[edge.source];
+                const target = nodes[edge.target];
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", source.x);
+                line.setAttribute("y1", source.y);
+                line.setAttribute("x2", target.x);
+                line.setAttribute("y2", target.y);
+                line.setAttribute("stroke", "#4facfe");
+                line.setAttribute("stroke-width", "2");
+                svg.appendChild(line);
+                
+                // Draw weight label
+                const midX = (source.x + target.x) / 2;
+                const midY = (source.y + target.y) / 2;
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", midX);
+                text.setAttribute("y", midY - 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#f0f8ff");
+                text.setAttribute("font-size", "14");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = edge.weight;
+                svg.appendChild(text);
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", node.x);
+                circle.setAttribute("cy", node.y);
+                circle.setAttribute("r", "20");
+                circle.setAttribute("fill", "#203a43");
+                circle.setAttribute("stroke", "#4facfe");
+                circle.setAttribute("stroke-width", "3");
+                circle.setAttribute("id", `weighted-node-${node.id}`);
+                svg.appendChild(circle);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x);
+                text.setAttribute("y", node.y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#f0f8ff");
+                text.setAttribute("font-size", "16");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = node.id;
+                svg.appendChild(text);
+            });
+            
+            canvas.appendChild(svg);
+        }
+        
+        function runMST() {
+            // Visualize MST edges
+            const mstEdges = [
+                {source: 0, target: 1},
+                {source: 1, target: 2},
+                {source: 1, target: 4},
+                {source: 0, target: 3}
+            ];
+            
+            mstEdges.forEach(edge => {
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                
+                // Calculate positions (simplified)
+                const sourceX = 100 + (edge.source === 0 ? 0 : edge.source === 1 ? 100 : edge.source === 2 ? 200 : edge.source === 3 ? 100 : 50);
+                const sourceY = 150 + (edge.source === 0 ? 0 : edge.source === 1 ? -50 : edge.source === 2 ? 0 : edge.source === 3 ? 50 : 100);
+                const targetX = 100 + (edge.target === 0 ? 0 : edge.target === 1 ? 100 : edge.target === 2 ? 200 : edge.target === 3 ? 100 : 50);
+                const targetY = 150 + (edge.target === 0 ? 0 : edge.target === 1 ? -50 : edge.target === 2 ? 0 : edge.target === 3 ? 50 : 100);
+                
+                line.setAttribute("x1", sourceX);
+                line.setAttribute("y1", sourceY);
+                line.setAttribute("x2", targetX);
+                line.setAttribute("y2", targetY);
+                line.setAttribute("stroke", "#4caf50");
+                line.setAttribute("stroke-width", "4");
+                line.setAttribute("opacity", "0.7");
+                
+                document.querySelector('#weighted-visualization svg').appendChild(line);
+            });
+        }
+        
+        function drawShortestPathGraph() {
+            const canvas = document.getElementById('shortest-visualization');
+            canvas.innerHTML = '';
+            
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", "0 0 400 300");
+            
+            const nodes = [
+                {id: 0, x: 50, y: 150},
+                {id: 1, x: 150, y: 100},
+                {id: 2, x: 150, y: 200},
+                {id: 3, x: 250, y: 150},
+                {id: 4, x: 350, y: 150}
+            ];
+            
+            const edges = [
+                {source: 0, target: 1, weight: 4},
+                {source: 0, target: 2, weight: 3},
+                {source: 1, target: 2, weight: 1},
+                {source: 1, target: 3, weight: 2},
+                {source: 2, target: 3, weight: 4},
+                {source: 3, target: 4, weight: 2}
+            ];
+            
+            // Draw edges with weights
+            edges.forEach(edge => {
+                const source = nodes[edge.source];
+                const target = nodes[edge.target];
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", source.x);
+                line.setAttribute("y1", source.y);
+                line.setAttribute("x2", target.x);
+                line.setAttribute("y2", target.y);
+                line.setAttribute("stroke", "#4facfe");
+                line.setAttribute("stroke-width", "2");
+                line.setAttribute("id", `edge-${edge.source}-${edge.target}`);
+                svg.appendChild(line);
+                
+                // Draw weight label
+                const midX = (source.x + target.x) / 2;
+                const midY = (source.y + target.y) / 2;
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", midX);
+                text.setAttribute("y", midY - 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#f0f8ff");
+                text.setAttribute("font-size", "14");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = edge.weight;
+                svg.appendChild(text);
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", node.x);
+                circle.setAttribute("cy", node.y);
+                circle.setAttribute("r", "18");
+                circle.setAttribute("fill", "#203a43");
+                circle.setAttribute("stroke", "#4facfe");
+                circle.setAttribute("stroke-width", "3");
+                circle.setAttribute("id", `shortest-node-${node.id}`);
+                svg.appendChild(circle);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x);
+                text.setAttribute("y", node.y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#f0f8ff");
+                text.setAttribute("font-size", "14");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = node.id;
+                svg.appendChild(text);
+            });
+            
+            canvas.appendChild(svg);
+        }
+        
+        function runDijkstra() {
+            // Visualize Dijkstra's algorithm
+            const distances = [0, 4, 3, 6, 8];
+            const path = [0, 1, 3, 4];
+            
+            // Highlight nodes with their distances
+            distances.forEach((dist, index) => {
+                const node = document.getElementById(`shortest-node-${index}`);
+                if (node) {
+                    // Create a text element for distance
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", node.getAttribute("cx"));
+                    text.setAttribute("y", node.getAttribute("cy") - 25);
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("fill", "#ff9800");
+                    text.setAttribute("font-size", "12");
+                    text.setAttribute("font-weight", "bold");
+                    text.textContent = `dist: ${dist}`;
+                    node.parentNode.appendChild(text);
+                }
+            });
+            
+            // Highlight the shortest path
+            for (let i = 0; i < path.length - 1; i++) {
+                const edge = document.getElementById(`edge-${path[i]}-${path[i+1]}`) || 
+                            document.getElementById(`edge-${path[i+1]}-${path[i]}`);
+                if (edge) {
+                    edge.setAttribute("stroke", "#4caf50");
+                    edge.setAttribute("stroke-width", "4");
+                }
+            }
+        }
+        
+        function runFloyd() {
+            // Simple visualization for Floyd-Warshall
+            const nodes = [0, 1, 2, 3, 4];
+            let delay = 0;
+            
+            // Highlight each node as a potential intermediate
+            nodes.forEach(k => {
+                setTimeout(() => {
+                    const node = document.getElementById(`shortest-node-${k}`);
+                    if (node) {
+                        const originalFill = node.getAttribute("fill");
+                        node.setAttribute("fill", "#ff9800");
+                        
+                        setTimeout(() => {
+                            node.setAttribute("fill", originalFill);
+                        }, 800);
+                    }
+                }, delay * 1000);
+                delay++;
+            });
+        }
+        
+        function resetShortest() {
+            drawShortestPathGraph();
+        }
+        
+        function drawChessboard() {
+            const board = document.getElementById('knight-board');
+            board.innerHTML = '';
+            
+            // Create 8x8 chessboard
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = `cell ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+                    cell.setAttribute('data-row', row);
+                    cell.setAttribute('data-col', col);
+                    cell.id = `cell-${row}-${col}`;
+                    board.appendChild(cell);
+                }
+            }
+        }
+        
+        let knightPosition = {row: 0, col: 0};
+        let moveNumber = 0;
+        let tourPath = [];
+        
+        function startKnightTour() {
+            resetKnightTour();
+            
+            // Start the tour from a random position
+            knightPosition = {row: Math.floor(Math.random() * 8), col: Math.floor(Math.random() * 8)};
+            moveNumber = 0;
+            tourPath = [knightPosition];
+            
+            // Mark the starting cell
+            const startCell = document.getElementById(`cell-${knightPosition.row}-${knightPosition.col}`);
+            startCell.classList.add('start');
+            startCell.innerHTML = `<i class="fas fa-chess-knight knight"></i>`;
+            
+            // Animate the tour
+            animateKnightTour();
+        }
+        
+        function animateKnightTour() {
+            if (moveNumber >= 63) return; // All squares visited
+            
+            // Possible knight moves
+            const moves = [
+                {dr: 2, dc: 1}, {dr: 1, dc: 2},
+                {dr: -1, dc: 2}, {dr: -2, dc: 1},
+                {dr: -2, dc: -1}, {dr: -1, dc: -2},
+                {dr: 1, dc: -2}, {dr: 2, dc: -1}
+            ];
+            
+            // Find valid moves
+            const validMoves = moves.map(move => ({
+                row: knightPosition.row + move.dr,
+                col: knightPosition.col + move.dc
+            })).filter(pos => 
+                pos.row >= 0 && pos.row < 8 && 
+                pos.col >= 0 && pos.col < 8 &&
+                !tourPath.some(visited => visited.row === pos.row && visited.col === pos.col)
+            );
+            
+            if (validMoves.length === 0) {
+                // No valid moves, tour ends
+                return;
+            }
+            
+            // Use Warnsdorff's rule: choose the move with the fewest onward moves
+            let bestMove = validMoves[0];
+            let minDegree = 9;
+            
+            validMoves.forEach(move => {
+                // Calculate degree (number of onward moves)
+                let degree = 0;
+                moves.forEach(kMove => {
+                    const nextRow = move.row + kMove.dr;
+                    const nextCol = move.col + kMove.dc;
+                    
+                    if (nextRow >= 0 && nextRow < 8 && nextCol >= 0 && nextCol < 8) {
+                        // Check if this square is not visited
+                        if (!tourPath.some(visited => visited.row === nextRow && visited.col === nextCol)) {
+                            degree++;
+                        }
+                    }
+                });
+                
+                if (degree < minDegree) {
+                    minDegree = degree;
+                    bestMove = move;
+                }
+            });
+            
+            // Move knight
+            setTimeout(() => {
+                // Clear current knight position
+                const currentCell = document.getElementById(`cell-${knightPosition.row}-${knightPosition.col}`);
+                currentCell.innerHTML = moveNumber + 1;
+                currentCell.classList.add('path');
+                
+                // Update knight position
+                knightPosition = bestMove;
+                tourPath.push(knightPosition);
+                moveNumber++;
+                
+                // Mark new position
+                const newCell = document.getElementById(`cell-${knightPosition.row}-${knightPosition.col}`);
+                newCell.innerHTML = `<i class="fas fa-chess-knight knight"></i>`;
+                newCell.classList.add('active');
+                
+                // Continue tour
+                if (moveNumber < 63) {
+                    animateKnightTour();
+                } else {
+                    // Tour complete
+                    newCell.classList.add('end');
+                }
+            }, 500);
+        }
+        
+        function stepKnightTour() {
+            // For simplicity, just restart the tour
+            startKnightTour();
+        }
+        
+        function resetKnightTour() {
+            drawChessboard();
+            knightPosition = {row: 0, col: 0};
+            moveNumber = 0;
+            tourPath = [];
+        }
+        
+        function submitQuiz(quizNumber) {
+            const options = document.querySelectorAll(`#quiz-${quizNumber} .option`);
+            let correctAnswers = 0;
+            let totalQuestions = 0;
+            
+            // Count questions
+            totalQuestions = document.querySelectorAll(`#quiz-${quizNumber} .question`).length;
+            
+            options.forEach(option => {
+                const isCorrect = option.getAttribute('data-correct') === 'true';
+                
+                if (option.classList.contains('selected')) {
+                    if (isCorrect) {
+                        option.classList.add('correct');
+                        correctAnswers++;
+                    } else {
+                        option.classList.add('incorrect');
+                    }
+                } else if (isCorrect) {
+                    option.classList.add('correct');
+                }
+            });
+            
+            const score = Math.round((correctAnswers / totalQuestions) * 100);
+            const resultElement = document.getElementById(`quiz-result-${quizNumber}`);
+            resultElement.textContent = `You scored ${correctAnswers}/${totalQuestions} (${score}%)`;
+            resultElement.classList.add('show');
+            
+            // Add appropriate color based on score
+            if (score >= 80) {
+                resultElement.style.backgroundColor = 'rgba(76, 175, 80, 0.3)';
+                resultElement.style.color = '#4caf50';
+            } else if (score >= 60) {
+                resultElement.style.backgroundColor = 'rgba(255, 193, 7, 0.3)';
+                resultElement.style.color = '#ffc107';
+            } else {
+                resultElement.style.backgroundColor = 'rgba(244, 67, 54, 0.3)';
+                resultElement.style.color = '#f44336';
+            }
+        }
+        
+        function toggleAnswers(answersNumber) {
+            const answersElement = document.getElementById(`answers-${answersNumber}`);
+            const button = document.getElementById(`show-answers-${answersNumber}`);
+            
+            if (answersElement.style.display === 'none' || !answersElement.style.display) {
+                answersElement.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Solutions';
+            } else {
+                answersElement.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-lightbulb"></i> Show Sample Solutions';
+            }
+        }
+        
+        // Initialize quiz options selection
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option')) {
+                const parent = e.target.parentElement;
+                const options = parent.querySelectorAll('.option');
+                
+                // Remove selected class from all options in this question
+                options.forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked option
+                e.target.classList.add('selected');
+            }
+        });
+    </script>
+</body>
+</html>
