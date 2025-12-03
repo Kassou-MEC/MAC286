@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC286 - Data Structures Final Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            .page-break { page-break-before: always; }
+            body { background: white; font-size: 11pt; }
+            .container { max-width: 100%; box-shadow: none; }
+            .section { break-inside: avoid-page; }
+            textarea { border: 1px solid #333 !important; min-height: 120px !important; }
+            .problem { page-break-inside: avoid; }
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.7;
+            color: #1a1a1a;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: normal;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            font-size: 1.2rem;
+            font-weight: normal;
+            opacity: 0.8;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px 40px;
+            background: #fafafa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .info-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-field label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        .info-field input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .info-field input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        .instructions {
+            padding: 30px 40px;
+            background: #fffbeb;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .instructions h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            border-bottom: 3px solid #1a1a1a;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .section-points {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .problem {
+            margin-bottom: 35px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .problem:last-child {
+            border-bottom: none;
+        }
+
+        .problem-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: baseline;
+        }
+
+        .problem-number {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .problem-title {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .problem-points {
+            margin-left: auto;
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .problem-text {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .scenario {
+            background: #f8f9fa;
+            border-left: 4px solid #1a1a1a;
+            padding: 20px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 20px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            border-radius: 4px;
+        }
+
+        .code-block .keyword { color: #569cd6; }
+        .code-block .type { color: #4ec9b0; }
+        .code-block .string { color: #ce9178; }
+        .code-block .number { color: #b5cea8; }
+        .code-block .comment { color: #6a9955; }
+
+        .answer-section {
+            margin-top: 20px;
+        }
+
+        .answer-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .sub-question {
+            margin: 15px 0 15px 20px;
+        }
+
+        .sub-question label {
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        textarea.large { min-height: 150px; }
+        textarea.code-answer {
+            font-family: 'Consolas', monospace;
+            background: #fafafa;
+        }
+
+        .hint {
+            background: #e8f4fd;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            border-radius: 4px;
+        }
+
+        .hint strong {
+            color: #1565c0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .comparison-table textarea {
+            min-height: 60px;
+            border: none;
+            width: 100%;
+        }
+
+        .download-section {
+            background: #1a1a1a;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .download-btn {
+            background: white;
+            color: #1a1a1a;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .download-note {
+            color: #999;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .student-info { grid-template-columns: 1fr; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MAC286 — Data Structures in Java</h1>
+            <h2>Final Project: Critical Analysis & Design</h2>
+        </div>
+
+        <div class="student-info">
+            <div class="info-field">
+                <label>Student Name</label>
+                <input type="text" id="studentName" placeholder="First and Last Name">
+            </div>
+            <div class="info-field">
+                <label>Date</label>
+                <input type="text" id="dateField" readonly>
+            </div>
+        </div>
+
+        <div class="instructions no-print">
+            <h3>Instructions</h3>
+            <ul>
+                <li>This project assesses your ability to analyze, compare, and apply data structures to solve real problems.</li>
+                <li>Answer all questions thoroughly. Justify your reasoning—correct answers without explanation receive partial credit.</li>
+                <li>When asked for complexity analysis, explain your reasoning, not just the final answer.</li>
+                <li>You may reference your notes, textbook, and lecture materials.</li>
+                <li>When complete, click "Download as PDF" and submit to Brightspace.</li>
+            </ul>
+        </div>
+
+        <div class="content">
+
+            <!-- SECTION 1: ALGORITHM ANALYSIS -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-title">Section I: Algorithm Analysis & Complexity</span>
+                    <span class="section-points">25 Points</span>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">1.1</span>
+                        <span class="problem-title">Stack Implementation Trade-offs</span>
+                        <span class="problem-points">8 pts</span>
+                    </div>
+                    <div class="problem-text">
+                        Consider two implementations of a Stack: one using a fixed-size array, and another using a dynamic array (ArrayList) that doubles in capacity when full.
+                    </div>
+                    
+                    <div class="answer-section">
+                        <label>(a) For the fixed-size array implementation, analyze the time complexity of push() in the best case, worst case, and explain when each occurs.</label>
+                        <textarea placeholder="Analyze push() for fixed-size array..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) For the dynamic array implementation, explain the concept of "amortized" time complexity. Why is push() considered O(1) amortized even though individual operations can be O(n)?</label>
+                        <textarea class="large" placeholder="Explain amortized analysis..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(c) Under what circumstances would you choose the fixed-size implementation over the dynamic one? Consider both performance and practical constraints.</label>
+                        <textarea placeholder="Discuss trade-offs and use cases..."></textarea>
+                    </div>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">1.2</span>
+                        <span class="problem-title">Comparative Complexity Analysis</span>
+                        <span class="problem-points">9 pts</span>
+                    </div>
+                    <div class="problem-text">
+                        Complete the following table comparing operations across data structures. For each cell, provide the time complexity AND a brief justification (1-2 sentences) explaining why.
+                    </div>
+
+                    <table class="comparison-table">
+                        <tr>
+                            <th style="width: 20%;">Operation</th>
+                            <th style="width: 26%;">Array (sorted)</th>
+                            <th style="width: 27%;">Linked List (unsorted)</th>
+                            <th style="width: 27%;">Balanced BST</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Search</strong></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Insert</strong></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Delete</strong></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                            <td><textarea placeholder="O(?) because..."></textarea></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">1.3</span>
+                        <span class="problem-title">Space-Time Trade-off Analysis</span>
+                        <span class="problem-points">8 pts</span>
+                    </div>
+                    <div class="problem-text">
+                        A hash table uses separate chaining with linked lists. The table has m buckets and stores n elements.
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(a) Derive the expected time complexity for search in terms of n and m. What is the load factor, and how does it affect performance?</label>
+                        <textarea placeholder="Derive and explain..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) If memory is constrained and you must choose between a hash table with m=100 buckets or a balanced BST to store n=10,000 elements, which would you choose and why? Analyze both time and space complexity.</label>
+                        <textarea class="large" placeholder="Compare and justify your choice..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: DESIGN PROBLEMS -->
+            <div class="section page-break">
+                <div class="section-header">
+                    <span class="section-title">Section II: Data Structure Design & Selection</span>
+                    <span class="section-points">30 Points</span>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">2.1</span>
+                        <span class="problem-title">Real-World System Design</span>
+                        <span class="problem-points">12 pts</span>
+                    </div>
+                    
+                    <div class="scenario">
+                        You are designing a text editor's UNDO/REDO functionality. The editor must support: (1) unlimited undo operations, (2) redo operations that are cleared when a new edit is made, and (3) efficient memory usage for documents with thousands of edits.
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(a) What data structure(s) would you use to implement this system? Explain your choice and why alternatives are less suitable.</label>
+                        <textarea class="large" placeholder="Propose and justify your design..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) Describe the algorithm for each operation: makeEdit(), undo(), and redo(). Use pseudocode or clear step-by-step descriptions.</label>
+                        <textarea class="large code-answer" placeholder="makeEdit():&#10;&#10;undo():&#10;&#10;redo():"></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(c) How would your design change if the requirement added "undo up to the last 50 operations only" to save memory? What data structure modification would you make?</label>
+                        <textarea placeholder="Explain the modification..."></textarea>
+                    </div>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">2.2</span>
+                        <span class="problem-title">Emergency Room Triage System</span>
+                        <span class="problem-points">10 pts</span>
+                    </div>
+                    
+                    <div class="scenario">
+                        An emergency room needs a patient management system where: (1) patients are seen based on severity (1=critical to 5=minor), (2) within the same severity level, patients are seen in arrival order, and (3) doctors need to quickly find and update a specific patient's status.
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(a) A simple priority queue won't fully satisfy these requirements. Explain why, and propose a data structure design (possibly combining multiple structures) that addresses all three requirements.</label>
+                        <textarea class="large" placeholder="Analyze the problem and propose a solution..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) Analyze the time complexity of: admitPatient(), callNextPatient(), and updatePatientSeverity() in your proposed design.</label>
+                        <textarea placeholder="Analyze each operation..."></textarea>
+                    </div>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">2.3</span>
+                        <span class="problem-title">File System Design</span>
+                        <span class="problem-points">8 pts</span>
+                    </div>
+                    <div class="problem-text">
+                        Consider a file system where directories can contain files and subdirectories. Operations needed: navigate to parent, navigate to child, list all contents, and find a file by name.
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(a) Which tree structure would best represent this hierarchy? Justify why a binary tree is or isn't appropriate.</label>
+                        <textarea placeholder="Analyze and justify..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) To implement "find file by name" efficiently across the entire file system, what auxiliary data structure would you add? Discuss the trade-off you're making.</label>
+                        <textarea placeholder="Propose auxiliary structure and analyze trade-off..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: CODE ANALYSIS -->
+            <div class="section page-break">
+                <div class="section-header">
+                    <span class="section-title">Section III: Code Analysis & Debugging</span>
+                    <span class="section-points">25 Points</span>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">3.1</span>
+                        <span class="problem-title">Critical Bug Analysis</span>
+                        <span class="problem-points">10 pts</span>
+                    </div>
+                    <div class="problem-text">
+                        The following code attempts to reverse a singly linked list. It compiles but produces incorrect results for some inputs.
+                    </div>
+
+                    <div class="code-block"><span class="keyword">public</span> <span class="type">Node</span> reverse(<span class="type">Node</span> head) {
+    <span class="type">Node</span> prev = <span class="keyword">null</span>;
+    <span class="type">Node</span> current = head;
+    
+    <span class="keyword">while</span> (current != <span class="keyword">null</span>) {
+        current.next = prev;
+        prev = current;
+        current = current.next;
+    }
+    <span class="keyword">return</span> prev;
+}</div>
+
+                    <div class="answer-section">
+                        <label>(a) Trace through this code with the list [1 → 2 → 3]. Identify exactly where the logic fails and explain why.</label>
+                        <textarea class="large" placeholder="Step-by-step trace showing the failure..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) Write the corrected code. Explain the fix and why the order of operations matters.</label>
+                        <textarea class="large code-answer" placeholder="// Corrected code:"></textarea>
+                    </div>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">3.2</span>
+                        <span class="problem-title">Algorithm Optimization</span>
+                        <span class="problem-points">8 pts</span>
+                    </div>
+                    <div class="problem-text">
+                        This method checks if a BST is valid but is inefficient:
+                    </div>
+
+                    <div class="code-block"><span class="keyword">public boolean</span> isValidBST(<span class="type">TreeNode</span> root) {
+    <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return true</span>;
+    
+    <span class="comment">// Check all nodes in left subtree are less than root</span>
+    <span class="keyword">if</span> (!allLessThan(root.left, root.val)) <span class="keyword">return false</span>;
+    
+    <span class="comment">// Check all nodes in right subtree are greater than root</span>
+    <span class="keyword">if</span> (!allGreaterThan(root.right, root.val)) <span class="keyword">return false</span>;
+    
+    <span class="keyword">return</span> isValidBST(root.left) && isValidBST(root.right);
+}
+
+<span class="comment">// Helper: returns true if all nodes in tree are less than value</span>
+<span class="keyword">private boolean</span> allLessThan(<span class="type">TreeNode</span> node, <span class="keyword">int</span> value) {
+    <span class="keyword">if</span> (node == <span class="keyword">null</span>) <span class="keyword">return true</span>;
+    <span class="keyword">return</span> node.val < value && 
+           allLessThan(node.left, value) && 
+           allLessThan(node.right, value);
+}</div>
+
+                    <div class="answer-section">
+                        <label>(a) Analyze the time complexity of this solution. Why is it inefficient?</label>
+                        <textarea placeholder="Analyze the complexity and identify inefficiency..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) Describe an O(n) approach to validate a BST. What key insight makes this optimization possible?</label>
+                        <textarea class="large" placeholder="Describe the optimized approach and the insight behind it..."></textarea>
+                    </div>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">3.3</span>
+                        <span class="problem-title">Edge Case Analysis</span>
+                        <span class="problem-points">7 pts</span>
+                    </div>
+                    <div class="problem-text">
+                        For the following circular queue implementation, identify ALL edge cases that could cause failures or incorrect behavior. For each, explain the scenario and consequence.
+                    </div>
+
+                    <div class="code-block"><span class="keyword">public class</span> <span class="type">CircularQueue</span> {
+    <span class="keyword">private int</span>[] arr;
+    <span class="keyword">private int</span> front = <span class="number">0</span>, rear = -<span class="number">1</span>, count = <span class="number">0</span>;
+    
+    <span class="keyword">public void</span> enqueue(<span class="keyword">int</span> value) {
+        rear = (rear + <span class="number">1</span>) % arr.length;
+        arr[rear] = value;
+        count++;
+    }
+    
+    <span class="keyword">public int</span> dequeue() {
+        <span class="keyword">int</span> value = arr[front];
+        front = (front + <span class="number">1</span>) % arr.length;
+        count--;
+        <span class="keyword">return</span> value;
+    }
+}</div>
+
+                    <div class="answer-section">
+                        <label>Identify at least THREE edge cases, explaining each scenario, what goes wrong, and how to fix it:</label>
+                        <textarea class="large" placeholder="Edge Case 1:&#10;&#10;Edge Case 2:&#10;&#10;Edge Case 3:"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: SYNTHESIS -->
+            <div class="section page-break">
+                <div class="section-header">
+                    <span class="section-title">Section IV: Synthesis & Application</span>
+                    <span class="section-points">20 Points</span>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">4.1</span>
+                        <span class="problem-title">LRU Cache Design</span>
+                        <span class="problem-points">12 pts</span>
+                    </div>
+                    
+                    <div class="scenario">
+                        Design an LRU (Least Recently Used) Cache with capacity k that supports two operations in O(1) time: get(key) returns the value if present, put(key, value) inserts or updates a key-value pair and evicts the least recently used item if at capacity.
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(a) Explain why using only a hash table OR only a linked list cannot achieve O(1) for both operations. What specific operation becomes O(n) in each case?</label>
+                        <textarea class="large" placeholder="Analyze limitations of each structure alone..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) Propose a design that combines data structures to achieve O(1) for both operations. Describe what each structure stores and how they interact.</label>
+                        <textarea class="large" placeholder="Describe your hybrid design..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(c) Walk through an example: capacity=2, operations: put(1,A), put(2,B), get(1), put(3,C). Show the state of your data structures after each operation.</label>
+                        <textarea class="large" placeholder="Trace through each operation..."></textarea>
+                    </div>
+                </div>
+
+                <div class="problem">
+                    <div class="problem-header">
+                        <span class="problem-number">4.2</span>
+                        <span class="problem-title">Comprehensive Analysis</span>
+                        <span class="problem-points">8 pts</span>
+                    </div>
+                    
+                    <div class="scenario">
+                        A social network needs to efficiently support: (1) checking if two users are friends, (2) finding all friends of a user, (3) suggesting "friends of friends," and (4) finding the shortest connection path between any two users.
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(a) What data structure would you use to represent the social network? Justify your choice over alternatives.</label>
+                        <textarea placeholder="Propose and justify..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(b) For requirement (4), finding the shortest path between users, what algorithm would you apply? Explain why it works and its complexity.</label>
+                        <textarea class="large" placeholder="Describe the algorithm and analyze it..."></textarea>
+                    </div>
+
+                    <div class="answer-section">
+                        <label>(c) If the network has 1 billion users, discuss scalability concerns with your design and possible optimizations.</label>
+                        <textarea placeholder="Discuss scalability and optimizations..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="download-section no-print">
+            <button class="download-btn" onclick="downloadPDF()">Download as PDF</button>
+            <p class="download-note">Complete all sections, then download and submit to Brightspace</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('dateField').value = new Date().toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        function downloadPDF() {
+            const name = document.getElementById('studentName').value.trim();
+            if (!name) {
+                alert('Please enter your name before downloading.');
+                return;
+            }
+            window.print();
+        }
+    </script>
+</body>
+</html>
