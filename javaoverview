@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Deep Review — MAC286</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F8FA; --panel:#FFFFFF; --ink:#1B2A41; --ink-soft:#4A5A70; --line:#DCE3EA;
+  --amber:#E8A33D; --amber-deep:#C07E1A; --teal:#2E8C83; --teal-soft:#E3F1EF;
+  --code-bg:#212836; --code-line:#2B3446; --code-ink:#D8DEE9;
+  --kw:#E8A15C; --str:#9CC177; --num:#7FA8D9; --com:#77839B; --typ:#F0C674; --ann:#B58CD8;
+  --good:#2E8C55; --bad:#C24A4A;
+  --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition:none!important;animation:none!important}}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.65;font-size:16.5px}
+a{color:var(--teal)}
+::selection{background:var(--amber);color:#fff}
+
+/* ---------- layout ---------- */
+.wrap{display:grid;grid-template-columns:280px 1fr;max-width:1180px;margin:0 auto}
+.rail{position:sticky;top:0;height:100vh;padding:34px 22px 24px 26px;border-right:1px solid var(--line);overflow-y:auto}
+main{padding:44px 56px 120px;max-width:860px;min-width:0}
+
+/* ---------- rail / linked-list nav ---------- */
+.brand{font-family:var(--mono);font-weight:600;font-size:.95rem;letter-spacing:.02em}
+.brand span{color:var(--amber-deep)}
+.rail-sub{font-size:.8rem;color:var(--ink-soft);margin:4px 0 26px}
+.llist{list-style:none}
+.llist li{position:relative;padding:0 0 0 34px;margin-bottom:2px}
+.llist li::before{ /* node */
+  content:"";position:absolute;left:6px;top:9px;width:13px;height:13px;border-radius:3px;
+  border:2px solid var(--ink-soft);background:var(--panel);transition:background .25s,border-color .25s;
+}
+.llist li::after{ /* pointer to next node */
+  content:"";position:absolute;left:11px;top:24px;width:2px;height:calc(100% - 15px);background:var(--line);
+}
+.llist li:last-child::after{display:none}
+.llist li.seen::before{background:var(--teal);border-color:var(--teal)}
+.llist li.here::before{background:var(--amber);border-color:var(--amber-deep)}
+.llist a{display:block;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.88rem}
+.llist a:hover{background:var(--teal-soft)}
+.llist li.here a{font-weight:600}
+.score-chip{margin-top:26px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.84rem}
+.score-chip strong{font-family:var(--mono);color:var(--teal)}
+.score-bar{height:6px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}
+.score-bar i{display:block;height:100%;width:0;background:var(--teal);transition:width .4s}
+
+/* ---------- headings & prose ---------- */
+h1{font-size:2.35rem;line-height:1.15;font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+h1 .cursor{display:inline-block;width:.55em;height:1.02em;background:var(--amber);vertical-align:-.12em;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.lede{font-size:1.12rem;color:var(--ink-soft);max-width:62ch;margin-bottom:8px}
+section{margin-top:84px;scroll-margin-top:24px}
+h2{font-size:1.6rem;font-weight:700;letter-spacing:-.015em;padding-bottom:10px;border-bottom:2px solid var(--ink);margin-bottom:6px}
+h2 .idx{font-family:var(--mono);font-size:.95rem;color:var(--amber-deep);margin-right:10px}
+.h2-sub{color:var(--ink-soft);font-size:.95rem;margin-bottom:22px}
+h3{font-size:1.12rem;font-weight:600;margin:30px 0 10px}
+p{max-width:70ch;margin-bottom:14px}
+ul.plain{max-width:70ch;margin:0 0 14px 22px}
+ul.plain li{margin-bottom:6px}
+code{font-family:var(--mono);font-size:.87em;background:#E9EEF3;padding:.1em .35em;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:#FBF3E4;padding:14px 18px;border-radius:0 8px 8px 0;margin:20px 0;max-width:70ch}
+.callout.teal{border-color:var(--teal);background:var(--teal-soft)}
+.callout b:first-child{display:block;margin-bottom:4px}
+
+/* ---------- interactive code widget ---------- */
+.code-widget{margin:26px 0;border-radius:12px;overflow:hidden;border:1px solid #17202D;box-shadow:0 10px 28px rgba(20,30,50,.16)}
+.cw-head{display:flex;align-items:center;gap:10px;background:#1A2130;padding:10px 16px;font-family:var(--mono);font-size:.8rem;color:#8EA0BC}
+.cw-head .fname{color:#C9D4E4;font-weight:500}
+.cw-head .hint{margin-left:auto;color:var(--amber);font-size:.74rem}
+.cw-head button{margin-left:8px;background:none;border:1px solid #35415A;color:#AEBDD4;border-radius:6px;padding:3px 10px;font-family:var(--mono);font-size:.74rem;cursor:pointer}
+.cw-head button:hover{border-color:var(--amber);color:var(--amber)}
+.cw-code{background:var(--code-bg);padding:14px 0;overflow-x:auto}
+.cline{display:flex;font-family:var(--mono);font-size:.86rem;line-height:1.75;cursor:pointer;border-left:3px solid transparent;white-space:pre}
+.cline .ln{width:44px;flex:0 0 44px;text-align:right;padding-right:14px;color:#556279;user-select:none}
+.cline .lc{color:var(--code-ink);padding-right:20px}
+.cline:hover{background:var(--code-line)}
+.cline.active{background:#33404F;border-left-color:var(--amber)}
+.cline.active .ln{color:var(--amber)}
+.cline:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.k{color:var(--kw)} .s{color:var(--str)} .n{color:var(--num)} .c{color:var(--com);font-style:italic} .t{color:var(--typ)} .a{color:var(--ann)}
+.inspector{background:#F1EAD9;border-top:2px solid var(--amber);padding:14px 18px;min-height:64px}
+.inspector .tag{font-family:var(--mono);font-size:.74rem;color:var(--amber-deep);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.inspector .tag .nav{margin-left:auto;display:flex;gap:6px}
+.inspector .tag .nav button{border:1px solid var(--amber-deep);background:none;color:var(--amber-deep);border-radius:6px;width:26px;height:22px;cursor:pointer;font-family:var(--mono);line-height:1}
+.inspector .tag .nav button:hover{background:var(--amber);color:#fff}
+.inspector .txt{font-size:.92rem;max-width:75ch}
+.inspector .idle{color:#8A7A55;font-size:.9rem;font-style:italic}
+
+/* ---------- quiz ---------- */
+.quiz{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:30px 0;max-width:74ch}
+.quiz .q-tag{font-family:var(--mono);font-size:.76rem;color:var(--teal);font-weight:600;margin-bottom:6px}
+.quiz .q-text{font-weight:600;margin-bottom:6px}
+.quiz pre{font-family:var(--mono);font-size:.84rem;background:#EDF1F5;border-radius:8px;padding:10px 14px;margin:10px 0;overflow-x:auto}
+.quiz .opts{display:grid;gap:8px;margin-top:12px}
+.quiz .opts button{text-align:left;font-family:var(--mono);font-size:.87rem;padding:9px 14px;border:1px solid var(--line);background:var(--paper);border-radius:8px;cursor:pointer;color:var(--ink)}
+.quiz .opts button:hover{border-color:var(--teal)}
+.quiz .opts button.right{border-color:var(--good);background:#E8F4EC;font-weight:600}
+.quiz .opts button.wrong{border-color:var(--bad);background:#F9ECEC}
+.quiz .verdict{margin-top:12px;font-size:.9rem;display:none;max-width:70ch}
+.quiz .verdict.show{display:block}
+
+/* ---------- predict output ---------- */
+.reveal-box{margin:14px 0}
+.reveal-box>button{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:var(--mono);font-size:.85rem;cursor:pointer}
+.reveal-box>button:hover{background:var(--teal)}
+.reveal-box .out{display:none;margin-top:10px;background:#101521;color:#B9E28C;font-family:var(--mono);font-size:.85rem;padding:12px 16px;border-radius:8px;white-space:pre}
+.reveal-box.open .out{display:block}
+
+/* ---------- Big-O lab ---------- */
+.bigo-lab{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:26px 0;max-width:74ch}
+.bigo-lab .nrow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.bigo-lab .nrow button{font-family:var(--mono);font-size:.85rem;padding:7px 14px;border:1px solid var(--line);border-radius:8px;background:var(--paper);cursor:pointer;color:var(--ink)}
+.bigo-lab .nrow button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+table.bigo{width:100%;border-collapse:collapse;font-size:.9rem}
+table.bigo th,table.bigo td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--mono)}
+table.bigo th:first-child,table.bigo td:first-child{text-align:left}
+table.bigo td.hot{color:var(--bad);font-weight:600}
+table.bigo td.cool{color:var(--good);font-weight:600}
+.footer{margin-top:90px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:.85rem}
+
+/* ---------- mobile ---------- */
+@media (max-width:900px){
+  .wrap{display:block}
+  .rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:22px 20px}
+  .llist li{display:inline-block;padding-left:0;margin-right:4px}
+  .llist li::before,.llist li::after{display:none}
+  .llist a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.8rem}
+  .llist li.seen a{border-color:var(--teal);color:var(--teal)}
+  .llist li.here a{border-color:var(--amber-deep);color:var(--amber-deep)}
+  main{padding:30px 20px 90px}
+  h1{font-size:1.7rem}
+  .cline{font-size:.78rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="rail" aria-label="Sections">
+  <div class="brand">MAC286<span>::</span>JavaReview</div>
+  <div class="rail-sub">Prof. Khalid Kassou — LaGuardia CC</div>
+  <ul class="llist" id="llist">
+    <li data-sec="s0"><a href="#s0">Start here</a></li>
+    <li data-sec="s1"><a href="#s1">Variables &amp; data types</a></li>
+    <li data-sec="s2"><a href="#s2">Conditionals</a></li>
+    <li data-sec="s3"><a href="#s3">Loops</a></li>
+    <li data-sec="s4"><a href="#s4">Methods</a></li>
+    <li data-sec="s5"><a href="#s5">Arrays &amp; strings</a></li>
+    <li data-sec="s6"><a href="#s6">OOP basics</a></li>
+    <li data-sec="s7"><a href="#s7">Inheritance &amp; polymorphism</a></li>
+  </ul>
+  <div class="score-chip">
+    Checkpoint score: <strong id="scoreTxt">0 / 7</strong>
+    <div class="score-bar"><i id="scoreBar"></i></div>
+  </div>
+</nav>
+<main>
+
+<section id="s0">
+  <h1>Java Fundamentals Review<span class="cursor"></span></h1>
+  <p class="lede">A friendly refresher of the core Java ideas you'll need for Data Structures (MAC286). Nothing scary — just the basics, explained simply.</p>
+  <p><b>How this page works: click any line of code and its explanation appears</b> in the amber panel underneath. You can also use the ‹ › buttons to walk through a program line by line. Try it right here:</p>
+  <div class="code-widget" data-block="warmup"></div>
+  <p>Each section ends with one quick checkpoint question. Your score fills in on the sidebar as you go. Take your time — this is a review, not a race.</p>
+</section>
+
+<section id="s1">
+  <h2><span class="idx">1</span>Variables &amp; data types</h2>
+  <p class="h2-sub">Boxes that hold your data</p>
+  <p>A variable is like a labeled box that stores one piece of data. In Java, every box must say what <em>type</em> of data it holds. The types you'll use most:</p>
+  <ul class="plain">
+    <li><b>int</b> — whole numbers (25, -3, 1000)</li>
+    <li><b>double</b> — decimal numbers (19.99, 3.14)</li>
+    <li><b>char</b> — one single character ('A'), in single quotes</li>
+    <li><b>boolean</b> — true or false, nothing else</li>
+    <li><b>String</b> — text ("Hello"), in double quotes. Capital S — String is a class, not a primitive.</li>
+  </ul>
+  <p>The pattern is always the same: <code>type name = value;</code></p>
+  <div class="code-widget" data-block="variables"></div>
+  <div class="callout"><b>Remember</b>Java checks types for you. If you try to put text into an int box, the program won't even compile — Java catches the mistake before you run anything. That's a feature, not an annoyance!</div>
+  <div class="quiz" data-quiz="q1"></div>
+</section>
+
+<section id="s2">
+  <h2><span class="idx">2</span>Conditionals</h2>
+  <p class="h2-sub">Letting your program make decisions</p>
+  <p>Conditionals let your program choose between paths. There are three tools:</p>
+  <ul class="plain">
+    <li><b>if / else</b> — "if this is true, do A; otherwise do B"</li>
+    <li><b>if / else if / else</b> — check several conditions in order; the first true one wins</li>
+    <li><b>switch</b> — pick one option from a list, based on a value</li>
+  </ul>
+  <div class="code-widget" data-block="conditionals"></div>
+  <div class="quiz" data-quiz="q2"></div>
+</section>
+
+<section id="s3">
+  <h2><span class="idx">3</span>Loops</h2>
+  <p class="h2-sub">Repeating things without copy-pasting code</p>
+  <p>Loops repeat a block of code. Which one you pick depends on one question: <em>do you know how many times to repeat?</em></p>
+  <ul class="plain">
+    <li><b>for</b> — when you know the count ("do this 5 times")</li>
+    <li><b>while</b> — when you repeat as long as something is true</li>
+    <li><b>do-while</b> — like while, but always runs at least once</li>
+  </ul>
+  <p>Two helpers work inside any loop: <b>continue</b> skips just the current round, and <b>break</b> stops the whole loop.</p>
+  <div class="code-widget" data-block="loops"></div>
+  <h3>Predict the output</h3>
+  <p>Look at the last loop (with continue and break). What does it print? Trace it in your head first, then check:</p>
+  <div class="reveal-box" data-out="1 2 3 4 6 7 ">
+    <button type="button">Reveal output</button>
+    <div class="out"></div>
+  </div>
+  <div class="quiz" data-quiz="q3"></div>
+</section>
+
+<section id="s4">
+  <h2><span class="idx">4</span>Methods</h2>
+  <p class="h2-sub">Naming a block of code so you can reuse it</p>
+  <p>A method is a mini-program with a name. Instead of writing the same code over and over, you write it once, give it a name, and <em>call</em> it whenever you need it. Three things to know about any method:</p>
+  <ul class="plain">
+    <li><b>Parameters</b> — the inputs it needs (inside the parentheses)</li>
+    <li><b>Return type</b> — what it hands back. <code>void</code> means "nothing, I just do something."</li>
+    <li><b>Overloading</b> — two methods can share a name if their parameters are different. Java picks the right one automatically.</li>
+  </ul>
+  <div class="code-widget" data-block="methods"></div>
+  <div class="callout"><b>Remember</b>The word <code>static</code> means the method belongs to the class itself — you can call it without creating an object. That's why <code>main</code> is static: it runs before any objects exist.</div>
+  <div class="quiz" data-quiz="q4"></div>
+</section>
+
+<section id="s5">
+  <h2><span class="idx">5</span>Arrays &amp; strings</h2>
+  <p class="h2-sub">Holding many values, and working with text</p>
+  <p>An <b>array</b> holds a fixed number of values of the same type, all under one name. You reach each value with an index — and <b>counting starts at 0</b>, so the first item is <code>numbers[0]</code>. This one fact prevents half of all beginner array bugs.</p>
+  <div class="code-widget" data-block="arrays"></div>
+  <p>A <b>String</b> holds text and comes with handy built-in methods. One golden rule: to compare two strings, use <code>.equals()</code> — not <code>==</code>.</p>
+  <div class="code-widget" data-block="strings"></div>
+  <div class="quiz" data-quiz="q5"></div>
+</section>
+
+<section id="s6">
+  <h2><span class="idx">6</span>OOP basics</h2>
+  <p class="h2-sub">Classes and objects — data and behavior together</p>
+  <p>Object-Oriented Programming means bundling <em>data</em> (fields) and <em>behavior</em> (methods) into one unit called a <b>class</b>. A class is a blueprint; an <b>object</b> is one real thing built from that blueprint. From one BankAccount class you can create many separate accounts.</p>
+  <ul class="plain">
+    <li><b>Fields</b> — the variables inside the class (each object gets its own copies)</li>
+    <li><b>Constructor</b> — a special method that runs when you write <code>new</code>, to set up the object</li>
+    <li><b>private</b> — hides a field from outside code, so it can only change through your methods. This protection is called <b>encapsulation</b>.</li>
+    <li><b>this</b> — means "my own field," used when a field and a parameter share a name</li>
+  </ul>
+  <div class="code-widget" data-block="oop"></div>
+  <div class="quiz" data-quiz="q6"></div>
+</section>
+
+<section id="s7">
+  <h2><span class="idx">7</span>Inheritance &amp; polymorphism</h2>
+  <p class="h2-sub">Building new classes from existing ones</p>
+  <p><b>Inheritance</b> lets a class receive everything from another class and add its own touches. <code>class Car extends Vehicle</code> means "a Car IS a Vehicle" — it gets all of Vehicle's fields and methods for free, and can <b>override</b> (replace) the ones it wants to do differently.</p>
+  <p><b>Polymorphism</b> is the payoff: if you treat a Car and a Motorcycle both as Vehicles and call <code>start()</code>, each one automatically runs its <em>own</em> version. Same call, different behavior — Java picks the right one while the program runs.</p>
+  <div class="code-widget" data-block="inheritance"></div>
+  <h3>Predict the output</h3>
+  <div class="reveal-box" data-out="The car starts with a key&#10;The motorcycle starts with a kick">
+    <button type="button">Reveal output</button>
+    <div class="out"></div>
+  </div>
+  <div class="callout teal"><b>You're ready</b>That's the whole toolkit: variables, decisions, loops, methods, arrays, classes, and inheritance. Everything in MAC286 — lists, stacks, queues, trees — is built from exactly these pieces. See you in class!</div>
+  <div class="quiz" data-quiz="q7"></div>
+  <div class="footer">Java Fundamentals Review for MAC286 — Data Structures · Prof. Khalid Kassou · LaGuardia Community College, CUNY · Updated 2026</div>
+</section>
+</main>
+</div>
+<script>
+/* =============== code blocks: [code, explanation] per line =============== */
+const BLOCKS = {
+warmup: {file:"Warmup.java", lines:[
+["public class Warmup {","Every Java program lives inside a class. The class name must match the file name (Warmup.java). Now click the next line, or press the \u203a button below \u2192"],
+["    public static void main(String[] args) {","This is main \u2014 the starting line. When you run the program, Java looks for this exact line and begins here."],
+["        System.out.println(\"You found the inspector!\");","This prints one line of text on the screen. Whatever is inside the quotes gets printed."],
+["    }","This closing brace } ends main. When the program reaches here, it is finished."],
+["}","This closing brace ends the class. That's the whole file!"]
+]},
+
+variables: {file:"VariablesExample.java", lines:[
+["public class VariablesExample {","One example of each common type. Click every line!"],
+["    public static void main(String[] args) {","Our starting point."],
+["        int age = 25;","An int box holding a whole number. Read it as: 'make an int called age, and put 25 inside.'"],
+["        double price = 19.99;","A double holds decimal numbers. Use double any time you need a decimal point."],
+["        char grade = 'A';","A char holds exactly ONE character, and it always uses single quotes."],
+["        boolean isJavaFun = true;","A boolean can only ever be true or false. Great for yes/no situations."],
+["        String name = \"John Doe\";","A String holds text, in double quotes. Notice the capital S \u2014 String is a class, which is why it gets special powers (methods) later."],
+["        long population = 7_800_000_000L;","7.8 billion is too big for an int, so we use long \u2014 a bigger box. The L at the end tells Java 'this is a long.' The underscores just make it easier to read."],
+["        System.out.println(\"Name: \" + name);","The + glues text and variables together. This prints: Name: John Doe"],
+["        System.out.println(\"Age: \" + age);","Prints: Age: 25 \u2014 Java automatically turns the number into text when gluing."],
+["        System.out.println(\"Price: $\" + price);","Prints: Price: $19.99"],
+["        System.out.println(\"Is Java fun? \" + isJavaFun);","Prints: Is Java fun? true"],
+["    }","End of main \u2014 the program is done."],
+["}",""]
+]},
+
+conditionals: {file:"ConditionalsExample.java", lines:[
+["public class ConditionalsExample {","Three ways to make decisions: if/else, else-if, and switch."],
+["    public static void main(String[] args) {",""],
+["        int number = 15;","The number we'll test."],
+["        if (number % 2 == 0) {","The % sign gives the REMAINDER after division. 15 \u00f7 2 leaves remainder 1, so this condition is false \u2014 we skip to else. (Remainder 0 would mean the number is even.)"],
+["            System.out.println(\"Even\");","Skipped this time, because the condition was false."],
+["        } else {","'Otherwise\u2026' \u2014 else runs whenever the if condition is false."],
+["            System.out.println(\"Odd\");","This runs! Prints: Odd"],
+["        }",""],
+["        int score = 85;","Now a chain of conditions \u2014 like assigning letter grades."],
+["        if (score >= 90) {","Is 85 at least 90? No \u2014 move to the next check."],
+["            System.out.println(\"Grade: A\");","Skipped."],
+["        } else if (score >= 80) {","Is 85 at least 80? Yes! This branch runs \u2014 and the rest of the chain is skipped. In a chain, only the FIRST true condition wins."],
+["            System.out.println(\"Grade: B\");","Prints: Grade: B"],
+["        } else {","The catch-all at the end, for when nothing above matched."],
+["            System.out.println(\"Grade: C or below\");","Skipped \u2014 a branch already ran."],
+["        }",""],
+["        int day = 3;","Now switch: perfect when one value picks from a list of options."],
+["        switch (day) {","Java compares day against each case below and jumps to the match."],
+["            case 1: System.out.println(\"Monday\"); break;","day isn't 1, skip. The break at the end means 'done \u2014 leave the switch.' Forgetting break makes the code fall through into the next case \u2014 a classic bug!"],
+["            case 2: System.out.println(\"Tuesday\"); break;","Not 2 either, skip."],
+["            case 3: System.out.println(\"Wednesday\"); break;","Match! Prints Wednesday, then break exits the switch."],
+["            default: System.out.println(\"Another day\");","default is the backup plan \u2014 it runs when no case matched. (Not needed this time.)"],
+["        }",""],
+["    }",""],
+["}",""]
+]},
+
+loops: {file:"LoopsExample.java", lines:[
+["public class LoopsExample {","The three loop types, plus the two helpers: continue and break."],
+["    public static void main(String[] args) {",""],
+["        for (int i = 1; i <= 5; i++) {","A for loop has 3 parts: START (i = 1) \u2192 KEEP GOING WHILE (i <= 5) \u2192 AFTER EACH ROUND (i++ adds 1). Use for when you know how many repeats you want."],
+["            System.out.print(i + \" \");","print (without ln) stays on the same line. This prints: 1 2 3 4 5"],
+["        }",""],
+["        System.out.println();","An empty println just moves to a new line."],
+["        int j = 5;","For a while loop, we set up the counter ourselves, before the loop."],
+["        while (j >= 1) {","A while loop checks its condition FIRST, then runs. It keeps going as long as the condition stays true."],
+["            System.out.print(j + \" \");","Prints: 5 4 3 2 1 \u2014 counting down."],
+["            j--;","j-- subtracts 1. Never forget this line \u2014 without it, j stays 5 forever and the loop never ends!"],
+["        }",""],
+["        System.out.println();",""],
+["        int k = 1;",""],
+["        do {","A do-while runs the body FIRST and checks the condition after. So it always runs at least once, no matter what."],
+["            System.out.print(k + \" \");","Prints: 1 2 3"],
+["            k++;",""],
+["        } while (k <= 3);","The check happens here, at the bottom. Note the semicolon!"],
+["        System.out.println();",""],
+["        for (int i = 1; i <= 10; i++) {","Last one: watch what continue and break do inside this loop from 1 to 10."],
+["            if (i == 5) continue;","When i is 5: continue means 'skip the REST of this round and jump to the next i.' So 5 never gets printed \u2014 but the loop keeps going."],
+["            if (i == 8) break;","When i is 8: break means 'stop the WHOLE loop right now.' So nothing from 8 onward prints."],
+["            System.out.print(i + \" \");","Prints: 1 2 3 4 6 7 \u2014 no 5 (skipped), nothing past 7 (stopped)."],
+["        }",""],
+["    }",""],
+["}",""]
+]},
+
+methods: {file:"MethodsExample.java", lines:[
+["public class MethodsExample {","Four small methods, then main calls them all."],
+["    public static void greet() {","The simplest kind: no inputs (empty parentheses), no answer back (void). It just does something."],
+["        System.out.println(\"Hello, welcome to Java!\");",""],
+["    }",""],
+["    public static void greetUser(String name) {","This one takes an INPUT: a String called name. Inputs in the parentheses are called parameters."],
+["        System.out.println(\"Hello, \" + name + \"!\");","It uses whatever name it was given. Call it with \"Alice\" and it prints: Hello, Alice!"],
+["    }",""],
+["    public static int addNumbers(int a, int b) {","This one HANDS BACK an answer. The word int before the name promises: 'I will return an int.'"],
+["        return a + b;","return sends the answer back to whoever called. The method ends here."],
+["    }",""],
+["    public static double addNumbers(double a, double b) {","Same name, different parameter types \u2014 that's called overloading, and it's allowed! Java looks at what you pass in and picks the matching version automatically."],
+["        return a + b;",""],
+["    }",""],
+["    public static void main(String[] args) {","Now let's call everything."],
+["        greet();","Calling a method = its name + parentheses. This jumps up to greet(), runs it, and comes back."],
+["        greetUser(\"Alice\");","We pass \"Alice\" as the input. Prints: Hello, Alice!"],
+["        int sum = addNumbers(5, 7);","The method runs, returns 12, and that answer lands in the variable sum. Whole numbers \u2192 Java picks the int version."],
+["        System.out.println(\"Sum: \" + sum);","Prints: Sum: 12"],
+["        System.out.println(addNumbers(2.5, 3.5));","Decimals this time \u2192 Java automatically picks the double version. Prints: 6.0"],
+["    }",""],
+["}",""]
+]},
+
+arrays: {file:"ArraysExample.java", lines:[
+["public class ArraysExample {","One variable, many values."],
+["    public static void main(String[] args) {",""],
+["        int[] numbers = {10, 20, 30, 40, 50};","int[] means 'an array of ints.' The curly braces fill it with 5 values. The size is now locked \u2014 this array holds exactly 5, forever."],
+["        System.out.println(numbers[0]);","The number in brackets is the index \u2014 the position. Counting starts at ZERO, so numbers[0] is the FIRST value: prints 10."],
+["        numbers[1] = 25;","You can replace a value at any position. Position 1 (the second slot) changes from 20 to 25."],
+["        System.out.println(numbers.length);","Every array knows its own size: .length gives 5. (No parentheses \u2014 it's not a method.)"],
+["        for (int i = 0; i < numbers.length; i++) {","The classic array loop: i runs 0, 1, 2, 3, 4 \u2014 every valid index. Notice i < length, NOT <=. Going one step too far is the most common array crash (ArrayIndexOutOfBounds)."],
+["            System.out.print(numbers[i] + \" \");","Prints each value: 10 25 30 40 50"],
+["        }",""],
+["        System.out.println();",""],
+["        for (int num : numbers) {","The for-each loop: 'for each num in numbers\u2026' Shorter and cleaner when you just want to read every value and don't care about positions."],
+["            System.out.print(num + \" \");","Same result, less typing: 10 25 30 40 50"],
+["        }",""],
+["        System.out.println();",""],
+["        String[] names = {\"Alice\", \"Bob\", \"Charlie\"};","Arrays work for any type \u2014 here, three Strings."],
+["        System.out.println(names[2]);","Index 2 is the THIRD item (0, 1, 2\u2026). Prints: Charlie"],
+["        int[][] matrix = { {1, 2}, {3, 4} };","A 2D array \u2014 an array of arrays, like a small table with rows and columns."],
+["        System.out.println(matrix[1][0]);","Read it as [row][column]: row 1 is {3, 4}, column 0 of that row is 3. Prints: 3"],
+["    }",""],
+["}",""]
+]},
+
+strings: {file:"StringsExample.java", lines:[
+["public class StringsExample {","Text, and the handy methods that come with it."],
+["    public static void main(String[] args) {",""],
+["        String first = \"Hello\";",""],
+["        String second = \"World\";",""],
+["        String message = first + \" \" + second;","The + glues strings together (that's called concatenation). message is now \"Hello World\"."],
+["        System.out.println(message.length());","Strings come with built-in methods. length() counts the characters: 11 (the space counts too)."],
+["        System.out.println(message.charAt(0));","charAt(0) grabs the character at position 0 \u2014 the first one. Prints: H (yes, strings count from zero, just like arrays)."],
+["        System.out.println(message.toUpperCase());","Prints: HELLO WORLD. Note \u2014 message itself is NOT changed; the method hands back a new uppercase copy."],
+["        System.out.println(message.substring(0, 5));","substring(0, 5) cuts out characters from position 0 up to (but NOT including) 5. Prints: Hello"],
+["        String a = \"Java\";",""],
+["        String b = \"java\";","Same word, different capital letter \u2014 perfect for testing comparisons."],
+["        System.out.println(a.equals(b));","THE golden rule: compare strings with .equals(), never with ==. Here it prints false, because the capital J and small j don't match."],
+["        System.out.println(a.equalsIgnoreCase(b));","Same check but ignoring capital letters: prints true."],
+["    }",""],
+["}",""]
+]},
+
+oop: {file:"BankAccount.java", lines:[
+["public class BankAccount {","A class is a blueprint. This one describes what every bank account has (data) and can do (methods)."],
+["    private String owner;","A field \u2014 a variable that belongs to each account. private means: only code inside this class can touch it. That protection is called encapsulation."],
+["    private double balance;","Every account object gets its OWN owner and its own balance."],
+["    public BankAccount(String owner, double startingBalance) {","The constructor \u2014 a special setup method with the same name as the class and no return type. It runs automatically when you write 'new BankAccount(\u2026)'."],
+["        this.owner = owner;","Two things named 'owner' here: the field and the parameter. 'this.owner' means MY field \u2014 so this line copies the parameter into the object's field."],
+["        this.balance = startingBalance;","The new account starts with whatever balance was passed in."],
+["    }",""],
+["    public void deposit(double amount) {","A method \u2014 something an account can DO. public means anyone can call it."],
+["        if (amount > 0) {","A little guard: only positive amounts are accepted. Since balance is private, this method is the only door in \u2014 so bad values can't sneak past."],
+["            balance = balance + amount;","Add the money. Could also be written balance += amount;"],
+["        }",""],
+["    }",""],
+["    public void withdraw(double amount) {",""],
+["        if (amount > 0 && amount <= balance) {","Two rules joined by && (AND): the amount must be positive AND we must have enough money. Both must be true."],
+["            balance = balance - amount;",""],
+["        }",""],
+["    }",""],
+["    public double getBalance() {","A getter \u2014 a polite way to let outside code READ a private field without being able to mess with it."],
+["        return balance;",""],
+["    }",""],
+["    public static void main(String[] args) {","Let's use the blueprint to build a real account."],
+["        BankAccount account = new BankAccount(\"John\", 100.0);","'new' builds an actual object from the class and runs the constructor. John's account starts with $100."],
+["        account.deposit(50.0);","Call the object's methods with a dot. Balance: 100 \u2192 150."],
+["        account.withdraw(30.0);","Balance: 150 \u2192 120."],
+["        System.out.println(account.getBalance());","Prints: 120.0 \u2014 read through the getter, since balance itself is private."],
+["    }",""],
+["}",""]
+]},
+
+inheritance: {file:"InheritanceTest.java", lines:[
+["class Vehicle {","The parent class (also called the superclass). It holds what ALL vehicles share."],
+["    protected String brand;","protected is like private, but child classes are allowed in too."],
+["    public Vehicle(String brand) {",""],
+["        this.brand = brand;",""],
+["    }",""],
+["    public void start() {","Every vehicle can start. This is the general, default version."],
+["        System.out.println(\"The vehicle is starting\");",""],
+["    }",""],
+["}",""],
+["class Car extends Vehicle {","'extends' is the magic word: a Car IS a Vehicle. Car automatically receives everything Vehicle has \u2014 the brand field, the start() method, all of it, for free."],
+["    public Car(String brand) {",""],
+["        super(brand);","super(\u2026) calls the PARENT's constructor \u2014 'hey Vehicle, you set up the brand part.' It must be the first line."],
+["    }",""],
+["    @Override","This note tells Java: 'the next method REPLACES the parent's version.' Java then double-checks you spelled it right \u2014 always write it."],
+["    public void start() {","Car overrides start() with its own version."],
+["        System.out.println(\"The car starts with a key\");",""],
+["    }",""],
+["    public void honk() {","A child class can also ADD brand-new things the parent never had."],
+["        System.out.println(\"Beep beep!\");",""],
+["    }",""],
+["}",""],
+["class Motorcycle extends Vehicle {","A second child of Vehicle, with its own twist on start()."],
+["    public Motorcycle(String brand) {",""],
+["        super(brand);",""],
+["    }",""],
+["    @Override",""],
+["    public void start() {",""],
+["        System.out.println(\"The motorcycle starts with a kick\");",""],
+["    }",""],
+["}",""],
+["public class InheritanceTest {",""],
+["    public static void main(String[] args) {",""],
+["        Vehicle[] vehicles = { new Car(\"Toyota\"), new Motorcycle(\"Honda\") };","One array holding BOTH kinds \u2014 allowed, because a Car is a Vehicle and a Motorcycle is a Vehicle."],
+["        for (Vehicle v : vehicles) {","We go through them treating each one simply as 'a Vehicle'\u2026"],
+["            v.start();","\u2026and here's polymorphism: the SAME line runs the CAR version first, then the MOTORCYCLE version. Java looks at what each object really is and picks its start() automatically. Same call, different behavior."],
+["        }",""],
+["    }",""],
+["}",""]
+]}
+};
+
+/* =============== quizzes =============== */
+const QUIZZES = {
+q1:{tag:"Checkpoint 1 \u00b7 Variables", text:"Which line correctly stores the text Hello in a variable?",
+ opts:["int msg = \"Hello\";","String msg = \"Hello\";","char msg = \"Hello\";","boolean msg = \"Hello\";"],
+ ans:1, why:"Text goes in a String, with double quotes. An int only holds whole numbers, a char only holds ONE character (in single quotes), and a boolean only holds true or false."},
+q2:{tag:"Checkpoint 2 \u00b7 Conditionals", text:"int x = 10;  if (x > 5) { print \"Big\"; } else { print \"Small\"; }  \u2014 what prints?",
+ opts:["Big","Small","Both","Nothing"],
+ ans:0, why:"The condition asks: is 10 greater than 5? Yes \u2014 so the if branch runs and prints Big. The else branch is only for when the condition is false, so it's skipped."},
+q3:{tag:"Checkpoint 3 \u00b7 Loops", text:"for (int i = 0; i < 3; i++) { System.out.print(i + \" \"); }  \u2014 what prints?",
+ opts:["1 2 3","0 1 2 3","0 1 2","1 2"],
+ ans:2, why:"i starts at 0 and the loop runs while i < 3 \u2014 so i takes the values 0, 1, 2. When i reaches 3, the condition '3 < 3' is false and the loop stops. Starting at 0 and using < is the most common loop pattern in Java."},
+q4:{tag:"Checkpoint 4 \u00b7 Methods", text:"With  public static int addNumbers(int a, int b) { return a + b; }  \u2014 what does addNumbers(3, 4) give back?",
+ opts:["Nothing \u2014 it just prints 7","7","34","An error \u2014 methods need exactly one parameter"],
+ ans:1, why:"The method takes the two inputs, adds them, and RETURNS the answer: 7. Returning is not printing \u2014 the 7 is handed back to the caller, who can store it in a variable or print it. And methods can take as many parameters as you like."},
+q5:{tag:"Checkpoint 5 \u00b7 Arrays & strings", text:"int[] a = {5, 10, 15};  \u2014 what is a[1]?",
+ opts:["5","10","15","An error"],
+ ans:1, why:"Array positions start at ZERO: a[0] is 5, a[1] is 10, a[2] is 15. So a[1] is the SECOND value \u2014 10. If off-by-one mistakes trip you up, you're in good company \u2014 just remember: index = position minus one."},
+q6:{tag:"Checkpoint 6 \u00b7 OOP", text:"In the BankAccount class, balance is private. What does that mean?",
+ opts:["The balance is secret and can never be read","Only code INSIDE the BankAccount class can touch balance directly","The balance can't be changed after the constructor","private makes the field faster"],
+ ans:1, why:"private means outside code can't reach the field directly \u2014 it must go through the class's public methods (deposit, withdraw, getBalance). Those methods check the rules first, so the balance can never be set to something silly. That protection is called encapsulation."},
+q7:{tag:"Checkpoint 7 \u00b7 Inheritance", text:"Car extends Vehicle and overrides start().  Vehicle v = new Car(\"Toyota\");  v.start();  \u2014 which version runs?",
+ opts:["Vehicle's version \u2014 the variable says Vehicle","Car's version \u2014 the object really is a Car","Both versions","It won't compile"],
+ ans:1, why:"Java looks at what the object REALLY is \u2014 a Car \u2014 and runs Car's start(). The variable's type (Vehicle) only decides what you're allowed to call, not which version runs. This automatic picking is polymorphism, and it's the superpower of inheritance."}
+};
+
+/* =============== syntax highlighting =============== */
+const KW = /\b(public|private|protected|class|interface|extends|implements|static|final|abstract|void|new|return|if|else|for|while|do|switch|case|default|break|continue|import|package|this|super|throw|throws|try|catch|instanceof|var|null|true|false|int|long|double|float|boolean|char|byte|short)\b/g;
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function hl(raw){
+  let line = esc(raw), comment = "";
+  const ci = line.indexOf("//");
+  if (ci >= 0){ comment = '<span class="c">'+line.slice(ci)+'</span>'; line = line.slice(0,ci); }
+  const stash = [];
+  line = line.replace(/"[^"]*"|'\\?[^']'/g, m => { stash.push('<span class="s">'+m+'</span>'); return "\u0001x"+(stash.length-1)+"x\u0001"; });
+  line = line.replace(/@\w+/g, m => { stash.push('<span class="a">'+m+'</span>'); return "\u0001x"+(stash.length-1)+"x\u0001"; });
+  line = line.replace(KW, '<span class="k">$1</span>');
+  line = line.replace(/\b([A-Z]\w*)\b/g, '<span class="t">$1</span>');
+  line = line.replace(/\b(\d[\d_]*\.?\d*[LlFf]?)\b/g, '<span class="n">$1</span>');
+  line = line.replace(/\u0001x(\d+)x\u0001/g, (_,i) => stash[+i]);
+  return line + comment;
+}
+
+/* =============== render code widgets =============== */
+document.querySelectorAll(".code-widget").forEach(w => {
+  const b = BLOCKS[w.dataset.block]; if(!b) return;
+  const head = document.createElement("div"); head.className = "cw-head";
+  head.innerHTML = '<span class="fname">'+b.file+'</span><span class="hint">click a line for its explanation</span><button type="button" class="copy">copy</button>';
+  const codeEl = document.createElement("div"); codeEl.className = "cw-code";
+  b.lines.forEach((pair,i) => {
+    const row = document.createElement("div");
+    row.className = "cline"; row.tabIndex = 0; row.dataset.i = i;
+    row.setAttribute("role","button");
+    row.innerHTML = '<span class="ln">'+(i+1)+'</span><span class="lc">'+(hl(pair[0])||"&nbsp;")+'</span>';
+    codeEl.appendChild(row);
+  });
+  const insp = document.createElement("div"); insp.className = "inspector";
+  insp.innerHTML = '<div class="idle">\u2196 Click any line of code above to see what it does.</div>';
+  w.append(head, codeEl, insp);
+
+  let cur = -1;
+  function show(i, fromKey){
+    const lines = b.lines;
+    if (fromKey){ let guard=0; while(!lines[i][1] && guard++ < lines.length){ i += (i>cur||cur<0?1:-1); i=(i+lines.length)%lines.length; } }
+    if (!lines[i]) return;
+    cur = i;
+    codeEl.querySelectorAll(".cline").forEach(r => r.classList.toggle("active", +r.dataset.i === i));
+    const e = lines[i][1] || "This line is just structure \u2014 a brace or a blank. Nothing extra happens here.";
+    insp.innerHTML =
+      '<div class="tag">LINE '+(i+1)+' \u00b7 '+b.file+
+      '<span class="nav"><button type="button" class="prev" aria-label="previous line">\u2039</button><button type="button" class="next" aria-label="next line">\u203a</button></span></div>'+
+      '<div class="txt">'+e+'</div>';
+    insp.querySelector(".prev").onclick = () => show((cur-1+lines.length)%lines.length, true);
+    insp.querySelector(".next").onclick = () => show((cur+1)%lines.length, true);
+  }
+  codeEl.addEventListener("click", e => { const r = e.target.closest(".cline"); if(r) show(+r.dataset.i); });
+  codeEl.addEventListener("keydown", e => {
+    const r = e.target.closest(".cline"); if(!r) return;
+    if (e.key==="Enter"||e.key===" "){ e.preventDefault(); show(+r.dataset.i); }
+  });
+  w.addEventListener("keydown", e => {
+    if (cur < 0) return;
+    if (e.key==="ArrowDown"||e.key==="ArrowRight"){ e.preventDefault(); show((cur+1)%b.lines.length, true); }
+    if (e.key==="ArrowUp"||e.key==="ArrowLeft"){ e.preventDefault(); show((cur-1+b.lines.length)%b.lines.length, true); }
+  });
+  head.querySelector(".copy").onclick = ev => {
+    navigator.clipboard.writeText(b.lines.map(l=>l[0]).join("\n")).then(()=>{
+      ev.target.textContent = "copied"; setTimeout(()=>ev.target.textContent="copy", 1400);
+    });
+  };
+  if (w.dataset.block === "warmup") show(0); // demo the inspector immediately on load
+});
+
+/* =============== quizzes =============== */
+let score = 0; const answered = new Set();
+function bumpScore(){
+  document.getElementById("scoreTxt").textContent = score + " / 7";
+  document.getElementById("scoreBar").style.width = (score/7*100)+"%";
+}
+document.querySelectorAll(".quiz").forEach(qEl => {
+  const q = QUIZZES[qEl.dataset.quiz]; if(!q) return;
+  qEl.innerHTML = '<div class="q-tag">'+q.tag+'</div><div class="q-text">'+q.text+'</div>'+
+    '<div class="opts">'+q.opts.map((o,i)=>'<button type="button" data-i="'+i+'">'+esc(o)+'</button>').join("")+'</div>'+
+    '<div class="verdict"></div>';
+  const v = qEl.querySelector(".verdict");
+  qEl.querySelectorAll(".opts button").forEach(btn => btn.onclick = () => {
+    const i = +btn.dataset.i, done = answered.has(qEl.dataset.quiz);
+    qEl.querySelectorAll(".opts button").forEach(x=>x.classList.remove("right","wrong"));
+    if (i === q.ans){
+      btn.classList.add("right");
+      v.innerHTML = "<b style='color:var(--good)'>Correct!</b> " + q.why;
+      if (!done){ answered.add(qEl.dataset.quiz); score++; bumpScore(); }
+    } else {
+      btn.classList.add("wrong");
+      qEl.querySelectorAll(".opts button")[q.ans].classList.add("right");
+      v.innerHTML = "<b style='color:var(--bad)'>Not quite.</b> " + q.why;
+      if (!done) answered.add(qEl.dataset.quiz);
+    }
+    v.classList.add("show");
+  });
+});
+
+/* =============== reveal boxes =============== */
+document.querySelectorAll(".reveal-box").forEach(rb => {
+  rb.querySelector(".out").textContent = rb.dataset.out;
+  rb.querySelector("button").onclick = () => {
+    rb.classList.toggle("open");
+    rb.querySelector("button").textContent = rb.classList.contains("open") ? "Hide output" : "Reveal output";
+  };
+});
+
+/* =============== linked-list nav progress =============== */
+const items = [...document.querySelectorAll("#llist li")];
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting){
+      const id = en.target.id;
+      items.forEach(li => {
+        if (li.dataset.sec === id){ li.classList.add("seen","here"); }
+        else li.classList.remove("here");
+      });
+    }
+  });
+}, {rootMargin:"-25% 0px -60% 0px"});
+document.querySelectorAll("section").forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
