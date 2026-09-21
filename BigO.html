@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAC286 · Complexity of Algorithms in Java — Time &amp; Space Complexity with Java Examples</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#151a21;
+  --panel:#1c232d;
+  --gutter:#10151b;
+  --ink:#e3e9f2;
+  --muted:#94a1b5;
+  --line:#2a3442;
+  --accent:#f2b63c;          /* amber marker — the highlighter pen of this page */
+  --accent-soft:rgba(242,182,60,.13);
+  --accent-strong:rgba(242,182,60,.22);
+  --teal:#57d9c0;
+  --kw:#b8a1f5;
+  --typ:#82b8f0;
+  --str:#57d9c0;
+  --com:#67748a;
+  --num:#eaa46b;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"JetBrains Mono", "SF Mono", Consolas, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:84px}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--serif); font-size:1.16rem; line-height:1.72;
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important; animation:none !important}
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  background:rgba(21,26,33,.94); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  max-width:1180px; margin:0 auto; padding:.55rem 1rem;
+  display:flex; align-items:center; gap:1rem;
+}
+.brand{font-family:var(--mono); font-size:.9rem; color:var(--accent); white-space:nowrap}
+.brand a{color:inherit; text-decoration:none}
+nav.toc{display:flex; gap:.15rem; overflow-x:auto; scrollbar-width:thin}
+nav.toc a{
+  font-family:var(--mono); font-size:.84rem; color:var(--muted);
+  text-decoration:none; padding:.3rem .55rem; border-radius:6px; white-space:nowrap;
+}
+nav.toc a:hover{color:var(--ink); background:var(--panel)}
+nav.toc a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ---------- header ---------- */
+header.hero{max-width:1180px; margin:0 auto; padding:3.2rem 1rem 1.2rem}
+.hero .course{font-family:var(--mono); font-size:.9rem; color:var(--muted); letter-spacing:.04em}
+.hero h1{
+  font-size:clamp(2rem, 4.5vw, 3.1rem); line-height:1.12; margin:.35rem 0 .6rem;
+  font-weight:700;
+}
+.hero h1 .mark{
+  background:linear-gradient(transparent 58%, var(--accent-strong) 58%);
+  padding:0 .1em;
+}
+.hero .sub{max-width:62ch; color:var(--muted); font-size:1.16rem; margin:0}
+
+/* the "how to read this page" strip */
+.howto{
+  max-width:1180px; margin:1.4rem auto 0; padding:0 1rem;
+}
+.howto-card{
+  border:1px solid var(--line); border-left:4px solid var(--accent);
+  background:var(--panel); border-radius:10px; padding:.9rem 1.1rem;
+  display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap;
+}
+.howto-card .demo-line{
+  font-family:var(--mono); font-size:.9rem; background:var(--gutter);
+  border:1px solid var(--line); border-radius:8px; padding:.5rem .7rem;
+  color:var(--typ); white-space:nowrap;
+}
+.howto-card .demo-line b{color:var(--accent); font-weight:500}
+.howto-card p{margin:.1rem 0; font-size:1.06rem}
+.howto-card .keys{font-family:var(--mono); font-size:.84rem; color:var(--muted)}
+kbd{
+  font-family:var(--mono); font-size:.75em; border:1px solid var(--line);
+  border-bottom-width:2px; border-radius:5px; padding:.05em .4em; background:var(--gutter);
+}
+
+/* ---------- lesson sections ---------- */
+main{max-width:1180px; margin:0 auto; padding:0 1rem 4rem}
+section.lesson{padding:2.6rem 0 1rem; border-bottom:1px solid var(--line)}
+section.lesson:last-of-type{border-bottom:none}
+.lesson h2{
+  font-size:1.9rem; margin:0 0 .2rem; font-weight:700;
+}
+.lesson h2 .chip{
+  font-family:var(--mono); font-size:.78rem; font-weight:500; color:var(--accent);
+  border:1px solid var(--accent); border-radius:999px; padding:.12em .6em;
+  vertical-align:.35em; margin-left:.5rem;
+}
+.lesson .lede{max-width:70ch; color:var(--muted); margin:.3rem 0 1.1rem}
+.lesson p{max-width:70ch}
+.bigidea{
+  max-width:70ch; margin:1rem 0; padding:.75rem 1rem;
+  border-left:3px solid var(--teal); background:rgba(87,217,192,.06);
+  border-radius:0 8px 8px 0; font-size:1.08rem;
+}
+.bigidea b{color:var(--teal)}
+.defcard{
+  border:1px solid var(--line); border-left:4px solid var(--accent);
+  border-radius:10px; background:var(--panel);
+  padding:1rem 1.2rem; margin:1.1rem 0; max-width:74ch;
+}
+.def-head{display:flex; align-items:baseline; gap:.7rem; margin-bottom:.2rem}
+.def-not{font-family:var(--mono); font-size:1.35rem; color:var(--accent); font-weight:700}
+.def-name{font-family:var(--mono); font-size:.86rem; color:var(--muted)}
+.def-curve{display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.75rem; color:var(--muted); margin:.15rem 0 .1rem}
+.def-swatch{width:22px; height:4px; border-radius:2px; display:inline-block; flex:none}
+.defcard dl{margin:.4rem 0 0}
+.defcard dt{font-family:var(--mono); font-size:.8rem; color:var(--teal); margin-top:.6rem}
+.defcard dd{margin:.15rem 0 0; font-size:1.08rem; line-height:1.62}
+.family{display:grid; grid-template-columns:repeat(auto-fit,minmax(195px,1fr)); gap:.8rem; margin:1.2rem 0}
+.fam{border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:.8rem .95rem}
+.fam-not{font-family:var(--mono); color:var(--accent); font-size:1.15rem; display:block; font-weight:700}
+.fam-name{font-family:var(--mono); font-size:.78rem; color:var(--muted)}
+.fam p{margin:.45rem 0 0; font-size:.99rem; line-height:1.55}
+.bigo-graph-wrap{margin:1.3rem 0; border:1px solid var(--line); border-radius:12px; background:var(--gutter); padding:1rem .8rem .6rem; max-width:760px}
+.bigo-graph{width:100%; height:auto; display:block}
+.bg-grid{stroke:var(--line); stroke-width:1; stroke-dasharray:2 4}
+.bg-axis{stroke:var(--muted); stroke-width:1.5}
+.bg-tick{fill:var(--muted); font-family:var(--mono); font-size:12px}
+.bg-title{fill:var(--ink); font-family:var(--mono); font-size:14px}
+.bg-curve{fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round}
+.bg-clab{font-family:var(--mono); font-size:14px; font-weight:700}
+.c-o1{stroke:#57d9c0}   .l-o1{fill:#57d9c0}
+.c-log{stroke:#82b8f0}  .l-log{fill:#82b8f0}
+.c-n{stroke:#f2b63c}    .l-n{fill:#f2b63c}
+.c-nlog{stroke:#eaa46b} .l-nlog{fill:#eaa46b}
+.c-n2{stroke:#e0716f}   .l-n2{fill:#e0716f}
+
+/* code + inspector grid */
+.lesson-grid{
+  display:grid; grid-template-columns:minmax(0,1fr) 330px;
+  gap:1.25rem; align-items:start; margin:1.1rem 0 .4rem;
+}
+
+/* code block */
+figure.codeblock{margin:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--gutter)}
+figure.codeblock figcaption{
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--panel); border-bottom:1px solid var(--line);
+  padding:.45rem .8rem;
+}
+.fname{font-family:var(--mono); font-size:.9rem; color:var(--ink)}
+.fname::before{content:"☕ "; }
+.copybtn{
+  font-family:var(--mono); font-size:.82rem; cursor:pointer;
+  color:var(--accent); background:transparent; border:1px solid var(--accent);
+  border-radius:7px; padding:.28em .8em;
+}
+.copybtn:hover{background:var(--accent); color:#1a1408}
+.copybtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.copybtn.done{background:var(--teal); border-color:var(--teal); color:#062a24}
+.btns{display:flex; gap:.45rem; flex-wrap:wrap; justify-content:flex-end}
+.copybtn.alt{color:var(--muted); border-color:var(--line)}
+.copybtn.alt:hover{background:var(--panel); color:var(--ink); border-color:var(--muted)}
+.codescroll{overflow-x:auto; padding:.55rem 0}
+.cl{
+  display:flex; align-items:baseline; cursor:pointer;
+  border-left:3px solid transparent;
+}
+.cl .ln{
+  min-width:3.2ch; padding:0 .8ch 0 .6ch; text-align:right;
+  font-family:var(--mono); font-size:.9rem; color:#4b5769; user-select:none;
+}
+.cl .ct{
+  font-family:var(--mono); font-size:.97rem; line-height:1.62;
+  white-space:pre; padding-right:1.2rem;
+}
+.cl:hover{background:rgba(255,255,255,.035)}
+.cl.active{background:var(--accent-soft); border-left-color:var(--accent)}
+.cl.active .ln{color:var(--accent)}
+.cl.pinned{background:var(--accent-strong)}
+.cl:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+/* syntax colors */
+.tk-kw{color:var(--kw)} .tk-typ{color:var(--typ)} .tk-str{color:var(--str)}
+.tk-com{color:var(--com); font-style:italic} .tk-num{color:var(--num)}
+
+/* inspector panel */
+aside.inspector{
+  position:sticky; top:76px;
+  border:1px solid var(--line); border-radius:12px; background:var(--panel);
+  overflow:hidden;
+}
+.ins-head{
+  display:flex; align-items:center; gap:.5rem;
+  font-family:var(--mono); font-size:.84rem; color:var(--muted);
+  border-bottom:1px solid var(--line); padding:.5rem .9rem;
+}
+.ins-dot{width:.55rem; height:.55rem; border-radius:50%; background:var(--accent); flex:none}
+.ins-body{padding:.85rem .95rem; min-height:9.5rem}
+.ins-hint{color:var(--muted); font-size:1.02rem; margin:0}
+.ins-lineno{
+  font-family:var(--mono); font-size:.8rem; color:var(--accent);
+  border:1px solid var(--accent); border-radius:999px; padding:.1em .65em;
+  display:inline-block; margin-bottom:.5rem;
+}
+.ins-code{
+  font-family:var(--mono); font-size:.88rem; color:var(--typ);
+  background:var(--gutter); border:1px solid var(--line); border-radius:7px;
+  padding:.45rem .6rem; margin:0 0 .6rem; overflow-x:auto; white-space:pre;
+}
+.ins-note{font-size:1.07rem; line-height:1.6; margin:0}
+.ins-pinstate{font-family:var(--mono); font-size:.78rem; color:var(--muted); margin:.7rem 0 0}
+
+/* expected output box */
+details.runbox{
+  margin:.9rem 0 0; border:1px solid var(--line); border-radius:10px;
+  background:var(--panel); max-width:100%;
+}
+details.runbox summary{
+  cursor:pointer; padding:.5rem .9rem; font-family:var(--mono);
+  font-size:.9rem; color:var(--teal); list-style:none;
+}
+details.runbox summary::before{content:"▸ "; }
+details.runbox[open] summary::before{content:"▾ "; }
+details.runbox summary:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+details.runbox pre{
+  margin:0; padding:.7rem 1rem .9rem; border-top:1px solid var(--line);
+  font-family:var(--mono); font-size:.92rem; color:var(--ink);
+  overflow-x:auto; line-height:1.6;
+}
+
+/* practice reveal */
+details.solution{margin:.7rem 0 1.6rem}
+details.solution > summary{
+  cursor:pointer; display:inline-block; font-family:var(--mono); font-size:.9rem;
+  color:var(--accent); border:1px solid var(--accent); border-radius:8px;
+  padding:.35em .9em; list-style:none;
+}
+details.solution > summary:hover{background:var(--accent); color:#1a1408}
+details.solution > summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+details.solution > .lesson-grid{margin-top:.9rem}
+
+/* quiz */
+.quiz-q{border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:1rem 1.2rem; margin:0 0 1rem; max-width:74ch}
+.quiz-q h3{margin:.1rem 0 .6rem; font-size:1.15rem}
+.quiz-q code{font-family:var(--mono); font-size:.85em; background:var(--gutter); border:1px solid var(--line); border-radius:5px; padding:.05em .35em}
+.quiz-q label{display:flex; gap:.55rem; align-items:baseline; padding:.22rem 0; cursor:pointer; font-size:1.07rem}
+.quiz-q input{accent-color:var(--accent)}
+.quiz-q.correct{border-color:var(--teal)}
+.quiz-q.wrong{border-color:#e0716f}
+.quiz-verdict{font-family:var(--mono); font-size:.86rem; margin:.5rem 0 0; display:none}
+.quiz-q.correct .quiz-verdict{display:block; color:var(--teal)}
+.quiz-q.wrong .quiz-verdict{display:block; color:#e0716f}
+#gradebtn{
+  font-family:var(--mono); font-size:.9rem; cursor:pointer;
+  background:var(--accent); color:#1a1408; border:none; border-radius:9px;
+  padding:.6em 1.4em; font-weight:700;
+}
+#gradebtn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+#quizscore{font-family:var(--mono); margin-left:1rem; color:var(--teal)}
+
+footer.pagefoot{
+  max-width:1180px; margin:0 auto; padding:1.4rem 1rem 2.6rem;
+  color:var(--muted); font-size:.98rem; border-top:1px solid var(--line);
+}
+footer.pagefoot .sig{font-family:var(--mono); font-size:.8rem}
+
+/* ---------- mobile ---------- */
+@media (max-width:920px){
+  .lesson-grid{grid-template-columns:1fr}
+  aside.inspector{
+    position:sticky; top:auto; bottom:0; z-index:30;
+    border-radius:12px 12px 0 0; box-shadow:0 -8px 24px rgba(0,0,0,.45);
+    max-height:36vh; overflow-y:auto;
+  }
+  .ins-body{min-height:5.5rem}
+  .hero{padding-top:2.2rem}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="brand"><a href="index.html">MAC286</a> · Algorithm Complexity</span>
+    <nav class="toc" aria-label="Lecture sections">
+      <a href="#what">1 What Is It?</a>
+      <a href="#warmup">2 Warm-up</a>
+      <a href="#linear">3 O(1) &amp; O(n)</a>
+      <a href="#quadratic">4 O(n²)</a>
+      <a href="#logn">5 O(log n)</a>
+      <a href="#cases">6 Cases</a>
+      <a href="#growth">7 Growth Table</a>
+      <a href="#space">8 Space</a>
+      <a href="#timing">9 Stopwatch</a>
+      <a href="#practice">Practice</a>
+      <a href="#quiz">Quiz</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <p class="course">MAC286 · Data Structures in Java · Prof. Kassou</p>
+  <h1>Complexity of algorithms: <span class="mark">counting the cost</span> of your code</h1>
+  <p class="sub">Two programs can give the same answer while one finishes in a blink and the other takes all afternoon. This lecture teaches you to see that difference before you press Run: we count steps by hand, meet the four famous shapes — O(1), O(n), O(n²) and O(log n) — compare best and worst cases, weigh time against memory, and finish by timing real code with a real stopwatch. Every program is complete and runnable, and we start slow: every idea is defined in plain English, with an everyday picture, before you see a single line of code.</p>
+</header>
+
+<div class="howto">
+  <div class="howto-card">
+    <div>
+      <p><strong>How this page works.</strong> Every program has a live <em>Inspector</em> beside it. Put your cursor on any line of code — click it or hover over it — and that line's explanation appears in the panel on the right.</p>
+      <p class="keys">Running the code online? Compilers like Programiz, JDoodle and OnlineGDB expect the class to be named <b style="color:var(--accent)">Main</b> — use each program’s <span style="color:var(--teal)">Copy as Main.java</span> button and paste as-is.</p>
+      <p class="keys">Click a line to <b style="color:var(--accent)">pin</b> its note · <kbd>↑</kbd> <kbd>↓</kbd> walk through the lines · <kbd>Esc</kbd> unpins · <span style="color:var(--teal)">Copy code</span> grabs the whole file.</p>
+    </div>
+    <div class="demo-line">int[] a = new int[5]; <b>◀ try clicking lines like this one below</b></div>
+  </div>
+</div>
+
+<main>
+<!-- ============ 1. WHAT IS COMPLEXITY ============ -->
+<section class="lesson" id="what">
+  <h2>1 · First things first: what is "complexity"? <span class="chip">no code yet</span></h2>
+  <p class="lede">Before a single line of Java, let's agree on what we are even talking about. Imagine two programs that both find a name in a list of a million customers. Both give the correct answer. One responds instantly; the other makes you wait. Same computer, same data, same answer — the difference is the <strong>algorithm</strong>: the step-by-step recipe each program follows. Complexity is how we describe the cost of a recipe.</p>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">Time complexity</span></div>
+    <dl>
+      <dt>What it means</dt>
+      <dd>Time complexity measures how the <em>runtime</em> of an algorithm increases as the input size grows.</dd>
+      <dt>In other words</dt>
+      <dd>It's like asking: "If I double my data, will my program take twice as long — or will it completely melt down?" 🔥</dd>
+    </dl>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">Space complexity</span></div>
+    <dl>
+      <dt>What it means</dt>
+      <dd>Space complexity measures how much <em>memory</em> an algorithm uses as the input size increases.</dd>
+      <dt>In other words</dt>
+      <dd>Think of it as: "Will my program eat all my RAM like Cookie Monster eats cookies?" 🍪</dd>
+    </dl>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">Big-O notation</span><span class="def-name">the vocabulary</span></div>
+    <dl>
+      <dt>What it is</dt>
+      <dd>The shared vocabulary for naming growth patterns. Instead of "the work grows in direct proportion to the input", programmers everywhere just say <strong>O(n)</strong>.</dd>
+      <dt>How to read it</dt>
+      <dd>Say "Big O of n". <strong>n</strong> is the input's size; whatever sits inside the parentheses is the growth shape.</dd>
+      <dt>One honest rule</dt>
+      <dd>Big-O describes the <em>worst-case</em> scenario. It’s pessimistic — like assuming every traffic light will be red on your way to work! (Section 6 makes the cases precise. It also ignores small constants: a loop doing 2 steps per element is still O(n).)</dd>
+    </dl>
+  </div>
+
+  <p>Here is the whole family you will meet in this lecture, slowest-growing first. Skim it now; each one gets its own definition, everyday picture, and runnable Java program below.</p>
+
+  <div class="family">
+    <div class="fam"><span class="fam-not">O(1)</span><span class="fam-name">constant</span><p>Same work no matter the size. Walking straight to mailbox #305.</p></div>
+    <div class="fam"><span class="fam-not">O(log n)</span><span class="fam-name">logarithmic</span><p>Each step halves the problem. The number-guessing game with higher/lower hints.</p></div>
+    <div class="fam"><span class="fam-not">O(n)</span><span class="fam-name">linear</span><p>Touch everything once. Reading every page of a book.</p></div>
+    <div class="fam"><span class="fam-not">O(n log n)</span><span class="fam-name">linearithmic</span><p>A log-n job for each of n items. What good sorting costs.</p></div>
+    <div class="fam"><span class="fam-not">O(n²)</span><span class="fam-name">quadratic</span><p>Everything meets everything. Every student shaking every hand.</p></div>
+  </div>
+
+  <p>The same family as a picture. The <strong>x-axis is the input size n</strong> (how much data you hand the algorithm); the <strong>y-axis is the operations</strong> (how much work it does in return):</p>
+
+  <figure class="bigo-graph-wrap">
+    <svg class="bigo-graph" viewBox="0 0 680 420" role="img" aria-label="Growth of Big-O shapes: operations versus input size n. O of 1 stays flat, O of log n rises very slowly, O of n is a straight diagonal, O of n log n rises faster, and O of n squared shoots off the top of the chart almost immediately.">
+      <line class="bg-grid" x1="62.0" y1="306.0" x2="648.0" y2="306.0"/><line class="bg-grid" x1="62.0" y1="240.0" x2="648.0" y2="240.0"/><line class="bg-grid" x1="62.0" y1="174.0" x2="648.0" y2="174.0"/><line class="bg-grid" x1="62.0" y1="108.0" x2="648.0" y2="108.0"/><line class="bg-grid" x1="62.0" y1="42.0" x2="648.0" y2="42.0"/><line class="bg-grid" x1="179.2" y1="372.0" x2="179.2" y2="42.0"/><line class="bg-grid" x1="296.4" y1="372.0" x2="296.4" y2="42.0"/><line class="bg-grid" x1="413.59999999999997" y1="372.0" x2="413.59999999999997" y2="42.0"/><line class="bg-grid" x1="530.8" y1="372.0" x2="530.8" y2="42.0"/><line class="bg-grid" x1="648.0" y1="372.0" x2="648.0" y2="42.0"/>
+      <line class="bg-axis" x1="62.0" y1="372.0" x2="648.0" y2="372.0"/>
+      <line class="bg-axis" x1="62.0" y1="372.0" x2="62.0" y2="42.0"/>
+      <text class="bg-tick" x="62.0" y="390.0" text-anchor="middle">0</text><text class="bg-tick" x="179.2" y="390.0" text-anchor="middle">10</text><text class="bg-tick" x="296.4" y="390.0" text-anchor="middle">20</text><text class="bg-tick" x="413.59999999999997" y="390.0" text-anchor="middle">30</text><text class="bg-tick" x="530.8" y="390.0" text-anchor="middle">40</text><text class="bg-tick" x="648.0" y="390.0" text-anchor="middle">50</text><text class="bg-tick" x="52.0" y="376.0" text-anchor="end">0</text><text class="bg-tick" x="52.0" y="310.0" text-anchor="end">10</text><text class="bg-tick" x="52.0" y="244.0" text-anchor="end">20</text><text class="bg-tick" x="52.0" y="178.0" text-anchor="end">30</text><text class="bg-tick" x="52.0" y="112.0" text-anchor="end">40</text><text class="bg-tick" x="52.0" y="46.0" text-anchor="end">50</text>
+      <text class="bg-title" x="355.0" y="410" text-anchor="middle">input size (n)</text>
+      <text class="bg-title" x="16" y="207.0" text-anchor="middle" transform="rotate(-90 16 207.0)">operations</text>
+      <polyline class="bg-curve c-n2" points="62.0,372.0 67.9,370.4 73.7,365.4 79.6,357.1 85.4,345.6 91.3,330.8 97.2,312.6 103.0,291.1 108.9,266.4 114.7,238.3 120.6,207.0 126.5,172.3 132.3,134.4 138.2,93.2 144.0,48.6 144.8,42.0"/>
+      <polyline class="bg-curve c-nlog" points="73.7,372.0 79.6,366.2 85.4,358.8 91.3,350.2 97.2,340.6 103.0,330.3 108.9,319.2 114.7,307.6 120.6,295.4 126.5,282.7 132.3,269.6 138.2,256.2 144.0,242.3 149.9,228.1 155.8,213.6 161.6,198.8 167.5,183.7 173.3,168.4 179.2,152.8 185.1,136.9 190.9,120.8 196.8,104.6 202.6,88.1 208.5,71.4 214.4,54.5 218.7,42.0"/>
+      <polyline class="bg-curve c-n" points="62.0,372.0 67.9,368.7 73.7,365.4 79.6,362.1 85.4,358.8 91.3,355.5 97.2,352.2 103.0,348.9 108.9,345.6 114.7,342.3 120.6,339.0 126.5,335.7 132.3,332.4 138.2,329.1 144.0,325.8 149.9,322.5 155.8,319.2 161.6,315.9 167.5,312.6 173.3,309.3 179.2,306.0 185.1,302.7 190.9,299.4 196.8,296.1 202.6,292.8 208.5,289.5 214.4,286.2 220.2,282.9 226.1,279.6 231.9,276.3 237.8,273.0 243.7,269.7 249.5,266.4 255.4,263.1 261.2,259.8 267.1,256.5 273.0,253.2 278.8,249.9 284.7,246.6 290.5,243.3 296.4,240.0 302.3,236.7 308.1,233.4 314.0,230.1 319.8,226.8 325.7,223.5 331.6,220.2 337.4,216.9 343.3,213.6 349.1,210.3 355.0,207.0 360.9,203.7 366.7,200.4 372.6,197.1 378.4,193.8 384.3,190.5 390.2,187.2 396.0,183.9 401.9,180.6 407.7,177.3 413.6,174.0 419.5,170.7 425.3,167.4 431.2,164.1 437.0,160.8 442.9,157.5 448.8,154.2 454.6,150.9 460.5,147.6 466.3,144.3 472.2,141.0 478.1,137.7 483.9,134.4 489.8,131.1 495.6,127.8 501.5,124.5 507.4,121.2 513.2,117.9 519.1,114.6 524.9,111.3 530.8,108.0 536.7,104.7 542.5,101.4 548.4,98.1 554.2,94.8 560.1,91.5 566.0,88.2 571.8,84.9 577.7,81.6 583.5,78.3 589.4,75.0 595.3,71.7 601.1,68.4 607.0,65.1 612.8,61.8 618.7,58.5 624.6,55.2 630.4,51.9 636.3,48.6 642.1,45.3 648.0,42.0"/>
+      <polyline class="bg-curve c-log" points="73.7,372.0 79.6,368.1 85.4,365.4 91.3,363.3 97.2,361.5 103.0,360.1 108.9,358.8 114.7,357.7 120.6,356.7 126.5,355.8 132.3,354.9 138.2,354.2 144.0,353.5 149.9,352.8 155.8,352.2 161.6,351.6 167.5,351.1 173.3,350.6 179.2,350.1 185.1,349.6 190.9,349.2 196.8,348.7 202.6,348.3 208.5,348.0 214.4,347.6 220.2,347.2 226.1,346.9 231.9,346.5 237.8,346.2 243.7,345.9 249.5,345.6 255.4,345.3 261.2,345.0 267.1,344.7 273.0,344.5 278.8,344.2 284.7,344.0 290.5,343.7 296.4,343.5 302.3,343.2 308.1,343.0 314.0,342.8 319.8,342.6 325.7,342.4 331.6,342.1 337.4,341.9 343.3,341.7 349.1,341.5 355.0,341.4 360.9,341.2 366.7,341.0 372.6,340.8 378.4,340.6 384.3,340.4 390.2,340.3 396.0,340.1 401.9,339.9 407.7,339.8 413.6,339.6 419.5,339.5 425.3,339.3 431.2,339.1 437.0,339.0 442.9,338.9 448.8,338.7 454.6,338.6 460.5,338.4 466.3,338.3 472.2,338.1 478.1,338.0 483.9,337.9 489.8,337.7 495.6,337.6 501.5,337.5 507.4,337.4 513.2,337.2 519.1,337.1 524.9,337.0 530.8,336.9 536.7,336.8 542.5,336.6 548.4,336.5 554.2,336.4 560.1,336.3 566.0,336.2 571.8,336.1 577.7,336.0 583.5,335.9 589.4,335.8 595.3,335.6 601.1,335.5 607.0,335.4 612.8,335.3 618.7,335.2 624.6,335.1 630.4,335.0 636.3,334.9 642.1,334.8 648.0,334.8"/>
+      <polyline class="bg-curve c-o1" points="62.0,365.4 67.9,365.4 73.7,365.4 79.6,365.4 85.4,365.4 91.3,365.4 97.2,365.4 103.0,365.4 108.9,365.4 114.7,365.4 120.6,365.4 126.5,365.4 132.3,365.4 138.2,365.4 144.0,365.4 149.9,365.4 155.8,365.4 161.6,365.4 167.5,365.4 173.3,365.4 179.2,365.4 185.1,365.4 190.9,365.4 196.8,365.4 202.6,365.4 208.5,365.4 214.4,365.4 220.2,365.4 226.1,365.4 231.9,365.4 237.8,365.4 243.7,365.4 249.5,365.4 255.4,365.4 261.2,365.4 267.1,365.4 273.0,365.4 278.8,365.4 284.7,365.4 290.5,365.4 296.4,365.4 302.3,365.4 308.1,365.4 314.0,365.4 319.8,365.4 325.7,365.4 331.6,365.4 337.4,365.4 343.3,365.4 349.1,365.4 355.0,365.4 360.9,365.4 366.7,365.4 372.6,365.4 378.4,365.4 384.3,365.4 390.2,365.4 396.0,365.4 401.9,365.4 407.7,365.4 413.6,365.4 419.5,365.4 425.3,365.4 431.2,365.4 437.0,365.4 442.9,365.4 448.8,365.4 454.6,365.4 460.5,365.4 466.3,365.4 472.2,365.4 478.1,365.4 483.9,365.4 489.8,365.4 495.6,365.4 501.5,365.4 507.4,365.4 513.2,365.4 519.1,365.4 524.9,365.4 530.8,365.4 536.7,365.4 542.5,365.4 548.4,365.4 554.2,365.4 560.1,365.4 566.0,365.4 571.8,365.4 577.7,365.4 583.5,365.4 589.4,365.4 595.3,365.4 601.1,365.4 607.0,365.4 612.8,365.4 618.7,365.4 624.6,365.4 630.4,365.4 636.3,365.4 642.1,365.4 648.0,365.4"/>
+      <text class="bg-clab l-n2" x="152.848275862069" y="58.0">O(n²)</text>
+      <text class="bg-clab l-nlog" x="226.65375809255755" y="58.0">O(n log n)</text>
+      <text class="bg-clab l-n" x="578.0" y="64.0">O(n)</text>
+      <text class="bg-clab l-log" x="560.0" y="326.7505491474868">O(log n)</text>
+      <text class="bg-clab l-o1" x="596.0" y="357.4">O(1)</text>
+    </svg>
+    <figcaption class="bigo-caption">How to read it: pick any input size on the x-axis and go up — the height of each curve is how many operations that shape costs. Flatter is better. O(1) never rises, O(log n) barely does, and O(n²) leaves the chart before n reaches 8.</figcaption>
+  </figure>
+
+  <div class="bigidea"><b>Why you should care:</b> for n = 1,000,000 items, an O(log n) recipe does about 20 steps, an O(n) recipe a million, and an O(n²) recipe a <em>trillion</em>. Same computer — the recipe alone is the difference between instant and impossible. Naming these shapes is the skill this lecture builds.</div>
+</section>
+
+<!-- ============ 2. WARM-UP ============ -->
+<section class="lesson" id="warmup">
+  <h2>2 · Warm-up: let's count the steps <span class="chip">easy start</span></h2>
+  <p class="lede"><strong>The purpose of this first program</strong> is to turn Section 1's definitions into something you can see with your own eyes. "Amount of work" sounds abstract — so we make it countable: we take a sum method you already know from the arrays lectures and add one extra passenger, a counter that ticks once per operation. Then we feed it a small input and a big input and compare the counts. Everything after this section is just giving names to the patterns this counter reveals.</p>
+  <div class="bigidea"><b>Big idea:</b> we never care about the exact step count (5, 100, 1042...). We care about the <strong>pattern</strong>: when the input got 20 times bigger, did the work get 20 times bigger too? That pattern is the algorithm's complexity.</div>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="StepCounter.java">
+      <figcaption><span class="fname">StepCounter.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class StepCounter {
+
+    // Add up an array, and COUNT how many steps it takes
+    public static int sum(int[] a) {
+        int steps = 0;
+        int total = 0;
+        for (int value : a) {
+            total = total + value;
+            steps = steps + 1;
+        }
+        System.out.println(a.length + " elements took " + steps + " steps");
+        return total;
+    }
+
+    public static void main(String[] args) {
+        int[] small = {4, 8, 15, 16, 23};
+        int[] big = new int[100];
+
+        sum(small);
+        sum(big);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["The purpose of this program: make the amount of work VISIBLE. We add a counter to a familiar method, feed it a small and a big input, and compare.",
+"",
+"We will not guess how much work this method does — we will count it, live.",
+"An ordinary sum method with one extra passenger: a step counter.",
+"The counter starts at zero.",
+"The running total, exactly like in the arrays lectures.",
+"Visit every element once.",
+"The real work: one addition per element.",
+"And tick the counter once per element — so steps ends up equal to the amount of work done.",
+"Closes the loop.",
+"The headline: how many elements went in, how many steps came out.",
+"Return the sum, like a normal method would.",
+"Closes sum().",
+"",
+"Demo.",
+"A tiny array: 5 elements.",
+"A bigger array: 100 elements. All zeros — the VALUES do not matter here, only how many there are.",
+"",
+"Prints: 5 elements took 5 steps.",
+"Prints: 100 elements took 100 steps. Twenty times the input, twenty times the work. That relationship is the whole subject.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — StepCounter.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>5 elements took 5 steps
+100 elements took 100 steps</pre>
+  </details>
+</section>
+
+<!-- ============ 2. O(1) vs O(n) ============ -->
+<section class="lesson" id="linear">
+  <h2>3 · O(1) and O(n): flat versus straight line <span class="chip">the first two shapes</span></h2>
+  <p class="lede">Big-O notation is just a short name for the growth pattern you counted in the warm-up. We start with the two friendliest shapes. <strong>O(1)</strong>, "order one", means <em>constant</em>: the step count does not change when the input grows. <strong>O(n)</strong>, "order n", means <em>linear</em>: double the input, double the work — a straight line.</p>
+  <div class="bigidea"><b>Big idea:</b> Big-O ignores small details on purpose. A loop that does 2 additions per element is still O(n), not "O(2n)" — because when n gets huge, the 2 is pocket change and the <em>shape</em> is what decides whether your program finishes in a blink or an hour.</div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">O(1)</span><span class="def-name">"Big O of one" — constant time</span></div>
+    <div class="def-curve"><span class="def-swatch" style="background:#57d9c0"></span>on the Section 1 chart: the flat teal line along the bottom</div>
+    <dl>
+      <dt>What it means</dt>
+      <dd>The step count stays the SAME no matter how big the input gets — the one operation that never slows down.</dd>
+      <dt>Everyday picture</dt>
+      <dd>Mailbox #305 out of 500: you walk straight to it and never touch the other 499.</dd>
+      <dt>How to spot it in code</dt>
+      <dd>No loop over the input: <code>a[5]</code>, simple math, an assignment.</dd>
+    </dl>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">O(n)</span><span class="def-name">"Big O of n" — linear time</span></div>
+    <div class="def-curve"><span class="def-swatch" style="background:#f2b63c"></span>on the Section 1 chart: the straight amber diagonal</div>
+    <dl>
+      <dt>What it means</dt>
+      <dd>Steps grow in direct proportion: double the data, double the work — the honest price of touching every element once.</dd>
+      <dt>Everyday picture</dt>
+      <dd>A letter is lost somewhere in the 500 mailboxes: open them one by one.</dd>
+      <dt>How to spot it in code</dt>
+      <dd>ONE loop that visits every element.</dd>
+    </dl>
+  </div>
+
+  <p>Now — and only now — the Java. One program, both shapes side by side, so you can compare them on the same arrays:</p>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="ConstantVsLinear.java">
+      <figcaption><span class="fname">ConstantVsLinear.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+import java.util.Arrays;
+
+public class ConstantVsLinear {
+
+    // O(1): one step, no matter how big the array is
+    public static int firstElement(int[] a) {
+        return a[0];
+    }
+
+    // O(n): the work grows WITH the array
+    public static int sum(int[] a) {
+        int total = 0;
+        for (int value : a) {
+            total = total + value;
+        }
+        return total;
+    }
+
+    public static void main(String[] args) {
+        int[] ten = new int[10];
+        int[] thousand = new int[1000];
+        Arrays.fill(ten, 1);
+        Arrays.fill(thousand, 1);
+
+        // One step each, no matter the size:
+        System.out.println("first of ten:      " + firstElement(ten));
+        System.out.println("first of thousand: " + firstElement(thousand));
+
+        // 10 steps, then 1000 steps:
+        System.out.println("sum of ten:      " + sum(ten));
+        System.out.println("sum of thousand: " + sum(thousand));
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["Arrays.fill() writes the same value into every box — a quick way to build test data.",
+"",
+"Two methods, two different worlds.",
+"",
+"Read O(1) as: order one — CONSTANT. The step count does not depend on the input size at all.",
+"The method accepts an array of ANY size...",
+"...and does exactly one thing: grab box 0. One step for 10 elements, one step for 10 million. Arrays give us this superpower.",
+"Closes firstElement().",
+"",
+"Read O(n) as: order n — LINEAR. Double the input, double the work.",
+"The same sum() as the warm-up, without the counter this time.",
+"One variable...",
+"...one visit per element...",
+"...one addition per element. n elements means n additions.",
+"Closes the loop.",
+"Return the answer.",
+"Closes sum().",
+"",
+"Demo.",
+"10 boxes.",
+"1000 boxes — one hundred times more.",
+"Fill both arrays with 1s...",
+"...so each sum will simply equal the array's size. Easy to check by eye.",
+"",
+"First, the O(1) method:",
+"One step. Prints 1.",
+"STILL one step, even though this array is 100 times bigger. Prints 1. The line is flat.",
+"",
+"Now the O(n) method:",
+"10 steps of work. Prints 10.",
+"1000 steps of work. Prints 1000. The work grew exactly as fast as the input — a straight line.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — ConstantVsLinear.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>first of ten:      1
+first of thousand: 1
+sum of ten:      10
+sum of thousand: 1000</pre>
+  </details>
+</section>
+
+<!-- ============ 3. O(n^2) ============ -->
+<section class="lesson" id="quadratic">
+  <h2>4 · O(n²): a loop inside a loop <span class="chip">the danger zone</span></h2>
+  <p class="lede">Here is the most common way to accidentally write slow code: nest one loop inside another, both walking the same array. Each of the n elements gets paired with the others — roughly n × n work. We will count the comparisons and watch the n² shape appear.</p>
+  <div class="bigidea"><b>Big idea:</b> the fingerprint of O(n²): <strong>double the input → about four times the work.</strong> Below, 5 elements need 10 comparisons but 10 elements need 45. At n = 1000 that is already about half a million comparisons — quadratic code feels fine in testing and explodes in production.</div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">O(n²)</span><span class="def-name">"Big O of n squared" — quadratic time</span></div>
+    <div class="def-curve"><span class="def-swatch" style="background:#e0716f"></span>on the Section 1 chart: the red curve that leaves the chart before n reaches 8</div>
+    <dl>
+      <dt>What it means</dt>
+      <dd>Work grows like size × size: double the input, about FOUR times the work. Feels fine on test data, chokes on real data.</dd>
+      <dt>Everyday picture</dt>
+      <dd>Everyone in class shakes everyone's hand: 10 students = 45 handshakes, 20 students = 190.</dd>
+      <dt>How to spot it in code</dt>
+      <dd>A loop INSIDE a loop, both walking the input.</dd>
+    </dl>
+  </div>
+
+  <p>Here is that handshake pattern as Java — a duplicate check that compares every element with every other, with a counter so the n² shape shows up in the output:</p>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="PairsDemo.java">
+      <figcaption><span class="fname">PairsDemo.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class PairsDemo {
+
+    // Does the array contain the same value twice? (the slow way)
+    public static boolean hasDuplicate(int[] a) {
+        int comparisons = 0;
+        for (int i = 0; i < a.length; i++) {
+            for (int j = i + 1; j < a.length; j++) {
+                comparisons = comparisons + 1;
+                if (a[i] == a[j]) {
+                    System.out.println("comparisons: " + comparisons);
+                    return true;
+                }
+            }
+        }
+        System.out.println("comparisons: " + comparisons);
+        return false;
+    }
+
+    public static void main(String[] args) {
+        int[] five = {1, 2, 3, 4, 5};
+        int[] ten = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        System.out.println(hasDuplicate(five));
+        System.out.println(hasDuplicate(ten));
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["A question you will meet constantly: does this array repeat a value?",
+"",
+"The honest, simple plan: compare every element with every LATER element. Any match means a duplicate.",
+"Takes any int array, answers yes or no.",
+"Count every comparison, so we can see the n-squared shape with our own eyes.",
+"The outer loop picks the first element of each pair...",
+"...the inner loop pairs it with everything AFTER it. Starting at i + 1 avoids comparing a box with itself and avoids checking the same pair twice.",
+"Tick — one comparison about to happen.",
+"The actual check.",
+"Report how many comparisons it took to find the match...",
+"...and answer yes right away.",
+"Closes the if.",
+"Closes the inner loop.",
+"Closes the outer loop.",
+"No match anywhere — report the FULL count: every possible pair was checked.",
+"Answer no.",
+"Closes hasDuplicate().",
+"",
+"Demo.",
+"5 distinct values.",
+"10 distinct values — exactly double.",
+"",
+"Prints comparisons: 10, then false. (5 elements form 10 pairs.)",
+"Prints comparisons: 45, then false. DOUBLE the input needed about FOUR times the comparisons — the fingerprint of O(n squared).",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — PairsDemo.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>comparisons: 10
+false
+comparisons: 45
+false</pre>
+  </details>
+</section>
+
+<!-- ============ 4. O(log n) ============ -->
+<section class="lesson" id="logn">
+  <h2>5 · O(log n): cut the problem in half <span class="chip">the happy one</span></h2>
+  <p class="lede">Now the opposite of the danger zone — the happiest complexity there is. It comes from one move: <em>every step throws away half of what is left.</em> Binary search (from the Advanced Arrays lecture) is the classic example; here it returns with a guess counter on board.</p>
+  <div class="bigidea"><b>Big idea:</b> <code>log n</code> is not scary math. It just answers: <strong>how many times can I cut n in half before nothing is left?</strong> 16 → 8 → 4 → 2 → 1 is four cuts. A million only takes about twenty. That is why doubling the array adds just <em>one</em> guess.</div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">O(log n)</span><span class="def-name">"Big O of log n" — logarithmic time</span></div>
+    <div class="def-curve"><span class="def-swatch" style="background:#82b8f0"></span>on the Section 1 chart: the blue curve that barely rises</div>
+    <dl>
+      <dt>What it means</dt>
+      <dd>log n just answers: <strong>how many times can I cut n in half?</strong> Work grows that slowly — doubling the input adds only ONE step.</dd>
+      <dt>Everyday picture</dt>
+      <dd>Guess my number from 1 to 100 with higher/lower hints: 7 guesses at most. From 1 to a million: about 20.</dd>
+      <dt>How to spot it in code</dt>
+      <dd>The remaining range keeps HALVING (binary search), or a loop variable DOUBLES: <code>i = i * 2</code>.</dd>
+    </dl>
+  </div>
+
+  <p>The guessing game in Java is binary search, which you met in the Advanced Arrays lecture. Here it is again with a guess counter, so the astonishing numbers print themselves:</p>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="Halving.java">
+      <figcaption><span class="fname">Halving.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class Halving {
+
+    // Binary search, counting the guesses
+    public static int search(int[] a, int target) {
+        int low = 0;
+        int high = a.length - 1;
+        int guesses = 0;
+        while (low <= high) {
+            guesses = guesses + 1;
+            int mid = low + (high - low) / 2;
+            if (a[mid] == target) {
+                System.out.println(a.length + " elements, " + guesses + " guesses");
+                return mid;
+            } else if (a[mid] < target) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        System.out.println(a.length + " elements, " + guesses + " guesses");
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int[] sixteen = new int[16];
+        for (int i = 0; i < sixteen.length; i++) {
+            sixteen[i] = i;
+        }
+        int[] million = new int[1000000];
+        for (int i = 0; i < million.length; i++) {
+            million[i] = i;
+        }
+
+        // Search for a value that is NOT there: the worst case
+        search(sixteen, -1);
+        search(million, -1);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["Where speed comes from: not working faster, but throwing half the problem away at every step.",
+"",
+"The binary search you know from the Advanced Arrays lecture — now with a guess counter on board.",
+"Requires a sorted array, as always.",
+"low and high fence in the part of the array that could still hold the target.",
+"high starts at the last index.",
+"Count every guess.",
+"Keep going while the fence still contains something.",
+"Tick — about to make a guess.",
+"Look exactly in the middle of the fence.",
+"Hit?",
+"Report the guess count...",
+"...and return the position.",
+"Middle too small: the target can only be in the RIGHT half...",
+"...so HALF of the remaining elements are eliminated by this one line. That is the magic.",
+"Middle too big...",
+"...throw away the right half instead. Either way: half gone per guess.",
+"Closes the if/else chain.",
+"Closes the loop.",
+"Not found — report how many guesses the worst case cost.",
+"The not-found signal.",
+"Closes search().",
+"",
+"Demo.",
+"16 sorted elements...",
+"...filled with 0, 1, 2, up to 15...",
+"...one value per box.",
+"Closes the fill loop.",
+"Now ONE MILLION sorted elements.",
+"Same fill...",
+"...0 up to 999999.",
+"Closes the fill loop.",
+"",
+"Searching for -1, which is not there, forces the search to keep halving until the fence is empty — a worst case.",
+"16 elements: only 4 guesses.",
+"1,000,000 elements: only 19 guesses. Not a typo. Going from 16 to a MILLION elements added just 15 guesses, because every doubling adds only ONE. That is O(log n).",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — Halving.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>16 elements, 4 guesses
+1000000 elements, 19 guesses</pre>
+  </details>
+</section>
+
+<!-- ============ 5. CASES ============ -->
+<section class="lesson" id="cases">
+  <h2>6 · Best, average, and worst case <span class="chip">same code, different luck</span></h2>
+  <p class="lede">One algorithm can be fast <em>and</em> slow — it depends on the input it happens to meet. Linear search finds a target in 1 check if it is lucky and n checks if it is not. That is why we name three cases, and why Big-O usually describes the <strong>worst</strong> one: it is the promise your code can always keep.</p>
+  <div class="bigidea"><b>Big idea:</b> when someone says "linear search is O(n)", they mean: <em>even on its unluckiest day</em> it does about n checks. Best case (O(1) here) is nice to know, but you cannot plan around luck.</div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">Best / average / worst case</span></div>
+    <dl>
+      <dt>Best case</dt>
+      <dd>The luckiest input — the target in the very first box. You cannot plan around luck.</dd>
+      <dt>Average case</dt>
+      <dd>A typical input — about n / 2 checks for linear search.</dd>
+      <dt>Worst case</dt>
+      <dd>The unluckiest input — every box checked. An unlabeled Big-O means THIS case: the promise kept no matter what.</dd>
+    </dl>
+  </div>
+
+  <p>All three fortunes, produced by one method and three carefully chosen searches:</p>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="LinearSearchCases.java">
+      <figcaption><span class="fname">LinearSearchCases.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class LinearSearchCases {
+
+    public static int find(int[] a, int target) {
+        int checks = 0;
+        for (int i = 0; i < a.length; i++) {
+            checks = checks + 1;
+            if (a[i] == target) {
+                System.out.println("found after " + checks + " checks");
+                return i;
+            }
+        }
+        System.out.println("not found after " + checks + " checks");
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int[] a = {41, 7, 93, 25, 68, 12, 84, 56, 30, 19};
+
+        find(a, 41);
+        find(a, 68);
+        find(a, 99);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["One method, three fortunes.",
+"",
+"Plain linear search: walk left to right until you find it. It works on ANY array — sorted or not.",
+"Count every look.",
+"Visit the boxes in order.",
+"Tick.",
+"Is this the one?",
+"Report how long the search took...",
+"...and stop immediately. Early exits are exactly why the cases differ.",
+"Closes the if.",
+"Closes the loop.",
+"We reached the end without finding it — every single element was checked.",
+"Not found.",
+"Closes find().",
+"",
+"Demo: same array, three very different searches.",
+"Ten unsorted values. Notice: 41 sits FIRST, 68 sits in the middle, 99 is not there at all.",
+"",
+"BEST case: the target is in box 0. Prints found after 1 checks. Pure luck.",
+"A middle case: prints found after 5 checks. On average, a present target costs about n / 2 checks.",
+"WORST case: 99 is absent, so all 10 boxes get checked. Big-O describes THIS case — linear search is O(n).",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — LinearSearchCases.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>found after 1 checks
+found after 5 checks
+not found after 10 checks</pre>
+  </details>
+</section>
+
+<!-- ============ 6. GROWTH TABLE ============ -->
+<section class="lesson" id="growth">
+  <h2>7 · The growth table: why any of this matters <span class="chip">see the shapes</span></h2>
+  <p class="lede">Time to put the shapes side by side. This program computes <code>log n</code> the honest way — by counting halvings — and prints one row per size as n doubles from 8 to 1024. Read the table column by column and watch each shape pull away from the last.</p>
+  <div class="bigidea"><b>Big idea:</b> at n = 1024, the columns read <strong>10</strong> (log n), <strong>10,240</strong> (n log n) and <strong>1,048,576</strong> (n²). Same input, a hundred-fold gap between good and bad — and the gap only widens. This is why replacing an O(n²) idea with an O(n log n) one (Practice Problem 2) is worth real money.</div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">O(n log n)</span><span class="def-name">"Big O of n log n" — linearithmic time</span></div>
+    <div class="def-curve"><span class="def-swatch" style="background:#eaa46b"></span>on the Section 1 chart: the orange curve between the diagonal and the red one</div>
+    <dl>
+      <dt>What it means</dt>
+      <dd>A log-n-sized job done for EACH of n items. More than linear, massively less than quadratic.</dd>
+      <dt>Where you will meet it</dt>
+      <dd>Good sorting: merge sort and <code>Arrays.sort()</code>. It is the price Practice Problem 2 pays for sorting first.</dd>
+      <dt>Everyday picture</dt>
+      <dd>Sorting a deck by splitting it into halves (log n rounds) and merging them back (n work per round).</dd>
+    </dl>
+  </div>
+
+  <p>With all five shapes defined, line them up and let the numbers speak:</p>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="GrowthTable.java">
+      <figcaption><span class="fname">GrowthTable.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class GrowthTable {
+
+    public static void main(String[] args) {
+        System.out.printf("%7s %9s %9s %9s%n", "n", "log n", "n log n", "n*n");
+        for (int n = 8; n <= 1024; n = n * 2) {
+            // Count how many times n can be halved: that is log n
+            int logN = 0;
+            int x = n;
+            while (x > 1) {
+                x = x / 2;
+                logN = logN + 1;
+            }
+            System.out.printf("%7d %9d %9d %9d%n", n, logN, n * logN, n * n);
+        }
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["No algorithms in this one — just arithmetic. This table is the reason the whole topic exists.",
+"",
+"Everything happens in main().",
+"printf lines things up in columns: %7s means print this in a slot 7 characters wide, and %n ends the line. This row is the header.",
+"n doubles each pass: 8, 16, 32, ... up to 1024.",
+"log n, computed the honest way: by asking how many times can I cut n in half?",
+"Start counting halvings at zero.",
+"Work on a copy of n, so the loop's own n stays untouched.",
+"Halve until we reach 1...",
+"...one halving...",
+"...one tick. For n = 8: 8 to 4 to 2 to 1 is three halvings, so log of 8 is 3.",
+"Closes the halving loop.",
+"One table row: n, log n, n log n, and n squared. %7d is the number version of %7s.",
+"Closes the doubling loop.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — GrowthTable.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>      n     log n   n log n       n*n
+      8         3        24        64
+     16         4        64       256
+     32         5       160      1024
+     64         6       384      4096
+    128         7       896     16384
+    256         8      2048     65536
+    512         9      4608    262144
+   1024        10     10240   1048576</pre>
+  </details>
+</section>
+
+<!-- ============ 7. SPACE ============ -->
+<section class="lesson" id="space">
+  <h2>8 · Space complexity: the memory bill <span class="chip">the other cost</span></h2>
+  <p class="lede">Time is not the only thing an algorithm spends. <strong>Space complexity</strong> asks: how much <em>extra</em> memory does the method need, beyond the input it was given? Here are two correct ways to reverse an array — same result, very different memory bills.</p>
+  <div class="bigidea"><b>Big idea:</b> O(1) space means a fixed handful of variables, whatever the input size. O(n) space means the extra memory grows with the input — like building a whole second array. Neither is "wrong": in-place is cheaper, the copy keeps the original safe. Knowing the price lets you choose.</div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">O(1) vs O(n) space</span></div>
+    <dl>
+      <dt>O(1) extra space</dt>
+      <dd>A fixed handful of variables, whatever the input size — the shelf shuffled in place.</dd>
+      <dt>O(n) extra space</dt>
+      <dd>Extra memory that grows with the input — typically a whole second array. The second shelf.</dd>
+      <dt>Why both exist</dt>
+      <dd>Neither is wrong: in-place is cheaper, the copy keeps the original safe. Know the price, choose on purpose.</dd>
+    </dl>
+  </div>
+
+  <p>Both bills, itemized in one program — two correct ways to reverse the same array:</p>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="SpaceDemo.java">
+      <figcaption><span class="fname">SpaceDemo.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+import java.util.Arrays;
+
+public class SpaceDemo {
+
+    // O(1) extra space: reverse the array where it lives
+    public static void reverseInPlace(int[] a) {
+        int left = 0;
+        int right = a.length - 1;
+        while (left < right) {
+            int temp = a[left];
+            a[left] = a[right];
+            a[right] = temp;
+            left = left + 1;
+            right = right - 1;
+        }
+    }
+
+    // O(n) extra space: build a NEW reversed array
+    public static int[] reversedCopy(int[] a) {
+        int[] result = new int[a.length];
+        for (int i = 0; i < a.length; i++) {
+            result[i] = a[a.length - 1 - i];
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] a = {1, 2, 3, 4, 5};
+
+        int[] copy = reversedCopy(a);
+        System.out.println("copy:     " + Arrays.toString(copy));
+        System.out.println("original: " + Arrays.toString(a));
+
+        reverseInPlace(a);
+        System.out.println("in place: " + Arrays.toString(a));
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["Arrays.toString() for printing.",
+"",
+"Same job, two memory bills.",
+"",
+"O(1) extra space: a fixed, small amount of extra memory — whatever the input size.",
+"The in-place reverse from the two-pointer section of Advanced Arrays.",
+"Count the extra memory with me: one int...",
+"...two ints...",
+"Walk inward from both ends.",
+"...three ints (this swap variable). And that is ALL — the same three ints whether the array holds 5 elements or 5 million. That is O(1) space.",
+"Swap step 2.",
+"Swap step 3.",
+"Move inward...",
+"...from both sides.",
+"Closes the while.",
+"Closes reverseInPlace(). It returns nothing: it changed the caller's own array (same house — remember the memory section of Advanced Arrays).",
+"",
+"O(n) extra space: the extra memory GROWS with the input.",
+"This version promises not to touch the original. The price of that promise is a whole new array.",
+"Here is the bill: a brand-new array as big as the input. 5 elements: 5 extra boxes. A million elements: a million extra boxes.",
+"Fill the new array...",
+"...back to front: box 0 of the copy receives the LAST value of the original, and so on.",
+"Closes the loop.",
+"Hand the new array back.",
+"Closes reversedCopy().",
+"",
+"Demo.",
+"The test array.",
+"",
+"Make a reversed copy — a itself is untouched.",
+"Prints copy:     [5, 4, 3, 2, 1].",
+"Proof the original survived: prints original: [1, 2, 3, 4, 5].",
+"",
+"Now reverse a itself, spending only three extra ints.",
+"Prints in place: [5, 4, 3, 2, 1]. Same result, different memory bill — a trade-off you can now name.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — SpaceDemo.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>copy:     [5, 4, 3, 2, 1]
+original: [1, 2, 3, 4, 5]
+in place: [5, 4, 3, 2, 1]</pre>
+  </details>
+</section>
+
+<!-- ============ 8. STOPWATCH ============ -->
+<section class="lesson" id="timing">
+  <h2>9 · Measuring for real, with a stopwatch <span class="chip">theory meets clock</span></h2>
+  <p class="lede">Counters prove the theory; a clock shows it costs real seconds. <code>System.nanoTime()</code> reads the computer's clock in billionths of a second. We time our O(n²) method at three sizes, each double the last — and the theory predicts each timing should be about <strong>four times</strong> the previous one.</p>
+  <div class="bigidea"><b>Big idea:</b> exact milliseconds vary from computer to computer and even run to run — that is normal. The <em>ratio between rows</em> is what confirms the complexity. Doubling n → roughly 4× the time is O(n²) shaking your hand.</div>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="StopwatchDemo.java">
+      <figcaption><span class="fname">StopwatchDemo.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class StopwatchDemo {
+
+    // O(n squared): every element meets every element
+    public static long allPairs(int[] a) {
+        long total = 0;
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a.length; j++) {
+                total = total + a[i] + a[j];
+            }
+        }
+        return total;
+    }
+
+    public static void main(String[] args) {
+        // Warm-up run, so Java finishes optimizing before we time anything
+        allPairs(new int[3000]);
+
+        int[] sizes = {2000, 4000, 8000};
+        for (int n : sizes) {
+            int[] a = new int[n];
+            long start = System.nanoTime();
+            allPairs(a);
+            long millis = (System.nanoTime() - start) / 1000000;
+            System.out.println("n = " + n + "  ->  " + millis + " ms");
+        }
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["Step counters are honest but tiring. Time for a real stopwatch: the computer's own clock.",
+"",
+"Our test subject: a deliberately O(n squared) method.",
+"n times n additions — for n = 8000 that is 64 million of them.",
+"long, because the totals can get big.",
+"Every i...",
+"...meets every j.",
+"A tiny bit of work per pair.",
+"Closes the inner loop.",
+"Closes the outer loop.",
+"Return something, so Java cannot decide the work is useless and skip it.",
+"Closes allPairs().",
+"",
+"The experiment.",
+"Java speeds code up WHILE it runs (the JIT compiler). One throwaway run first makes the timed runs fair.",
+"The throwaway run — we ignore its time completely.",
+"",
+"Three sizes, each DOUBLE the previous one.",
+"One timed experiment per size.",
+"A fresh array of that size. All zeros is fine — we are timing, not calculating.",
+"Read the clock. System.nanoTime() counts in nanoseconds — billionths of a second.",
+"Do the O(n squared) work.",
+"Read the clock again, subtract, and divide by a million to turn nanoseconds into milliseconds.",
+"One result row per size.",
+"Closes the sizes loop.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — StopwatchDemo.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see what it does — and why it is written that way.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Sample output — your times WILL differ; watch the pattern, not the numbers</summary>
+    <pre>n = 2000  ->  18 ms
+n = 4000  ->  82 ms
+n = 8000  ->  292 ms
+
+(each row is roughly 4x the one above — that is the O(n squared) signature)</pre>
+  </details>
+</section>
+
+<!-- ============ PRACTICE ============ -->
+<section class="lesson" id="practice">
+  <h2>Practice problems <span class="chip">predict, then run</span></h2>
+  <p class="lede">The skill this lecture builds is <em>reading</em> code and naming its growth pattern. For each problem: write down your prediction first, then reveal the solution and check yourself with the Inspector.</p>
+
+  <h3>Problem 1 — Name that Big-O</h3>
+  <p>Three mystery methods, each with a step counter. Predict the printed step counts for <code>a(6)</code>, <code>b(6)</code>, and <code>c(64)</code>, and name each method's Big-O — <em>before</em> revealing.</p>
+  <details class="solution">
+    <summary>Show solution</summary>
+    <div class="lesson-grid">
+      <figure class="codeblock" data-name="MysteryMethods.java">
+        <figcaption><span class="fname">MysteryMethods.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+        <script type="text/plain" class="src">
+public class MysteryMethods {
+
+    // Mystery A
+    public static void a(int n) {
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            count = count + 1;
+        }
+        System.out.println("A did " + count + " steps");
+    }
+
+    // Mystery B
+    public static void b(int n) {
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                count = count + 1;
+            }
+        }
+        System.out.println("B did " + count + " steps");
+    }
+
+    // Mystery C: careful, i doubles!
+    public static void c(int n) {
+        int count = 0;
+        for (int i = 1; i < n; i = i * 2) {
+            count = count + 1;
+        }
+        System.out.println("C did " + count + " steps");
+    }
+
+    public static void main(String[] args) {
+        a(6);
+        b(6);
+        c(64);
+    }
+}
+</script>
+        <script type="application/json" class="notes">
+["Three mysteries. Did you write your predictions down first?",
+"",
+"Mystery A.",
+"One loop, one parameter.",
+"Counting steps, as usual.",
+"i runs from 0 to n - 1: that is n passes.",
+"One step per pass.",
+"Closes the loop.",
+"For n = 6, prints A did 6 steps. Verdict: O(n) — linear.",
+"Closes a().",
+"",
+"Mystery B.",
+"Looks similar at first glance...",
+"Counter again.",
+"...same outer loop...",
+"...but there is a second loop INSIDE, also running n times.",
+"n times n steps.",
+"Closes the inner loop.",
+"Closes the outer loop.",
+"For n = 6, prints B did 36 steps. Verdict: O(n squared) — quadratic.",
+"Closes b().",
+"",
+"Mystery C. The comment is the hint: watch how i changes.",
+"One loop again — but read the update part, i = i * 2, very carefully.",
+"Counter.",
+"i does not go 1, 2, 3... it goes 1, 2, 4, 8, 16, 32 — DOUBLING. Doubling up is the mirror image of halving down.",
+"One step per doubling.",
+"Closes the loop.",
+"For n = 64, prints C did 6 steps (i took the values 1, 2, 4, 8, 16, 32). Verdict: O(log n).",
+"Closes c().",
+"",
+"The reveal.",
+"6 steps.",
+"36 steps.",
+"6 steps — even though C's n is more than ten times A's. The growth SHAPE beats the raw size.",
+"Closes main().",
+"Closes the class."]
+</script>
+      </figure>
+      <aside class="inspector" aria-live="polite">
+        <div class="ins-head"><span class="ins-dot"></span> Inspector — MysteryMethods.java</div>
+        <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see the explanation.</p></div>
+      </aside>
+    </div>
+    <details class="runbox">
+      <summary>Expected output when you run it</summary>
+      <pre>A did 6 steps
+B did 36 steps
+C did 6 steps</pre>
+    </details>
+  </details>
+
+  <h3>Problem 2 — Beat the O(n²) duplicate check</h3>
+  <p>Section 4's duplicate check compared every pair: O(n²). Improve it to O(n log n). Hint: what becomes true about duplicates <em>after you sort</em>?</p>
+  <details class="solution">
+    <summary>Show solution</summary>
+    <div class="lesson-grid">
+      <figure class="codeblock" data-name="FasterDuplicates.java">
+        <figcaption><span class="fname">FasterDuplicates.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+        <script type="text/plain" class="src">
+import java.util.Arrays;
+
+public class FasterDuplicates {
+
+    // Sort first, then only compare NEIGHBORS
+    public static boolean hasDuplicate(int[] a) {
+        Arrays.sort(a);
+        for (int i = 1; i < a.length; i++) {
+            if (a[i] == a[i - 1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        int[] noDupes = {9, 4, 7, 1, 5};
+        int[] dupes = {9, 4, 7, 4, 5};
+
+        System.out.println(hasDuplicate(noDupes));
+        System.out.println(hasDuplicate(dupes));
+    }
+}
+</script>
+        <script type="application/json" class="notes">
+["Arrays.sort() is the tool that buys the speed-up.",
+"",
+"Same question as Section 4, much better answer.",
+"",
+"The insight: after sorting, equal values sit NEXT TO each other. So there is no need to compare every pair — only neighbors.",
+"Same question, faster answer.",
+"Sorting costs O(n log n). It is the most expensive line in the method — so it sets the total.",
+"Then one single pass, starting at index 1...",
+"...comparing each element only with its left neighbor.",
+"Neighbors match: duplicate found.",
+"Closes the if.",
+"Closes the loop.",
+"No neighbor matched anywhere: all values are distinct.",
+"Closes hasDuplicate(). Total: O(n log n) sort plus O(n) scan = O(n log n). One honest warning: sorting rearranges the caller's array (clone it first if that matters).",
+"",
+"Demo.",
+"Five distinct values.",
+"The 4 appears twice.",
+"",
+"Prints false.",
+"Prints true. For 10 elements, the old way made up to 45 comparisons; this way sorts, then makes at most 9.",
+"Closes main().",
+"Closes the class."]
+</script>
+      </figure>
+      <aside class="inspector" aria-live="polite">
+        <div class="ins-head"><span class="ins-dot"></span> Inspector — FasterDuplicates.java</div>
+        <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see the explanation.</p></div>
+      </aside>
+    </div>
+    <details class="runbox">
+      <summary>Expected output when you run it</summary>
+      <pre>false
+true</pre>
+    </details>
+  </details>
+
+  <h3>Problem 3 — A sneaky O(log n)</h3>
+  <p>This method sums the digits of a number. The input is a <em>number</em>, not an array — so what plays the role of n? Predict the loop counts for <code>sumDigits(9)</code> and <code>sumDigits(123456789)</code>, then name the Big-O.</p>
+  <details class="solution">
+    <summary>Show solution</summary>
+    <div class="lesson-grid">
+      <figure class="codeblock" data-name="SumDigits.java">
+        <figcaption><span class="fname">SumDigits.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+        <script type="text/plain" class="src">
+public class SumDigits {
+
+    // How many loops for a 1-digit number? A 9-digit number?
+    public static int sumDigits(int n) {
+        int loops = 0;
+        int total = 0;
+        while (n > 0) {
+            total = total + (n % 10);
+            n = n / 10;
+            loops = loops + 1;
+        }
+        System.out.println(loops + " loops");
+        return total;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("sum = " + sumDigits(9));
+        System.out.println("sum = " + sumDigits(123456789));
+    }
+}
+</script>
+        <script type="application/json" class="notes">
+["A sneaky one: no array in sight.",
+"",
+"Predict before running.",
+"Adds up the digits of n.",
+"Loop counter.",
+"Digit total.",
+"Keep going while digits remain.",
+"n % 10 is the LAST digit (123 % 10 is 3). Add it to the total.",
+"n / 10 chops that last digit off (123 / 10 is 12 — integer division). The number shrinks by a factor of 10 every pass: this is halving's cousin, tenth-ing.",
+"Tick.",
+"Closes the loop.",
+"Report the pass count.",
+"Return the digit sum.",
+"Closes sumDigits().",
+"",
+"The reveal.",
+"One digit: prints 1 loops, then sum = 9.",
+"Nine digits: prints 9 loops, then sum = 45. The work equals the NUMBER OF DIGITS — and the digit count of n is its log (base 10). Verdict: O(log n). Which base? Big-O does not care: all logs have the same shape.",
+"Closes main().",
+"Closes the class."]
+</script>
+      </figure>
+      <aside class="inspector" aria-live="polite">
+        <div class="ins-head"><span class="ins-dot"></span> Inspector — SumDigits.java</div>
+        <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see the explanation.</p></div>
+      </aside>
+    </div>
+    <details class="runbox">
+      <summary>Expected output when you run it</summary>
+      <pre>1 loops
+sum = 9
+9 loops
+sum = 45</pre>
+    </details>
+  </details>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="lesson" id="quiz">
+  <h2>Quick quiz <span class="chip">5 questions</span></h2>
+  <p class="lede">No counters this time — answer from the shapes in your head.</p>
+
+  <div class="quiz-q" data-answer="d">
+    <h3>1. For large n, which of these grows the fastest?</h3>
+    <label><input type="radio" name="q1" value="a"> O(log n)</label>
+    <label><input type="radio" name="q1" value="b"> O(n)</label>
+    <label><input type="radio" name="q1" value="c"> O(n log n)</label>
+    <label><input type="radio" name="q1" value="d"> O(n²)</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="b">
+    <h3>2. An O(n²) method takes 2 seconds on some input. You double the input. Roughly how long now?</h3>
+    <label><input type="radio" name="q2" value="a"> About 4 seconds</label>
+    <label><input type="radio" name="q2" value="b"> About 8 seconds</label>
+    <label><input type="radio" name="q2" value="c"> Still about 2 seconds</label>
+    <label><input type="radio" name="q2" value="d"> About 2 minutes</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="a">
+    <h3>3. Reading <code>a[5]</code> from an array of a million elements is:</h3>
+    <label><input type="radio" name="q3" value="a"> O(1) — arrays jump straight to any box</label>
+    <label><input type="radio" name="q3" value="b"> O(n) — Java walks the first five boxes</label>
+    <label><input type="radio" name="q3" value="c"> O(log n)</label>
+    <label><input type="radio" name="q3" value="d"> It depends on the values stored</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="c">
+    <h3>4. Binary search on a sorted array of 1,000,000 elements needs about how many guesses, worst case?</h3>
+    <label><input type="radio" name="q4" value="a"> About 1,000,000</label>
+    <label><input type="radio" name="q4" value="b"> About 1,000</label>
+    <label><input type="radio" name="q4" value="c"> About 20</label>
+    <label><input type="radio" name="q4" value="d"> Exactly 2</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="b">
+    <h3>5. <code>reverseInPlace</code> uses O(1) extra space because:</h3>
+    <label><input type="radio" name="q5" value="a"> It contains no loops</label>
+    <label><input type="radio" name="q5" value="b"> Its extra memory is a fixed handful of variables, no matter how big the array is</label>
+    <label><input type="radio" name="q5" value="c"> It runs in constant time</label>
+    <label><input type="radio" name="q5" value="d"> Arrays never use memory</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <button id="gradebtn" type="button">Grade my answers</button><span id="quizscore"></span>
+</section>
+
+</main>
+
+<footer class="pagefoot">
+  <p>MAC286 · Data Structures in Java — Complexity of Algorithms lecture. Every program on this page is complete: paste it into a file named after its class and run it.</p>
+  <p class="sig">Prof. K. Kassou · MEC Department · LaGuardia Community College</p>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- tiny Java syntax highlighter ---------- */
+  var KW = /\b(public|private|protected|static|final|void|class|interface|extends|implements|new|return|if|else|while|for|break|continue|throw|throws|try|catch|import|package|this|super|abstract)\b/g;
+  var TY = /\b(int|long|double|float|boolean|char|byte|short|String|Integer|Arrays|System|Math|Comparator|IndexOutOfBoundsException|ArrayIndexOutOfBoundsException|Student|MyIntList|List|ArrayList|Object)\b/g;
+  var NUM = /\b(\d+(\.\d+)?)\b/g;
+
+  function esc(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function splitComment(line){
+    var inStr = false;
+    for (var i = 0; i < line.length - 1; i++){
+      var ch = line.charAt(i);
+      if (ch === '"') inStr = !inStr;
+      if (!inStr && ch === '/' && line.charAt(i+1) === '/'){
+        return [line.slice(0, i), line.slice(i)];
+      }
+    }
+    return [line, ""];
+  }
+
+  function highlight(line){
+    var parts = splitComment(line);
+    var code = parts[0], comment = parts[1];
+    // pull string literals out so keywords inside them stay untouched
+    var strings = [];
+    code = code.replace(/"([^"\\]|\\.)*"/g, function(m){
+      strings.push(m);
+      return "\u0001" + (strings.length - 1) + "\u0001";
+    });
+    code = esc(code)
+      .replace(KW, '<span class="tk-kw">$1</span>')
+      .replace(TY, '<span class="tk-typ">$1</span>')
+      .replace(NUM, '<span class="tk-num">$1</span>');
+    code = code.replace(/\u0001(\d+)\u0001/g, function(m, idx){
+      return '<span class="tk-str">' + esc(strings[+idx]) + '</span>';
+    });
+    if (comment){
+      code += '<span class="tk-com">' + esc(comment) + '</span>';
+    }
+    return code || "&nbsp;";
+  }
+
+  /* ---------- build each code block ---------- */
+  var blocks = document.querySelectorAll("figure.codeblock");
+
+  blocks.forEach(function(block){
+    var srcEl = block.querySelector("script.src");
+    var notesEl = block.querySelector("script.notes");
+    if (!srcEl) return;
+
+    var raw = srcEl.textContent.replace(/^\n/, "").replace(/\s+$/, "");
+    var lines = raw.split("\n");
+    var notes = [];
+    if (notesEl){
+      try { notes = JSON.parse(notesEl.textContent); } catch(e){ notes = []; }
+    }
+
+    var name = block.getAttribute("data-name") || "code";
+    var inspector = block.closest(".lesson-grid");
+    inspector = inspector ? inspector.querySelector("aside.inspector .ins-body") : null;
+    var pinned = null;
+
+    var scroller = document.createElement("div");
+    scroller.className = "codescroll";
+
+    lines.forEach(function(text, idx){
+      var row = document.createElement("div");
+      row.className = "cl";
+      row.tabIndex = 0;
+      row.setAttribute("role", "button");
+      row.setAttribute("aria-label", "Line " + (idx + 1) + " of " + name);
+
+      var ln = document.createElement("span");
+      ln.className = "ln";
+      ln.textContent = idx + 1;
+
+      var ct = document.createElement("span");
+      ct.className = "ct";
+      ct.innerHTML = highlight(text);
+
+      row.appendChild(ln);
+      row.appendChild(ct);
+      scroller.appendChild(row);
+
+      var note = (notes[idx] || "").trim();
+      if (!note){
+        note = text.trim() === ""
+          ? "A blank line — spacing that separates one group of related statements from the next."
+          : "This line is part of the statement explained on the neighboring lines — step up or down to read them.";
+      }
+
+      function show(pin){
+        // clear previous highlight in this block
+        scroller.querySelectorAll(".cl.active").forEach(function(el){
+          el.classList.remove("active", "pinned");
+        });
+        row.classList.add("active");
+        if (pin) row.classList.add("pinned");
+        if (!inspector) return;
+        inspector.innerHTML =
+          '<span class="ins-lineno">line ' + (idx + 1) + '</span>' +
+          '<pre class="ins-code">' + (esc(text.trim()) || "&nbsp;") + '</pre>' +
+          '<p class="ins-note">' + note + '</p>' +
+          '<p class="ins-pinstate">' + (pin
+            ? "📌 pinned — press Esc or click again to release"
+            : "hover to preview · click to pin") + '</p>';
+      }
+
+      row.addEventListener("mouseenter", function(){ if (!pinned) show(false); });
+      row.addEventListener("focus", function(){ if (!pinned || pinned === row) show(pinned === row); });
+      row.addEventListener("click", function(){
+        if (pinned === row){
+          pinned = null;
+          show(false);
+        } else {
+          pinned = row;
+          show(true);
+        }
+      });
+      row.addEventListener("keydown", function(ev){
+        if (ev.key === "Enter" || ev.key === " "){
+          ev.preventDefault();
+          row.click();
+        } else if (ev.key === "ArrowDown" && row.nextElementSibling){
+          ev.preventDefault();
+          pinned = null;
+          row.nextElementSibling.focus();
+        } else if (ev.key === "ArrowUp" && row.previousElementSibling){
+          ev.preventDefault();
+          pinned = null;
+          row.previousElementSibling.focus();
+        } else if (ev.key === "Escape"){
+          pinned = null;
+          show(false);
+        }
+      });
+    });
+
+    block.appendChild(scroller);
+
+    /* copy buttons: exact source, or class renamed to Main for online compilers */
+    var className = name.replace(/\.java$/, "");
+    block.querySelectorAll(".copybtn").forEach(function(btn){
+      var label = btn.textContent;
+      btn.addEventListener("click", function(){
+        var text = raw;
+        if (btn.getAttribute("data-mode") === "main"){
+          text = raw.replace(new RegExp("\\b" + className + "\\b", "g"), "Main");
+        }
+        function done(){
+          btn.textContent = "Copied ✓";
+          btn.classList.add("done");
+          setTimeout(function(){
+            btn.textContent = label;
+            btn.classList.remove("done");
+          }, 1600);
+        }
+        function fallback(){
+          var ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); done(); } catch(e){}
+          document.body.removeChild(ta);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done, function(){ fallback(); });
+        } else {
+          fallback();
+        }
+      });
+    });
+  });
+
+  /* ---------- quiz ---------- */
+  var gradeBtn = document.getElementById("gradebtn");
+  if (gradeBtn){
+    gradeBtn.addEventListener("click", function(){
+      var qs = document.querySelectorAll(".quiz-q");
+      var score = 0;
+      qs.forEach(function(q){
+        var want = q.getAttribute("data-answer");
+        var picked = q.querySelector("input:checked");
+        var verdict = q.querySelector(".quiz-verdict");
+        q.classList.remove("correct", "wrong");
+        if (picked && picked.value === want){
+          q.classList.add("correct");
+          verdict.textContent = "✓ Correct";
+          score++;
+        } else {
+          q.classList.add("wrong");
+          verdict.textContent = picked ? "✗ Not quite — revisit the matching section above." : "✗ No answer chosen.";
+        }
+      });
+      document.getElementById("quizscore").textContent = "Score: " + score + " / " + qs.length;
+    });
+  }
+})();
+</script>
+</body>
+</html>
