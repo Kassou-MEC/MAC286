@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Fundamentals Quiz — MAC286</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F8FA; --panel:#FFFFFF; --ink:#1B2A41; --ink-soft:#4A5A70; --line:#DCE3EA;
+  --amber:#E8A33D; --amber-deep:#B8741A; --teal:#2E8C83; --teal-soft:#E3F1EF;
+  --code-bg:#212836; --code-ink:#D8DEE9;
+  --kw:#E8A15C; --str:#9CC177; --num:#7FA8D9; --com:#77839B; --typ:#F0C674; --ann:#B58CD8;
+  --good:#2E8C55; --good-soft:#E8F4EC; --bad:#C24A4A; --bad-soft:#F9ECEC;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition:none!important;animation:none!important}}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;font-size:18px}
+a{color:var(--teal)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* layout */
+.wrap{display:grid;grid-template-columns:290px 1fr;max-width:1220px;margin:0 auto}
+.rail{position:sticky;top:0;height:100vh;padding:34px 22px 24px 26px;border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
+main{padding:44px 56px 120px;max-width:900px;min-width:0}
+
+/* rail: linked-list progress */
+.brand{font-family:var(--mono);font-weight:600;font-size:1rem}
+.brand span{color:var(--amber-deep)}
+.rail-sub{font-size:.85rem;color:var(--ink-soft);margin:4px 0 24px}
+.llist{list-style:none}
+.llist li{position:relative;padding:0 0 0 34px;margin-bottom:2px}
+.llist li::before{content:"";position:absolute;left:6px;top:11px;width:14px;height:14px;border-radius:3px;border:2px solid var(--ink-soft);background:var(--panel);transition:background .25s,border-color .25s}
+.llist li::after{content:"";position:absolute;left:12px;top:27px;width:2px;height:calc(100% - 16px);background:var(--line)}
+.llist li:last-child::after{display:none}
+.llist li.part::before{background:linear-gradient(to top,var(--amber) 50%,var(--panel) 50%);border-color:var(--amber-deep)}
+.llist li.done::before{background:var(--teal);border-color:var(--teal)}
+.llist a{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.92rem}
+.llist a:hover{background:var(--teal-soft)}
+.llist .cnt{font-family:var(--mono);font-size:.78rem;color:var(--ink-soft)}
+.prog{margin-top:22px;padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.9rem}
+.prog strong{font-family:var(--mono);color:var(--teal)}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--teal);transition:width .3s}
+.rail-actions{margin-top:16px;display:grid;gap:8px}
+.rail-foot{margin-top:auto;padding-top:26px}
+.linkbtn{background:none;border:none;color:var(--ink-soft);font-size:.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.linkbtn:hover{color:var(--ink)}
+
+/* buttons */
+.btn{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;padding:10px 18px;font-weight:600;font-size:.95rem;cursor:pointer}
+.btn:hover{background:var(--teal);border-color:var(--teal)}
+.btn.ghost{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--teal);color:var(--teal);background:var(--panel)}
+.btn.warn{background:var(--bad);border-color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* header */
+h1{font-size:2.3rem;line-height:1.15;letter-spacing:-.02em;margin-bottom:14px}
+h1 .cursor{display:inline-block;width:.5em;height:1em;background:var(--amber);margin-left:6px;vertical-align:-.12em;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.lede{font-size:1.1rem;color:var(--ink-soft);max-width:62ch;margin-bottom:22px}
+.howto{max-width:66ch;margin:0 0 26px 22px}
+.howto li{margin-bottom:6px}
+.student{display:grid;grid-template-columns:2fr 1.2fr 1fr;gap:14px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:18px 20px;margin-bottom:30px}
+.student label{display:block;font-size:.85rem;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+.student input{width:100%;font:inherit;font-size:1rem;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.student input:focus{border-color:var(--teal);outline:none;box-shadow:0 0 0 3px var(--teal-soft)}
+.student input.missing{border-color:var(--bad);background:var(--bad-soft)}
+
+/* result banner */
+.result{display:none;align-items:center;gap:24px;background:var(--ink);color:#fff;border-radius:12px;padding:22px 26px;margin-bottom:30px}
+.result.show{display:flex}
+.result .big{font-family:var(--mono);font-size:2.6rem;font-weight:600;line-height:1;color:var(--amber)}
+.result .big small{font-size:1.1rem;color:#B9C4D4}
+.result p{font-size:.95rem;color:#D5DCE6}
+.result .who{font-size:.8rem;color:#8EA0BC;margin-top:4px}
+
+/* sections */
+section{margin-top:46px}
+h2{font-size:1.65rem;font-weight:700;letter-spacing:-.015em;padding-bottom:10px;border-bottom:2px solid var(--ink);margin-bottom:6px;display:flex;align-items:baseline;gap:12px}
+h2 .idx{font-family:var(--mono);font-size:1rem;color:var(--amber-deep)}
+.h2-sub{color:var(--ink-soft);font-size:.95rem;margin-bottom:18px}
+code{font-family:var(--mono);font-size:.88em;background:#E9EEF3;padding:.1em .35em;border-radius:4px}
+
+/* question */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:18px 0;scroll-margin-top:20px}
+.q.unans-flag{border-color:var(--amber);box-shadow:0 0 0 3px #FBEBCF}
+.q-head{display:flex;gap:10px;align-items:baseline;margin-bottom:6px;font-family:var(--mono);font-size:.82rem;color:var(--teal);font-weight:600}
+.q-head .pts{margin-left:auto;color:var(--ink-soft);font-weight:500}
+.q-text{font-weight:600;font-size:1.05rem;margin-bottom:8px}
+.q-note{font-size:.88rem;color:var(--ink-soft);margin-bottom:8px}
+.code{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 0;margin:12px 0;overflow-x:auto;font-family:var(--mono);font-size:.92rem;line-height:1.75}
+.code .row{display:flex;white-space:pre}
+.code .ln{width:42px;flex:0 0 42px;text-align:right;padding-right:14px;color:#556279;user-select:none}
+.code .lc{padding-right:20px}
+.k{color:var(--kw)} .s{color:var(--str)} .n{color:var(--num)} .c{color:var(--com);font-style:italic} .t{color:var(--typ)} .a{color:var(--ann)}
+.code input.blank{font-family:var(--mono);font-size:.92rem;width:9ch;padding:1px 6px;border:none;border-bottom:2px solid var(--amber);background:#33404F;color:#fff;border-radius:4px 4px 0 0}
+.code input.blank:focus{outline:2px solid var(--amber);outline-offset:1px}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:10px 14px;border:1px solid var(--line);background:var(--paper);border-radius:8px;cursor:pointer;font-size:1rem}
+.opt:hover:not(:disabled){border-color:var(--teal)}
+.opt .mark{flex:0 0 20px;height:20px;margin-top:3px;border:2px solid var(--ink-soft);border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:700;color:#fff}
+.q[data-type="multi"] .opt .mark{border-radius:4px}
+.opt.picked{border-color:var(--ink);background:#EEF2F7}
+.opt.picked .mark{background:var(--ink);border-color:var(--ink)}
+.opt.picked .mark::after{content:"✓"}
+.opt .otxt.mono{font-family:var(--mono);font-size:.92rem;white-space:pre-wrap}
+.opt:disabled{cursor:default}
+.opt.is-right{border-color:var(--good);background:var(--good-soft)}
+.opt.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+textarea.out{width:100%;min-height:74px;font-family:var(--mono);font-size:.95rem;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#101521;color:#B9E28C;resize:vertical;margin-top:6px}
+textarea.out:disabled,input.blank:disabled{opacity:.85}
+.out-label{font-size:.85rem;color:var(--ink-soft);margin-top:4px}
+.fb{display:none;margin-top:14px;padding:12px 16px;border-radius:8px;font-size:.95rem;max-width:72ch}
+.fb.show{display:block}
+.fb.ok{background:var(--good-soft);border-left:4px solid var(--good)}
+.fb.part{background:#FBF3E4;border-left:4px solid var(--amber)}
+.fb.no{background:var(--bad-soft);border-left:4px solid var(--bad)}
+.fb .ans{font-family:var(--mono);font-size:.9rem;white-space:pre-wrap;display:block;margin:4px 0 6px}
+.print-ans{display:none}
+
+/* submit + receipt */
+.submit-zone{margin-top:56px;padding:26px;background:var(--panel);border:2px dashed var(--line);border-radius:12px}
+.submit-zone h2{border:none;padding:0;margin-bottom:8px}
+.submit-zone p{max-width:64ch;margin-bottom:14px;color:var(--ink-soft)}
+.submit-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.msg{font-size:.92rem;color:var(--bad);margin-top:10px}
+.receipt{display:none;margin-top:20px;background:var(--teal-soft);border:1px solid var(--teal);border-radius:10px;padding:18px 20px}
+.receipt.show{display:block}
+.receipt .code-id{font-family:var(--mono);font-size:1.05rem;font-weight:600;letter-spacing:.04em;word-break:break-all;display:block;margin:6px 0}
+.receipt p{margin:0 0 6px;color:var(--ink)}
+
+/* dialogs */
+dialog{border:none;border-radius:14px;padding:0;max-width:560px;width:calc(100% - 32px);box-shadow:0 24px 60px rgba(20,30,50,.3);color:var(--ink)}
+dialog::backdrop{background:rgba(27,42,65,.55)}
+.dlg{padding:24px 26px}
+.dlg h3{font-size:1.25rem;margin-bottom:8px}
+.dlg p{font-size:.95rem;color:var(--ink-soft);margin-bottom:12px}
+.dlg .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+.dlg input[type=password],.dlg input[type=text]{width:100%;font:inherit;font-size:.95rem;padding:9px 12px;border:1px solid var(--line);border-radius:8px;margin-top:4px}
+.dlg label{display:block;font-size:.85rem;font-weight:600;margin-top:10px}
+.dlg .blk{border-top:1px solid var(--line);padding-top:14px;margin-top:16px}
+.dlg .blk h4{font-size:1rem;margin-bottom:6px}
+.dlg .outbox{font-family:var(--mono);font-size:.85rem;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:10px;word-break:break-all;white-space:pre-wrap}
+.dlg .err{color:var(--bad);font-size:.9rem;margin-top:8px;min-height:1.2em}
+#instructorBadge{display:none;position:fixed;right:16px;bottom:16px;background:var(--amber);color:var(--ink);font-weight:600;font-size:.85rem;padding:8px 14px;border-radius:999px;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+#instructorBadge.show{display:block}
+.footer{margin-top:80px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:.85rem}
+#printHead{display:none}
+
+/* mobile */
+@media (max-width:900px){
+  .wrap{display:block}
+  .rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:22px 20px}
+  .llist li{display:inline-block;padding-left:0;margin:0 4px 6px 0}
+  .llist li::before,.llist li::after{display:none}
+  .llist a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.82rem}
+  .llist li.done a{border-color:var(--teal);color:var(--teal)}
+  .llist li.part a{border-color:var(--amber-deep)}
+  .rail-foot{padding-top:12px}
+  main{padding:30px 18px 90px}
+  h1{font-size:1.8rem}
+  .student{grid-template-columns:1fr}
+  .code{font-size:.8rem}
+  .result{flex-direction:column;align-items:flex-start;gap:10px}
+}
+
+/* print / save as PDF */
+@media print{
+  @page{margin:14mm 12mm}
+  body{background:#fff;font-size:11pt}
+  .rail,.submit-zone,.howto,.lede,dialog,#instructorBadge,.student,.footer,h1 .cursor{display:none!important}
+  .wrap{display:block}
+  main{padding:0;max-width:none}
+  h1{font-size:18pt;margin-bottom:6px}
+  #printHead{display:block;border:1.5px solid #1B2A41;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:10.5pt}
+  #printHead table{width:100%;border-collapse:collapse}
+  #printHead td{padding:2px 6px 2px 0;vertical-align:top}
+  #printHead td:nth-child(odd){font-weight:600;white-space:nowrap;width:1%}
+  #printHead .draft{color:#C24A4A;font-weight:700}
+  .result{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  section{margin-top:14px}
+  h2{font-size:13pt;break-after:avoid}
+  .h2-sub{display:none}
+  .q{break-inside:avoid;padding:10px 12px;margin:8px 0;border-color:#C7D0DA}
+  .code{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:8.5pt;padding:8px 0;white-space:pre-wrap}
+  .opt{padding:5px 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .opt .mark{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  textarea.out,.out-label{display:none}
+  .print-ans{display:block;font-family:var(--mono);font-size:9.5pt;border:1px solid #C7D0DA;border-radius:6px;padding:6px 10px;margin-top:6px;white-space:pre-wrap}
+  .print-ans b{font-family:var(--sans)}
+  .print-ans:empty{display:none}
+  .code input.blank{font-size:8.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .fb{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:9.5pt}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="rail" aria-label="Quiz sections">
+  <div class="brand">MAC286<span>::</span>JavaQuiz</div>
+  <div class="rail-sub">Prof. Khalid Kassou, LaGuardia CC</div>
+  <ul class="llist" id="llist"></ul>
+  <div class="prog">
+    Answered <strong id="progTxt">0 / 0</strong>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+  <div class="rail-actions">
+    <button type="button" class="btn ghost" id="pdfBtnRail">Save as PDF</button>
+  </div>
+  <div class="rail-foot">
+    <button type="button" class="linkbtn" id="instrLink">Instructor access</button>
+  </div>
+</nav>
+
+<main>
+  <div id="printHead"></div>
+  <h1>Java Fundamentals Quiz<span class="cursor"></span></h1>
+  <p class="lede">Twenty-eight questions on the Java fundamentals: variables, conditionals, loops, methods, arrays and strings, classes, and inheritance.</p>
+  <ul class="howto">
+    <li>Trace the code in your head (or on paper) before answering. Work on your own, without notes or a compiler.</li>
+    <li>For "What does this print?" questions, type the exact output. Put each printed line on its own line.</li>
+    <li>Your answers save automatically in this browser, so you can close the tab and come back.</li>
+    <li>You can submit once. After you submit, save the page as a PDF and upload it to Brightspace.</li>
+  </ul>
+
+  <div class="student" id="studentBox">
+    <div><label for="stName">Full name</label><input id="stName" autocomplete="name"></div>
+    <div><label for="stId">EMPLID</label><input id="stId" inputmode="numeric" autocomplete="off"></div>
+    <div><label for="stSec">Section</label><input id="stSec" autocomplete="off" placeholder="e.g. 1WA"></div>
+  </div>
+
+  <div class="result" id="result" role="status"></div>
+
+  <div id="quiz"></div>
+
+  <div class="submit-zone" id="submitZone">
+    <h2>Submit your quiz</h2>
+    <p id="submitHelp">Check your answers, then submit. You can't change anything after submitting. Your grade will be posted when your instructor releases it.</p>
+    <div class="submit-row">
+      <button type="button" class="btn" id="submitBtn">Submit quiz</button>
+      <button type="button" class="btn ghost" id="pdfBtn">Save as PDF</button>
+    </div>
+    <div class="msg" id="submitMsg" role="alert"></div>
+    <div class="receipt" id="receipt"></div>
+  </div>
+
+  <div class="footer">Java Fundamentals Quiz for MAC286, Data Structures. Prof. Khalid Kassou, LaGuardia Community College, CUNY.</div>
+</main>
+</div>
+
+<button type="button" id="instructorBadge">Instructor view on. Lock</button>
+
+<dialog id="confirmDlg">
+  <div class="dlg">
+    <h3>Submit your quiz?</h3>
+    <p id="confirmTxt"></p>
+    <div class="row">
+      <button type="button" class="btn ghost" id="confirmNo">Keep working</button>
+      <button type="button" class="btn" id="confirmYes">Submit quiz</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="instrDlg">
+  <div class="dlg" id="instrBody"></div>
+</dialog>
+
+<script>
+/* ================================================================
+   CONFIG — the only block you normally edit
+   ----------------------------------------------------------------
+   GRADES_RELEASED  false: students never see a score or feedback.
+                    true : after submitting, students see their score,
+                           what they got right/wrong, and explanations.
+   INSTRUCTOR_HASH  SHA-256 of your instructor passcode. To change it,
+                    open "Instructor access", unlock, and use
+                    "Change passcode" to generate a new hash.
+   QUIZ_ID          change this if you reuse the file for a new quiz
+                    (it keeps saved answers from different quizzes apart).
+   ================================================================ */
+const CONFIG = {
+  QUIZ_ID: "MAC286-JavaFundamentals-Quiz-v1",
+  GRADES_RELEASED: false,
+  INSTRUCTOR_HASH: "e29d73eaf4292af844eb273513e4d3bf83ca0f27bade9653d4ab676a29d13c11"
+};
+
+/* ---------- data (answer key is encoded, not in plain text) ---------- */
+const SECTIONS = [{"n": 1, "title": "Variables & data types", "sub": "Boxes that hold your data."}, {"n": 2, "title": "Conditionals", "sub": "Letting your program make decisions."}, {"n": 3, "title": "Loops", "sub": "Repeating things without copy-pasting code."}, {"n": 4, "title": "Methods", "sub": "Naming a block of code so you can reuse it."}, {"n": 5, "title": "Arrays & strings", "sub": "Holding many values, and working with text."}, {"n": 6, "title": "OOP basics", "sub": "Classes and objects: data and behavior together."}, {"n": 7, "title": "Inheritance & polymorphism", "sub": "Building new classes from existing ones."}];
+const QUESTIONS = [
+{
+"id": "q1",
+"sec": 1,
+"type": "mc",
+"prompt": "The world population is about 7.8 billion, which is too big for an `int`. Which type should hold it?",
+"opts": [
+"int",
+"long",
+"char",
+"boolean"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q2",
+"sec": 1,
+"type": "fill",
+"prompt": "Fill in the blank with the correct type.",
+"code": "@@ grade = 'A';",
+"pts": 1
+},
+{
+"id": "q3",
+"sec": 1,
+"type": "output",
+"prompt": "What does this print?",
+"code": "int age = 25;\nSystem.out.println(\"Age: \" + age + 1);",
+"pts": 1
+},
+{
+"id": "q4",
+"sec": 1,
+"type": "mc",
+"prompt": "Which declaration will NOT compile?",
+"opts": [
+"double price = 19.99;",
+"boolean done = \"false\";",
+"String s = \"7\";",
+"int n = -3;"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q5",
+"sec": 2,
+"type": "output",
+"prompt": "What does this print?",
+"code": "int score = 95;\nif (score >= 80) {\n    System.out.println(\"B\");\n} else if (score >= 90) {\n    System.out.println(\"A\");\n} else {\n    System.out.println(\"C\");\n}",
+"pts": 1
+},
+{
+"id": "q6",
+"sec": 2,
+"type": "mc",
+"prompt": "What is the value of `17 % 5`?",
+"opts": [
+"3",
+"2",
+"3.4",
+"0"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q7",
+"sec": 2,
+"type": "output",
+"prompt": "What does this print?",
+"code": "int day = 2;\nswitch (day) {\n    case 1: System.out.println(\"Mon\");\n    case 2: System.out.println(\"Tue\");\n    case 3: System.out.println(\"Wed\"); break;\n    default: System.out.println(\"Other\");\n}",
+"note": "Type each printed line on its own line.",
+"pts": 1
+},
+{
+"id": "q8",
+"sec": 3,
+"type": "output",
+"prompt": "What does this print?",
+"code": "for (int i = 1; i <= 10; i++) {\n    if (i == 3) continue;\n    if (i == 6) break;\n    System.out.print(i + \" \");\n}",
+"pts": 1
+},
+{
+"id": "q9",
+"sec": 3,
+"type": "mc",
+"prompt": "Which loop always runs its body at least once?",
+"opts": [
+"for",
+"while",
+"do-while",
+"for-each"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q10",
+"sec": 3,
+"type": "output",
+"prompt": "What does this print?",
+"code": "int k = 10;\ndo {\n    System.out.print(k + \" \");\n    k++;\n} while (k < 5);",
+"pts": 1
+},
+{
+"id": "q11",
+"sec": 3,
+"type": "mc",
+"prompt": "What happens when this runs?",
+"code": "int j = 5;\nwhile (j >= 1) {\n    System.out.print(j + \" \");\n}",
+"opts": [
+"It prints 5 4 3 2 1",
+"It prints 5 once",
+"It prints 5 forever (infinite loop)",
+"It does not compile"
+],
+"pts": 1
+},
+{
+"id": "q12",
+"sec": 4,
+"type": "mc",
+"prompt": "A method's return type is `void`. What does that mean?",
+"opts": [
+"It returns 0",
+"It returns nothing; it just does something",
+"It cannot take parameters",
+"It can only be called from main"
+],
+"pts": 1
+},
+{
+"id": "q13",
+"sec": 4,
+"type": "output",
+"prompt": "What does this print?",
+"code": "public static int addNumbers(int a, int b) { return a + b; }\npublic static double addNumbers(double a, double b) { return a + b; }\n\n// inside main:\nSystem.out.println(addNumbers(2.0, 3.0));\nSystem.out.println(addNumbers(2, 3));",
+"note": "Type each printed line on its own line.",
+"pts": 1
+},
+{
+"id": "q14",
+"sec": 4,
+"type": "multi",
+"prompt": "Select ALL method headers that are valid Java.",
+"opts": [
+"public static int square(int n)",
+"public static void printLine(String s)",
+"public static square(int n)",
+"public static double average(int a, int b)"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q15",
+"sec": 5,
+"type": "output",
+"prompt": "What does this print?",
+"code": "int[] nums = {4, 8, 15, 16};\nnums[2] = nums[0] + nums[3];\nSystem.out.println(nums[2]);",
+"pts": 1
+},
+{
+"id": "q16",
+"sec": 5,
+"type": "mc",
+"prompt": "What happens when this runs?",
+"code": "int[] arr = {1, 2, 3};\nfor (int i = 0; i <= arr.length; i++) {\n    System.out.print(arr[i] + \" \");\n}",
+"opts": [
+"It prints 1 2 3",
+"It prints 1 2 3 0",
+"It prints 1 2 3, then crashes with ArrayIndexOutOfBoundsException",
+"It does not compile"
+],
+"pts": 1
+},
+{
+"id": "q17",
+"sec": 5,
+"type": "output",
+"prompt": "What does this print?",
+"code": "String s = \"DataStructures\";\nSystem.out.println(s.substring(4, 10));",
+"pts": 1
+},
+{
+"id": "q18",
+"sec": 5,
+"type": "mc",
+"prompt": "`input` holds text the user typed. Which line correctly checks whether it is \"yes\"?",
+"opts": [
+"if (input == \"yes\")",
+"if (input.equals(\"yes\"))",
+"if (input = \"yes\")",
+"if (input.equal(\"yes\"))"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q19",
+"sec": 5,
+"type": "output",
+"prompt": "What does this print?",
+"code": "int[][] grid = { {1, 2, 3}, {4, 5, 6} };\nSystem.out.println(grid[1][2] + grid[0][0]);",
+"pts": 1
+},
+{
+"id": "q20",
+"sec": 6,
+"type": "mc",
+"prompt": "Which statement about a constructor is true?",
+"opts": [
+"It has the same name as the class and no return type",
+"It must end with return this;",
+"You call it with a dot, like account.BankAccount()",
+"Every class must write exactly one"
+],
+"pts": 1
+},
+{
+"id": "q21",
+"sec": 6,
+"type": "output",
+"prompt": "What does this print?",
+"code": "public void deposit(double amount) {\n    if (amount > 0) {\n        balance = balance + amount;\n    }\n}\npublic void withdraw(double amount) {\n    if (amount > 0 && amount <= balance) {\n        balance = balance - amount;\n    }\n}\n\n// inside main:\nBankAccount acct = new BankAccount(\"Ana\", 50.0);\nacct.withdraw(80.0);\nacct.deposit(-10.0);\nacct.deposit(25.0);\nSystem.out.println(acct.getBalance());",
+"pts": 1
+},
+{
+"id": "q22",
+"sec": 6,
+"type": "fill",
+"prompt": "The parameter and the field share the name `owner`. Fill in the blank so the field gets the parameter's value.",
+"code": "public BankAccount(String owner, double startingBalance) {\n    @@.owner = owner;\n    balance = startingBalance;\n}",
+"pts": 1
+},
+{
+"id": "q23",
+"sec": 6,
+"type": "multi",
+"prompt": "Code OUTSIDE the BankAccount class has `BankAccount account = new BankAccount(\"John\", 100.0);`. Select ALL lines that compile.",
+"opts": [
+"account.balance = 1000000;",
+"account.deposit(10.0);",
+"double b = account.getBalance();",
+"BankAccount other = new BankAccount();"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q24",
+"sec": 7,
+"type": "fill",
+"prompt": "Fill in the keyword that makes a Truck a kind of Vehicle.",
+"code": "class Truck @@ Vehicle {\n    // ...\n}",
+"pts": 1
+},
+{
+"id": "q25",
+"sec": 7,
+"type": "mc",
+"prompt": "What does this print?",
+"code": "class Vehicle {\n    public void start() { System.out.println(\"The vehicle is starting\"); }\n}\nclass Car extends Vehicle {\n    @Override\n    public void start() { System.out.println(\"The car starts with a key\"); }\n}\nclass Motorcycle extends Vehicle {\n    @Override\n    public void start() { System.out.println(\"The motorcycle starts with a kick\"); }\n}\n\n// inside main (each constructor takes a brand name):\nVehicle[] fleet = { new Motorcycle(\"Honda\"), new Vehicle(\"Generic\"), new Car(\"Toyota\") };\nfor (Vehicle v : fleet) {\n    v.start();\n}",
+"opts": [
+"The vehicle is starting\nThe vehicle is starting\nThe vehicle is starting",
+"The motorcycle starts with a kick\nThe vehicle is starting\nThe car starts with a key",
+"The motorcycle starts with a kick\nThe car starts with a key\nThe car starts with a key",
+"It does not compile: an array can't hold different classes"
+],
+"codeOpts": true,
+"pts": 1
+},
+{
+"id": "q26",
+"sec": 7,
+"type": "mc",
+"prompt": "Car has a `honk()` method that Vehicle does not. What happens here?",
+"code": "Vehicle v = new Car(\"Toyota\");\nv.honk();",
+"opts": [
+"It prints Beep beep!",
+"Compile error: Vehicle has no honk() method",
+"It compiles, then crashes when it runs",
+"It prints nothing"
+],
+"pts": 1
+},
+{
+"id": "q27",
+"sec": 7,
+"type": "mc",
+"prompt": "What does `super(brand);` do inside Car's constructor?",
+"opts": [
+"Calls Vehicle's constructor to set up the brand",
+"Creates a second, separate Vehicle object",
+"Overrides the brand field",
+"Calls Car's start() method"
+],
+"pts": 1
+},
+{
+"id": "q28",
+"sec": 7,
+"type": "mc",
+"prompt": "Why write `@Override` above `start()` in Car?",
+"opts": [
+"It makes the method run faster",
+"Without it, the method won't compile",
+"It asks Java to check that it really replaces a parent method",
+"It hides the parent's version from every other class"
+],
+"pts": 1
+}
+];
+const KEY_BLOB = "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";
+const SEAL = "MAC286-kassou-33cfca64a50f";
+
+/* ---------- SHA-256 (pure JS, works offline and on file://) ---------- */
+const K256 = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+function sha256(str){
+  const ror = (x,n) => (x>>>n)|(x<<(32-n));
+  const bytes = new TextEncoder().encode(str), l = bytes.length;
+  const buf = new Uint8Array(((l + 9 + 63) >> 6) << 6);
+  buf.set(bytes); buf[l] = 0x80;
+  const dv = new DataView(buf.buffer);
+  dv.setUint32(buf.length - 4, (l * 8) >>> 0);
+  dv.setUint32(buf.length - 8, Math.floor(l / 0x20000000));
+  let H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const W = new Uint32Array(64);
+  for (let i = 0; i < buf.length; i += 64){
+    for (let t = 0; t < 16; t++) W[t] = dv.getUint32(i + t*4);
+    for (let t = 16; t < 64; t++){
+      const x = W[t-15], y = W[t-2];
+      W[t] = (W[t-16] + (ror(x,7)^ror(x,18)^(x>>>3)) + W[t-7] + (ror(y,17)^ror(y,19)^(y>>>10))) | 0;
+    }
+    let [a,b,c,d,e,f,g,h] = H;
+    for (let t = 0; t < 64; t++){
+      const t1 = (h + (ror(e,6)^ror(e,11)^ror(e,25)) + ((e&f)^(~e&g)) + K256[t] + W[t]) | 0;
+      const t2 = ((ror(a,2)^ror(a,13)^ror(a,22)) + ((a&b)^(a&c)^(b&c))) | 0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    H = [a,b,c,d,e,f,g,h].map((v,i) => (v + H[i]) | 0);
+  }
+  return H.map(v => (v>>>0).toString(16).padStart(8,"0")).join("");
+}
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const md = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+const normOut = s => String(s || "").replace(/\r/g,"").trim().split(/\s+/).join(" ");
+const fmtTime = ts => new Date(ts).toLocaleString([], {dateStyle:"medium", timeStyle:"short"});
+const fmtPts = n => (Math.round(n*10)/10).toString();
+
+let _key = null;
+function KEY(){
+  if (_key) return _key;
+  const raw = atob(KEY_BLOB), out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i) ^ SEAL.charCodeAt(i % SEAL.length);
+  return (_key = JSON.parse(new TextDecoder().decode(out)));
+}
+
+/* syntax highlighting (same rules as the lecture) */
+const KW = /\b(public|private|protected|class|interface|extends|implements|static|final|abstract|void|new|return|if|else|for|while|do|switch|case|default|break|continue|this|super|null|true|false|int|long|double|float|boolean|char)\b/g;
+function hl(raw){
+  let line = esc(raw).replace(/&quot;/g,'"'), comment = "";
+  const ci = line.indexOf("//");
+  if (ci >= 0){ comment = '<span class="c">' + line.slice(ci) + '</span>'; line = line.slice(0, ci); }
+  const stash = [];
+  const keep = (m, cls) => { stash.push('<span class="'+cls+'">'+m+'</span>'); return "\u0001x"+(stash.length-1)+"x\u0001"; };
+  line = line.replace(/"[^"]*"|'\\?[^']'/g, m => keep(m, "s"));
+  line = line.replace(/@\w+/g, m => keep(m, "a"));
+  line = line.replace(KW, '<span class="k">$1</span>');
+  line = line.replace(/\b([A-Z]\w*)\b/g, '<span class="t">$1</span>');
+  line = line.replace(/\b(\d[\d_]*\.?\d*[LlFf]?)\b/g, '<span class="n">$1</span>');
+  line = line.replace(/\u0001x(\d+)x\u0001/g, (_, i) => stash[+i]);
+  return line + comment;
+}
+
+/* ---------- state ---------- */
+const STORE = "quiz:" + CONFIG.QUIZ_ID;
+const blank = () => ({name:"", emplid:"", section:"", answers:{}, submitted:false, submittedAt:null, code:null});
+let state = (() => { try { return JSON.parse(localStorage.getItem(STORE)) || blank(); } catch(e){ return blank(); } })();
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e){} }
+let instructorView = false;
+const reveal = () => instructorView || (CONFIG.GRADES_RELEASED && state.submitted);
+
+function isAnswered(q){
+  const a = state.answers[q.id];
+  if (q.type === "multi") return Array.isArray(a) && a.length > 0;
+  if (q.type === "mc") return typeof a === "number";
+  return typeof a === "string" && a.trim() !== "";
+}
+
+/* ---------- grading ---------- */
+function grade(){
+  const key = KEY(); let earned = 0, total = 0; const per = {};
+  QUESTIONS.forEach(q => {
+    const k = key[q.id], a = state.answers[q.id]; let e = 0;
+    if (q.type === "mc") e = a === k.a ? 1 : 0;
+    else if (q.type === "multi"){
+      const right = new Set(k.a); let hit = 0, bad = 0;
+      (a || []).forEach(i => right.has(i) ? hit++ : bad++);
+      e = Math.max(0, (hit - bad) / right.size);
+    }
+    else if (q.type === "output") e = k.a.some(x => normOut(x) === normOut(a)) ? 1 : 0;
+    else if (q.type === "fill") e = k.a.includes(String(a || "").trim()) ? 1 : 0;
+    e *= q.pts; earned += e; total += q.pts; per[q.id] = {e, k};
+  });
+  return {earned: Math.round(earned*10)/10, total, per};
+}
+
+/* receipt code: score + time, sealed to the student's EMPLID */
+function makeCode(score, total, ts, emplid){
+  const payload = Math.round(score*10) + "." + total + "." + ts.toString(36);
+  const sig = sha256(SEAL + "|" + payload + "|" + emplid.trim()).slice(0, 6);
+  const plain = payload + "." + sig;
+  let hex = "";
+  for (let i = 0; i < plain.length; i++) hex += (plain.charCodeAt(i) ^ SEAL.charCodeAt(i % SEAL.length)).toString(16).padStart(2,"0");
+  return hex.toUpperCase().match(/.{1,4}/g).join("-");
+}
+function readCode(code, emplid){
+  const hex = code.replace(/[^0-9a-f]/gi, "");
+  if (!hex || hex.length % 2) return null;
+  let plain = "";
+  for (let i = 0; i < hex.length; i += 2) plain += String.fromCharCode(parseInt(hex.substr(i,2),16) ^ SEAL.charCodeAt((i/2) % SEAL.length));
+  const p = plain.split(".");
+  if (p.length !== 4 || !/^\d+$/.test(p[0]) || !/^\d+$/.test(p[1]) || !/^[0-9a-z]+$/.test(p[2])) return null;
+  const verified = emplid.trim() ? sha256(SEAL + "|" + p.slice(0,3).join(".") + "|" + emplid.trim()).slice(0,6) === p[3] : null;
+  return {score: +p[0]/10, total: +p[1], time: parseInt(p[2], 36), verified};
+}
+
+/* ---------- build the quiz ---------- */
+function codeBlock(src, q){
+  return '<div class="code">' + src.split("\n").map((ln, i) => {
+    let html;
+    if (q && ln.includes("@@")){
+      const [l, r] = ln.split("@@");
+      html = hl(l) + '<input class="blank" data-q="'+q.id+'" aria-label="Blank for question '+q.num+'" spellcheck="false" autocomplete="off" autocapitalize="off">' + hl(r);
+    } else html = hl(ln) || "&nbsp;";
+    return '<div class="row"><span class="ln">'+(i+1)+'</span><span class="lc">'+html+'</span></div>';
+  }).join("") + '</div>';
+}
+
+function build(){
+  let n = 0, html = "", nav = "";
+  SECTIONS.forEach(sec => {
+    const qs = QUESTIONS.filter(q => q.sec === sec.n);
+    nav += '<li data-sec="'+sec.n+'"><a href="#sec'+sec.n+'"><span>'+esc(sec.title)+'</span><span class="cnt" data-cnt="'+sec.n+'"></span></a></li>';
+    html += '<section id="sec'+sec.n+'"><h2><span class="idx">'+sec.n+'</span>'+esc(sec.title)+'</h2>' +
+            '<p class="h2-sub">'+esc(sec.sub)+'</p>';
+    qs.forEach(q => {
+      q.num = ++n;
+      html += '<div class="q" id="'+q.id+'" data-type="'+q.type+'">' +
+        '<div class="q-head"><span>Question '+q.num+'</span><span class="pts">'+q.pts+' pt'+(q.type==="multi"?", partial credit":"")+'</span></div>' +
+        '<div class="q-text">'+md(q.prompt)+'</div>' + (q.note ? '<div class="q-note">'+md(q.note)+'</div>' : "");
+      if (q.code) html += codeBlock(q.code, q.type === "fill" ? q : null);
+      if (q.type === "mc" || q.type === "multi"){
+        html += '<div class="opts" role="'+(q.type==="mc"?"radiogroup":"group")+'" aria-label="Question '+q.num+' options">' +
+          q.opts.map((o, i) => '<button type="button" class="opt" data-q="'+q.id+'" data-i="'+i+'" role="'+(q.type==="mc"?"radio":"checkbox")+'" aria-checked="false">' +
+            '<span class="mark" aria-hidden="true"></span><span class="otxt'+(q.codeOpts?" mono":"")+'">'+(q.codeOpts?esc(o):md(o))+'</span></button>').join("") + '</div>';
+        if (q.type === "multi") html += '<div class="out-label">Select every correct option.</div>';
+      }
+      if (q.type === "output") html += '<div class="out-label">Your output:</div><textarea class="out" data-q="'+q.id+'" spellcheck="false" autocomplete="off" aria-label="Output for question '+q.num+'"></textarea>';
+      html += '<div class="print-ans" data-pa="'+q.id+'"></div><div class="fb" data-fb="'+q.id+'"></div></div>';
+    });
+    html += '</section>';
+  });
+  $("#quiz").innerHTML = html;
+  $("#llist").innerHTML = nav;
+
+  /* restore + wire answers */
+  document.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
+    if (state.submitted) return;
+    const q = QUESTIONS.find(x => x.id === b.dataset.q), i = +b.dataset.i;
+    if (q.type === "mc") state.answers[q.id] = i;
+    else {
+      const set = new Set(state.answers[q.id] || []);
+      set.has(i) ? set.delete(i) : set.add(i);
+      state.answers[q.id] = [...set].sort();
+    }
+    $("#"+q.id).classList.remove("unans-flag");
+    save(); paint();
+  }));
+  document.querySelectorAll("textarea.out, input.blank").forEach(el => {
+    el.value = state.answers[el.dataset.q] || "";
+    el.addEventListener("input", () => {
+      if (state.submitted) return;
+      state.answers[el.dataset.q] = el.value;
+      $("#"+el.dataset.q).classList.remove("unans-flag");
+      save(); paint();
+    });
+  });
+  [["stName","name"],["stId","emplid"],["stSec","section"]].forEach(([id, f]) => {
+    const el = $("#"+id); el.value = state[f] || "";
+    el.addEventListener("input", () => { if (state.submitted) return; state[f] = el.value; el.classList.remove("missing"); save(); });
+  });
+}
+
+/* ---------- paint everything from state ---------- */
+function answerText(q, a){
+  if (q.type === "mc") return typeof a === "number" ? String.fromCharCode(65+a) + ". " + q.opts[a] : "";
+  if (q.type === "multi") return (a || []).map(i => String.fromCharCode(65+i) + ". " + q.opts[i]).join("\n");
+  return String(a || "").trim();
+}
+function keyText(q, k){
+  if (q.type === "mc") return String.fromCharCode(65+k.a) + ". " + q.opts[k.a];
+  if (q.type === "multi") return k.a.map(i => String.fromCharCode(65+i) + ". " + q.opts[i]).join("\n");
+  return k.a[0];
+}
+
+function paint(){
+  const locked = state.submitted, show = reveal();
+  const g = show ? grade() : null;
+  let answered = 0;
+
+  QUESTIONS.forEach(q => {
+    const card = $("#"+q.id), a = state.answers[q.id];
+    if (isAnswered(q)) answered++;
+    card.querySelectorAll(".opt").forEach(b => {
+      const i = +b.dataset.i;
+      const on = q.type === "mc" ? a === i : (a || []).includes(i);
+      b.classList.toggle("picked", on);
+      b.setAttribute("aria-checked", on);
+      b.disabled = locked;
+      b.classList.remove("is-right","is-wrong");
+      if (show){
+        const k = g.per[q.id].k.a;
+        const right = q.type === "mc" ? k === i : k.includes(i);
+        if (right) b.classList.add("is-right"); else if (on) b.classList.add("is-wrong");
+      }
+    });
+    card.querySelectorAll("textarea.out, input.blank").forEach(el => { el.disabled = locked; });
+    const ta = card.querySelector("textarea.out");
+    if (ta){ ta.style.height = "auto"; ta.style.height = Math.max(74, ta.scrollHeight + 4) + "px"; }
+
+    /* print mirror for text answers */
+    const pa = card.querySelector("[data-pa]");
+    if (q.type === "output" || q.type === "fill"){
+      const t = answerText(q, a);
+      pa.innerHTML = '<b>Answer:</b> ' + (t ? esc(t) : '<i>(no answer)</i>');
+    } else pa.innerHTML = isAnswered(q) ? "" : '<b>Answer:</b> <i>(no answer)</i>';
+
+    /* feedback */
+    const fb = card.querySelector("[data-fb]");
+    if (show){
+      const {e, k} = g.per[q.id];
+      const cls = e >= q.pts ? "ok" : e > 0 ? "part" : "no";
+      const head = cls === "ok" ? "Correct." : cls === "part" ? "Partly right." : (isAnswered(q) ? "Not quite." : "Not answered.");
+      fb.className = "fb show " + cls;
+      fb.innerHTML = '<b>' + head + '</b> ' + fmtPts(e) + ' / ' + q.pts +
+        (cls !== "ok" ? '<span class="ans">Correct answer:\n' + esc(keyText(q, k)) + '</span>' : ' ') + md(k.why);
+    } else { fb.className = "fb"; fb.innerHTML = ""; }
+  });
+
+  /* progress + nav nodes */
+  $("#progTxt").textContent = answered + " / " + QUESTIONS.length;
+  $("#progBar").style.width = (answered / QUESTIONS.length * 100) + "%";
+  SECTIONS.forEach(sec => {
+    const qs = QUESTIONS.filter(q => q.sec === sec.n), d = qs.filter(isAnswered).length;
+    const li = document.querySelector('#llist li[data-sec="'+sec.n+'"]');
+    li.classList.toggle("done", d === qs.length);
+    li.classList.toggle("part", d > 0 && d < qs.length);
+    li.querySelector("[data-cnt]").textContent = d + "/" + qs.length;
+  });
+
+  /* student fields */
+  ["stName","stId","stSec"].forEach(id => $("#"+id).disabled = locked);
+
+  /* result banner */
+  const r = $("#result");
+  if (show && (state.submitted || instructorView)){
+    const pct = Math.round(g.earned / g.total * 100);
+    r.innerHTML = '<div class="big">' + fmtPts(g.earned) + '<small> / ' + g.total + '</small></div>' +
+      '<div><p><b>' + pct + '%</b> ' + (state.submitted ? "on your submitted quiz." : "on the current answers (not yet submitted).") +
+      ' Each question below shows what you got and why.</p>' +
+      (instructorView && !CONFIG.GRADES_RELEASED ? '<div class="who">Instructor view. Students can\'t see this.</div>' : '') + '</div>';
+    r.classList.add("show");
+  } else { r.classList.remove("show"); r.innerHTML = ""; }
+
+  /* submit zone */
+  $("#submitBtn").disabled = locked;
+  $("#submitBtn").textContent = locked ? "Submitted" : "Submit quiz";
+  $("#submitHelp").textContent = locked
+    ? "Your quiz is submitted and locked. Save it as a PDF and upload it to Brightspace."
+    : "Check your answers, then submit. You can't change anything after submitting." + (CONFIG.GRADES_RELEASED ? " Your score appears right after you submit." : " Your grade will be posted when your instructor releases it.");
+  const rc = $("#receipt");
+  if (locked){
+    rc.innerHTML = '<p><b>Submitted ' + esc(fmtTime(state.submittedAt)) + '</b></p>' +
+      '<p>Receipt code (your instructor uses it to confirm your submission):</p>' +
+      '<span class="code-id">' + esc(state.code) + '</span>' +
+      '<p>Next step: select <b>Save as PDF</b>, choose "Save as PDF" as the printer, and upload the file.</p>';
+    rc.classList.add("show");
+  } else rc.classList.remove("show");
+
+  $("#instructorBadge").classList.toggle("show", instructorView);
+}
+
+/* ---------- submit ---------- */
+$("#submitBtn").addEventListener("click", () => {
+  const msg = $("#submitMsg"); msg.textContent = "";
+  const miss = [];
+  if (!state.name.trim()){ $("#stName").classList.add("missing"); miss.push("your full name"); }
+  if (!state.emplid.trim()){ $("#stId").classList.add("missing"); miss.push("your EMPLID"); }
+  if (miss.length){
+    msg.textContent = "Add " + miss.join(" and ") + " at the top of the page before submitting.";
+    $("#studentBox").scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
+  const un = QUESTIONS.filter(q => !isAnswered(q));
+  document.querySelectorAll(".q").forEach(c => c.classList.remove("unans-flag"));
+  un.forEach(q => $("#"+q.id).classList.add("unans-flag"));
+  $("#confirmTxt").innerHTML = un.length
+    ? "You left <b>" + un.length + "</b> question" + (un.length>1?"s":"") + " blank (Question " + un.map(q => q.num).join(", ") + "), highlighted in amber. Blank answers earn no points. After you submit, you can't change your answers."
+    : "All " + QUESTIONS.length + " questions are answered. After you submit, you can't change your answers.";
+  $("#confirmDlg").showModal();
+});
+$("#confirmNo").addEventListener("click", () => $("#confirmDlg").close());
+$("#confirmYes").addEventListener("click", () => {
+  $("#confirmDlg").close();
+  const g = grade();
+  state.submitted = true;
+  state.submittedAt = Date.now();
+  state.code = makeCode(g.earned, g.total, state.submittedAt, state.emplid);
+  save(); paint();
+  $("#submitZone").scrollIntoView({behavior:"smooth", block:"start"});
+});
+
+/* ---------- save as PDF ---------- */
+function fillPrintHead(){
+  const show = reveal(), g = show ? grade() : null;
+  const rows = [
+    ["Course", "MAC286 Data Structures, Java Fundamentals Quiz"],
+    ["Student", state.name || "—"], ["EMPLID", state.emplid || "—"], ["Section", state.section || "—"],
+    ["Status", state.submitted ? "Submitted " + fmtTime(state.submittedAt) : '<span class="draft">DRAFT, not submitted</span>'],
+    ["Receipt code", state.submitted ? esc(state.code) : "—"]
+  ];
+  if (show) rows.push(["Score", fmtPts(g.earned) + " / " + g.total + " (" + Math.round(g.earned/g.total*100) + "%)"]);
+  const safe = new Set(["Student","EMPLID","Section"]);
+  let html = "<table>";
+  for (let i = 0; i < rows.length; i += 2){
+    html += "<tr>" + rows.slice(i, i+2).map(r => "<td>" + r[0] + "</td><td>" + (safe.has(r[0]) ? esc(r[1]) : r[1]) + "</td>").join("") + "</tr>";
+  }
+  $("#printHead").innerHTML = html + "</table>";
+}
+let savedTitle = document.title;
+window.addEventListener("beforeprint", () => {
+  fillPrintHead(); paint();
+  savedTitle = document.title;
+  const who = (state.name || "student").trim().replace(/[^\w\- ]+/g,"").replace(/\s+/g,"_");
+  document.title = "MAC286_JavaQuiz_" + who;
+});
+window.addEventListener("afterprint", () => { document.title = savedTitle; });
+function savePdf(){
+  if (!state.submitted && !confirm("You haven't submitted yet. The PDF will be marked DRAFT and won't include a receipt code. Save a draft anyway?")) return;
+  window.print();
+}
+$("#pdfBtn").addEventListener("click", savePdf);
+$("#pdfBtnRail").addEventListener("click", savePdf);
+
+/* ---------- instructor access ---------- */
+const dlg = $("#instrDlg"), body = $("#instrBody");
+function instrLocked(){
+  body.innerHTML = '<h3>Instructor access</h3><p>Enter the instructor passcode to see grades on this device, check receipt codes, or reset an attempt.</p>' +
+    '<label for="ipass">Passcode</label><input type="password" id="ipass" autocomplete="off">' +
+    '<div class="err" id="ierr"></div>' +
+    '<div class="row"><button type="button" class="btn ghost" id="icancel">Cancel</button><button type="button" class="btn" id="igo">Unlock</button></div>';
+  const go = () => {
+    if (sha256($("#ipass").value) === CONFIG.INSTRUCTOR_HASH){ instructorView = true; paint(); instrOpen(); }
+    else { $("#ierr").textContent = "That passcode doesn't match. Check it and try again."; $("#ipass").select(); }
+  };
+  $("#igo").onclick = go;
+  $("#ipass").onkeydown = e => { if (e.key === "Enter") go(); };
+  $("#icancel").onclick = () => dlg.close();
+  setTimeout(() => $("#ipass").focus(), 30);
+}
+function instrOpen(){
+  const g = grade();
+  const status = state.submitted
+    ? "Submitted " + fmtTime(state.submittedAt) + " by " + (state.name || "(no name)") + " (" + (state.emplid || "no EMPLID") + ").<br>Score: <b>" + fmtPts(g.earned) + " / " + g.total + "</b> (" + Math.round(g.earned/g.total*100) + "%)"
+    : "Not submitted yet. Current answers score <b>" + fmtPts(g.earned) + " / " + g.total + "</b>.";
+  body.innerHTML = '<h3>Instructor tools</h3>' +
+    '<div class="blk"><h4>This device</h4><p>' + status + '</p>' +
+      '<p>Answers, scores, and explanations are now showing on the page. They hide again when you lock.</p>' +
+      '<div class="row" style="justify-content:flex-start"><button type="button" class="btn warn" id="ireset">Reset this attempt</button></div></div>' +
+    '<div class="blk"><h4>Check a receipt code</h4><p>Copy the receipt code and EMPLID from a student\'s PDF. The EMPLID confirms the code belongs to that student.</p>' +
+      '<label for="icode">Receipt code</label><input type="text" id="icode" autocomplete="off" spellcheck="false">' +
+      '<label for="iemp">Student EMPLID</label><input type="text" id="iemp" autocomplete="off">' +
+      '<div class="row" style="justify-content:flex-start"><button type="button" class="btn" id="icheck">Check code</button></div>' +
+      '<div class="outbox" id="iout" hidden></div></div>' +
+    '<div class="blk"><h4>Release grades to students</h4><p>Grades are currently <b>' + (CONFIG.GRADES_RELEASED ? "released" : "hidden") + '</b>. To ' + (CONFIG.GRADES_RELEASED ? "hide them, set" : "release them, set") + ' <code>GRADES_RELEASED: ' + (!CONFIG.GRADES_RELEASED) + '</code> in the CONFIG block at the top of this file\'s script and re-upload it. Students who already submitted will see their score the next time they open the page.</p></div>' +
+    '<div class="blk"><h4>Change passcode</h4><p>Type a new passcode, then paste the hash into <code>INSTRUCTOR_HASH</code> in the CONFIG block.</p>' +
+      '<label for="inew">New passcode</label><input type="text" id="inew" autocomplete="off">' +
+      '<div class="outbox" id="ihash" hidden></div></div>' +
+    '<div class="row"><button type="button" class="btn ghost" id="iclose">Close</button><button type="button" class="btn" id="ilock">Lock instructor view</button></div>';
+  $("#icheck").onclick = () => {
+    const r = readCode($("#icode").value, $("#iemp").value), out = $("#iout");
+    out.hidden = false;
+    if (!r){ out.textContent = "That isn't a valid receipt code. Check for missing or extra characters."; return; }
+    out.textContent = "Score: " + fmtPts(r.score) + " / " + r.total + " (" + Math.round(r.score/r.total*100) + "%)\n" +
+      "Submitted: " + fmtTime(r.time) + "\n" +
+      (r.verified === null ? "EMPLID: not checked (enter one to confirm ownership)" :
+       r.verified ? "EMPLID: matches this code" : "EMPLID: DOES NOT match this code. The code may belong to another student.");
+  };
+  $("#inew").oninput = () => { const v = $("#inew").value, h = $("#ihash"); h.hidden = !v; h.textContent = v ? sha256(v) : ""; };
+  $("#ireset").onclick = () => {
+    if (!confirm("Erase all answers and the submission on this device? This can't be undone.")) return;
+    state = blank(); save();
+    document.querySelectorAll("textarea.out, input.blank").forEach(el => el.value = "");
+    ["stName","stId","stSec"].forEach(id => $("#"+id).value = "");
+    paint(); instrOpen();
+  };
+  $("#iclose").onclick = () => dlg.close();
+  $("#ilock").onclick = lockInstructor;
+}
+function lockInstructor(){ instructorView = false; paint(); if (dlg.open) dlg.close(); }
+$("#instrLink").addEventListener("click", () => { instructorView ? instrOpen() : instrLocked(); dlg.showModal(); });
+$("#instructorBadge").addEventListener("click", lockInstructor);
+
+/* ---------- go ---------- */
+build();
+paint();
+</script>
+</body>
+</html>
