@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAC286 · Boxes &amp; Arrows — The Picture Language of Java Memory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#151a21;
+  --panel:#1c232d;
+  --gutter:#10151b;
+  --ink:#e3e9f2;
+  --muted:#94a1b5;
+  --line:#2a3442;
+  --accent:#f2b63c;
+  --accent-soft:rgba(242,182,60,.13);
+  --accent-strong:rgba(242,182,60,.22);
+  --teal:#57d9c0;
+  --kw:#b8a1f5;
+  --typ:#82b8f0;
+  --str:#57d9c0;
+  --com:#67748a;
+  --num:#eaa46b;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"JetBrains Mono", "SF Mono", Consolas, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:84px}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--serif); font-size:1.16rem; line-height:1.72;
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important; animation:none !important}
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  background:rgba(21,26,33,.94); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  max-width:1180px; margin:0 auto; padding:.55rem 1rem;
+  display:flex; align-items:center; gap:1rem;
+}
+.brand{font-family:var(--mono); font-size:.9rem; color:var(--accent); white-space:nowrap}
+.brand a{color:inherit; text-decoration:none}
+nav.toc{display:flex; gap:.15rem; overflow-x:auto; scrollbar-width:thin}
+nav.toc a{
+  font-family:var(--mono); font-size:.84rem; color:var(--muted);
+  text-decoration:none; padding:.3rem .55rem; border-radius:6px; white-space:nowrap;
+}
+nav.toc a:hover{color:var(--ink); background:var(--panel)}
+nav.toc a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ---------- header ---------- */
+header.hero{max-width:1180px; margin:0 auto; padding:3.2rem 1rem 1.2rem}
+.hero .course{font-family:var(--mono); font-size:.9rem; color:var(--muted); letter-spacing:.04em}
+.hero h1{
+  font-size:clamp(2rem, 4.5vw, 3.1rem); line-height:1.12; margin:.35rem 0 .6rem;
+  font-weight:700;
+}
+.hero h1 .mark{
+  background:linear-gradient(transparent 58%, var(--accent-strong) 58%);
+  padding:0 .1em;
+}
+.hero .sub{max-width:62ch; color:var(--muted); font-size:1.16rem; margin:0}
+
+/* the "how to read this page" strip */
+.howto{max-width:1180px; margin:1.4rem auto 0; padding:0 1rem}
+.howto-card{
+  border:1px solid var(--line); border-left:4px solid var(--accent);
+  background:var(--panel); border-radius:10px; padding:.9rem 1.1rem;
+  display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap;
+}
+.howto-card .demo-line{
+  font-family:var(--mono); font-size:.9rem; background:var(--gutter);
+  border:1px solid var(--line); border-radius:8px; padding:.5rem .7rem;
+  color:var(--typ); white-space:nowrap;
+}
+.howto-card .demo-line b{color:var(--accent); font-weight:500}
+.howto-card p{margin:.1rem 0; font-size:1.06rem}
+.howto-card .keys{font-family:var(--mono); font-size:.84rem; color:var(--muted)}
+kbd{
+  font-family:var(--mono); font-size:.75em; border:1px solid var(--line);
+  border-bottom-width:2px; border-radius:5px; padding:.05em .4em; background:var(--gutter);
+}
+
+/* ---------- lesson sections ---------- */
+main{max-width:1180px; margin:0 auto; padding:0 1rem 4rem}
+section.lesson{padding:2.6rem 0 1rem; border-bottom:1px solid var(--line)}
+section.lesson:last-of-type{border-bottom:none}
+.lesson h2{
+  font-size:1.9rem; margin:0 0 .2rem; font-weight:700;
+}
+.lesson h2 .chip{
+  font-family:var(--mono); font-size:.78rem; font-weight:500; color:var(--accent);
+  border:1px solid var(--accent); border-radius:999px; padding:.12em .6em;
+  vertical-align:.35em; margin-left:.5rem;
+}
+.lesson .lede{max-width:70ch; color:var(--muted); margin:.3rem 0 1.1rem}
+.lesson p{max-width:70ch}
+.bigidea{
+  max-width:70ch; margin:1rem 0; padding:.75rem 1rem;
+  border-left:3px solid var(--teal); background:rgba(87,217,192,.06);
+  border-radius:0 8px 8px 0; font-size:1.08rem;
+}
+.bigidea b{color:var(--teal)}
+
+/* definition cards */
+.defcard{
+  border:1px solid var(--line); border-left:4px solid var(--accent);
+  border-radius:10px; background:var(--panel);
+  padding:1rem 1.2rem; margin:1.1rem 0; max-width:74ch;
+}
+.def-head{display:flex; align-items:baseline; gap:.7rem; margin-bottom:.2rem}
+.def-not{font-family:var(--mono); font-size:1.35rem; color:var(--accent); font-weight:700}
+.def-name{font-family:var(--mono); font-size:.86rem; color:var(--muted)}
+.defcard dl{margin:.4rem 0 0}
+.def-bullets{margin:.5rem 0 0; padding-left:1.15rem; font-size:1.08rem; line-height:1.6}
+.def-bullets li{margin:.24rem 0}
+.def-bullets li::marker{color:var(--accent)}
+.picit{font-family:var(--mono); font-size:.82em; color:var(--teal); font-weight:700; margin-right:.15em}
+pre.mini{
+  margin:.7rem 0 .1rem; padding:.6rem .85rem; background:var(--gutter);
+  border:1px solid var(--line); border-radius:8px; font-family:var(--mono);
+  font-size:.95rem; line-height:1.7; color:var(--typ); overflow-x:auto; white-space:pre;
+}
+pre.mini .mc{color:var(--com); font-style:italic}
+pre.mini .mok{color:var(--teal)}
+pre.mini .mbad{color:#e0716f}
+.defcard dt{font-family:var(--mono); font-size:.8rem; color:var(--teal); margin-top:.6rem}
+.defcard dd{margin:.15rem 0 0; font-size:1.08rem; line-height:1.62}
+
+/* reference diagram */
+.arr-wrap{margin:1.3rem 0; border:1px solid var(--line); border-radius:12px; background:var(--gutter); padding:1rem .8rem .6rem; max-width:760px}
+.arr-wrap svg{width:100%; height:auto; display:block}
+.arr-box{fill:var(--panel); stroke:var(--accent); stroke-width:2}
+.arr-null{fill:var(--muted); font-family:var(--mono); font-size:16px; font-style:italic}
+.arr-idx{fill:var(--muted); font-family:var(--mono); font-size:13px}
+.arr-dot{fill:#57d9c0}
+.arr-arrow{stroke:#57d9c0; stroke-width:2.5}
+.arr-lab{fill:var(--accent); font-family:var(--mono); font-size:16px; font-weight:700}
+.arr-card{fill:rgba(87,217,192,.08); stroke:#57d9c0; stroke-width:1.6}
+.arr-cardname{fill:var(--ink); font-family:var(--mono); font-size:15px; font-weight:700}
+.arr-cardval{fill:var(--muted); font-family:var(--mono); font-size:13px}
+.diagram-caption{color:var(--muted); font-size:.95rem; margin:.5rem .2rem 0}
+
+/* comparison table */
+table.cmp{border-collapse:collapse; margin:1.1rem 0; font-size:1.02rem; max-width:74ch}
+.cmp th,.cmp td{border:1px solid var(--line); padding:.5rem .8rem; text-align:left}
+.cmp th{font-family:var(--mono); font-size:.84rem; color:var(--teal); background:var(--panel)}
+.cmp td:first-child{font-weight:600}
+.tblnote{font-size:.93rem; color:var(--muted); max-width:74ch}
+
+/* code + inspector grid */
+.lesson-grid{
+  display:grid; grid-template-columns:minmax(0,1fr) 330px;
+  gap:1.25rem; align-items:start; margin:1.1rem 0 .4rem;
+}
+
+/* code block */
+figure.codeblock{margin:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--gutter)}
+figure.codeblock figcaption{
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--panel); border-bottom:1px solid var(--line);
+  padding:.45rem .8rem;
+}
+.fname{font-family:var(--mono); font-size:.9rem; color:var(--ink)}
+.fname::before{content:"☕ "; }
+.btns{display:flex; gap:.45rem; flex-wrap:wrap; justify-content:flex-end}
+.copybtn{
+  font-family:var(--mono); font-size:.82rem; cursor:pointer;
+  color:var(--accent); background:transparent; border:1px solid var(--accent);
+  border-radius:7px; padding:.28em .8em;
+}
+.copybtn:hover{background:var(--accent); color:#1a1408}
+.copybtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.copybtn.done{background:var(--teal); border-color:var(--teal); color:#062a24}
+.copybtn.alt{color:var(--muted); border-color:var(--line)}
+.copybtn.alt:hover{background:var(--panel); color:var(--ink); border-color:var(--muted)}
+.codescroll{overflow-x:auto; padding:.55rem 0}
+.cl{
+  display:flex; align-items:baseline; cursor:pointer;
+  border-left:3px solid transparent;
+}
+.cl .ln{
+  min-width:3.2ch; padding:0 .8ch 0 .6ch; text-align:right;
+  font-family:var(--mono); font-size:.9rem; color:#4b5769; user-select:none;
+}
+.cl .ct{
+  font-family:var(--mono); font-size:.97rem; line-height:1.62;
+  white-space:pre; padding-right:1.2rem;
+}
+.cl:hover{background:rgba(255,255,255,.035)}
+.cl.active{background:var(--accent-soft); border-left-color:var(--accent)}
+.cl.active .ln{color:var(--accent)}
+.cl.pinned{background:var(--accent-strong)}
+.cl:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.tk-kw{color:var(--kw)} .tk-typ{color:var(--typ)} .tk-str{color:var(--str)}
+.tk-com{color:var(--com); font-style:italic} .tk-num{color:var(--num)}
+
+/* inspector panel */
+aside.inspector{
+  position:sticky; top:76px;
+  border:1px solid var(--line); border-radius:12px; background:var(--panel);
+  overflow:hidden;
+}
+.ins-head{
+  display:flex; align-items:center; gap:.5rem;
+  font-family:var(--mono); font-size:.84rem; color:var(--muted);
+  border-bottom:1px solid var(--line); padding:.5rem .9rem;
+}
+.ins-dot{width:.55rem; height:.55rem; border-radius:50%; background:var(--accent); flex:none}
+.ins-body{padding:.85rem .95rem; min-height:9.5rem}
+.ins-hint{color:var(--muted); font-size:1.02rem; margin:0}
+.ins-lineno{
+  font-family:var(--mono); font-size:.8rem; color:var(--accent);
+  border:1px solid var(--accent); border-radius:999px; padding:.1em .65em;
+  display:inline-block; margin-bottom:.5rem;
+}
+.ins-code{
+  font-family:var(--mono); font-size:.88rem; color:var(--typ);
+  background:var(--gutter); border:1px solid var(--line); border-radius:7px;
+  padding:.45rem .6rem; margin:0 0 .6rem; overflow-x:auto; white-space:pre;
+}
+.ins-note{font-size:1.07rem; line-height:1.6; margin:0}
+.ins-pinstate{font-family:var(--mono); font-size:.78rem; color:var(--muted); margin:.7rem 0 0}
+
+/* expected output box */
+details.runbox{
+  margin:.9rem 0 0; border:1px solid var(--line); border-radius:10px;
+  background:var(--panel); max-width:100%;
+}
+details.runbox summary{
+  cursor:pointer; padding:.5rem .9rem; font-family:var(--mono);
+  font-size:.9rem; color:var(--teal); list-style:none;
+}
+details.runbox summary::before{content:"▸ "; }
+details.runbox[open] summary::before{content:"▾ "; }
+details.runbox summary:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+details.runbox pre{
+  margin:0; padding:.7rem 1rem .9rem; border-top:1px solid var(--line);
+  font-family:var(--mono); font-size:.92rem; color:var(--ink);
+  overflow-x:auto; line-height:1.6;
+}
+
+/* practice reveal */
+details.solution{margin:.7rem 0 1.6rem}
+details.solution > summary{
+  cursor:pointer; display:inline-block; font-family:var(--mono); font-size:.9rem;
+  color:var(--accent); border:1px solid var(--accent); border-radius:8px;
+  padding:.35em .9em; list-style:none;
+}
+details.solution > summary:hover{background:var(--accent); color:#1a1408}
+details.solution > summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+details.solution > .lesson-grid{margin-top:.9rem}
+
+/* quiz */
+.quiz-q{border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:1rem 1.2rem; margin:0 0 1rem; max-width:74ch}
+.quiz-q h3{margin:.1rem 0 .6rem; font-size:1.15rem}
+.quiz-q code{font-family:var(--mono); font-size:.85em; background:var(--gutter); border:1px solid var(--line); border-radius:5px; padding:.05em .35em}
+.quiz-q label{display:flex; gap:.55rem; align-items:baseline; padding:.22rem 0; cursor:pointer; font-size:1.07rem}
+.quiz-q input{accent-color:var(--accent)}
+.quiz-q.correct{border-color:var(--teal)}
+.quiz-q.wrong{border-color:#e0716f}
+.quiz-verdict{font-family:var(--mono); font-size:.86rem; margin:.5rem 0 0; display:none}
+.quiz-q.correct .quiz-verdict{display:block; color:var(--teal)}
+.quiz-q.wrong .quiz-verdict{display:block; color:#e0716f}
+#gradebtn{
+  font-family:var(--mono); font-size:.95rem; cursor:pointer;
+  background:var(--accent); color:#1a1408; border:none; border-radius:9px;
+  padding:.6em 1.4em; font-weight:700;
+}
+#gradebtn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+#quizscore{font-family:var(--mono); margin-left:1rem; color:var(--teal)}
+
+footer.pagefoot{
+  max-width:1180px; margin:0 auto; padding:1.4rem 1rem 2.6rem;
+  color:var(--muted); font-size:.98rem; border-top:1px solid var(--line);
+}
+footer.pagefoot .sig{font-family:var(--mono); font-size:.8rem}
+
+/* ---------- mobile ---------- */
+@media (max-width:920px){
+  .lesson-grid{grid-template-columns:1fr}
+  aside.inspector{
+    position:sticky; top:auto; bottom:0; z-index:30;
+    border-radius:12px 12px 0 0; box-shadow:0 -8px 24px rgba(0,0,0,.45);
+    max-height:36vh; overflow-y:auto;
+  }
+  .ins-body{min-height:5.5rem}
+  .hero{padding-top:2.2rem}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="brand"><a href="index.html">MAC286</a> · Boxes &amp; Arrows</span>
+    <nav class="toc" aria-label="Lecture sections">
+      <a href="#box">1 The Box</a>
+      <a href="#copyvalue">2 Copy a Value</a>
+      <a href="#arrow">3 The Arrow</a>
+      <a href="#twoarrows">4 Two Arrows</a>
+      <a href="#null">5 null</a>
+      <a href="#rows">6 Rows</a>
+      <a href="#dictionary">7 Dictionary</a>
+      <a href="#practice">Practice</a>
+      <a href="#quiz">Quiz</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <p class="course">MAC286 · Data Structures in Java · Prof. Kassou</p>
+  <h1>Boxes &amp; arrows: <span class="mark">how Java remembers</span></h1>
+  <p class="sub">Every lecture in this course draws the same pictures: boxes, arrows, cards, null. This page teaches the pictures themselves — <strong>one word at a time</strong>, one drawing at a time, one tiny program at a time. Every word gets its <strong>real definition first</strong> — the picture comes second, clearly labeled. No other lecture needed first.</p>
+</header>
+
+<div class="howto">
+  <div class="howto-card">
+    <div>
+      <p><strong>How this page works.</strong> Every program has a live <em>Inspector</em> beside it. Put your cursor on any line of code — click it or hover over it — and that line's explanation appears in the panel on the right.</p>
+      <p class="keys">Running the code online? Compilers like Programiz, JDoodle and OnlineGDB expect the class to be named <b style="color:var(--accent)">Main</b> — use each program's <span style="color:var(--teal)">Copy as Main.java</span> button and paste as-is.</p>
+      <p class="keys">Click a line to <b style="color:var(--accent)">pin</b> its note · <kbd>↑</kbd> <kbd>↓</kbd> walk through the lines · <kbd>Esc</kbd> unpins · <span style="color:var(--teal)">Copy code</span> grabs the whole file.</p>
+    </div>
+    <div class="demo-line">Student b = a; <b>◀ try clicking lines like this one below</b></div>
+  </div>
+</div>
+
+<main>
+<!-- ============ 1. THE BOX ============ -->
+<section class="lesson" id="box">
+  <h2>1 · The box <span class="chip">word 1</span></h2>
+  <p class="lede">Everything in this course is drawn with a few pictures. Here is the first one.</p>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">variable</span><span class="def-name">word 1</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> a named storage location in memory. It holds <strong>one</strong> value.</li>
+      <li><code>=</code> (assignment) stores a new value there. The old value is replaced.</li>
+      <li><span class="picit">Picture it:</span> the variable is a labeled <strong>box</strong> 📦 — the label is the name, the content is the value.</li>
+    </ul>
+    <pre class="mini">int age = 21;   <span class="mc">// variable "age" now stores 21</span>
+age = 22;       <span class="mc">// same variable, new value (21 is gone)</span></pre>
+  </div>
+
+  <figure class="arr-wrap">
+    <svg viewBox="0 0 680 190" role="img" aria-label="Two states of one box labeled age. Before: the box contains 21. An arrow labeled age equals 22 leads to the after state, where the same box contains 22.">
+      <defs>
+        <marker id="bx1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#57d9c0"/>
+        </marker>
+      </defs>
+      <text class="arr-lab" x="185" y="45" text-anchor="middle">age</text>
+      <rect class="arr-box" x="110" y="58" width="150" height="72" rx="9"/>
+      <text class="arr-cardname" x="185" y="103" text-anchor="middle" style="font-size:26px">21</text>
+      <text class="arr-idx" x="185" y="160" text-anchor="middle">before</text>
+      <line class="arr-arrow" x1="285" y1="94" x2="390" y2="94" marker-end="url(#bx1)"/>
+      <text class="arr-idx" x="338" y="80" text-anchor="middle">age = 22;</text>
+      <text class="arr-lab" x="495" y="45" text-anchor="middle">age</text>
+      <rect class="arr-box" x="420" y="58" width="150" height="72" rx="9"/>
+      <text class="arr-cardname" x="495" y="103" text-anchor="middle" style="font-size:26px">22</text>
+      <text class="arr-idx" x="495" y="160" text-anchor="middle">after — one box, new content</text>
+    </svg>
+  </figure>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="Boxes.java">
+      <figcaption><span class="fname">Boxes.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class Boxes {
+    public static void main(String[] args) {
+        // One box, labeled age, holding the value 21
+        int age = 21;
+        System.out.println(age);
+
+        // Put a NEW value in the same box (the old one is gone)
+        age = 22;
+        System.out.println(age);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["The smallest program in the whole course. One box, two contents.",
+"The program starts here.",
+"The picture from the diagram above, as code.",
+"Create the variable age and store 21 in it.",
+"Prints 21 - the current content of the box.",
+"",
+"= always means: REPLACE the content.",
+"Same box, new value. The 21 is gone forever - a box holds one thing.",
+"Prints 22.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — Boxes.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see its explanation.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>21
+22</pre>
+  </details>
+</section>
+
+<!-- ============ 2. COPYING A VALUE ============ -->
+<section class="lesson" id="copyvalue">
+  <h2>2 · Copying a value <span class="chip">word 2</span></h2>
+  <p class="lede">What does <code>int b = a;</code> actually do? For ints: a photocopy.</p>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">copying a primitive</span><span class="def-name">int, double, boolean, char…</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> for primitive types, <code>b = a</code> stores a <strong>copy of the value</strong> in b.</li>
+      <li>Result: two variables, two independent values.</li>
+      <li><span class="picit">Picture it:</span> a photocopy 📸 — changing the copy never changes the original.</li>
+    </ul>
+    <pre class="mini">int b = a;   <span class="mc">// b gets its OWN copy of the number</span></pre>
+  </div>
+
+  <figure class="arr-wrap">
+    <svg viewBox="0 0 680 170" role="img" aria-label="Two independent boxes. Box a contains 5. Box b contains 99. A caption reads: two boxes, two values - changing b never touched a.">
+      <text class="arr-lab" x="205" y="40" text-anchor="middle">a</text>
+      <rect class="arr-box" x="130" y="52" width="150" height="72" rx="9"/>
+      <text class="arr-cardname" x="205" y="97" text-anchor="middle" style="font-size:26px">5</text>
+      <text class="arr-lab" x="475" y="40" text-anchor="middle">b</text>
+      <rect class="arr-box" x="400" y="52" width="150" height="72" rx="9"/>
+      <text class="arr-cardname" x="475" y="97" text-anchor="middle" style="font-size:26px">99</text>
+      <text class="arr-idx" x="340" y="155" text-anchor="middle">after b = a; then b = 99;  —  two boxes, two values. a never noticed.</text>
+    </svg>
+  </figure>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="CopyTheValue.java">
+      <figcaption><span class="fname">CopyTheValue.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class CopyTheValue {
+    public static void main(String[] args) {
+        int a = 5;
+
+        // Copying a primitive = photocopying the VALUE
+        int b = a;
+
+        // Change the copy...
+        b = 99;
+
+        // ...the original box is untouched
+        System.out.println("a is " + a);
+        System.out.println("b is " + b);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["The photocopy experiment.",
+"Start.",
+"Variable a stores 5.",
+"",
+"The word VALUE is the key. Watch what gets copied.",
+"Variable b is created and receives its OWN copy of the 5. Two variables, each holding a 5.",
+"",
+"Now attack the copy.",
+"b gets a new value. a is a separate variable - it hears nothing.",
+"",
+"The proof:",
+"Prints a is 5. The original survived.",
+"Prints b is 99. Only the copy changed. Remember this program - Section 4 repeats it with an object, and the answer flips!",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — CopyTheValue.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see its explanation.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>a is 5
+b is 99</pre>
+  </details>
+</section>
+
+<!-- ============ 3. OBJECTS AND THE ARROW ============ -->
+<section class="lesson" id="arrow">
+  <h2>3 · Objects and the arrow <span class="chip">words 3, 4, 5</span></h2>
+  <p class="lede">Three words, one real definition each — then one diagram that connects all three.</p>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">object</span><span class="def-name">word 3</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> a value made of several pieces of data (<strong>fields</strong>) grouped together. A Student = a name + a grade.</li>
+      <li>Created with <code>new</code>.</li>
+      <li><span class="picit">Picture it:</span> we draw an object as a <strong>card</strong>, one line per field.</li>
+    </ul>
+    <pre class="mini">new Student()   <span class="mc">// builds ONE object: fields name and grade</span></pre>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">the heap</span><span class="def-name">word 4</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> the region of the computer’s memory where Java stores <strong>every object</strong>.</li>
+      <li>An object is never stored inside a variable — always in the heap.</li>
+      <li><span class="picit">Picture it:</span> variables are boxes on your desk; the heap is the warehouse where the cards are kept. 🏭</li>
+    </ul>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">reference</span><span class="def-name">word 5</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> the <strong>memory address</strong> of an object. A variable of a class type stores this address — not the object itself.</li>
+      <li>The dot <code>.</code> uses the address to reach the object, then reads or writes one field.</li>
+      <li><span class="picit">Picture it:</span> we draw the address as an <strong>arrow</strong> from the box to the card.</li>
+    </ul>
+    <pre class="mini">Student s = new Student();   <span class="mc">// s stores the new object's ADDRESS</span>
+s.name = "Amina";            <span class="mc">// use that address, write field "name"</span></pre>
+  </div>
+
+  <figure class="arr-wrap">
+    <svg viewBox="0 0 680 240" role="img" aria-label="A box labeled s holds a dot with an arrow pointing to a Student card. The card has two rooms: name Amina and grade 95. The box is captioned: the box holds the address. The card is captioned: the object, living on the heap.">
+      <defs>
+        <marker id="bx3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#57d9c0"/>
+        </marker>
+      </defs>
+      <text class="arr-lab" x="150" y="62" text-anchor="middle">s</text>
+      <rect class="arr-box" x="90" y="74" width="120" height="60" rx="9"/>
+      <circle class="arr-dot" cx="150" cy="104" r="5"/>
+      <text class="arr-idx" x="150" y="168" text-anchor="middle">the variable s (a box)</text>
+      <text class="arr-idx" x="150" y="188" text-anchor="middle">(holds the address)</text>
+      <line class="arr-arrow" x1="158" y1="104" x2="392" y2="104" marker-end="url(#bx3)"/>
+      <text class="arr-idx" x="275" y="90" text-anchor="middle">the reference = the address</text>
+      <rect class="arr-card" x="400" y="44" width="210" height="124" rx="11"/>
+      <text class="arr-cardname" x="505" y="76" text-anchor="middle">Student</text>
+      <text class="arr-cardval" x="505" y="106" text-anchor="middle">name:  "Amina"</text>
+      <text class="arr-cardval" x="505" y="132" text-anchor="middle">grade:  95</text>
+      <text class="arr-idx" x="505" y="192" text-anchor="middle">the object (drawn as a card)</text>
+      <text class="arr-idx" x="505" y="212" text-anchor="middle">(stored in the heap)</text>
+    </svg>
+  </figure>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="OneStudent.java">
+      <figcaption><span class="fname">OneStudent.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class OneStudent {
+
+    static class Student {
+        String name;
+        int grade;
+    }
+
+    public static void main(String[] args) {
+        // new builds the object (the card) on the heap
+        Student s = new Student();
+
+        // s holds the ADDRESS of that card
+        s.name = "Amina";
+        s.grade = 95;
+
+        // The dot means: follow the arrow, then open a room
+        System.out.println(s.name + ": " + s.grade);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["The diagram above, line by line.",
+"",
+"The class: every Student object will have two fields.",
+"Field 1: a name.",
+"Field 2: a grade. (No constructor - kept as simple as possible.)",
+"Closes the class.",
+"",
+"Start.",
+"new is the builder.",
+"Right side: new builds one object in the heap. Left side: variable s receives that object's ADDRESS. The object is NOT inside the variable.",
+"",
+"Everything below works through that address.",
+"s.name means: use the address stored in s to reach the object, then write Amina into its field name.",
+"Same trip, field grade, value 95.",
+"",
+"One dot = one address-trip.",
+"Two trips, two fields read. Prints Amina: 95.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — OneStudent.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see its explanation.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>Amina: 95</pre>
+  </details>
+</section>
+
+<!-- ============ 4. TWO ARROWS, ONE OBJECT ============ -->
+<section class="lesson" id="twoarrows">
+  <h2>4 · Two arrows, one object <span class="chip">words 6, 7</span></h2>
+  <p class="lede">Section 2's photocopy experiment again — but with a card instead of a number. The answer flips.</p>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">copying a reference</span><span class="def-name">word 6</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> for class types, <code>b = a</code> copies the <strong>address</strong>. No new object is created.</li>
+      <li>Result: two variables, ONE object — a change made through either name is seen through both. 👀</li>
+      <li><span class="picit">Picture it:</span> two boxes, two arrows, one card.</li>
+    </ul>
+    <pre class="mini">Student b = a;   <span class="mc">// copies the ADDRESS - still one student!</span></pre>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">garbage collector</span><span class="def-name">word 7 — the cleaner</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> the part of Java that automatically frees the memory of objects that <strong>no reference points to</strong> anymore.</li>
+      <li>You never delete objects yourself.</li>
+      <li><span class="picit">Picture it:</span> a card no arrow can reach gets recycled. 🧹</li>
+    </ul>
+    <pre class="mini">a = null;   <span class="mc">// if that was the LAST address, the object gets recycled</span></pre>
+  </div>
+
+  <figure class="arr-wrap">
+    <svg viewBox="0 0 680 240" role="img" aria-label="Two boxes, a and b, each holding a dot. Both arrows point at the same single Student card, whose grade room shows 100. Caption: two names, one card.">
+      <defs>
+        <marker id="bx4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#57d9c0"/>
+        </marker>
+      </defs>
+      <text class="arr-lab" x="150" y="44" text-anchor="middle">a</text>
+      <rect class="arr-box" x="90" y="56" width="120" height="56" rx="9"/>
+      <circle class="arr-dot" cx="150" cy="84" r="5"/>
+      <text class="arr-lab" x="150" y="152" text-anchor="middle">b</text>
+      <rect class="arr-box" x="90" y="164" width="120" height="56" rx="9"/>
+      <circle class="arr-dot" cx="150" cy="192" r="5"/>
+      <line class="arr-arrow" x1="158" y1="84" x2="392" y2="118" marker-end="url(#bx4)"/>
+      <line class="arr-arrow" x1="158" y1="192" x2="392" y2="146" marker-end="url(#bx4)"/>
+      <rect class="arr-card" x="400" y="70" width="210" height="124" rx="11"/>
+      <text class="arr-cardname" x="505" y="102" text-anchor="middle">Student</text>
+      <text class="arr-cardval" x="505" y="132" text-anchor="middle">name:  "Amina"</text>
+      <text class="arr-cardval" x="505" y="158" text-anchor="middle">grade:  100</text>
+      <text class="arr-idx" x="505" y="222" text-anchor="middle">two variables — ONE object</text>
+    </svg>
+  </figure>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="TwoNamesOneStudent.java">
+      <figcaption><span class="fname">TwoNamesOneStudent.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class TwoNamesOneStudent {
+
+    static class Student {
+        String name;
+        int grade;
+    }
+
+    public static void main(String[] args) {
+        Student a = new Student();
+        a.name = "Amina";
+        a.grade = 95;
+
+        // This copies the ARROW, not the student
+        Student b = a;
+
+        // Change the grade through b...
+        b.grade = 100;
+
+        // ...and look through a: same card!
+        System.out.println(a.name + " has " + a.grade);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["Section 2's experiment, repeated with a card. Watch the answer flip.",
+"",
+"The same two-field Student.",
+"Room 1.",
+"Room 2.",
+"Closes the class.",
+"",
+"Start.",
+"One object built; variable a stores its address.",
+"Follow a's arrow, write Amina.",
+"Follow a's arrow, write 95.",
+"",
+"The line of the lecture. Compare it with int b = a; from Section 2.",
+"Variable b receives a COPY OF THE ADDRESS. No new object was built - count the news in this program: one!",
+"",
+"Now change something through the name b...",
+"...use b's address, write 100 into grade. But b's address leads to THE SAME object as a's.",
+"",
+"...and read through the name a:",
+"Prints Amina has 100. One object, two names - both saw the change. This exact surprise causes half of all beginner Java bugs.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — TwoNamesOneStudent.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see its explanation.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>Amina has 100</pre>
+  </details>
+</section>
+
+<!-- ============ 5. NULL AND THE CRASH ============ -->
+<section class="lesson" id="null">
+  <h2>5 · null and the crash <span class="chip">words 8, 9</span></h2>
+  <p class="lede">What does an arrow box hold before it points anywhere? And what happens if you follow an arrow that isn't there?</p>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">null</span><span class="def-name">word 8</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> the special value meaning “this variable stores <strong>no address</strong>”. No object is attached.</li>
+      <li>Printing null is safe — it just prints the word <code>null</code>.</li>
+      <li><span class="picit">Picture it:</span> a box with no arrow coming out. 🚫</li>
+    </ul>
+    <pre class="mini">Student s = null;   <span class="mc">// variable exists, address does not</span>
+System.out.println(s);   <span class="mok">// prints: null   (safe)</span></pre>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">NullPointerException</span><span class="def-name">word 9 — the crash 💥</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> the runtime error thrown when the dot <code>.</code> is used on null — there is no address to follow, so no object to reach.</li>
+      <li>Prevention: <code>if (s != null)</code> before the dot.</li>
+      <li><span class="picit">Picture it:</span> trying to follow an arrow that isn’t there.</li>
+    </ul>
+    <pre class="mini">s.name                       <span class="mbad">// CRASH - no object to reach</span>
+if (s != null) { s.name }    <span class="mok">// safe - address checked first</span></pre>
+  </div>
+
+  <figure class="arr-wrap">
+    <svg viewBox="0 0 680 170" role="img" aria-label="A box labeled s contains the word null. A dashed line leaves the box and stops in empty space at an X. Caption: the dot tries to follow this arrow - but it leads nowhere.">
+      <text class="arr-lab" x="170" y="52" text-anchor="middle">s</text>
+      <rect class="arr-box" x="110" y="64" width="120" height="56" rx="9"/>
+      <text class="arr-null" x="170" y="99" text-anchor="middle">null</text>
+      <line class="arr-arrow" x1="238" y1="92" x2="400" y2="92" stroke-dasharray="6 7" opacity="0.55"/>
+      <text x="432" y="100" style="fill:#e0716f; font-family:var(--mono); font-size:24px; font-weight:700">✕</text>
+      <text class="arr-idx" x="330" y="150" text-anchor="middle">the dot tries to follow this arrow — but it leads nowhere 💥</text>
+    </svg>
+  </figure>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="EmptyBox.java">
+      <figcaption><span class="fname">EmptyBox.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class EmptyBox {
+
+    static class Student {
+        String name;
+    }
+
+    public static void main(String[] args) {
+        // An arrow box with NO arrow yet
+        Student s = null;
+
+        // Printing null is safe
+        System.out.println(s);
+
+        // A dot on null would CRASH:
+        // System.out.println(s.name);   <- NullPointerException!
+
+        // The habit: check before you dot
+        if (s != null) {
+            System.out.println(s.name);
+        } else {
+            System.out.println("empty box - nothing to open");
+        }
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["Meeting null on purpose, in a safe environment.",
+"",
+"A one-field Student is enough here.",
+"The single field.",
+"Closes the class.",
+"",
+"Start.",
+"The diagram above, in words.",
+"Variable s exists - but it stores null: no address, no object. Nothing was built.",
+"",
+"Experiment 1: printing.",
+"Prints the word null. No crash - println just describes the box's content.",
+"",
+"Experiment 2 stays in a comment, because it would end the program.",
+"Remove the // and run it: Exception in thread main java.lang.NullPointerException. The dot demanded an address to follow; there was none.",
+"",
+"Experiment 3: the professional habit.",
+"Ask FIRST: does s store an address?",
+"Only dotted if the answer was yes. (Today it is not.)",
+"The answer was no...",
+"...so we take the safe road. Prints the message instead of crashing.",
+"Closes the if/else.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — EmptyBox.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see its explanation.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>null
+empty box - nothing to open</pre>
+  </details>
+</section>
+
+<!-- ============ 6. ROWS OF BOXES ============ -->
+<section class="lesson" id="rows">
+  <h2>6 · Rows of boxes <span class="chip">words 10, 11</span></h2>
+  <p class="lede">An array is just boxes in a row. There are two kinds of row — and now you know both kinds of box.</p>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">array of values</span><span class="def-name">word 10</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> a numbered row of variables of a <strong>primitive</strong> type. Each slot stores the value itself.</li>
+      <li>New <code>int</code> slots start at <strong>0</strong>.</li>
+      <li><span class="picit">Picture it:</span> value boxes in a row — the numbers live inside.</li>
+    </ul>
+    <pre class="mini">int[] points = new int[3];   <span class="mc">// [0, 0, 0] - three zeros inside</span></pre>
+  </div>
+
+  <div class="defcard">
+    <div class="def-head"><span class="def-not">array of objects</span><span class="def-name">word 11</span></div>
+    <ul class="def-bullets">
+      <li><strong>Definition:</strong> a numbered row of variables of a <strong>class</strong> type. Each slot stores an <strong>address</strong> — or null.</li>
+      <li>Creating the array creates <strong>no objects</strong>: every slot starts at null.</li>
+      <li><span class="picit">Picture it:</span> arrow boxes in a row. 🅿️</li>
+    </ul>
+    <pre class="mini">String[] names = new String[3];   <span class="mc">// [null, null, null] - no addresses yet</span></pre>
+  </div>
+
+  <figure class="arr-wrap">
+    <svg viewBox="0 0 680 300" role="img" aria-label="Top row: an int array named points with three boxes holding 10, 0 and 0 - the values sit inside the boxes. Bottom row: a String array named names with three boxes; box 0 holds a dot with an arrow to a card containing Amina, boxes 1 and 2 hold null.">
+      <defs>
+        <marker id="bx6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#57d9c0"/>
+        </marker>
+      </defs>
+      <text class="arr-lab" x="30" y="66">int[] points</text>
+      <rect class="arr-box" x="230" y="36" width="110" height="52" rx="8"/>
+      <rect class="arr-box" x="340" y="36" width="110" height="52" rx="8"/>
+      <rect class="arr-box" x="450" y="36" width="110" height="52" rx="8"/>
+      <text class="arr-cardname" x="285" y="69" text-anchor="middle">10</text>
+      <text class="arr-cardname" x="395" y="69" text-anchor="middle">0</text>
+      <text class="arr-cardname" x="505" y="69" text-anchor="middle">0</text>
+      <text class="arr-idx" x="285" y="106" text-anchor="middle">0</text>
+      <text class="arr-idx" x="395" y="106" text-anchor="middle">1</text>
+      <text class="arr-idx" x="505" y="106" text-anchor="middle">2</text>
+      <text class="arr-lab" x="30" y="176">String[] names</text>
+      <rect class="arr-box" x="230" y="146" width="110" height="52" rx="8"/>
+      <rect class="arr-box" x="340" y="146" width="110" height="52" rx="8"/>
+      <rect class="arr-box" x="450" y="146" width="110" height="52" rx="8"/>
+      <circle class="arr-dot" cx="285" cy="172" r="5"/>
+      <text class="arr-null" x="395" y="178" text-anchor="middle">null</text>
+      <text class="arr-null" x="505" y="178" text-anchor="middle">null</text>
+      <text class="arr-idx" x="285" y="216" text-anchor="middle">0</text>
+      <text class="arr-idx" x="395" y="216" text-anchor="middle">1</text>
+      <text class="arr-idx" x="505" y="216" text-anchor="middle">2</text>
+      <line class="arr-arrow" x1="285" y1="179" x2="230" y2="242" marker-end="url(#bx6)"/>
+      <rect class="arr-card" x="130" y="248" width="150" height="42" rx="8"/>
+      <text class="arr-cardval" x="205" y="275" text-anchor="middle">"Amina"</text>
+      <text class="arr-idx" x="460" y="272" text-anchor="middle">value boxes hold 0 when empty — arrow boxes hold null</text>
+    </svg>
+  </figure>
+
+  <div class="lesson-grid">
+    <figure class="codeblock" data-name="TwoKindsOfRows.java">
+      <figcaption><span class="fname">TwoKindsOfRows.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+      <script type="text/plain" class="src">
+public class TwoKindsOfRows {
+    public static void main(String[] args) {
+        // Row of VALUE boxes: the numbers live inside
+        int[] points = new int[3];
+        points[0] = 10;
+        System.out.println(points[0] + " " + points[1] + " " + points[2]);
+
+        // Row of ARROW boxes: they start as null
+        String[] names = new String[3];
+        names[0] = "Amina";
+        System.out.println(names[0] + " " + names[1] + " " + names[2]);
+    }
+}
+</script>
+      <script type="application/json" class="notes">
+["Both kinds of row, side by side, in 8 lines.",
+"Start.",
+"Row 1: value boxes.",
+"Three int boxes. Java fills empty VALUE boxes with 0: [0, 0, 0].",
+"Put 10 inside box 0. Inside - not an address.",
+"Prints 10 0 0. The untouched boxes show their default: zero.",
+"",
+"Row 2: arrow boxes.",
+"Three String boxes. Java fills empty ARROW boxes with null: [null, null, null]. Zero Strings were built!",
+"Build one String object, store its address in box 0.",
+"Prints Amina null null. Same experiment, different kind of box, different empty. That difference IS this lecture.",
+"Closes main().",
+"Closes the class."]
+</script>
+    </figure>
+    <aside class="inspector" aria-live="polite">
+      <div class="ins-head"><span class="ins-dot"></span> Inspector — TwoKindsOfRows.java</div>
+      <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see its explanation.</p></div>
+    </aside>
+  </div>
+
+  <details class="runbox">
+    <summary>Expected output when you run it</summary>
+    <pre>10 0 0
+Amina null null</pre>
+  </details>
+  <div class="bigidea"><b>Same experiment, two answers:</b> empty <em>value</em> box → <code>0</code>. Empty <em>arrow</em> box → <code>null</code>.</div>
+</section>
+
+<!-- ============ 7. PICTURE DICTIONARY ============ -->
+<section class="lesson" id="dictionary">
+  <h2>7 · The picture dictionary <span class="chip">keep this page open</span></h2>
+  <p class="lede">Every diagram in this course — arrays, linked lists, all of it — is built from these five pictures. This is the legend.</p>
+
+  <figure class="arr-wrap">
+    <svg viewBox="0 0 680 380" role="img" aria-label="A legend of five symbols. A value box containing 21: the value lives inside. An arrow box containing a dot: it holds an address. A box containing null: points at nothing. A teal arrow: the address itself. A card with rooms: an object living on the heap.">
+      <defs>
+        <marker id="bx7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#57d9c0"/>
+        </marker>
+      </defs>
+      <rect class="arr-box" x="60" y="40" width="120" height="56" rx="9"/>
+      <text class="arr-cardname" x="120" y="76" text-anchor="middle">21</text>
+      <text class="arr-idx" x="120" y="122" text-anchor="middle">value box = primitive variable</text>
+      <text class="arr-idx" x="120" y="142" text-anchor="middle">the value lives inside</text>
+      <rect class="arr-box" x="280" y="40" width="120" height="56" rx="9"/>
+      <circle class="arr-dot" cx="340" cy="68" r="5"/>
+      <text class="arr-idx" x="340" y="122" text-anchor="middle">arrow box = reference variable</text>
+      <text class="arr-idx" x="340" y="142" text-anchor="middle">stores an object’s address</text>
+      <rect class="arr-box" x="500" y="40" width="120" height="56" rx="9"/>
+      <text class="arr-null" x="560" y="76" text-anchor="middle">null</text>
+      <text class="arr-idx" x="560" y="122" text-anchor="middle">null</text>
+      <text class="arr-idx" x="560" y="142" text-anchor="middle">no address stored</text>
+      <line class="arr-arrow" x1="80" y1="252" x2="220" y2="252" marker-end="url(#bx7)"/>
+      <text class="arr-idx" x="150" y="296" text-anchor="middle">the arrow</text>
+      <text class="arr-idx" x="150" y="316" text-anchor="middle">the address — the dot . follows it</text>
+      <rect class="arr-card" x="400" y="204" width="200" height="100" rx="11"/>
+      <text class="arr-cardname" x="500" y="236" text-anchor="middle">Student</text>
+      <text class="arr-cardval" x="500" y="264" text-anchor="middle">name: "Amina"</text>
+      <text class="arr-cardval" x="500" y="286" text-anchor="middle">grade: 95</text>
+      <text class="arr-idx" x="500" y="340" text-anchor="middle">the card = an object, stored in the heap</text>
+    </svg>
+  </figure>
+
+  <div class="bigidea"><b>Reading any diagram:</b> value inside a box → it IS the value. Dot in a box → follow the arrow. <code>null</code> in a box → nothing to follow. Card → an object in the heap city. 🏙️</div>
+</section>
+
+<!-- ============ PRACTICE ============ -->
+<section class="lesson" id="practice">
+  <h2>Practice: predict the output <span class="chip">draw it first</span></h2>
+  <p class="lede">Two puzzles. Draw the boxes and arrows on paper, write your prediction — then reveal.</p>
+
+  <h3>Puzzle 1 — Photocopy or shared arrow?</h3>
+  <p>The same experiment runs twice: once with <code>int</code>, once with a <code>Score</code> card. What does the last line print?</p>
+  <details class="solution">
+    <summary>Show solution</summary>
+    <div class="lesson-grid">
+      <figure class="codeblock" data-name="Predict1.java">
+        <figcaption><span class="fname">Predict1.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+        <script type="text/plain" class="src">
+public class Predict1 {
+
+    static class Score {
+        int points;
+    }
+
+    public static void main(String[] args) {
+        int x = 7;
+        int y = x;
+        y = 50;
+
+        Score s1 = new Score();
+        s1.points = 7;
+        Score s2 = s1;
+        s2.points = 50;
+
+        System.out.println(x + " and " + s1.points);
+    }
+}
+</script>
+        <script type="application/json" class="notes">
+["The whole lecture in one printed line.",
+"",
+"A one-field class: Score.",
+"The field.",
+"Closes the class.",
+"",
+"Start.",
+"Value box x, 7 inside.",
+"PHOTOCOPY: y gets its own 7. Two boxes, two values.",
+"Only the copy changes. x still holds 7.",
+"",
+"One Score object built; s1 stores its address.",
+"Follow s1's arrow, write 7.",
+"ADDRESS COPY: s2 stores the SAME address. Still one object!",
+"Use s2's address, write 50 - onto the one shared object.",
+"",
+"Prints 7 and 50. The int kept its value (the VALUE was copied); the object's field changed for both names (the ADDRESS was copied). If this line makes sense, you own this lecture.",
+"Closes main().",
+"Closes the class."]
+</script>
+      </figure>
+      <aside class="inspector" aria-live="polite">
+        <div class="ins-head"><span class="ins-dot"></span> Inspector — Predict1.java</div>
+        <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see the explanation.</p></div>
+      </aside>
+    </div>
+    <details class="runbox">
+      <summary>Expected output when you run it</summary>
+      <pre>7 and 50</pre>
+    </details>
+  </details>
+
+  <h3>Puzzle 2 — What's in an empty spot?</h3>
+  <p>A <code>Score[]</code> row with only spot 0 filled. Predict both printed lines — and what the commented question would do.</p>
+  <details class="solution">
+    <summary>Show solution</summary>
+    <div class="lesson-grid">
+      <figure class="codeblock" data-name="Predict2.java">
+        <figcaption><span class="fname">Predict2.java</span><span class="btns"><button class="copybtn" type="button">Copy code</button><button class="copybtn alt" type="button" data-mode="main" title="Same program with its class renamed to Main - what Programiz, JDoodle, OnlineGDB and most online compilers expect">Copy as Main.java</button></span></figcaption>
+        <script type="text/plain" class="src">
+public class Predict2 {
+
+    static class Score {
+        int points;
+    }
+
+    public static void main(String[] args) {
+        Score[] row = new Score[2];
+        row[0] = new Score();
+        row[0].points = 10;
+
+        System.out.println(row[0].points);
+        System.out.println(row[1]);
+        // Bonus question: what would row[1].points do?
+    }
+}
+</script>
+        <script type="application/json" class="notes">
+["Arrays of objects, words 8-11 in one program.",
+"",
+"The same one-field class.",
+"The field.",
+"Closes the class.",
+"",
+"Start.",
+"Two ARROW boxes: [null, null]. Zero objects built.",
+"Build one object, store its address in spot 0. Spot 1 stays null.",
+"Use spot 0's address, write 10 into points.",
+"",
+"Spot 0 stores an address: use it, read the field points. Prints 10.",
+"Spot 1 is null. PRINTING is safe: prints the word null.",
+"But DOTTING it? row[1].points would crash with NullPointerException - a dot demands an arrow, and spot 1 has none.",
+"Closes main().",
+"Closes the class."]
+</script>
+      </figure>
+      <aside class="inspector" aria-live="polite">
+        <div class="ins-head"><span class="ins-dot"></span> Inspector — Predict2.java</div>
+        <div class="ins-body"><p class="ins-hint">Click or hover on any line of code to see the explanation.</p></div>
+      </aside>
+    </div>
+    <details class="runbox">
+      <summary>Expected output when you run it</summary>
+      <pre>10
+null</pre>
+    </details>
+  </details>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="lesson" id="quiz">
+  <h2>Quick quiz <span class="chip">5 questions</span></h2>
+  <p class="lede">Draw the picture in your head first. 📦➡️🏠</p>
+
+  <div class="quiz-q" data-answer="b">
+    <h3>1. <code>int b = a;</code> copies…</h3>
+    <label><input type="radio" name="q1" value="a"> The box itself</label>
+    <label><input type="radio" name="q1" value="b"> The value — a photocopy; two independent boxes</label>
+    <label><input type="radio" name="q1" value="c"> An arrow</label>
+    <label><input type="radio" name="q1" value="d"> Nothing until b is used</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="c">
+    <h3>2. <code>Student b = a;</code> copies…</h3>
+    <label><input type="radio" name="q2" value="a"> The whole student</label>
+    <label><input type="radio" name="q2" value="b"> Just the name field</label>
+    <label><input type="radio" name="q2" value="c"> The arrow — two boxes now point at ONE card</label>
+    <label><input type="radio" name="q2" value="d"> It builds a second card</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="a">
+    <h3>3. Right after <code>String[] names = new String[4];</code> each box holds…</h3>
+    <label><input type="radio" name="q3" value="a"> null — arrow boxes start with no arrow</label>
+    <label><input type="radio" name="q3" value="b"> An empty string ""</label>
+    <label><input type="radio" name="q3" value="c"> 0</label>
+    <label><input type="radio" name="q3" value="d"> Four new Strings</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="d">
+    <h3>4. Right after <code>int[] points = new int[4];</code> each box holds…</h3>
+    <label><input type="radio" name="q4" value="a"> null</label>
+    <label><input type="radio" name="q4" value="b"> Garbage values</label>
+    <label><input type="radio" name="q4" value="c"> Nothing — reading one crashes</label>
+    <label><input type="radio" name="q4" value="d"> 0 — value boxes start at zero</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <div class="quiz-q" data-answer="b">
+    <h3>5. <code>s</code> is null. What does <code>s.name</code> do?</h3>
+    <label><input type="radio" name="q5" value="a"> Prints null</label>
+    <label><input type="radio" name="q5" value="b"> Crashes: NullPointerException — a dot with no arrow to follow</label>
+    <label><input type="radio" name="q5" value="c"> Returns an empty string</label>
+    <label><input type="radio" name="q5" value="d"> Creates a Student automatically</label>
+    <p class="quiz-verdict"></p>
+  </div>
+
+  <button id="gradebtn" type="button">Grade my answers</button><span id="quizscore"></span>
+</section>
+
+</main>
+
+<footer class="pagefoot">
+  <p>MAC286 · Data Structures in Java — Boxes &amp; Arrows lecture — the foundations page for the whole course. Every program on this page is complete: paste it into a file named after its class (or use Copy as Main.java for online compilers) and run it.</p>
+  <p class="sig">Prof. K. Kassou · MEC Department · LaGuardia Community College</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- tiny Java syntax highlighter ---------- */
+  var KW = /\b(public|private|protected|static|final|void|class|interface|extends|implements|new|return|if|else|while|for|break|continue|throw|throws|try|catch|import|package|this|super|abstract)\b/g;
+  var TY = /\b(int|long|double|float|boolean|char|byte|short|String|Integer|Arrays|System|Math|Comparator|IndexOutOfBoundsException|ArrayIndexOutOfBoundsException|NullPointerException|Student|Score|Book|Shape|Circle|Rectangle|Library|Node|List|ArrayList|Object)\b/g;
+  var NUM = /\b(\d+(\.\d+)?)\b/g;
+
+  function esc(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function splitComment(line){
+    var inStr = false;
+    for (var i = 0; i < line.length - 1; i++){
+      var ch = line.charAt(i);
+      if (ch === '"') inStr = !inStr;
+      if (!inStr && ch === '/' && line.charAt(i+1) === '/'){
+        return [line.slice(0, i), line.slice(i)];
+      }
+    }
+    return [line, ""];
+  }
+
+  function highlight(line){
+    var parts = splitComment(line);
+    var code = parts[0], comment = parts[1];
+    var strings = [];
+    code = code.replace(/"([^"\\]|\\.)*"/g, function(m){
+      strings.push(m);
+      return "\u0001" + (strings.length - 1) + "\u0001";
+    });
+    code = esc(code)
+      .replace(KW, '<span class="tk-kw">$1</span>')
+      .replace(TY, '<span class="tk-typ">$1</span>')
+      .replace(NUM, '<span class="tk-num">$1</span>');
+    code = code.replace(/\u0001(\d+)\u0001/g, function(m, idx){
+      return '<span class="tk-str">' + esc(strings[+idx]) + '</span>';
+    });
+    if (comment){
+      code += '<span class="tk-com">' + esc(comment) + '</span>';
+    }
+    return code || "&nbsp;";
+  }
+
+  /* ---------- build each code block ---------- */
+  var blocks = document.querySelectorAll("figure.codeblock");
+
+  blocks.forEach(function(block){
+    var srcEl = block.querySelector("script.src");
+    var notesEl = block.querySelector("script.notes");
+    if (!srcEl) return;
+
+    var raw = srcEl.textContent.replace(/^\n/, "").replace(/\s+$/, "");
+    var lines = raw.split("\n");
+    var notes = [];
+    if (notesEl){
+      try { notes = JSON.parse(notesEl.textContent); } catch(e){ notes = []; }
+    }
+
+    var name = block.getAttribute("data-name") || "code";
+    var inspector = block.closest(".lesson-grid");
+    inspector = inspector ? inspector.querySelector("aside.inspector .ins-body") : null;
+    var pinned = null;
+
+    var scroller = document.createElement("div");
+    scroller.className = "codescroll";
+
+    lines.forEach(function(text, idx){
+      var row = document.createElement("div");
+      row.className = "cl";
+      row.tabIndex = 0;
+      row.setAttribute("role", "button");
+      row.setAttribute("aria-label", "Line " + (idx + 1) + " of " + name);
+
+      var ln = document.createElement("span");
+      ln.className = "ln";
+      ln.textContent = idx + 1;
+
+      var ct = document.createElement("span");
+      ct.className = "ct";
+      ct.innerHTML = highlight(text);
+
+      row.appendChild(ln);
+      row.appendChild(ct);
+      scroller.appendChild(row);
+
+      var note = (notes[idx] || "").trim();
+      if (!note){
+        note = text.trim() === ""
+          ? "A blank line - spacing that separates one group of related statements from the next."
+          : "This line is part of the statement explained on the neighboring lines - step up or down to read them.";
+      }
+
+      function show(pin){
+        scroller.querySelectorAll(".cl.active").forEach(function(el){
+          el.classList.remove("active", "pinned");
+        });
+        row.classList.add("active");
+        if (pin) row.classList.add("pinned");
+        if (!inspector) return;
+        inspector.innerHTML =
+          '<span class="ins-lineno">line ' + (idx + 1) + '</span>' +
+          '<pre class="ins-code">' + (esc(text.trim()) || "&nbsp;") + '</pre>' +
+          '<p class="ins-note">' + note + '</p>' +
+          '<p class="ins-pinstate">' + (pin
+            ? "📌 pinned - press Esc or click again to release"
+            : "hover to preview · click to pin") + '</p>';
+      }
+
+      row.addEventListener("mouseenter", function(){ if (!pinned) show(false); });
+      row.addEventListener("focus", function(){ if (!pinned) show(false); });
+      row.addEventListener("click", function(){
+        if (pinned === row){
+          pinned = null;
+          show(false);
+        } else {
+          pinned = row;
+          show(true);
+        }
+      });
+      row.addEventListener("keydown", function(ev){
+        if (ev.key === "Enter" || ev.key === " "){
+          ev.preventDefault();
+          row.click();
+        } else if (ev.key === "ArrowDown" && row.nextElementSibling){
+          ev.preventDefault();
+          pinned = null;
+          row.nextElementSibling.focus();
+        } else if (ev.key === "ArrowUp" && row.previousElementSibling){
+          ev.preventDefault();
+          pinned = null;
+          row.previousElementSibling.focus();
+        } else if (ev.key === "Escape"){
+          pinned = null;
+          show(false);
+        }
+      });
+    });
+
+    block.appendChild(scroller);
+
+    /* copy buttons: exact source, or class renamed to Main for online compilers */
+    var className = name.replace(/\.java$/, "");
+    block.querySelectorAll(".copybtn").forEach(function(btn){
+      var label = btn.textContent;
+      btn.addEventListener("click", function(){
+        var text = raw;
+        if (btn.getAttribute("data-mode") === "main"){
+          text = raw.replace(new RegExp("\\b" + className + "\\b", "g"), "Main");
+        }
+        function done(){
+          btn.textContent = "Copied ✓";
+          btn.classList.add("done");
+          setTimeout(function(){
+            btn.textContent = label;
+            btn.classList.remove("done");
+          }, 1600);
+        }
+        function fallback(){
+          var ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); done(); } catch(e){}
+          document.body.removeChild(ta);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done, function(){ fallback(); });
+        } else {
+          fallback();
+        }
+      });
+    });
+  });
+
+  /* ---------- quiz ---------- */
+  var gradeBtn = document.getElementById("gradebtn");
+  if (gradeBtn){
+    gradeBtn.addEventListener("click", function(){
+      var qs = document.querySelectorAll(".quiz-q");
+      var score = 0;
+      qs.forEach(function(q){
+        var want = q.getAttribute("data-answer");
+        var picked = q.querySelector("input:checked");
+        var verdict = q.querySelector(".quiz-verdict");
+        q.classList.remove("correct", "wrong");
+        if (picked && picked.value === want){
+          q.classList.add("correct");
+          verdict.textContent = "✓ Correct";
+          score++;
+        } else {
+          q.classList.add("wrong");
+          verdict.textContent = picked ? "✗ Not quite - revisit the matching section above." : "✗ No answer chosen.";
+        }
+      });
+      document.getElementById("quizscore").textContent = "Score: " + score + " / " + qs.length;
+    });
+  }
+})();
+</script>
+</body>
+</html>
