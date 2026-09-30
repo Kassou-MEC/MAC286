@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Java Arrays Lesson: Memory, References & Heap</title>
+    <!-- Tailwind CSS for modern responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.8); }
+        }
+        .animate-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        /* Custom scrollbar for code blocks */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex flex-col overflow-x-hidden">
+
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex items-center justify-between shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="bg-blue-600 text-white p-2 rounded-xl font-bold flex items-center justify-center shadow-md">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">Java Arrays & Memory Visualizer</h1>
+                <p class="text-xs text-slate-400">Variables as Boxes, Heap Memory, References, & Arrows</p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center space-x-2 text-sm">
+            <span class="px-3 py-1 bg-slate-800 rounded-full border border-slate-700 text-slate-300 font-medium">Interactive Lesson</span>
+            <span class="px-3 py-1 bg-blue-900/40 text-blue-300 rounded-full border border-blue-700/50">Core OOP Concepts</span>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Left Sidebar: Chapter Navigator -->
+        <nav class="w-full lg:w-80 bg-slate-900/90 border-r border-slate-800 p-5 flex flex-col space-y-3 overflow-y-auto shrink-0">
+            <h2 class="text-xs uppercase font-semibold text-slate-400 tracking-wider mb-2">Lesson Modules</h2>
+            
+            <button onclick="switchTab(1)" id="nav-btn-1" class="w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-blue-600 text-white shadow-md shadow-blue-900/30 font-medium">
+                <span class="w-6 h-6 rounded-lg bg-blue-500/50 flex items-center justify-center text-xs">1</span>
+                <div>
+                    <div class="text-sm">Variables as Boxes</div>
+                    <div class="text-xs opacity-75">Primitives vs. References</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab(2)" id="nav-btn-2" class="w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-medium border border-slate-700/40">
+                <span class="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center text-xs">2</span>
+                <div>
+                    <div class="text-sm">The Heap & Objects</div>
+                    <div class="text-xs opacity-75">Where arrays actually live</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab(3)" id="nav-btn-3" class="w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-medium border border-slate-700/40">
+                <span class="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center text-xs">3</span>
+                <div>
+                    <div class="text-sm">References & Arrows</div>
+                    <div class="text-xs opacity-75">Connecting boxes to heap objects</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab(4)" id="nav-btn-4" class="w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-medium border border-slate-700/40">
+                <span class="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center text-xs">4</span>
+                <div>
+                    <div class="text-sm">Interactive Playground</div>
+                    <div class="text-xs opacity-75">Build & execute code live</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab(5)" id="nav-btn-5" class="w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-medium border border-slate-700/40">
+                <span class="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center text-xs">5</span>
+                <div>
+                    <div class="text-sm">Common Pitfalls</div>
+                    <div class="text-xs opacity-75">Aliasing & NullPointerException</div>
+                </div>
+            </button>
+
+            <button onclick="switchTab(6)" id="nav-btn-6" class="w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-medium border border-slate-700/40">
+                <span class="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center text-xs">6</span>
+                <div>
+                    <div class="text-sm">Glossary & Key Terms</div>
+                    <div class="text-xs opacity-75">Stack, Heap, Reference, Null...</div>
+                </div>
+            </button>
+
+            <div class="mt-auto pt-6 border-t border-slate-800 text-xs text-slate-500">
+                <p>Designed for absolute clarity on Java reference semantics.</p>
+            </div>
+        </nav>
+
+        <!-- Right Content Panel -->
+        <div class="flex-1 bg-slate-950 overflow-y-auto p-6 lg:p-10">
+            
+            <!-- MODULE 1: Variables as Boxes -->
+            <div id="tab-content-1" class="space-y-8 max-w-4xl mx-auto">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-blue-400 font-semibold text-sm tracking-wide uppercase">Module 1 of 5</span>
+                    <h2 class="text-3xl font-bold text-white mt-1">Variables as Boxes (Primitives vs. Objects)</h2>
+                    <p class="text-slate-400 mt-2">Understand the fundamental container model of Java memory.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 class="text-lg font-semibold text-blue-300 flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>The "Variable as a Box" Mental Model</span>
+                    </h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        In Java, every variable can be visualized as a <strong>storage box</strong> with a specific name. However, what goes <em>inside</em> the box depends entirely on the variable's data type:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl">
+                            <h4 class="font-bold text-emerald-400 text-sm mb-2">1. Primitive Variables</h4>
+                            <p class="text-slate-300 text-sm mb-3">Holds the <strong>actual value</strong> directly inside the box (e.g., numbers, booleans, characters).</p>
+                            <div class="code-font bg-slate-900 p-3 rounded-lg text-xs text-slate-200 border border-slate-800">
+                                int score = 95;<br>
+                                <span class="text-slate-500">// Box named 'score' holds '95' directly</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl">
+                            <h4 class="font-bold text-blue-400 text-sm mb-2">2. Reference Variables (Arrays / Objects)</h4>
+                            <p class="text-slate-300 text-sm mb-3">Holds a <strong>remote address/reference</strong> (an arrow pointer) pointing to an object residing elsewhere in memory (the Heap).</p>
+                            <div class="code-font bg-slate-900 p-3 rounded-lg text-xs text-slate-200 border border-slate-800">
+                                int[] nums = new int[3];<br>
+                                <span class="text-slate-500">// Box named 'nums' holds a memory address</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Box Visualizer -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Interactive Box Comparison</h3>
+                            <p class="text-xs text-slate-400">Click buttons to load different variable declarations into memory</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="loadMod1Demo('primitive')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold transition shadow">Primitive (int)</button>
+                            <button onclick="loadMod1Demo('reference')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition shadow">Reference (Array)</button>
+                        </div>
+                    </div>
+
+                    <div id="mod1-demo-container" class="bg-slate-950 border border-slate-800 rounded-xl p-6 min-h-[220px] flex flex-col items-center justify-center">
+                        <div class="text-center text-slate-400 text-sm">Select an option above to inspect the variable box in memory.</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="switchTab(2)" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30">
+                        <span>Next: The Heap & Objects</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 2: The Heap & Objects -->
+            <div id="tab-content-2" class="space-y-8 max-w-4xl mx-auto hidden">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-blue-400 font-semibold text-sm tracking-wide uppercase">Module 2 of 5</span>
+                    <h2 class="text-3xl font-bold text-white mt-1">The Heap & Array Objects</h2>
+                    <p class="text-slate-400 mt-2">Where large data structures and objects live in Java memory.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 class="text-lg font-semibold text-blue-300 flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <span>What is the Heap?</span>
+                    </h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        The <strong>Heap</strong> is a large pool of memory dedicated to dynamic memory allocation in Java. When you use the <code class="code-font text-blue-400">new</code> keyword (e.g., <code class="code-font text-blue-400">new int[4]</code>), Java carves out space on the Heap to store the actual array object, complete with its length and individual element slots (indexes).
+                    </p>
+                    <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
+                        <div class="text-xs uppercase tracking-wider text-slate-400 font-bold">Key Characteristics of Array Objects:</div>
+                        <ul class="list-disc list-inside text-sm text-slate-300 space-y-1">
+                            <li>Arrays are <strong>objects</strong> in Java, even if they hold primitive types.</li>
+                            <li>They have a fixed size determined upon creation (<code class="code-font text-amber-400">array.length</code>).</li>
+                            <li>Elements are stored contiguously in memory with zero-based indexing (<code class="code-font text-amber-400">0</code> to <code class="code-font text-amber-400">length - 1</code>).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interactive Heap Visualizer -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                    <h3 class="text-lg font-semibold text-white">Anatomy of an Array Object on the Heap</h3>
+                    <p class="text-xs text-slate-400">Examine how an array is structured in memory when created with <code class="code-font text-blue-400">new int[4]</code>.</p>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 flex flex-col items-center">
+                        <div class="border-2 border-indigo-500/60 bg-indigo-950/20 rounded-xl p-5 w-full max-w-lg shadow-lg relative">
+                            <div class="absolute -top-3 left-4 bg-indigo-600 text-white text-xs px-3 py-0.5 rounded-full font-mono uppercase tracking-wider">Heap Memory Object (#@40f8)</div>
+                            
+                            <div class="mt-2 mb-4 flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-800 text-xs">
+                                <span class="text-slate-400">Property: <strong class="text-white">length</strong></span>
+                                <span class="bg-indigo-600/30 text-indigo-300 px-2 py-0.5 rounded font-mono font-bold">4</span>
+                            </div>
+
+                            <div class="text-xs text-slate-400 mb-2 font-semibold">Array Elements (Boxes inside the Object):</div>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-center">
+                                    <div class="text-[10px] text-slate-500 font-mono mb-1">Index [0]</div>
+                                    <div class="code-font text-emerald-400 font-bold text-lg">0</div>
+                                </div>
+                                <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-center">
+                                    <div class="text-[10px] text-slate-500 font-mono mb-1">Index [1]</div>
+                                    <div class="code-font text-emerald-400 font-bold text-lg">0</div>
+                                </div>
+                                <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-center">
+                                    <div class="text-[10px] text-slate-500 font-mono mb-1">Index [2]</div>
+                                    <div class="code-font text-emerald-400 font-bold text-lg">0</div>
+                                </div>
+                                <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-center">
+                                    <div class="text-[10px] text-slate-500 font-mono mb-1">Index [3]</div>
+                                    <div class="code-font text-emerald-400 font-bold text-lg">0</div>
+                                </div>
+                            </div>
+                            <div class="text-[11px] text-slate-400 text-center mt-3">Notice: Java automatically initializes numeric arrays with default value <code class="code-font text-amber-400">0</code>.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="switchTab(1)" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <span>Previous</span>
+                    </button>
+                    <button onclick="switchTab(3)" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30">
+                        <span>Next: References & Arrows</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 3: References & Arrows -->
+            <div id="tab-content-3" class="space-y-8 max-w-4xl mx-auto hidden">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-blue-400 font-semibold text-sm tracking-wide uppercase">Module 3 of 5</span>
+                    <h2 class="text-3xl font-bold text-white mt-1">References & Arrows (Connecting the Stack to Heap)</h2>
+                    <p class="text-slate-400 mt-2">How variables hook up to objects in memory using reference arrows.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 class="text-lg font-semibold text-blue-300 flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span>The Arrow Mental Model</span>
+                    </h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        When you write <code class="code-font text-blue-400">int[] arr = new int[3];</code>, two distinct things happen in memory simultaneously:
+                    </p>
+                    <ol class="list-decimal list-inside text-sm text-slate-300 space-y-2">
+                        <li>A stack variable box named <code class="code-font text-amber-400">arr</code> is created.</li>
+                        <li>An array object is instantiated on the heap.</li>
+                        <li>An <strong>arrow (reference address)</strong> is stored inside the <code class="code-font text-amber-400">arr</code> box pointing directly to that heap object.</li>
+                    </ol>
+                    <div class="bg-amber-950/20 border border-amber-700/40 p-4 rounded-xl text-xs text-amber-300 flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <div>
+                            <strong>Crucial Distinction:</strong> The variable box <code class="code-font text-amber-200">arr</code> is <em>not</em> the array itself. It is merely a remote control holding the address of the array!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Reference & Arrow Diagram -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                    <h3 class="text-lg font-semibold text-white">Visual Memory Diagram: Stack vs. Heap</h3>
+                    <p class="text-xs text-slate-400">Step through code execution to watch the reference arrow form in real-time.</p>
+
+                    <div class="flex items-center justify-center space-x-4 mb-4">
+                        <button onclick="setStepAnim(1)" id="step-btn-1" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold transition">Step 1: Declaration</button>
+                        <button onclick="setStepAnim(2)" id="step-btn-2" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold transition">Step 2: Instantiation & Arrow</button>
+                        <button onclick="setStepAnim(3)" id="step-btn-3" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold transition">Step 3: Assignment</button>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-8 min-h-[300px] flex flex-col md:flex-row items-center justify-around gap-8 relative overflow-hidden">
+                        
+                        <!-- Stack Box Area -->
+                        <div class="flex flex-col items-center space-y-2">
+                            <span class="text-xs uppercase font-bold tracking-wider text-slate-400">Stack Memory</span>
+                            <div id="stack-box" class="bg-slate-900 border-2 border-slate-700 rounded-xl p-4 w-40 text-center transition-all duration-300">
+                                <div class="text-xs text-slate-400 font-mono mb-1">int[] data</div>
+                                <div id="stack-value" class="code-font text-sm text-slate-500 font-bold bg-slate-950 py-2 rounded border border-slate-800">null</div>
+                            </div>
+                        </div>
+
+                        <!-- Arrow Container -->
+                        <div class="flex flex-col items-center justify-center h-16 w-32 relative">
+                            <div id="arrow-line" class="w-full h-1 bg-slate-700 transition-all duration-300 relative opacity-20">
+                                <div class="absolute right-0 -top-1.5 w-0 h-0 border-t-4 border-b-4 border-l-8 border-t-transparent border-b-transparent border-l-slate-700" id="arrow-head"></div>
+                            </div>
+                            <span id="arrow-label" class="text-[10px] text-slate-500 font-mono mt-1 opacity-0 transition-opacity">Reference Address</span>
+                        </div>
+
+                        <!-- Heap Object Area -->
+                        <div class="flex flex-col items-center space-y-2">
+                            <span class="text-xs uppercase font-bold tracking-wider text-slate-400">Heap Memory</span>
+                            <div id="heap-object" class="bg-slate-900 border-2 border-slate-800 opacity-40 rounded-xl p-4 w-64 text-center transition-all duration-300">
+                                <div class="text-xs text-indigo-400 font-mono mb-2">Array Object [length: 3]</div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="bg-slate-950 p-2 rounded border border-slate-800 text-xs text-slate-300">[0]: <span id="heap-el-0" class="text-emerald-400">0</span></div>
+                                    <div class="bg-slate-950 p-2 rounded border border-slate-800 text-xs text-slate-300">[1]: <span id="heap-el-1" class="text-emerald-400">0</span></div>
+                                    <div class="bg-slate-950 p-2 rounded border border-slate-800 text-xs text-slate-300">[2]: <span id="heap-el-2" class="text-emerald-400">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="step-explanation" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm text-slate-300">
+                        <strong>Current Step:</strong> Click <code class="code-font text-blue-400">Step 1</code> above to begin the memory walkthrough.
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="switchTab(2)" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <span>Previous</span>
+                    </button>
+                    <button onclick="switchTab(4)" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30">
+                        <span>Next: Interactive Playground</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 4: Interactive Playground -->
+            <div id="tab-content-4" class="space-y-8 max-w-4xl mx-auto hidden">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-blue-400 font-semibold text-sm tracking-wide uppercase">Module 4 of 5</span>
+                    <h2 class="text-3xl font-bold text-white mt-1">Interactive Array Builder & Simulator</h2>
+                    <p class="text-slate-400 mt-2">Write simulated Java code and instantly see the stack box, heap object, and reference arrows update!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Code Editor Control Panel -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col space-y-4">
+                        <h3 class="text-lg font-semibold text-white flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                            <span>Java Code Input</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Configure your array parameters and run simulation:</p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Variable Name:</label>
+                                <input type="text" id="sim-var-name" value="scores" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 code-font focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Array Size (Length):</label>
+                                <input type="number" id="sim-size" min="1" max="6" value="4" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 code-font focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Initial Values (comma-separated):</label>
+                                <input type="text" id="sim-values" value="85, 92, 78, 90" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 code-font focus:outline-none focus:border-blue-500">
+                            </div>
+                            <button onclick="runSimulation()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Execute & Visualize Memory</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300">
+                            <span class="text-purple-400">int[]</span> <span id="code-preview-name" class="text-blue-300">scores</span> = <span class="text-purple-400">new</span> <span class="text-purple-400">int</span>[<span id="code-preview-size" class="text-amber-300">4</span>];
+                        </div>
+                    </div>
+
+                    <!-- Visual Memory Output Panel -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4">
+                        <h3 class="text-lg font-semibold text-white">Live Memory Graph</h3>
+                        
+                        <div id="sim-output-canvas" class="bg-slate-950 border border-slate-800 rounded-xl p-6 flex-1 flex flex-col items-center justify-center space-y-6 min-h-[300px]">
+                            <div class="text-center text-slate-500 text-sm">Click "Execute & Visualize Memory" to render the stack box and heap object.</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="switchTab(3)" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <span>Previous</span>
+                    </button>
+                    <button onclick="switchTab(5)" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30">
+                        <span>Next: Common Pitfalls</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 5: Common Pitfalls & Aliasing -->
+            <div id="tab-content-5" class="space-y-8 max-w-4xl mx-auto hidden">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-blue-400 font-semibold text-sm tracking-wide uppercase">Module 5 of 5</span>
+                    <h2 class="text-3xl font-bold text-white mt-1">Common Pitfalls: Aliasing & NullPointerException</h2>
+                    <p class="text-slate-400 mt-2">Master the common bugs caused by misunderstanding reference arrows.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Pitfall 1: Aliasing -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-amber-500/20 text-amber-400 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">1. Array Aliasing</h3>
+                                <p class="text-xs text-slate-400">Two boxes pointing to the exact same heap object</p>
+                            </div>
+                        </div>
+
+                        <div class="code-font bg-slate-950 p-3 rounded-xl text-xs text-slate-300 border border-slate-800 space-y-1">
+                            <span class="text-purple-400">int[]</span> a = {10, 20, 30};<br>
+                            <span class="text-purple-400">int[]</span> b = a; <span class="text-slate-500">// Copies reference arrow!</span><br>
+                            b[0] = 99;<br>
+                            <span class="text-slate-500">System.out.println(a[0]); // Prints 99!</span>
+                        </div>
+
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Because variable <code class="code-font text-amber-300">b</code> was assigned the value of <code class="code-font text-amber-300">a</code>, both reference boxes point to the <strong>same single array object</strong> on the heap. Modifying through <code class="code-font text-amber-300">b</code> changes what <code class="code-font text-amber-300">a</code> sees!
+                        </p>
+                    </div>
+
+                    <!-- Pitfall 2: NullPointerException -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-rose-500/20 text-rose-400 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">2. NullPointerException</h3>
+                                <p class="text-xs text-slate-400">An arrow pointing to nothingness (<code class="code-font text-rose-400">null</code>)</p>
+                            </div>
+                        </div>
+
+                        <div class="code-font bg-slate-950 p-3 rounded-xl text-xs text-slate-300 border border-slate-800 space-y-1">
+                            <span class="text-purple-400">int[]</span> list;<br>
+                            <span class="text-slate-500">// list box holds 'null' (no arrow)</span><br>
+                            <span class="text-rose-400">System.out.println(list.length);</span><br>
+                            <span class="text-rose-400 font-bold">// CRASH: NullPointerException!</span>
+                        </div>
+
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Declaring a reference variable without <code class="code-font text-blue-400">new</code> initializes the box with <code class="code-font text-rose-400">null</code> (an empty, broken arrow). Trying to access length or elements attempts to follow a non-existent arrow, crashing your program.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border border-blue-700/40 rounded-2xl p-6 text-center space-y-3">
+                    <h3 class="text-lg font-bold text-white">Lesson Complete! 🎓</h3>
+                    <p class="text-slate-300 text-sm max-w-xl mx-auto">You now understand how Java variables act as boxes, how arrays live on the heap, and how reference arrows connect them together.</p>
+                    <button onclick="switchTab(1)" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition shadow-lg">Review from Module 1</button>
+                </div>
+
+                <div class="flex justify-start">
+                    <button onclick="switchTab(4)" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <span>Previous</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 6: Glossary & Key Terms -->
+            <div id="tab-content-6" class="space-y-8 max-w-4xl mx-auto hidden">
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-blue-400 font-semibold text-sm tracking-wide uppercase">Module 6 of 6</span>
+                    <h2 class="text-3xl font-bold text-white mt-1">Glossary & Key Memory Terms</h2>
+                    <p class="text-slate-400 mt-2">Explicit definitions and explanations for every essential Java memory concept.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Term 1: Variable -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-amber-300 code-font">Variable</h3>
+                            <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Container</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            A named container box in memory used to store data values. In Java, a variable can hold either a primitive value directly or a memory reference address pointing to an object.
+                        </p>
+                    </div>
+
+                    <!-- Term 2: Primitive -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-emerald-300 code-font">Primitive</h3>
+                            <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-mono">Data Type</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Basic built-in data types (like <code class="code-font text-emerald-300">int</code>, <code class="code-font text-emerald-300">double</code>, <code class="code-font text-emerald-300">boolean</code>, <code class="code-font text-emerald-300">char</code>) that store their actual literal value directly inside their variable box.
+                        </p>
+                    </div>
+
+                    <!-- Term 3: Stack -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-blue-300 code-font">Stack Memory</h3>
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono">Scope Memory</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            A region of memory where local variables and method call frames are stored. Stack allocation is fast and automatic, structured in a Last-In, First-Out (LIFO) order.
+                        </p>
+                    </div>
+
+                    <!-- Term 4: Heap -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-indigo-300 code-font">Heap Memory</h3>
+                            <span class="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded font-mono">Dynamic Pool</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            A large pool of dynamic memory used to store all Java objects and arrays created with the <code class="code-font text-indigo-300">new</code> keyword. Heap objects persist until garbage-collected.
+                        </p>
+                    </div>
+
+                    <!-- Term 5: Object -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-purple-300 code-font">Object</h3>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded font-mono">Instance</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            An instance of a class or array residing on the heap containing state (data fields or elements) and behavior. In Java, arrays are objects.
+                        </p>
+                    </div>
+
+                    <!-- Term 6: Reference -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-cyan-300 code-font">Reference</h3>
+                            <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded font-mono">Pointer Address</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            A memory address value stored inside a reference variable box that acts as a pointer or remote control directing access to an object on the heap.
+                        </p>
+                    </div>
+
+                    <!-- Term 7: Arrow -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-teal-300 code-font">Reference Arrow</h3>
+                            <span class="text-xs bg-teal-500/20 text-teal-400 px-2 py-0.5 rounded font-mono">Visual Link</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            The visual mental model and diagrammatic link connecting a stack reference variable box to its corresponding target object residing in the heap.
+                        </p>
+                    </div>
+
+                    <!-- Term 8: Array -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-rose-300 code-font">Array</h3>
+                            <span class="text-xs bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-mono">Data Structure</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            A fixed-size data structure object stored on the heap that holds a collection of values of the same data type in contiguous memory locations.
+                        </p>
+                    </div>
+
+                    <!-- Term 9: Index -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-sky-300 code-font">Index</h3>
+                            <span class="text-xs bg-sky-500/20 text-sky-400 px-2 py-0.5 rounded font-mono">Position Key</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            The integer offset position of an element within an array. Java uses zero-based indexing, meaning the first element is at index <code class="code-font text-sky-300">0</code> and the last is at <code class="code-font text-sky-300">length - 1</code>.
+                        </p>
+                    </div>
+
+                    <!-- Term 10: Null -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-red-300 code-font">Null</h3>
+                            <span class="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-mono">Empty Pointer</span>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            A special literal value indicating that a reference variable box currently points to no object at all (an empty or broken arrow). Attempting to use a null reference causes a <code class="code-font text-red-300">NullPointerException</code>.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-start">
+                    <button onclick="switchTab(5)" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <span>Previous</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Tab switching logic
+        function switchTab(tabNum) {
+            for (let i = 1; i <= 6; i++) {
+                const content = document.getElementById(`tab-content-${i}`);
+                const btn = document.getElementById(`nav-btn-${i}`);
+                if (content) content.classList.add('hidden');
+                if (btn) {
+                    btn.className = "w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-medium border border-slate-700/40";
+                    const numSpan = btn.querySelector('span');
+                    if (numSpan) numSpan.className = "w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center text-xs";
+                }
+            }
+
+            const activeContent = document.getElementById(`tab-content-${tabNum}`);
+            const activeBtn = document.getElementById(`nav-btn-${tabNum}`);
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.className = "w-full text-left p-3 rounded-xl transition-all flex items-center space-x-3 bg-blue-600 text-white shadow-md shadow-blue-900/30 font-medium";
+                const numSpan = activeBtn.querySelector('span');
+                if (numSpan) numSpan.className = "w-6 h-6 rounded-lg bg-blue-500/50 flex items-center justify-center text-xs";
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Module 1 Demo Loader
+        function loadMod1Demo(type) {
+            const container = document.getElementById('mod1-demo-container');
+            if (type === 'primitive') {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center space-y-4 animate-fadeIn">
+                        <div class="text-xs uppercase font-bold tracking-wider text-emerald-400">Primitive Variable Box</div>
+                        <div class="bg-slate-900 border-2 border-emerald-500/60 rounded-xl p-4 w-48 text-center shadow-lg shadow-emerald-950/50">
+                            <div class="text-xs text-slate-400 font-mono mb-1">int score = 95;</div>
+                            <div class="code-font text-emerald-400 font-bold text-2xl bg-slate-950 py-3 rounded-lg border border-slate-800">95</div>
+                        </div>
+                        <p class="text-xs text-slate-300 text-center max-w-md">The literal value <strong class="text-emerald-400">95</strong> lives directly inside the variable box named <code class="code-font text-emerald-300">score</code>.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center space-y-4 animate-fadeIn">
+                        <div class="text-xs uppercase font-bold tracking-wider text-blue-400">Reference Variable Box</div>
+                        <div class="bg-slate-900 border-2 border-blue-500/60 rounded-xl p-4 w-48 text-center shadow-lg shadow-blue-950/50">
+                            <div class="text-xs text-slate-400 font-mono mb-1">int[] nums = ...</div>
+                            <div class="code-font text-blue-400 font-bold text-lg bg-slate-950 py-3 rounded-lg border border-slate-800 flex items-center justify-center space-x-2">
+                                <span>🔗 0x7a8f</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-300 text-center max-w-md">The variable box holds an <strong class="text-blue-400">address pointer (reference arrow)</strong> pointing to an array object elsewhere in memory.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Module 3 Animation Steps
+        function setStepAnim(step) {
+            const stackBox = document.getElementById('stack-box');
+            const stackVal = document.getElementById('stack-value');
+            const arrowLine = document.getElementById('arrow-line');
+            const arrowHead = document.getElementById('arrow-head');
+            const arrowLabel = document.getElementById('arrow-label');
+            const heapObj = document.getElementById('heap-object');
+            const exp = document.getElementById('step-explanation');
+
+            // Reset buttons
+            for(let i=1; i<=3; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                if(btn) btn.className = "px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold transition";
+            }
+            const activeBtn = document.getElementById(`step-btn-${step}`);
+            if(activeBtn) activeBtn.className = "px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold transition shadow";
+
+            if (step === 1) {
+                stackBox.className = "bg-slate-900 border-2 border-amber-500 rounded-xl p-4 w-40 text-center transition-all duration-300 animate-glow";
+                stackVal.innerText = "null";
+                stackVal.className = "code-font text-sm text-amber-400 font-bold bg-slate-950 py-2 rounded border border-slate-800";
+                arrowLine.style.opacity = "0.2";
+                arrowHead.style.borderLeftColor = "#334155";
+                arrowLabel.style.opacity = "0";
+                heapObj.style.opacity = "0.4";
+                heapObj.className = "bg-slate-900 border-2 border-slate-800 opacity-40 rounded-xl p-4 w-64 text-center transition-all duration-300";
+                exp.innerHTML = "<strong>Step 1: Declaration (<code class='code-font text-amber-300'>int[] data;</code>)</strong> — A stack variable box named <code class='code-font text-amber-300'>data</code> is created. It currently holds <code class='code-font text-amber-300'>null</code> (no arrow points anywhere yet).";
+            } else if (step === 2) {
+                stackBox.className = "bg-slate-900 border-2 border-blue-500 rounded-xl p-4 w-40 text-center transition-all duration-300";
+                stackVal.innerText = "0x91F2";
+                stackVal.className = "code-font text-sm text-blue-400 font-bold bg-slate-950 py-2 rounded border border-slate-800";
+                arrowLine.style.opacity = "1";
+                arrowLine.className = "w-full h-1 bg-blue-500 transition-all duration-300 relative animate-glow";
+                arrowHead.style.borderLeftColor = "#3b82f6";
+                arrowLabel.style.opacity = "1";
+                heapObj.style.opacity = "1";
+                heapObj.className = "bg-slate-900 border-2 border-indigo-500 rounded-xl p-4 w-64 text-center transition-all duration-300 shadow-xl shadow-indigo-950/50";
+                exp.innerHTML = "<strong>Step 2: Instantiation (<code class='code-font text-blue-300'>data = new int[3];</code>)</strong> — An array object is created on the heap. A <strong>reference arrow</strong> forms instantly from the stack box into the heap object!";
+            } else if (step === 3) {
+                stackBox.className = "bg-slate-900 border-2 border-emerald-500 rounded-xl p-4 w-40 text-center transition-all duration-300";
+                stackVal.innerText = "0x91F2";
+                stackVal.className = "code-font text-sm text-emerald-400 font-bold bg-slate-950 py-2 rounded border border-slate-800";
+                arrowLine.className = "w-full h-1 bg-emerald-500 transition-all duration-300 relative";
+                arrowHead.style.borderLeftColor = "#10b981";
+                arrowLabel.style.opacity = "1";
+                heapObj.className = "bg-slate-900 border-2 border-emerald-500 rounded-xl p-4 w-64 text-center transition-all duration-300 shadow-xl";
+                document.getElementById('heap-el-0').innerText = "42";
+                document.getElementById('heap-el-1').innerText = "17";
+                document.getElementById('heap-el-2').innerText = "99";
+                exp.innerHTML = "<strong>Step 3: Element Assignment (<code class='code-font text-emerald-300'>data[0] = 42; ...</code>)</strong> — The stack box still holds the same arrow address, but the individual element boxes inside the heap object now store assigned values!";
+            }
+        }
+
+        // Module 4 Interactive Playground Simulation
+        function runSimulation() {
+            const varName = document.getElementById('sim-var-name').value.trim() || "arr";
+            const size = parseInt(document.getElementById('sim-size').value) || 3;
+            const rawVals = document.getElementById('sim-values').value.split(',').map(v => v.trim());
+            
+            document.getElementById('code-preview-name').innerText = varName;
+            document.getElementById('code-preview-size').innerText = size;
+
+            let elementsHTML = '';
+            for(let i=0; i<size; i++) {
+                let val = rawVals[i] !== undefined && rawVals[i] !== "" ? rawVals[i] : "0";
+                elementsHTML += `
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-center">
+                        <div class="text-[10px] text-slate-500 font-mono mb-0.5">[${i}]</div>
+                        <div class="code-font text-emerald-400 font-bold text-sm">${val}</div>
+                    </div>
+                `;
+            }
+
+            const canvas = document.getElementById('sim-output-canvas');
+            canvas.innerHTML = `
+                <div class="w-full flex flex-col md:flex-row items-center justify-around gap-6 py-4">
+                    <!-- Stack Box -->
+                    <div class="flex flex-col items-center space-y-2">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Stack Memory</span>
+                        <div class="bg-slate-900 border-2 border-blue-500 rounded-xl p-4 w-36 text-center shadow-lg">
+                            <div class="text-[11px] text-slate-400 font-mono mb-1">int[] ${varName}</div>
+                            <div class="code-font text-xs text-blue-400 font-bold bg-slate-950 py-2 rounded border border-slate-800">🔗 0x8F2A</div>
+                        </div>
+                    </div>
+
+                    <!-- Arrow Indicator -->
+                    <div class="hidden md:flex flex-col items-center justify-center">
+                        <div class="w-16 h-1 bg-blue-500 relative">
+                            <div class="absolute right-0 -top-1.5 w-0 h-0 border-t-4 border-b-4 border-l-8 border-t-transparent border-b-transparent border-l-blue-500"></div>
+                        </div>
+                        <span class="text-[9px] text-slate-500 font-mono mt-1">Reference</span>
+                    </div>
+
+                    <!-- Heap Object -->
+                    <div class="flex flex-col items-center space-y-2">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Heap Memory Object</span>
+                        <div class="bg-slate-900 border-2 border-indigo-500 rounded-xl p-4 w-full max-w-xs text-center shadow-xl">
+                            <div class="text-[11px] text-indigo-300 font-mono mb-2 flex justify-between px-1">
+                                <span>Type: int[]</span>
+                                <span>length: ${size}</span>
+                            </div>
+                            <div class="grid grid-cols-${Math.min(size, 4)} gap-2">
+                                ${elementsHTML}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-800/50 px-4 py-2 rounded-lg text-center">
+                    ✓ Successfully simulated variable <code class="code-font text-white">${varName}</code> pointing to heap array of size ${size}.
+                </div>
+            `;
+        }
+
+        // Initialize default demo on load
+        window.onload = function() {
+            loadMod1Demo('primitive');
+            runSimulation();
+        };
+    </script>
+</body>
+</html>
