@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering Java Array Sorting: Concepts, Definitions, Table & Complete Examples</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-pink: #f472b6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+            color: #ffffff;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent-blue);
+        }
+
+        p, ul, ol {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #131c2e;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-muted);
+        }
+
+        td strong {
+            color: var(--text-main);
+        }
+
+        /* Definition Box Callouts */
+        .definition-box {
+            background-color: #131c2e;
+            border-left: 4px solid var(--accent-amber);
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .definition-box strong {
+            color: var(--accent-amber);
+        }
+
+        /* Code Block Styling */
+        .code-container {
+            position: relative;
+            background-color: #090d16;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background-color: #131c2e;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        pre {
+            padding: 1.25rem;
+            overflow-x: auto;
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .kw { color: #f472b6; font-weight: bold; }
+        .type { color: #38bdf8; }
+        .str { color: #a5f3fc; }
+        .num { color: #fbbf24; }
+        .com { color: #64748b; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Mastering Java Array Sorting</h1>
+        <p>Definitions, Concepts, Algorithm Comparison Table, and Complete Runnable Code</p>
+    </header>
+
+    <!-- SECTION 1: INTRO & DEFINITIONS -->
+    <div class="card">
+        <h2>1. Introduction & Key Terminology</h2>
+        <p>
+            When we talk about sorting an array in Java, we are rearranging the elements stored in contiguous heap memory into a strict sequence (ascending or descending). To understand sorting deeply, let's establish core definitions:
+        </p>
+
+        <div class="definition-box">
+            <strong>What is Sorting?</strong> The algorithmic process of organizing elements by comparing their values and repositioning them relative to one another.
+        </div>
+
+        <div class="definition-box">
+            <strong>What is a Swap?</strong> Because array elements cannot magically move past each other in memory, sorting requires temporarily holding a value in a variable so two slots can exchange contents:
+            <br><code>int temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;</code>
+        </div>
+
+        <div class="definition-box">
+            <strong>What is Time Complexity (Big-O)?</strong> A mathematical notation describing how execution time scales as the array size ($n$) grows. 
+            <ul>
+                <li><strong>O(n) - Linear Time:</strong> Execution scales directly and efficiently with size.</li>
+                <li><strong>O(n²) - Quadratic Time:</strong> Requires nested loops (comparing every element against every other element). Typical for simple sorting algorithms.</li>
+                <li><strong>O(n log n) - Log-Linear Time:</strong> Highly optimized divide-and-conquer efficiency.</li>
+            </ul>
+        </div>
+
+        <h3>Algorithm Comparison Matrix</h3>
+        <p>Before diving into individual implementations, use this reference table to compare how each algorithm performs across different scenarios:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Best Time (Already Sorted)</th>
+                    <th>Average Time</th>
+                    <th>Worst Time (Reverse Sorted)</th>
+                    <th>Space Complexity (Memory)</th>
+                    <th>Stability</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Bubble Sort</strong></td>
+                    <td><strong>O(n)</strong> (with optimization)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td><strong>O(1)</strong> (In-place)</td>
+                    <td>Stable</td>
+                </tr>
+                <tr>
+                    <td><strong>Selection Sort</strong></td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td><strong>O(1)</strong> (In-place)</td>
+                    <td>Unstable</td>
+                </tr>
+                <tr>
+                    <td><strong>Insertion Sort</strong></td>
+                    <td><strong>O(n)</strong></td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td><strong>O(1)</strong> (In-place)</td>
+                    <td>Stable</td>
+                </tr>
+                <tr>
+                    <td><strong>Quick Sort</strong></td>
+                    <td>O(n log n)</td>
+                    <td><strong>O(n log n)</strong></td>
+                    <td>O(n²) (poor pivot)</td>
+                    <td>O(log n) (recursion stack)</td>
+                    <td>Unstable</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECTION 2: BUBBLE SORT -->
+    <div class="card">
+        <h2>2. Bubble Sort</h2>
+        <p>
+            <strong>Definition:</strong> Bubble Sort is a straightforward sorting algorithm that repeatedly steps through the array, compares adjacent elements, and swaps them if they are in the wrong order. 
+        </p>
+        <p>
+            <strong>How it works conceptually:</strong> Imagine heavy numbers sinking to the bottom while light numbers "bubble" up to the top. In each full pass through the array, the largest unsorted element bubbles up to its final correct position on the far right.
+        </p>
+
+        <h3>Complete Runnable Example: Bubble Sort</h3>
+        <div class="code-container">
+            <div class="code-header">
+                <span>BubbleSortMaster.java</span>
+                <button class="copy-btn" onclick="copyCode('code-bubble')">Copy Code</button>
+            </div>
+            <pre id="code-bubble"><span class="kw">public class</span> <span class="type">BubbleSortMaster</span> {
+    <span class="kw">public static void</span> <span class="type">main</span>(<span class="type">String</span>[] args) {
+        <span class="type">int</span>[] numbers = {<span class="num">64</span>, <span class="num">34</span>, <span class="num">25</span>, <span class="num">12</span>, <span class="num">22</span>, <span class="num">11</span>, <span class="num">90</span>};
+
+        System.out.println(<span class="str">"--- Before Bubble Sort ---"</span>);
+        printArray(numbers);
+
+        <span class="com">// Outer loop controls the number of passes</span>
+        <span class="kw">for</span> (<span class="type">int</span> i = <span class="num">0</span>; i < numbers.length - <span class="num">1</span>; i++) {
+            <span class="kw">boolean</span> swapped = <span class="kw">false</span>;
+
+            <span class="com">// Inner loop performs adjacent comparisons</span>
+            <span class="kw">for</span> (<span class="type">int</span> j = <span class="num">0</span>; j < numbers.length - i - <span class="num">1</span>; j++) {
+                <span class="com">// If left element is greater than right, swap them</span>
+                <span class="kw">if</span> (numbers[j] > numbers[j + <span class="num">1</span>]) {
+                    <span class="type">int</span> temp = numbers[j];
+                    numbers[j] = numbers[j + <span class="num">1</span>];
+                    numbers[j + <span class="num">1</span>] = temp;
+                    swapped = <span class="kw">true</span>;
+                }
+            }
+
+            <span class="com">// Optimization: if no swaps occurred, array is already sorted!</span>
+            <span class="kw">if</span> (!swapped) {
+                <span class="kw">break</span>;
+            }
+        }
+
+        System.out.println(<span class="str">"--- After Bubble Sort ---"</span>);
+        printArray(numbers);
+    }
+
+    <span class="kw">public static void</span> <span class="type">printArray</span>(<span class="type">int</span>[] arr) {
+        <span class="kw">for</span> (<span class="type">int</span> n : arr) {
+            System.out.print(n + <span class="str">" "</span>);
+        }
+        System.out.println();
+    }
+}</pre>
+        </div>
+    </div>
+
+    <!-- SECTION 3: SELECTION SORT -->
+    <div class="card">
+        <h2>3. Selection Sort</h2>
+        <p>
+            <strong>Definition:</strong> Selection Sort divides the array into two regions: a <em>sorted</em> region on the left and an <em>unsorted</em> region on the right. It repeatedly scans the unsorted region to find the minimum value, then swaps it into the next available spot in the sorted region.
+        </p>
+
+        <h3>Complete Runnable Example: Selection Sort</h3>
+        <div class="code-container">
+            <div class="code-header">
+                <span>SelectionSortMaster.java</span>
+                <button class="copy-btn" onclick="copyCode('code-selection')">Copy Code</button>
+            </div>
+            <pre id="code-selection"><span class="kw">public class</span> <span class="type">SelectionSortMaster</span> {
+    <span class="kw">public static void</span> <span class="type">main</span>(<span class="type">String</span>[] args) {
+        <span class="type">int</span>[] scores = {<span class="num">85</span>, <span class="num">42</span>, <span class="num">99</span>, <span class="num">58</span>, <span class="num">71</span>};
+
+        System.out.println(<span class="str">"--- Before Selection Sort ---"</span>);
+        printArray(scores);
+
+        <span class="kw">for</span> (<span class="type">int</span> i = <span class="num">0</span>; i < scores.length - <span class="num">1</span>; i++) {
+            <span class="com">// Assume the first element of the unsorted region is the minimum</span>
+            <span class="type">int</span> minIndex = i;
+
+            <span class="com">// Scan the rest of the array to find a smaller element</span>
+            <span class="kw">for</span> (<span class="type">int</span> j = i + <span class="num">1</span>; j < scores.length; j++) {
+                <span class="kw">if</span> (scores[j] < scores[minIndex]) {
+                    minIndex = j; <span class="com">// Update index of new minimum</span>
+                }
+            }
+
+            <span class="com">// Swap the found minimum with the current starting position (i)</span>
+            <span class="type">int</span> temp = scores[minIndex];
+            scores[minIndex] = scores[i];
+            scores[i] = temp;
+        }
+
+        System.out.println(<span class="str">"--- After Selection Sort ---"</span>);
+        printArray(scores);
+    }
+
+    <span class="kw">public static void</span> <span class="type">printArray</span>(<span class="type">int</span>[] arr) {
+        <span class="kw">for</span> (<span class="type">int</span> n : arr) {
+            System.out.print(n + <span class="str">" "</span>);
+        }
+        System.out.println();
+    }
+}</pre>
+        </div>
+    </div>
+
+    <!-- SECTION 4: INSERTION SORT -->
+    <div class="card">
+        <h2>4. Insertion Sort</h2>
+        <p>
+            <strong>Definition:</strong> Insertion Sort builds the final sorted array one item at a time. It takes an element, compares it backward against the already sorted section, and shifts larger elements to the right until it finds the exact correct slot to "insert" the element (analogous to sorting playing cards in your hand).
+        </p>
+
+        <h3>Complete Runnable Example: Insertion Sort</h3>
+        <div class="code-container">
+            <div class="code-header">
+                <span>InsertionSortMaster.java</span>
+                <button class="copy-btn" onclick="copyCode('code-insertion')">Copy Code</button>
+            </div>
+            <pre id="code-insertion"><span class="kw">public class</span> <span class="type">InsertionSortMaster</span> {
+    <span class="kw">public static void</span> <span class="type">main</span>(<span class="type">String</span>[] args) {
+        <span class="type">int</span>[] arr = {<span class="num">12</span>, <span class="num">11</span>, <span class="num">13</span>, <span class="num">5</span>, <span class="num">6</span>};
+
+        System.out.println(<span class="str">"--- Before Insertion Sort ---"</span>);
+        printArray(arr);
+
+        <span class="kw">for</span> (<span class="type">int</span> i = <span class="num">1</span>; i < arr.length; i++) {
+            <span class="type">int</span> key = arr[i]; <span class="com">// The element we are inserting</span>
+            <span class="type">int</span> j = i - <span class="num">1</span>;
+
+            <span class="com">// Shift elements of the sorted segment that are greater than key</span>
+            <span class="kw">while</span> (j >= <span class="num">0</span> && arr[j] > key) {
+                arr[j + <span class="num">1</span>] = arr[j];
+                j--;
+            }
+
+            <span class="com">// Insert the key into its correct position</span>
+            arr[j + <span class="num">1</span>] = key;
+        }
+
+        System.out.println(<span class="str">"--- After Insertion Sort ---"</span>);
+        printArray(arr);
+    }
+
+    <span class="kw">public static void</span> <span class="type">printArray</span>(<span class="type">int</span>[] arr) {
+        <span class="kw">for</span> (<span class="type">int</span> n : arr) {
+            System.out.print(n + <span class="str">" "</span>);
+        }
+        System.out.println();
+    }
+}</pre>
+        </div>
+    </div>
+
+    <!-- SECTION 5: QUICK SORT -->
+    <div class="card">
+        <h2>5. Quick Sort</h2>
+        <p>
+            <strong>Definition:</strong> Quick Sort is an efficient, recursive <strong>divide-and-conquer</strong> algorithm. It selects a benchmark element called a <em>pivot</em>, partitions the array so all smaller elements move to the left of the pivot and all larger elements move to the right, and then recursively repeats the process for both sub-arrays.
+        </p>
+
+        <h3>Complete Runnable Example: Quick Sort</h3>
+        <div class="code-container">
+            <div class="code-header">
+                <span>QuickSortMaster.java</span>
+                <button class="copy-btn" onclick="copyCode('code-quick')">Copy Code</button>
+            </div>
+            <pre id="code-quick"><span class="kw">public class</span> <span class="type">QuickSortMaster</span> {
+    <span class="kw">public static void</span> <span class="type">main</span>(<span class="type">String</span>[] args) {
+        <span class="type">int</span>[] arr = {<span class="num">10</span>, <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">1</span>, <span class="num">5</span>};
+
+        System.out.println(<span class="str">"--- Before Quick Sort ---"</span>);
+        printArray(arr);
+
+        quickSort(arr, <span class="num">0</span>, arr.length - <span class="num">1</span>);
+
+        System.out.println(<span class="str">"--- After Quick Sort ---"</span>);
+        printArray(arr);
+    }
+
+    <span class="kw">public static void</span> <span class="type">quickSort</span>(<span class="type">int</span>[] arr, <span class="type">int</span> low, <span class="type">int</span> high) {
+        <span class="kw">if</span> (low < high) {
+            <span class="com">// Partition the array around a pivot index</span>
+            <span class="type">int</span> pi = partition(arr, low, high);
+
+            <span class="com">// Recursively sort elements before and after partition</span>
+            quickSort(arr, low, pi - <span class="num">1</span>);
+            quickSort(arr, pi + <span class="num">1</span>, high);
+        }
+    }
+
+    <span class="kw">public static int</span> <span class="type">partition</span>(<span class="type">int</span>[] arr, <span class="type">int</span> low, <span class="type">int</span> high) {
+        <span class="type">int</span> pivot = arr[high]; <span class="com">// Choose last element as pivot</span>
+        <span class="type">int</span> i = (low - <span class="num">1</span>);     <span class="com">// Index of smaller element</span>
+
+        <span class="kw">for</span> (<span class="type">int</span> j = low; j < high; j++) {
+            <span class="kw">if</span> (arr[j] <= pivot) {
+                i++;
+                <span class="com">// Swap arr[i] and arr[j]</span>
+                <span class="type">int</span> temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+
+        <span class="com">// Place pivot in its correct sorted position</span>
+        <span class="type">int</span> temp = arr[i + <span class="num">1</span>];
+        arr[i + <span class="num">1</span>] = arr[high];
+        arr[high] = temp;
+
+        <span class="kw">return</span> i + <span class="num">1</span>;
+    }
+
+    <span class="kw">public static void</span> <span class="type">printArray</span>(<span class="type">int</span>[] arr) {
+        <span class="kw">for</span> (<span class="type">int</span> n : arr) {
+            System.out.print(n + <span class="str">" "</span>);
+        }
+        System.out.println();
+    }
+}</pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyCode(elementId) {
+        const codeText = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(codeText).then(() => {
+            const btn = document.querySelector(`#${elementId}`).closest('.code-container').querySelector('.copy-btn');
+            const original = btn.innerText;
+            btn.innerText = 'Copied!';
+            setTimeout(() => btn.innerText = original, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
