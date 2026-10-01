@@ -65,11 +65,14 @@
   <div class="tabs">
     <button class="tab active" data-tab="s1">1. The Problem</button>
     <button class="tab" data-tab="s2">2. One Array</button>
-    <button class="tab" data-tab="s3">3. What Is Stored?</button>
-    <button class="tab" data-tab="s4">4. Inside the Array</button>
-    <button class="tab" data-tab="s5">5. Two Names</button>
-    <button class="tab" data-tab="s6">6. null</button>
-    <button class="tab" data-tab="s7">7. Final Picture</button>
+    <button class="tab" data-tab="s3">3. Stack Memory</button>
+    <button class="tab" data-tab="s4">4. Heap Memory</button>
+    <button class="tab" data-tab="s5">5. Reference Arrows</button>
+    <button class="tab" data-tab="s6">6. Accessing Elements</button>
+    <button class="tab" data-tab="s7">7. Two Names</button>
+    <button class="tab" data-tab="s8">8. null</button>
+    <button class="tab" data-tab="s9">9. Garbage Collection</button>
+    <button class="tab" data-tab="s10">10. Final Picture</button>
   </div>
 
   <section id="s1" class="storyPanel active panel">
@@ -131,193 +134,388 @@ int grade4 = 75;</pre>
     <div class="navrow"><button data-next="s1">← Back</button><button data-next="s3">Next →</button></div>
   </section>
 
-  <section id="s3" class="storyPanel panel">
-    <div class="eyebrow">Scene 3 • The key idea</div>
-    <h2>Does the array variable contain the whole array?</h2>
-    <pre>int[] scores = new int[4];</pre>
 
-    <div class="card question">
-      <strong>Prediction</strong>
-      <p>What is stored in <code>scores</code>?</p>
-      <button class="refGuess" data-a="wrong">The four integers themselves</button>
-      <button class="refGuess" data-a="right">A reference to the array</button>
-      <div id="refFeedback" class="feedback"></div>
+  <section id="s3" class="storyPanel panel">
+    <div class="eyebrow">Scene 3 • Where local variables live conceptually</div>
+    <h2>Stack Memory: the method's working area</h2>
+
+    <p class="big">Before we talk about arrays, students need a picture of where ordinary local variables are kept during a method call.</p>
+
+    <div class="card soft teacher">
+      <strong>Instructor narrative</strong>
+      <p>“When a method runs, Java needs a temporary working area for that method. In our classroom memory model, we call that the <strong>stack</strong>.”</p>
+      <p>“The stack is where we will picture local variables such as <code>int x</code> and local reference variables such as <code>int[] scores</code>.”</p>
     </div>
 
-    <div id="refPicture" style="display:none;margin-top:18px">
-      <div class="grid3" style="align-items:center">
-        <div class="card center"><small class="muted">variable</small><div class="big"><code>scores</code></div><div>reference</div></div>
-        <div class="arrow">→</div>
-        <div class="card">
-          <small class="muted">array object</small>
-          <div class="grid4" style="margin-top:10px">
-            <div class="cell">0</div><div class="cell">0</div><div class="cell">0</div><div class="cell">0</div>
-          </div>
-        </div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card">
+        <h3>Example</h3>
+        <pre>public static void main(String[] args) {
+    int x = 10;
+    int y = 20;
+}</pre>
+        <p>For this lesson, picture <code>x</code> and <code>y</code> inside the current method's stack frame.</p>
       </div>
-      <div class="card soft teacher" style="margin-top:16px">
-        <strong>Say it this way</strong>
-        <p>“The variable <code>scores</code> does not contain all four integers. It contains a <strong>reference</strong> that Java uses to find the array object.”</p>
+
+      <div class="card">
+        <h3>Conceptual stack frame</h3>
+        <div class="cell"><strong>main()</strong></div>
+        <div class="cell" style="margin-top:8px"><code>x = 10</code></div>
+        <div class="cell" style="margin-top:8px"><code>y = 20</code></div>
       </div>
+    </div>
+
+    <div class="card question" style="margin-top:18px">
+      <strong>Ask students</strong>
+      <p>If <code>x</code> is a primitive <code>int</code>, what does the variable itself hold?</p>
+      <button class="stackQ" data-a="value">The actual integer value</button>
+      <button class="stackQ" data-a="ref">A reference</button>
+      <div id="stackFeedback" class="feedback"></div>
+    </div>
+
+    <div class="card soft teacher">
+      <strong>Key distinction</strong>
+      <p>Primitive local variables hold primitive values directly. Reference variables hold references to objects.</p>
     </div>
 
     <div class="navrow"><button data-next="s2">← Back</button><button data-next="s4">Next →</button></div>
   </section>
 
   <section id="s4" class="storyPanel panel">
-    <div class="eyebrow">Scene 4 • Follow the reference</div>
-    <h2>What happens when we evaluate <code>scores[2]</code>?</h2>
-    <p>Walk through the action before focusing on syntax.</p>
+    <div class="eyebrow">Scene 4 • Where objects live conceptually</div>
+    <h2>Heap Memory: where array objects are created</h2>
 
-    <div class="grid3">
-      <button class="memStep" data-step="1"><strong>Step 1</strong><br>Find <code>scores</code></button>
-      <button class="memStep" data-step="2"><strong>Step 2</strong><br>Follow the reference</button>
-      <button class="memStep" data-step="3"><strong>Step 3</strong><br>Go to index 2</button>
+    <p class="big">Now compare a primitive value with an array object.</p>
+
+    <pre>int x = 10;
+int[] scores = new int[4];</pre>
+
+    <div class="card soft teacher">
+      <strong>Instructor narrative</strong>
+      <p>“The variable <code>x</code> can hold its integer directly. But the array is an object. In the usual introductory Java memory model, objects are created in the <strong>heap</strong>.”</p>
     </div>
 
-    <div id="memText" class="card soft" style="margin-top:16px">Click Step 1 and narrate what Java is doing.</div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card">
+        <h3>Stack</h3>
+        <div class="cell"><code>x = 10</code></div>
+        <div class="cell" style="margin-top:8px"><code>scores = reference</code></div>
+      </div>
 
-    <div class="grid3" style="align-items:center;margin-top:18px">
-      <div class="card center"><code>scores</code><br><small>reference</small></div>
-      <div class="arrow">→</div>
-      <div class="grid4">
-        <div class="cell memCell">90<br><small>[0]</small></div>
-        <div class="cell memCell">85<br><small>[1]</small></div>
-        <div class="cell memCell" data-target="2">100<br><small>[2]</small></div>
-        <div class="cell memCell">75<br><small>[3]</small></div>
+      <div class="card">
+        <h3>Heap</h3>
+        <div class="grid4">
+          <div class="cell"><small>[0]</small><br><strong>0</strong></div>
+          <div class="cell"><small>[1]</small><br><strong>0</strong></div>
+          <div class="cell"><small>[2]</small><br><strong>0</strong></div>
+          <div class="cell"><small>[3]</small><br><strong>0</strong></div>
+        </div>
       </div>
     </div>
 
-    <div class="card teacher" style="margin-top:18px">
-      <strong>Now connect the picture to Java</strong>
-      <pre>System.out.println(scores[2]);</pre>
-      <p>The result is <strong>100</strong>.</p>
+    <div class="card question" style="margin-top:18px">
+      <strong>Prediction</strong>
+      <p>After <code>new int[4]</code>, what values are initially inside the array?</p>
+      <button class="heapQ" data-a="zeros">0, 0, 0, 0</button>
+      <button class="heapQ" data-a="unknown">Unknown values</button>
+      <div id="heapFeedback" class="feedback"></div>
+    </div>
+
+    <div class="card teacher">
+      <strong>Important classroom note</strong>
+      <p>The stack/heap picture is a useful conceptual model for introductory Java. Real JVM implementations may manage memory internally in more complex ways, but this model correctly explains references, object lifetimes, aliasing, and array behavior for students.</p>
     </div>
 
     <div class="navrow"><button data-next="s3">← Back</button><button data-next="s5">Next →</button></div>
   </section>
 
   <section id="s5" class="storyPanel panel">
-    <div class="eyebrow">Scene 5 • The surprise</div>
-    <h2>Can two variables refer to the same array?</h2>
-    <pre>int[] a = {10, 20, 30};
-int[] b = a;</pre>
+    <div class="eyebrow">Scene 5 • Connect stack to heap</div>
+    <h2>Reference Arrows: how the variable finds the object</h2>
 
-    <div class="grid3" style="align-items:center">
-      <div>
-        <div class="cell"><code>a</code></div>
-        <div class="cell" style="margin-top:8px"><code>b</code></div>
+    <pre>int[] scores = new int[4];</pre>
+
+    <div class="card soft teacher">
+      <strong>Instructor narrative</strong>
+      <p>“The stack variable <code>scores</code> does not contain the four array elements. It contains a <strong>reference</strong>. We draw an arrow from the variable to the array object to represent that relationship.”</p>
+    </div>
+
+    <div class="grid3" style="align-items:center;margin-top:18px">
+      <div class="card center">
+        <small class="muted">STACK</small>
+        <div class="big"><code>scores</code></div>
+        <div>reference</div>
       </div>
       <div class="arrow">→</div>
-      <div class="grid3">
-        <div id="shared0" class="cell"><strong>10</strong></div>
-        <div class="cell"><strong>20</strong></div>
-        <div class="cell"><strong>30</strong></div>
+      <div class="card">
+        <small class="muted">HEAP ARRAY OBJECT</small>
+        <div class="grid4" style="margin-top:10px">
+          <div class="cell">0</div><div class="cell">0</div><div class="cell">0</div><div class="cell">0</div>
+        </div>
       </div>
     </div>
 
     <div class="card question" style="margin-top:18px">
-      <strong>Prediction</strong>
-      <p>If <code>b[0] = 99;</code>, what will <code>a[0]</code> be?</p>
-      <button class="alias" data-v="10">10</button>
-      <button class="alias" data-v="99">99</button>
-      <div id="aliasFeedback" class="feedback"></div>
+      <strong>Ask students</strong>
+      <p>Does the arrow represent a Java variable that students can directly print as a raw memory address?</p>
+      <button class="arrowQ" data-a="no">No</button>
+      <button class="arrowQ" data-a="yes">Yes</button>
+      <div id="arrowFeedback" class="feedback"></div>
     </div>
 
     <div class="card soft teacher">
-      <strong>Instructor explanation</strong>
-      <p>“There are not two arrays here. There are two references to the same array. That is why a change through <code>b</code> is also visible through <code>a</code>.”</p>
+      <strong>Best wording</strong>
+      <p>“The arrow is a <strong>conceptual reference relationship</strong>. It helps us see which object the variable refers to.”</p>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <strong>Build the statement in three moves</strong>
+      <div class="grid3" style="margin-top:12px">
+        <button class="arrowStep" data-step="1">1. Declare variable</button>
+        <button class="arrowStep" data-step="2">2. Create array</button>
+        <button class="arrowStep" data-step="3">3. Store reference</button>
+      </div>
+      <div id="arrowNarration" class="card soft" style="margin-top:12px">Click Step 1.</div>
     </div>
 
     <div class="navrow"><button data-next="s4">← Back</button><button data-next="s6">Next →</button></div>
   </section>
 
   <section id="s6" class="storyPanel panel">
-    <div class="eyebrow">Scene 6 • What if the arrow points nowhere?</div>
-    <h2>Understanding <code>null</code></h2>
-    <p>By now students understand that a reference normally leads to an object.</p>
-    <div class="card soft center big">What if the reference leads to no object at all?</div>
+    <div class="eyebrow">Scene 6 • Following the arrow</div>
+    <h2>Accessing an element means following the reference</h2>
 
-    <button id="showNull" style="margin-top:14px">Reveal</button>
-    <div id="nullPic" style="display:none;margin-top:18px">
-      <div class="grid3" style="align-items:center">
-        <div class="card center"><code>data</code><br><strong>null</strong></div>
-        <div class="arrow">→</div>
-        <div class="card center muted" style="border-style:dashed">No array object</div>
-      </div>
-      <p><code>null</code> means the reference currently refers to no object.</p>
-    </div>
+    <p>Suppose:</p>
+    <pre>int[] scores = {90, 85, 100, 75};</pre>
 
     <div class="card question">
-      <strong>Ask students</strong>
-      <p>Can Java evaluate <code>data.length</code> if <code>data</code> is null?</p>
-      <button class="nullChoice" data-a="yes">Yes</button>
-      <button class="nullChoice" data-a="no">No</button>
-      <div id="nullFeedback" class="feedback"></div>
+      <strong>Walk through <code>scores[2]</code></strong>
+      <div class="grid3" style="margin-top:12px">
+        <button class="accessStep" data-step="1">1. Find <code>scores</code></button>
+        <button class="accessStep" data-step="2">2. Follow reference</button>
+        <button class="accessStep" data-step="3">3. Go to index 2</button>
+      </div>
+      <div id="accessText" class="card soft" style="margin-top:12px">Click Step 1.</div>
     </div>
 
-    <div class="card soft teacher">
-      <strong>Instructor wording</strong>
-      <p>“Java tries to follow the reference to find the array. But there is no array there. That is why a <code>NullPointerException</code> occurs.”</p>
+    <div class="grid3" style="align-items:center;margin-top:18px">
+      <div class="card center">
+        <small class="muted">STACK</small>
+        <div class="big"><code>scores</code></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="grid4">
+        <div class="cell accessCell"><small>[0]</small><br><strong>90</strong></div>
+        <div class="cell accessCell"><small>[1]</small><br><strong>85</strong></div>
+        <div class="cell accessCell" data-index="2"><small>[2]</small><br><strong>100</strong></div>
+        <div class="cell accessCell"><small>[3]</small><br><strong>75</strong></div>
+      </div>
     </div>
 
-    <div class="card teacher">
-      <strong>Important precision</strong>
-      <p>A local variable declared only as <code>int[] data;</code> is not automatically usable as <code>null</code>. To demonstrate null explicitly, write:</p>
-      <pre>int[] data = null;</pre>
+    <div class="card teacher" style="margin-top:18px">
+      <strong>Narrative sentence</strong>
+      <p>“Java evaluates <code>scores</code>, follows the reference to the array object, then selects element number 2.”</p>
     </div>
 
     <div class="navrow"><button data-next="s5">← Back</button><button data-next="s7">Next →</button></div>
   </section>
 
   <section id="s7" class="storyPanel panel">
-    <div class="eyebrow">Scene 7 • Put the whole story together</div>
-    <h2>The mental model students should leave with</h2>
+    <div class="eyebrow">Scene 7 • Two variables, one heap object</div>
+    <h2>Aliasing: two references can point to the same array</h2>
 
-    <div class="grid3">
-      <div class="card center"><strong>1</strong><br>Declare a reference variable</div>
-      <div class="card center"><strong>2</strong><br><code>new</code> creates an array object</div>
-      <div class="card center"><strong>3</strong><br>The variable stores a reference to it</div>
+    <pre>int[] a = {10, 20, 30};
+int[] b = a;</pre>
+
+    <div class="grid3" style="align-items:center">
+      <div class="card">
+        <small class="muted">STACK</small>
+        <div class="cell"><code>a</code> → reference</div>
+        <div class="cell" style="margin-top:8px"><code>b</code> → same reference</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="card">
+        <small class="muted">ONE HEAP ARRAY</small>
+        <div class="grid3" style="margin-top:10px">
+          <div id="alias0" class="cell"><strong>10</strong></div>
+          <div class="cell"><strong>20</strong></div>
+          <div class="cell"><strong>30</strong></div>
+        </div>
+      </div>
     </div>
 
     <div class="card question" style="margin-top:18px">
-      <strong>Five questions students should now answer</strong>
-      <ol>
-        <li>What is an array?</li>
-        <li>Why do array indexes begin at 0?</li>
-        <li>What does an array variable actually store?</li>
-        <li>How can two variables modify the same array?</li>
-        <li>What does <code>null</code> mean?</li>
-      </ol>
+      <strong>Prediction</strong>
+      <p>After <code>b[0] = 99;</code>, what does <code>a[0]</code> become?</p>
+      <button class="aliasQ" data-a="10">10</button>
+      <button class="aliasQ" data-a="99">99</button>
+      <div id="aliasFeedback2" class="feedback"></div>
     </div>
 
     <div class="card soft teacher">
-      <strong>Closing statement</strong>
-      <p>“When you read array code, do not just read the syntax. Draw the picture: variable → reference → array object → indexed elements. If you can see that picture in your mind, you can predict what the program will do.”</p>
+      <strong>Instructor explanation</strong>
+      <p>“Assignment between reference variables copies the reference, not the array object itself. So both variables can reach the same heap object.”</p>
     </div>
 
-    <div class="card question">
-      <strong>Exit question</strong>
-      <p>If <code>a</code> and <code>b</code> both refer to the same array and <code>b[2]</code> changes, does <code>a[2]</code> see the new value?</p>
-      <button id="exitBtn">Reveal answer</button>
-      <div id="exitAns" class="answer">Yes — because both variables reach the same array object.</div>
-    </div>
-
-    <div class="navrow"><button data-next="s6">← Back</button><button data-next="s1">Restart Lecture</button></div>
+    <div class="navrow"><button data-next="s6">← Back</button><button data-next="s8">Next →</button></div>
   </section>
 
-  <p class="footer-note">Teaching note: the arrows in this lecture are conceptual references. They are not literal manipulable memory addresses.</p>
+  <section id="s8" class="storyPanel panel">
+    <div class="eyebrow">Scene 8 • A reference to nowhere</div>
+    <h2>Understanding <code>null</code></h2>
+
+    <pre>int[] data = null;</pre>
+
+    <div class="grid3" style="align-items:center">
+      <div class="card center">
+        <small class="muted">STACK</small>
+        <div class="big"><code>data</code></div>
+        <div><strong>null</strong></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="card center muted" style="border-style:dashed">No array object</div>
+    </div>
+
+    <div class="card question" style="margin-top:18px">
+      <strong>Ask students</strong>
+      <p>What happens if Java tries to evaluate <code>data.length</code>?</p>
+      <button class="nullQ" data-a="0">It returns 0</button>
+      <button class="nullQ" data-a="npe">NullPointerException</button>
+      <div id="nullFeedback2" class="feedback"></div>
+    </div>
+
+    <div class="card teacher">
+      <strong>Important precision</strong>
+      <p>A local variable declared only as <code>int[] data;</code> must be definitely assigned before use. To demonstrate null, explicitly write <code>int[] data = null;</code>.</p>
+    </div>
+
+    <div class="navrow"><button data-next="s7">← Back</button><button data-next="s9">Next →</button></div>
+  </section>
+
+  <section id="s9" class="storyPanel panel">
+    <div class="eyebrow">Scene 9 • What if no reference remains?</div>
+    <h2>Garbage Collection: unreachable objects can be reclaimed</h2>
+
+    <p>Start with:</p>
+    <pre>int[] data = {5, 10, 15};</pre>
+
+    <div class="grid3" style="align-items:center">
+      <div class="card center">
+        <small class="muted">STACK</small>
+        <div class="big"><code>data</code></div>
+      </div>
+      <div class="arrow" id="gcArrow">→</div>
+      <div class="card" id="gcArray">
+        <small class="muted">HEAP ARRAY</small>
+        <div class="grid3" style="margin-top:10px">
+          <div class="cell">5</div><div class="cell">10</div><div class="cell">15</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card question" style="margin-top:18px">
+      <strong>Now execute:</strong>
+      <pre>data = null;</pre>
+      <button id="gcBtn">Show what changes</button>
+      <div id="gcText" class="feedback"></div>
+    </div>
+
+    <div class="card soft teacher">
+      <strong>Instructor narrative</strong>
+      <p>“The array object does not instantly disappear the moment the reference is removed. But if no reachable reference can get to that object anymore, the JVM may later reclaim that memory through garbage collection.”</p>
+    </div>
+
+    <div class="card teacher">
+      <strong>Key phrase for students</strong>
+      <p><strong>Unreachable object</strong> = an object that the running program can no longer reach through any live reference.</p>
+    </div>
+
+    <div class="navrow"><button data-next="s8">← Back</button><button data-next="s10">Next →</button></div>
+  </section>
+
+  <section id="s10" class="storyPanel panel">
+    <div class="eyebrow">Scene 10 • Put the whole memory story together</div>
+    <h2>The complete mental model</h2>
+
+    <div class="card soft teacher">
+      <strong>Closing narrative</strong>
+      <p>“When you see an array, separate the picture into two parts: the <strong>reference variable</strong> and the <strong>array object</strong>. Then draw the arrow between them.”</p>
+    </div>
+
+    <div class="grid2" style="margin-top:18px">
+      <div class="card">
+        <h3>Stack side</h3>
+        <ul>
+          <li>Current method calls</li>
+          <li>Local primitive variables</li>
+          <li>Local reference variables</li>
+          <li>Temporary working data for method execution</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Heap side</h3>
+        <ul>
+          <li>Array objects</li>
+          <li>Objects created with <code>new</code></li>
+          <li>Objects may be shared by several references</li>
+          <li>Unreachable objects may later be garbage-collected</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card question" style="margin-top:18px">
+      <strong>Final memory trace</strong>
+      <pre>int[] first = {4, 8, 12};
+int[] second = first;
+second[1] = 50;</pre>
+      <p>Ask students to draw:</p>
+      <ol>
+        <li>Two reference variables in the stack frame.</li>
+        <li>One array object in the heap.</li>
+        <li>Two arrows pointing to the same array.</li>
+        <li>The array contents <code>[4, 50, 12]</code>.</li>
+      </ol>
+      <button id="finalReveal">Reveal picture</button>
+      <div id="finalPic" style="display:none;margin-top:16px">
+        <div class="grid3" style="align-items:center">
+          <div class="card">
+            <small class="muted">STACK</small>
+            <div class="cell"><code>first</code> →</div>
+            <div class="cell" style="margin-top:8px"><code>second</code> →</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="card">
+            <small class="muted">HEAP</small>
+            <div class="grid3" style="margin-top:10px">
+              <div class="cell">4</div><div class="cell highlight">50</div><div class="cell">12</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card soft teacher">
+      <strong>Final sentence to leave on screen</strong>
+      <p>“Read array code as a picture: <strong>stack variable → reference arrow → heap object → indexed element</strong>.”</p>
+    </div>
+
+    <div class="navrow"><button data-next="s9">← Back</button><button data-next="s1">Restart Lecture</button></div>
+  </section>
+
+  <p class="footer-note">Teaching note: stack/heap diagrams and arrows are conceptual teaching models. They are intended to explain Java references and object behavior, not expose literal physical memory addresses.</p>
 </div>
 
 <script>
 (function(){
   const panels=[...document.querySelectorAll('.storyPanel')];
   const tabs=[...document.querySelectorAll('.tab')];
+
   function show(id){
     panels.forEach(p=>p.classList.toggle('active',p.id===id));
     tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
     window.scrollTo({top:0,behavior:'smooth'});
   }
+
   tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.tab)));
   document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.next)));
 
@@ -327,45 +525,72 @@ int[] b = a;</pre>
       : 'It would work, but it becomes difficult to manage. Arrays solve that problem.';
   }));
 
-  document.getElementById('showIndexes').addEventListener('click',()=>document.getElementById('indexes').classList.add('show'));
+  document.getElementById('showIndexes').addEventListener('click',()=>{
+    document.getElementById('indexes').classList.add('show');
+  });
 
-  document.querySelectorAll('.refGuess').forEach(b=>b.addEventListener('click',()=>{
-    document.getElementById('refFeedback').textContent=b.dataset.a==='right'
-      ? 'Correct. scores stores a reference to the array object.'
-      : 'Common first guess. The elements are in the array object; scores stores a reference to that object.';
-    document.getElementById('refPicture').style.display='block';
+  document.querySelectorAll('.stackQ').forEach(b=>b.addEventListener('click',()=>{
+    document.getElementById('stackFeedback').textContent=b.dataset.a==='value'
+      ? 'Correct. A primitive int variable holds the integer value directly.'
+      : 'Not for a primitive int. A primitive variable stores its primitive value directly.';
   }));
 
-  document.querySelectorAll('.memStep').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('.memCell').forEach(c=>c.classList.remove('highlight'));
+  document.querySelectorAll('.heapQ').forEach(b=>b.addEventListener('click',()=>{
+    document.getElementById('heapFeedback').textContent=b.dataset.a==='zeros'
+      ? 'Correct. A newly created int[] is initialized with zeros.'
+      : 'Java initializes the elements of a new int[] to 0.';
+  }));
+
+  document.querySelectorAll('.arrowQ').forEach(b=>b.addEventListener('click',()=>{
+    document.getElementById('arrowFeedback').textContent=b.dataset.a==='no'
+      ? 'Correct. The arrow is a conceptual picture of the reference relationship.'
+      : 'No. We use the arrow to visualize which object the reference points to; Java does not expose it to students as a raw address to manipulate.';
+  }));
+
+  document.querySelectorAll('.arrowStep').forEach(b=>b.addEventListener('click',()=>{
     const s=b.dataset.step;
-    if(s==='1') document.getElementById('memText').textContent='Step 1: Java evaluates the variable scores. It contains a reference.';
-    if(s==='2') document.getElementById('memText').textContent='Step 2: Java follows that reference to reach the array object.';
+    const el=document.getElementById('arrowNarration');
+    if(s==='1') el.textContent='Step 1: int[] scores declares a local reference variable named scores.';
+    if(s==='2') el.textContent='Step 2: new int[4] creates the array object.';
+    if(s==='3') el.textContent='Step 3: the reference to that new array is stored in scores.';
+  }));
+
+  document.querySelectorAll('.accessStep').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('.accessCell').forEach(c=>c.classList.remove('highlight'));
+    const s=b.dataset.step;
+    if(s==='1') document.getElementById('accessText').textContent='Step 1: Java evaluates the local variable scores.';
+    if(s==='2') document.getElementById('accessText').textContent='Step 2: Java follows the reference from scores to the array object.';
     if(s==='3'){
-      document.getElementById('memText').textContent='Step 3: Java goes to index 2. The value there is 100.';
-      document.querySelector('[data-target="2"]').classList.add('highlight');
+      document.getElementById('accessText').textContent='Step 3: Java selects index 2. The value stored there is 100.';
+      document.querySelector('.accessCell[data-index="2"]').classList.add('highlight');
     }
   }));
 
-  document.querySelectorAll('.alias').forEach(b=>b.addEventListener('click',()=>{
-    if(b.dataset.v==='99'){
-      document.getElementById('aliasFeedback').textContent='Correct. Both a and b refer to the same array.';
-      document.getElementById('shared0').innerHTML='<strong>99</strong>';
-      document.getElementById('shared0').classList.add('highlight');
+  document.querySelectorAll('.aliasQ').forEach(b=>b.addEventListener('click',()=>{
+    if(b.dataset.a==='99'){
+      document.getElementById('aliasFeedback2').textContent='Correct. Both variables reach the same heap object.';
+      document.getElementById('alias0').innerHTML='<strong>99</strong>';
+      document.getElementById('alias0').classList.add('highlight');
     } else {
-      document.getElementById('aliasFeedback').textContent='Remember: b = a copies the reference, not the array.';
+      document.getElementById('aliasFeedback2').textContent='Remember: b = a copies the reference. It does not create a second array.';
     }
   }));
 
-  document.getElementById('showNull').addEventListener('click',()=>document.getElementById('nullPic').style.display='block');
-
-  document.querySelectorAll('.nullChoice').forEach(b=>b.addEventListener('click',()=>{
-    document.getElementById('nullFeedback').textContent=b.dataset.a==='no'
-      ? 'Correct. There is no array object to reach, so data.length causes a NullPointerException.'
-      : 'No. Java needs an actual array object in order to read its length.';
+  document.querySelectorAll('.nullQ').forEach(b=>b.addEventListener('click',()=>{
+    document.getElementById('nullFeedback2').textContent=b.dataset.a==='npe'
+      ? 'Correct. Java cannot follow null to an array object, so a NullPointerException occurs.'
+      : 'No. null does not mean an empty array. It means no array object is referenced.';
   }));
 
-  document.getElementById('exitBtn').addEventListener('click',()=>document.getElementById('exitAns').classList.add('show'));
+  document.getElementById('gcBtn').addEventListener('click',()=>{
+    document.getElementById('gcArrow').textContent='×';
+    document.getElementById('gcArray').style.opacity='0.45';
+    document.getElementById('gcText').textContent='The variable now stores null. If no other live reference reaches this array, the object is unreachable and may later be reclaimed by garbage collection.';
+  });
+
+  document.getElementById('finalReveal').addEventListener('click',()=>{
+    document.getElementById('finalPic').style.display='block';
+  });
 })();
 </script>
 </body>
