@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>MAC286 · Java Arrays, References &amp; Memory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Colour carries meaning on this page:
+   amber = STACK (variables) · teal = HEAP (objects) · pink = REFERENCE (the arrow) */
+:root{
+  --bg:#14122b; --panel:#1d1b3a; --raise:#27254a; --line:#3a3766;
+  --ink:#f4f2ff; --ink2:#cbc7ea; --muted:#9a95c4;
+  --stack:#ffb547; --stack-bg:#3a2c1c; --stack-line:#7a5a25;
+  --heap:#3ddbc3;  --heap-bg:#123a3b;  --heap-line:#1f7a70;
+  --ref:#ff6fa6;   --ref-bg:#42203a;
+  --ok:#7be08a; --ok-bg:#173a2a; --no:#ff8a75; --no-bg:#43211f;
+  --violet:#a99bff; --code-bg:#0e0c22;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:19px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+code,pre{font-family:var(--mono)}
+p code,li code,h2 code,strong code,button code,.say code{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.88em;color:var(--violet)}
+:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:292px minmax(0,1fr);min-height:100vh}
+.rail{background:var(--panel);border-right:1px solid var(--line);padding:26px 18px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:22px}
+.brand .course{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.brand h1{font-family:var(--display);font-weight:800;font-size:27px;line-height:1.08;margin-top:6px;letter-spacing:-.01em}
+.brand h1 .s{color:var(--stack)} .brand h1 .r{color:var(--ref)} .brand h1 .h{color:var(--heap)}
+.steps{list-style:none;display:flex;flex-direction:column;gap:2px;position:relative}
+.steps button{width:100%;display:flex;align-items:center;gap:12px;background:none;border:0;border-radius:10px;padding:8px 10px;text-align:left;color:var(--ink2);font-size:16.5px}
+.steps button:hover{background:var(--raise)}
+.steps .n{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--muted);background:var(--panel)}
+.steps .done .n{border-color:var(--heap-line);color:var(--heap)}
+.steps .active{background:var(--raise);color:var(--ink);font-weight:700}
+.steps .active .n{background:var(--ref);border-color:var(--ref);color:#2a0f1e}
+.legend{margin-top:auto;border-top:1px solid var(--line);padding-top:16px;font-size:14.5px;color:var(--ink2);display:grid;gap:8px}
+.legend b{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:9px;vertical-align:-2px}
+.legend .rhythm{color:var(--muted);font-size:13.5px;margin-top:6px}
+
+.stage{padding:34px clamp(18px,4vw,56px) 110px;max-width:1240px;width:100%}
+.scene{display:none}
+.scene.active{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.head{display:grid;grid-template-columns:auto 1fr;gap:6px 22px;align-items:center;margin-bottom:26px}
+.head .big-n{grid-row:span 2;font-family:var(--display);font-weight:800;font-size:92px;line-height:.8;color:transparent;-webkit-text-stroke:2px var(--ref);letter-spacing:-.04em}
+.head .kick{color:var(--ref);font-weight:700;font-size:16px;align-self:end}
+.head h2{font-family:var(--display);font-weight:700;font-size:clamp(28px,3.4vw,42px);line-height:1.1;letter-spacing:-.015em;text-wrap:balance;align-self:start}
+.lead{font-size:23px;line-height:1.4;color:var(--ink);margin-bottom:16px;max-width:38em}
+.scene p{max-width:40em}
+
+/* layout: story on the left, memory board on the right */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px;align-items:start}
+.story{display:grid;gap:18px}
+.board{position:sticky;top:24px;display:grid;gap:14px}
+.stack-gap{display:grid;gap:18px}
+
+/* ---------- code ---------- */
+pre{background:var(--code-bg);border:1px solid var(--line);border-left:4px solid var(--violet);border-radius:12px;padding:16px 18px;font-size:18px;line-height:1.6;overflow-x:auto;white-space:pre}
+pre .k{color:var(--violet);font-weight:600} pre .t{color:#7cc7ff} pre .d{color:var(--stack)} pre .c{color:var(--muted)}
+
+/* ---------- speech & question blocks ---------- */
+.say{position:relative;background:var(--raise);border-radius:4px 18px 18px 18px;padding:16px 20px 16px 58px}
+.say::before{content:"🎙️";position:absolute;left:16px;top:14px;font-size:24px}
+.say.note::before{content:"📌"} .say.key::before{content:"🔑"} .say.bridge::before{content:"🌉"}
+.say strong.t{display:block;font-size:14.5px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.say p + p{margin-top:8px}
+.ask{background:linear-gradient(160deg,#2b2466,#22204a);border:1px solid #4d44a8;border-radius:18px;padding:18px 20px}
+.ask strong.t{display:inline-block;background:var(--violet);color:#1a1440;border-radius:999px;padding:2px 14px;font-size:14.5px;margin-bottom:10px}
+.ask p{font-size:21px;font-weight:700;line-height:1.35}
+.choices .btn{white-space:normal}
+.choices{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.btn{min-height:48px;white-space:nowrap;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:9px 18px;font-weight:700}
+.btn:hover{border-color:var(--violet)}
+.btn.right{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.btn.wrong{background:var(--no-bg);border-color:var(--no);color:var(--no)}
+.btn.on{background:var(--ref-bg);border-color:var(--ref);color:var(--ink)}
+.btn.go{background:var(--ref);border-color:var(--ref);color:#2a0f1e}
+.fb{margin-top:12px;font-weight:700;min-height:1.5em}
+.fb.ok{color:var(--ok)} .fb.no{color:var(--no)}
+.narr{margin-top:12px;background:var(--code-bg);border:1px dashed var(--line);border-radius:12px;padding:12px 16px;min-height:58px}
+
+/* ---------- memory board ---------- */
+.mem{position:relative;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(44px,7vw,90px);align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px}
+.mem.solo{grid-template-columns:1fr}
+.mem .wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.wires path{fill:none;stroke:var(--ref);stroke-width:3.5;stroke-linecap:round;transition:opacity .3s}
+.wires .hot{stroke-width:6;filter:drop-shadow(0 0 6px var(--ref))}
+.wires .cut{stroke-dasharray:3 9;opacity:.55}
+.wires text{fill:var(--no);font:700 26px var(--body)}
+.zone{border-radius:16px;padding:14px;border:2px solid;position:relative;z-index:1}
+.zone h4{font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.zone h4 small{font-family:var(--body);font-weight:400;font-size:12.5px;opacity:.8}
+.zone.stack{background:var(--stack-bg);border-color:var(--stack-line)} .zone.stack h4{color:var(--stack)}
+.zone.heap{background:var(--heap-bg);border-color:var(--heap-line)} .zone.heap h4{color:var(--heap)}
+.frame-name{font-family:var(--mono);font-size:13.5px;color:var(--stack);opacity:.85;margin-bottom:8px}
+.var{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#1c1510;border:2px solid var(--stack-line);border-radius:10px;padding:8px 12px;font-family:var(--mono);font-size:17px;font-weight:600;transition:box-shadow .25s,border-color .25s}
+.var + .var{margin-top:8px}
+.var .val{color:var(--stack)}
+.var .dot{width:16px;height:16px;border-radius:50%;background:var(--ref);box-shadow:0 0 0 4px var(--ref-bg);flex:0 0 auto}
+.var .nul{color:var(--no);border:1.5px dashed var(--no);border-radius:6px;padding:0 7px;font-size:15px}
+.var.hot{border-color:var(--stack);box-shadow:0 0 0 4px rgba(255,181,71,.25)}
+.arr{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;transition:opacity .4s}
+.cell{background:#0c2526;border:2px solid var(--heap-line);border-radius:10px;padding:6px 2px 8px;text-align:center;font-family:var(--mono);transition:background .3s,transform .3s,border-color .3s}
+.cell i{display:block;font-style:normal;font-size:12.5px;color:var(--heap);opacity:.85}
+.cell b{font-size:21px}
+.cell.hot{background:var(--heap);border-color:#fff;color:#062a26;transform:translateY(-5px)}
+.cell.hot i{color:#062a26}
+.arr.gone{opacity:.35;filter:grayscale(.6)}
+.tag{display:none;margin-top:10px;font-size:14px;color:var(--no);font-weight:700}
+.tag.show{display:block}
+.empty{border:2px dashed var(--heap-line);border-radius:10px;padding:16px;text-align:center;color:var(--muted);font-size:16px}
+.cap{font-size:15px;color:var(--muted);text-align:center}
+[data-stage="1"] .arr,[data-stage="1"] .dot,[data-stage="2"] .dot{visibility:hidden}
+
+/* scene 2: variables becoming one array */
+.morph{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:20px;align-items:center}
+.morph .down{font-size:34px;color:var(--ref)}
+.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+/* scene 10 */
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.sides ul{list-style:none;display:grid;gap:8px;font-size:18px}
+.sides li{padding-left:22px;position:relative}
+.sides li::before{content:"";position:absolute;left:0;top:.6em;width:10px;height:10px;border-radius:3px;background:currentColor}
+.sides .stack li::before{color:var(--stack)} .sides .heap li::before{color:var(--heap)}
+ol.draw{margin:10px 0 0 26px;display:grid;gap:4px}
+.chain{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:var(--display);font-weight:700;font-size:clamp(19px,2.2vw,26px);margin-top:6px}
+.chain span{border-radius:12px;padding:6px 16px;border:2px solid}
+.chain .a{color:var(--stack);border-color:var(--stack-line);background:var(--stack-bg)}
+.chain .b{color:var(--ref);border-color:var(--ref);background:var(--ref-bg)}
+.chain .c{color:var(--heap);border-color:var(--heap-line);background:var(--heap-bg)}
+.chain .d{color:#062a26;border-color:var(--heap);background:var(--heap)}
+.chain em{font-style:normal;color:var(--muted)}
+
+/* ---------- bottom nav ---------- */
+.dock{position:fixed;left:292px;right:0;bottom:0;background:rgba(20,18,43,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px clamp(18px,4vw,56px);display:flex;align-items:center;gap:16px;z-index:5}
+.dock .track{flex:1;height:8px;border-radius:4px;background:var(--raise);overflow:hidden}
+.dock .fill{height:100%;width:10%;background:linear-gradient(90deg,var(--stack),var(--ref),var(--heap));border-radius:4px;transition:width .35s}
+.dock .where{font-family:var(--mono);font-size:14px;color:var(--muted);white-space:nowrap}
+.foot{margin-top:34px;font-size:15px;color:var(--muted);max-width:52em}
+
+@media (max-width:1080px){.split{grid-template-columns:1fr}.board{position:static}}
+@media (max-width:820px){
+  body{font-size:18px}
+  .shell{grid-template-columns:1fr}
+  .rail{position:sticky;top:0;height:auto;z-index:6;padding:12px 14px;gap:10px;border-right:0;border-bottom:1px solid var(--line)}
+  .brand h1{font-size:19px}.brand .course,.legend{display:none}
+  .steps{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .steps button{width:auto;white-space:nowrap;padding:5px 10px 5px 5px;font-size:15px}
+  .dock{left:0;gap:10px}.dock .where{display:none}
+  .head .big-n{font-size:60px}
+  .morph,.sides{grid-template-columns:1fr}.morph .down{transform:rotate(90deg);justify-self:center}
+  .mem{padding:12px;gap:40px}.zone{padding:10px}.var{font-size:15px;padding:6px 8px}.cell b{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <div class="course">MAC286 · Data Structures</div>
+      <h1>Java Arrays, <span class="r">References</span> &amp; Memory</h1>
+    </div>
+    <ol class="steps" id="steps"></ol>
+    <div class="legend">
+      <div><b style="background:var(--stack)"></b>Stack — variables</div>
+      <div><b style="background:var(--ref)"></b>Reference — the arrow</div>
+      <div><b style="background:var(--heap)"></b>Heap — objects</div>
+      <div class="rhythm">Explain → Ask → Predict → Reveal → Connect to Java</div>
+    </div>
+  </aside>
+
+  <main class="stage">
+
+  <!-- 1 -->
+  <section id="s1" class="scene" data-title="The Problem">
+    <div class="head"><div class="big-n">01</div><div class="kick">Start with something familiar</div><h2>We already know how to store one value.</h2></div>
+    <div class="split">
+      <div class="story">
+        <p class="lead">Suppose I want to store one student's exam grade.</p>
+        <pre>int grade = 90;</pre>
+        <p>The variable <code>grade</code> stores one integer value.</p>
+        <div class="say"><strong class="t">Instructor narrative</strong><p>“Java gives us a structure that can hold many values of the same type under one name. That structure is an <strong>array</strong>.”</p></div>
+      </div>
+      <div class="board">
+        <div class="ask" data-quiz>
+          <strong class="t">Ask the class</strong>
+          <p>What if I have 30 students?</p>
+          <div class="choices">
+            <button class="btn" data-ok="0" data-msg="It would work, but it becomes difficult to manage. Arrays solve that problem.">Create 30 variables</button>
+            <button class="btn" data-ok="1" data-msg="Exactly. We want one structure that can hold many related values.">Use one structure</button>
+          </div>
+          <div class="fb"></div>
+        </div>
+        <div class="mem solo"><div class="zone stack"><h4>One variable <small>one value</small></h4><div class="var"><span>grade</span><span class="val">90</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="s2" class="scene" data-title="One Array">
+    <div class="head"><div class="big-n">02</div><div class="kick">Replace many variables with one array</div><h2>One name. Several values.</h2></div>
+    <div class="stack-gap">
+      <div class="morph">
+        <div><p style="margin-bottom:10px">Instead of writing separate variables:</p>
+<pre>int grade1 = 90;
+int grade2 = 85;
+int grade3 = 100;
+int grade4 = 75;</pre></div>
+        <div class="down">➜</div>
+        <div><p style="margin-bottom:10px">we can think of the grades as one collection:</p>
+          <div class="zone heap"><h4>grades <small>one collection</small></h4>
+            <div class="arr" id="idxArr"><div class="cell"><i>&nbsp;</i><b>90</b></div><div class="cell"><i>&nbsp;</i><b>85</b></div><div class="cell"><i>&nbsp;</i><b>100</b></div><div class="cell"><i>&nbsp;</i><b>75</b></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ask">
+        <strong class="t">Ask students</strong>
+        <p>If Java needs to identify each position, what should those positions be called?</p>
+        <div class="choices"><button class="btn go" id="showIndexes">Reveal Java's answer</button></div>
+        <div class="fb ok" id="idxFb"></div>
+      </div>
+      <div class="say bridge"><strong class="t">Transition</strong><p>“So far, an array looks like a row of boxes. But there is one important question: where is that row of boxes actually stored?”</p></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="s3" class="scene" data-title="Stack Memory">
+    <div class="head"><div class="big-n">03</div><div class="kick">Where local variables live conceptually</div><h2>Stack memory: the method's working area</h2></div>
+    <p class="lead">Before we talk about arrays, students need a picture of where ordinary local variables are kept during a method call.</p>
+    <div class="split">
+      <div class="story">
+        <div class="say"><strong class="t">Instructor narrative</strong>
+          <p>“When a method runs, Java needs a temporary working area for that method. In our classroom memory model, we call that the <strong>stack</strong>.”</p>
+          <p>“The stack is where we will picture local variables such as <code>int x</code> and local reference variables such as <code>int[] scores</code>.”</p></div>
+<pre>public static void main(String[] args) {
+    int x = 10;
+    int y = 20;
+}</pre>
+        <p>For this lesson, picture <code>x</code> and <code>y</code> inside the current method's stack frame.</p>
+        <div class="say key"><strong class="t">Key distinction</strong><p>Primitive local variables hold primitive values directly. Reference variables hold references to objects.</p></div>
+      </div>
+      <div class="board">
+        <div class="mem solo"><div class="zone stack"><h4>Stack <small>conceptual stack frame</small></h4><div class="frame-name">main()</div>
+          <div class="var"><span>x</span><span class="val">10</span></div><div class="var"><span>y</span><span class="val">20</span></div></div></div>
+        <div class="ask" data-quiz>
+          <strong class="t">Ask students</strong>
+          <p>If <code>x</code> is a primitive <code>int</code>, what does the variable itself hold?</p>
+          <div class="choices">
+            <button class="btn" data-ok="1" data-msg="Correct. A primitive int variable holds the integer value directly.">The actual integer value</button>
+            <button class="btn" data-ok="0" data-msg="Not for a primitive int. A primitive variable stores its primitive value directly.">A reference</button>
+          </div><div class="fb"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="s4" class="scene" data-title="Heap Memory">
+    <div class="head"><div class="big-n">04</div><div class="kick">Where objects live conceptually</div><h2>Heap memory: where array objects are created</h2></div>
+    <p class="lead">Now compare a primitive value with an array object.</p>
+    <div class="split">
+      <div class="story">
+<pre>int x = 10;
+int[] scores = new int[4];</pre>
+        <div class="say"><strong class="t">Instructor narrative</strong><p>“The variable <code>x</code> can hold its integer directly. But the array is an object. In the usual introductory Java memory model, objects are created in the <strong>heap</strong>.”</p></div>
+        <div class="say note"><strong class="t">Important classroom note</strong><p>The stack/heap picture is a useful conceptual model for introductory Java. Real JVM implementations may manage memory internally in more complex ways, but this model correctly explains references, object lifetimes, aliasing, and array behavior for students.</p></div>
+      </div>
+      <div class="board">
+        <div class="mem">
+          <div class="zone stack"><h4>Stack</h4><div class="var"><span>x</span><span class="val">10</span></div><div class="var"><span>scores</span><span class="val" style="color:var(--ref);font-size:14px">reference</span></div></div>
+          <div class="zone heap"><h4>Heap</h4><div class="arr"><div class="cell"><i>[0]</i><b>0</b></div><div class="cell"><i>[1]</i><b>0</b></div><div class="cell"><i>[2]</i><b>0</b></div><div class="cell"><i>[3]</i><b>0</b></div></div></div>
+        </div>
+        <div class="ask" data-quiz>
+          <strong class="t">Prediction</strong>
+          <p>After <code>new int[4]</code>, what values are initially inside the array?</p>
+          <div class="choices">
+            <button class="btn" data-ok="1" data-msg="Correct. A newly created int[] is initialized with zeros.">0, 0, 0, 0</button>
+            <button class="btn" data-ok="0" data-msg="Java initializes the elements of a new int[] to 0.">Unknown values</button>
+          </div><div class="fb"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="s5" class="scene" data-title="Reference Arrows">
+    <div class="head"><div class="big-n">05</div><div class="kick">Connect stack to heap</div><h2>Reference arrows: how the variable finds the object</h2></div>
+    <div class="split">
+      <div class="story">
+        <pre>int[] scores = new int[4];</pre>
+        <div class="say"><strong class="t">Instructor narrative</strong><p>“The stack variable <code>scores</code> does not contain the four array elements. It contains a <strong>reference</strong>. We draw an arrow from the variable to the array object to represent that relationship.”</p></div>
+        <div class="ask" data-quiz>
+          <strong class="t">Ask students</strong>
+          <p>Does the arrow represent a Java variable that students can directly print as a raw memory address?</p>
+          <div class="choices">
+            <button class="btn" data-ok="1" data-msg="Correct. The arrow is a conceptual picture of the reference relationship.">No</button>
+            <button class="btn" data-ok="0" data-msg="No. We use the arrow to visualize which object the reference points to; Java does not expose it to students as a raw address to manipulate.">Yes</button>
+          </div><div class="fb"></div>
+        </div>
+        <div class="say key"><strong class="t">Best wording</strong><p>“The arrow is a <strong>conceptual reference relationship</strong>. It helps us see which object the variable refers to.”</p></div>
+      </div>
+      <div class="board">
+        <div class="mem" id="mem5">
+          <svg class="wires" aria-hidden="true"></svg>
+          <div class="zone stack"><h4>Stack</h4><div class="var" data-to="o5"><span>scores</span><span class="dot"></span></div></div>
+          <div class="zone heap"><h4>Heap <small>array object</small></h4><div class="arr" data-obj="o5"><div class="cell"><i>[0]</i><b>0</b></div><div class="cell"><i>[1]</i><b>0</b></div><div class="cell"><i>[2]</i><b>0</b></div><div class="cell"><i>[3]</i><b>0</b></div></div></div>
+        </div>
+        <div class="ask">
+          <strong class="t">Build the statement in three moves</strong>
+          <div class="choices" data-steps="mem5">
+            <button class="btn" data-step="1" data-msg="Step 1: int[] scores declares a local reference variable named scores.">1. Declare variable</button>
+            <button class="btn" data-step="2" data-msg="Step 2: new int[4] creates the array object.">2. Create array</button>
+            <button class="btn" data-step="3" data-msg="Step 3: the reference to that new array is stored in scores.">3. Store reference</button>
+          </div>
+          <div class="narr">Click Step 1.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="s6" class="scene" data-title="Accessing Elements">
+    <div class="head"><div class="big-n">06</div><div class="kick">Following the arrow</div><h2>Accessing an element means following the reference</h2></div>
+    <div class="split">
+      <div class="story">
+        <p>Suppose:</p>
+        <pre>int[] scores = {90, 85, 100, 75};</pre>
+        <div class="ask">
+          <strong class="t">Walk through scores[2]</strong>
+          <div class="choices" data-steps="mem6">
+            <button class="btn" data-step="1" data-msg="Step 1: Java evaluates the local variable scores.">1. Find <code>scores</code></button>
+            <button class="btn" data-step="2" data-msg="Step 2: Java follows the reference from scores to the array object.">2. Follow reference</button>
+            <button class="btn" data-step="3" data-msg="Step 3: Java selects index 2. The value stored there is 100.">3. Go to index 2</button>
+          </div>
+          <div class="narr">Click Step 1.</div>
+        </div>
+        <div class="say"><strong class="t">Narrative sentence</strong><p>“Java evaluates <code>scores</code>, follows the reference to the array object, then selects element number 2.”</p></div>
+      </div>
+      <div class="board">
+        <div class="mem" id="mem6">
+          <svg class="wires" aria-hidden="true"></svg>
+          <div class="zone stack"><h4>Stack</h4><div class="var" data-to="o6"><span>scores</span><span class="dot"></span></div></div>
+          <div class="zone heap"><h4>Heap</h4><div class="arr" data-obj="o6"><div class="cell"><i>[0]</i><b>90</b></div><div class="cell"><i>[1]</i><b>85</b></div><div class="cell" data-index="2"><i>[2]</i><b>100</b></div><div class="cell"><i>[3]</i><b>75</b></div></div></div>
+        </div>
+        <p class="cap">Stack variable → reference → heap array → element [2]</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="s7" class="scene" data-title="Two Names">
+    <div class="head"><div class="big-n">07</div><div class="kick">Two variables, one heap object</div><h2>Aliasing: two references can point to the same array</h2></div>
+    <div class="split">
+      <div class="story">
+<pre>int[] a = {10, 20, 30};
+int[] b = a;</pre>
+        <div class="ask">
+          <strong class="t">Prediction</strong>
+          <p>After <code>b[0] = 99;</code>, what does <code>a[0]</code> become?</p>
+          <div class="choices" id="aliasQ">
+            <button class="btn" data-a="10">10</button>
+            <button class="btn" data-a="99">99</button>
+          </div><div class="fb" id="aliasFb"></div>
+        </div>
+        <div class="say"><strong class="t">Instructor explanation</strong><p>“Assignment between reference variables copies the reference, not the array object itself. So both variables can reach the same heap object.”</p></div>
+      </div>
+      <div class="board">
+        <div class="mem" id="mem7">
+          <svg class="wires" aria-hidden="true"></svg>
+          <div class="zone stack"><h4>Stack</h4><div class="var" data-to="o7"><span>a</span><span class="dot"></span></div><div class="var" data-to="o7"><span>b</span><span class="dot"></span></div></div>
+          <div class="zone heap"><h4>Heap <small>one array</small></h4><div class="arr" data-obj="o7"><div class="cell" id="alias0"><i>[0]</i><b>10</b></div><div class="cell"><i>[1]</i><b>20</b></div><div class="cell"><i>[2]</i><b>30</b></div></div></div>
+        </div>
+        <p class="cap"><code>b</code> holds the same reference as <code>a</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section id="s8" class="scene" data-title="null">
+    <div class="head"><div class="big-n">08</div><div class="kick">A reference to nowhere</div><h2>Understanding <code>null</code></h2></div>
+    <div class="split">
+      <div class="story">
+        <pre>int[] data = null;</pre>
+        <div class="ask" data-quiz>
+          <strong class="t">Ask students</strong>
+          <p>What happens if Java tries to evaluate <code>data.length</code>?</p>
+          <div class="choices">
+            <button class="btn" data-ok="0" data-msg="No. null does not mean an empty array. It means no array object is referenced.">It returns 0</button>
+            <button class="btn" data-ok="1" data-msg="Correct. Java cannot follow null to an array object, so a NullPointerException occurs.">NullPointerException</button>
+          </div><div class="fb"></div>
+        </div>
+        <div class="say note"><strong class="t">Important precision</strong><p>A local variable declared only as <code>int[] data;</code> must be definitely assigned before use. To demonstrate null, explicitly write <code>int[] data = null;</code>.</p></div>
+      </div>
+      <div class="board">
+        <div class="mem">
+          <div class="zone stack"><h4>Stack</h4><div class="var"><span>data</span><span class="nul">null</span></div></div>
+          <div class="zone heap"><h4>Heap</h4><div class="empty">No array object</div></div>
+        </div>
+        <p class="cap">No arrow: <code>null</code> refers to nothing</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section id="s9" class="scene" data-title="Garbage Collection">
+    <div class="head"><div class="big-n">09</div><div class="kick">What if no reference remains?</div><h2>Garbage collection: unreachable objects can be reclaimed</h2></div>
+    <div class="split">
+      <div class="story">
+        <p>Start with:</p>
+        <pre>int[] data = {5, 10, 15};</pre>
+        <div class="ask">
+          <strong class="t">Now execute</strong>
+          <pre>data = null;</pre>
+          <div class="choices"><button class="btn go" id="gcBtn">Show what changes</button></div>
+          <div class="fb" id="gcText"></div>
+        </div>
+        <div class="say"><strong class="t">Instructor narrative</strong><p>“The array object does not instantly disappear the moment the reference is removed. But if no reachable reference can get to that object anymore, the JVM may later reclaim that memory through garbage collection.”</p></div>
+        <div class="say key"><strong class="t">Key phrase for students</strong><p><strong>Unreachable object</strong> = an object that the running program can no longer reach through any live reference.</p></div>
+      </div>
+      <div class="board">
+        <div class="mem" id="mem9">
+          <svg class="wires" aria-hidden="true"></svg>
+          <div class="zone stack"><h4>Stack</h4><div class="var" data-to="o9" id="gcVar"><span>data</span><span class="dot"></span></div></div>
+          <div class="zone heap"><h4>Heap <small>array</small></h4><div class="arr" data-obj="o9" id="gcArr"><div class="cell"><i>[0]</i><b>5</b></div><div class="cell"><i>[1]</i><b>10</b></div><div class="cell"><i>[2]</i><b>15</b></div></div><div class="tag" id="gcTag">🗑️ unreachable — may be reclaimed later</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section id="s10" class="scene" data-title="Final Picture">
+    <div class="head"><div class="big-n">10</div><div class="kick">Put the whole memory story together</div><h2>The complete mental model</h2></div>
+    <div class="stack-gap">
+      <div class="say"><strong class="t">Closing narrative</strong><p>“When you see an array, separate the picture into two parts: the <strong>reference variable</strong> and the <strong>array object</strong>. Then draw the arrow between them.”</p></div>
+      <div class="sides">
+        <div class="zone stack"><h4>Stack side</h4><ul><li>Current method calls</li><li>Local primitive variables</li><li>Local reference variables</li><li>Temporary working data for method execution</li></ul></div>
+        <div class="zone heap"><h4>Heap side</h4><ul><li>Array objects</li><li>Objects created with <code>new</code></li><li>Objects may be shared by several references</li><li>Unreachable objects may later be garbage-collected</li></ul></div>
+      </div>
+      <div class="split">
+        <div class="ask">
+          <strong class="t">Final memory trace</strong>
+<pre>int[] first = {4, 8, 12};
+int[] second = first;
+second[1] = 50;</pre>
+          <p style="margin-top:12px;font-size:19px">Ask students to draw:</p>
+          <ol class="draw"><li>Two reference variables in the stack frame.</li><li>One array object in the heap.</li><li>Two arrows pointing to the same array.</li><li>The array contents <code>[4, 50, 12]</code>.</li></ol>
+          <div class="choices"><button class="btn go" id="finalReveal">Reveal picture</button></div>
+        </div>
+        <div class="board">
+          <div class="mem" id="mem10" style="visibility:hidden">
+            <svg class="wires" aria-hidden="true"></svg>
+            <div class="zone stack"><h4>Stack</h4><div class="var" data-to="o10"><span>first</span><span class="dot"></span></div><div class="var" data-to="o10"><span>second</span><span class="dot"></span></div></div>
+            <div class="zone heap"><h4>Heap</h4><div class="arr" data-obj="o10"><div class="cell"><i>[0]</i><b>4</b></div><div class="cell hot"><i>[1]</i><b>50</b></div><div class="cell"><i>[2]</i><b>12</b></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="say key"><strong class="t">Final sentence to leave on screen</strong><p>“Read array code as a picture:”</p>
+        <div class="chain"><span class="a">stack variable</span><em>→</em><span class="b">reference arrow</span><em>→</em><span class="c">heap object</span><em>→</em><span class="d">indexed element</span></div></div>
+    </div>
+  </section>
+
+  <p class="foot">Teaching note: stack/heap diagrams and arrows are conceptual teaching models. They are intended to explain Java references and object behavior, not expose literal physical memory addresses.</p>
+  </main>
+</div>
+
+<div class="dock">
+  <button class="btn" id="prev">← Back</button>
+  <div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div>
+  <span class="where" id="where"></span>
+  <button class="btn go" id="next">Next →</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var scenes=[].slice.call(document.querySelectorAll('.scene')), cur=0, seen={};
+  var $=function(id){return document.getElementById(id);};
+
+  /* --- Java colouring --- */
+  document.querySelectorAll('pre').forEach(function(p){
+    var s=p.textContent.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    p.innerHTML=s.replace(/(\/\/.*)|\b(public|static|void|new|null)\b|\b(int|String)\b|\b(\d+)\b/g,function(m,c,k,t,d){
+      return c?'<span class="c">'+m+'</span>':k?'<span class="k">'+m+'</span>':t?'<span class="t">'+m+'</span>':'<span class="d">'+m+'</span>';});
+  });
+
+  /* --- navigation --- */
+  var steps=$('steps');
+  scenes.forEach(function(s,i){
+    var li=document.createElement('li');
+    li.innerHTML='<button type="button"><span class="n">'+(i+1)+'</span><span>'+s.dataset.title+'</span></button>';
+    li.firstChild.addEventListener('click',function(){show(i);});
+    steps.appendChild(li);
+  });
+  function show(i,keep){
+    cur=Math.max(0,Math.min(scenes.length-1,i)); seen[cur]=1;
+    scenes.forEach(function(s,k){s.classList.toggle('active',k===cur);});
+    [].forEach.call(steps.children,function(li,k){
+      li.firstChild.className=k===cur?'active':(seen[k]?'done':'');
+      if(k===cur){li.firstChild.setAttribute('aria-current','step');li.scrollIntoView({block:'nearest',inline:'center'});}else li.firstChild.removeAttribute('aria-current');
+    });
+    $('fill').style.width=(100*(cur+1)/scenes.length)+'%';
+    $('where').textContent='Scene '+(cur+1)+' of '+scenes.length;
+    $('prev').style.visibility=cur?'visible':'hidden';
+    $('next').textContent=cur===scenes.length-1?'Restart lecture':'Next →';
+    try{history.replaceState(null,'','#'+scenes[cur].id);}catch(e){}
+    if(!keep)window.scrollTo(0,0);
+    drawAll();
+  }
+  $('prev').addEventListener('click',function(){show(cur-1);});
+  $('next').addEventListener('click',function(){show(cur===scenes.length-1?0:cur+1);});
+  document.addEventListener('keydown',function(e){
+    if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+    if(e.key==='ArrowRight')show(cur+1); if(e.key==='ArrowLeft')show(cur-1);
+  });
+
+  /* --- reference arrows: drawn from each variable's dot to its heap object --- */
+  var NS='http://www.w3.org/2000/svg';
+  function draw(mem){
+    var svg=mem.querySelector('.wires'); if(!svg)return;
+    var r=mem.getBoundingClientRect(); if(!r.width)return;
+    svg.setAttribute('viewBox','0 0 '+r.width+' '+r.height);
+    svg.innerHTML='<defs><marker id="h_'+mem.id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:#ff6fa6;stroke:none"/></marker></defs>';
+    var vars=mem.querySelectorAll('.var[data-to]'), stage=mem.dataset.stage;
+    [].forEach.call(vars,function(v,i){
+      var dot=v.querySelector('.dot'), tgt=mem.querySelector('[data-obj="'+v.dataset.to+'"]');
+      if(!tgt||(stage&&stage<3))return;
+      var cut=v.dataset.wire==='cut';
+      var d=(dot||v).getBoundingClientRect(), t=tgt.getBoundingClientRect();
+      var x1=(dot?d.left+d.width/2:d.right)-r.left, y1=d.top+d.height/2-r.top;
+      var x2=t.left-r.left-10, y2=t.top+t.height/2-r.top+(i-(vars.length-1)/2)*30;
+      if(cut){x2=x1+(x2-x1)*.6;y2=y1+(y2-y1)*.6;}
+      var k=(x2-x1)*.5, p=document.createElementNS(NS,'path');
+      p.setAttribute('d','M'+x1+' '+y1+' C'+(x1+k)+' '+y1+' '+(x2-k)+' '+y2+' '+x2+' '+y2);
+      if(cut){p.setAttribute('class','cut');var x=document.createElementNS(NS,'text');x.setAttribute('x',x2+4);x.setAttribute('y',y2+9);x.textContent='✕';svg.appendChild(x);}
+      else{p.setAttribute('marker-end','url(#h_'+mem.id+')');if(v.dataset.wire==='hot')p.setAttribute('class','hot');}
+      svg.appendChild(p);
+    });
+  }
+  function drawAll(){scenes[cur].querySelectorAll('.mem').forEach(draw);}
+  window.addEventListener('resize',drawAll);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawAll);
+
+  /* --- two-choice questions --- */
+  document.querySelectorAll('[data-quiz]').forEach(function(q){
+    var fb=q.querySelector('.fb');
+    q.querySelectorAll('.btn').forEach(function(b){b.addEventListener('click',function(){
+      q.querySelectorAll('.btn').forEach(function(x){x.classList.remove('right','wrong');});
+      var ok=b.dataset.ok==='1'; b.classList.add(ok?'right':'wrong');
+      fb.className='fb '+(ok?'ok':'no'); fb.textContent=(ok?'✓ ':'✗ ')+b.dataset.msg;
+    });});
+  });
+
+  /* --- scene 2: reveal indexes --- */
+  $('showIndexes').addEventListener('click',function(){
+    [].forEach.call($('idxArr').children,function(c,i){c.querySelector('i').textContent='index '+i;c.classList.add('hot');setTimeout(function(){c.classList.remove('hot');},500+i*150);});
+    $('idxFb').innerHTML='Java uses <strong>indexes</strong>, beginning at <strong>0</strong>.';
+  });
+
+  /* --- scenes 5 and 6: three-step walk-throughs that drive the diagram --- */
+  document.querySelectorAll('[data-steps]').forEach(function(g){
+    var mem=$(g.dataset.steps), narr=g.parentNode.querySelector('.narr'), build=mem.id==='mem5';
+    g.querySelectorAll('.btn').forEach(function(b){b.addEventListener('click',function(){
+      g.querySelectorAll('.btn').forEach(function(x){x.classList.toggle('on',x===b);});
+      var s=+b.dataset.step, v=mem.querySelector('.var'); narr.textContent=b.dataset.msg;
+      if(build){mem.dataset.stage=s; v.classList.toggle('hot',s===1);}
+      else{v.classList.toggle('hot',s===1); v.dataset.wire=s>=2?'hot':'';
+        mem.querySelectorAll('.cell').forEach(function(c){c.classList.toggle('hot',s===3&&c.dataset.index==='2');});}
+      draw(mem);
+    });});
+  });
+
+  /* --- scene 7: aliasing --- */
+  $('aliasQ').querySelectorAll('.btn').forEach(function(b){b.addEventListener('click',function(){
+    var ok=b.dataset.a==='99', fb=$('aliasFb');
+    $('aliasQ').querySelectorAll('.btn').forEach(function(x){x.classList.remove('right','wrong');});
+    b.classList.add(ok?'right':'wrong'); fb.className='fb '+(ok?'ok':'no');
+    if(ok){fb.textContent='✓ Correct. Both variables reach the same heap object.';
+      $('alias0').querySelector('b').textContent='99'; $('alias0').classList.add('hot');
+      $('mem7').querySelectorAll('.var').forEach(function(v){v.dataset.wire='hot';}); draw($('mem7'));}
+    else fb.textContent='✗ Remember: b = a copies the reference. It does not create a second array.';
+  });});
+
+  /* --- scene 9: garbage collection --- */
+  $('gcBtn').addEventListener('click',function(){
+    var v=$('gcVar'); v.dataset.wire='cut';
+    v.querySelector('.dot').outerHTML='<span class="nul">null</span>';
+    $('gcArr').classList.add('gone'); $('gcTag').classList.add('show');
+    $('gcText').className='fb no';
+    $('gcText').textContent='The variable now stores null. If no other live reference reaches this array, the object is unreachable and may later be reclaimed by garbage collection.';
+    this.disabled=true; draw($('mem9'));
+  });
+
+  /* --- scene 10: final picture --- */
+  $('finalReveal').addEventListener('click',function(){$('mem10').style.visibility='visible';draw($('mem10'));});
+
+  var start=scenes.map(function(s){return '#'+s.id;}).indexOf(location.hash);
+  show(start>0?start:0,true);
+})();
+</script>
+</body>
+</html>
