@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Java Array Sorting — Interactive Classroom Lecture</title>
+<style>
+:root{
+  --bg:#151a21; --panel:#1c232d; --gutter:#10151b;
+  --ink:#e3e9f2; --muted:#94a1b5; --line:#2a3442;
+  --accent:#f2b63c; --accent-soft:rgba(242,182,60,.14); --accent-strong:rgba(242,182,60,.26);
+  --teal:#57d9c0; --teal-soft:rgba(87,217,192,.14);
+  --blue:#82b8f0; --red:#e0716f;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono","SF Mono",Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--serif);font-size:1.12rem;background:var(--bg);color:var(--ink);line-height:1.7}
+.wrap{max-width:1140px;margin:auto;padding:28px 20px 48px}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:1.4fr .6fr;gap:18px;align-items:start;padding:18px 0 6px}
+.hero h1{font-size:clamp(2rem,4.5vw,3rem);line-height:1.1;margin:.3rem 0 .6rem;font-weight:700}
+.big{font-size:1.25rem;font-weight:600;display:inline;background:linear-gradient(transparent 62%,rgba(242,182,60,.38) 62%);padding:0 .15em}
+.eyebrow{font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--accent);text-transform:none;letter-spacing:.02em}
+h1,h2,h3{line-height:1.2}
+h2{font-size:1.8rem;margin:.3rem 0 .6rem;font-weight:700}
+h3{font-family:var(--mono);font-size:1.15rem;color:var(--accent);margin:.2rem 0 .4rem;font-weight:700}
+
+/* ---------- cards ---------- */
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.soft{background:var(--gutter)}
+.question{border-left:4px solid var(--blue)}
+.question>strong{font-family:var(--mono);font-size:.8rem;font-weight:500;color:var(--blue);letter-spacing:.05em;text-transform:uppercase}
+.teacher{border-left:4px solid var(--teal);background:rgba(87,217,192,.05)}
+.teacher>strong{font-family:var(--mono);font-size:.8rem;font-weight:500;color:var(--teal);letter-spacing:.05em;text-transform:uppercase}
+.teacher p{font-style:italic}
+.teacher pre{font-style:normal}
+
+/* ---------- tabs & buttons ---------- */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 20px}
+button{min-height:42px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);padding:9px 16px;font-family:var(--mono);font-size:.88rem;font-weight:500;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.active{background:var(--accent);border-color:var(--accent);color:#1a1408;font-weight:700}
+.navrow{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:24px}
+.navrow button{border-radius:10px}
+.navrow button:last-child{background:var(--accent);border-color:var(--accent);color:#1a1408;font-weight:700}
+
+/* ---------- scenes ---------- */
+.story{display:none}
+.story.active{display:block}
+@media (prefers-reduced-motion:no-preference){
+  .story.active{animation:sceneIn .35s ease-out}
+  @keyframes sceneIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .cell{transition:background .3s,border-color .3s,color .3s}
+}
+
+/* ---------- code (their snippets + expected output) ---------- */
+pre,code{font-family:var(--mono)}
+pre{white-space:pre-wrap;background:var(--gutter);color:var(--ink);padding:16px;border-radius:12px;border:1px solid var(--line);overflow:auto;font-size:.95rem;line-height:1.65}
+code{font-size:.9em;background:var(--gutter);border:1px solid var(--line);border-radius:5px;padding:.08em .4em}
+pre code{border:none;background:none;padding:0}
+
+/* ---------- the array cells: the page's signature ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.arr{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.cell{min-width:72px;border:1.5px solid var(--line);border-radius:12px;padding:12px 10px;text-align:center;background:var(--gutter);font-family:var(--mono)}
+.cell strong{font-size:1.4rem;font-weight:700}
+.cell small{color:var(--muted);font-size:.72rem}
+.mark{background:var(--accent-soft)!important;border-color:var(--accent)!important}
+.sorted{background:var(--teal-soft)!important;border-color:var(--teal)!important}
+.pivot{background:var(--accent-strong)!important;border-color:var(--accent)!important}
+.feedback{margin-top:14px;font-family:var(--mono);font-size:.95rem;font-weight:500;color:var(--teal);min-height:1.4em}
+
+/* ---------- text utilities & table ---------- */
+.small{font-size:.92rem}.muted{color:var(--muted)}
+.tableWrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{border:1px solid var(--line);padding:11px 12px;text-align:left}
+th{background:var(--panel);font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--teal)}
+td:first-child{font-weight:600}
+
+/* ---------- complete-Java panels ---------- */
+details.javacode{background:var(--gutter);border:1px solid var(--line);border-radius:14px;padding:0;margin-top:16px}
+details.javacode>summary{cursor:pointer;list-style:none;padding:14px 20px;font-family:var(--mono);font-size:.95rem;color:var(--accent)}
+details.javacode>summary::-webkit-details-marker{display:none}
+details.javacode>summary::before{content:"\25B8  "}
+details.javacode[open]>summary::before{content:"\25BE  "}
+details.javacode>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+details.javacode>*:not(summary){margin-left:20px;margin-right:20px}
+details.javacode>.outbox{margin-bottom:18px}
+.copyrow{display:flex;gap:8px;justify-content:flex-end;margin:4px 0 0;flex-wrap:wrap}
+.copyrow button{min-height:36px;padding:6px 14px;font-size:.84rem;border-radius:8px;color:var(--accent);border-color:var(--accent);background:transparent}
+.copyrow button:hover{background:var(--accent);color:#1a1408}
+.copyrow button[data-main]{color:var(--muted);border-color:var(--line)}
+.copyrow button[data-main]:hover{background:var(--panel);color:var(--ink);border-color:var(--muted)}
+.codewrap{display:grid;grid-template-columns:1.3fr .7fr;gap:14px;margin-top:12px}
+.codelines{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 0;overflow:auto}
+.cl{display:flex;cursor:pointer;border-left:3px solid transparent}
+.cl .ln{min-width:3.2ch;padding:0 9px;text-align:right;color:#4b5769;font-family:var(--mono);font-size:.84rem;user-select:none}
+.cl .ct{font-family:var(--mono);font-size:.95rem;line-height:1.62;white-space:pre;padding-right:16px}
+.cl:hover{background:rgba(255,255,255,.04)}
+.cl.active{background:var(--accent-soft);border-left-color:var(--accent)}
+.cl.active .ln{color:var(--accent)}
+.cl:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tk-kw{color:#b8a1f5}.tk-typ{color:var(--blue)}.tk-str{color:var(--teal)}.tk-com{color:#67748a;font-style:italic}.tk-num{color:#eaa46b}
+.expl{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:12px;align-self:start;min-height:160px}
+.expl .lineno{display:inline-block;font-family:var(--mono);font-size:.76rem;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 11px;margin-bottom:9px}
+.expl pre.echo{margin:0 0 10px;padding:8px 11px;font-size:.84rem;color:var(--blue)}
+.expl .note{margin:0;font-size:1.02rem;line-height:1.6}
+.expl .pinstate{margin:11px 0 0;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.outbox{margin-top:12px}
+.outbox>span{font-family:var(--mono);font-size:.8rem}
+.outbox pre{margin:6px 0 0;font-size:.88rem}
+
+@media(max-width:800px){
+  .hero,.grid2,.grid3,.codewrap{grid-template-columns:1fr}
+  .expl{position:static}
+  body{font-size:1.05rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<div><div class="eyebrow">MAC286 • Narrative-First Interactive Lecture</div><h1>Mastering Java Array Sorting</h1><p class="big">How sorting algorithms think — before we look at the code.</p><p class="muted">Explain → ask → predict → visualize → connect to Java.</p></div>
+<div class="card soft"><strong>Teaching goal</strong><p class="small">Students should be able to predict the next move of each algorithm, not merely memorize loops.</p></div>
+</section>
+
+<div class="tabs">
+<button class="tab active" data-tab="s1">1. Why Sort?</button><button class="tab" data-tab="s2">2. Swap</button><button class="tab" data-tab="s3">3. Big-O</button><button class="tab" data-tab="s4">4. Bubble</button><button class="tab" data-tab="s5">5. Selection</button><button class="tab" data-tab="s6">6. Insertion</button><button class="tab" data-tab="s7">7. Quick Sort</button><button class="tab" data-tab="s8">8. Compare</button><button class="tab" data-tab="s9">9. Final Check</button>
+</div>
+
+<section id="s1" class="story active panel">
+<div class="eyebrow">Scene 1 • Start with the problem</div><h2>Why do we sort data?</h2><p>Suppose these are student scores:</p>
+<div class="arr"><div class="cell"><strong>72</strong></div><div class="cell"><strong>95</strong></div><div class="cell"><strong>61</strong></div><div class="cell"><strong>88</strong></div><div class="cell"><strong>79</strong></div></div>
+<div class="card question" style="margin-top:18px"><strong>Ask the class</strong><p>Which tasks become easier after sorting?</p><button class="sortWhy">Find smallest</button><button class="sortWhy">Find largest</button><button class="sortWhy">Rank students</button><button class="sortWhy">All of these</button><div id="whyFeedback" class="feedback"></div></div>
+<div class="card soft teacher"><strong>Instructor narrative</strong><p>“Sorting means rearranging the values into an order — usually ascending or descending. The values do not disappear; they simply change positions.”</p></div>
+<div class="navrow"><span></span><button data-next="s2">Next →</button></div>
+</section>
+
+<section id="s2" class="story panel">
+<div class="eyebrow">Scene 2 • The basic move</div><h2>What is a swap?</h2><p>Sorting algorithms often need to exchange two values.</p>
+<div class="arr"><div id="swapA" class="cell mark"><small>index 0</small><br><strong>9</strong></div><div id="swapB" class="cell mark"><small>index 1</small><br><strong>3</strong></div></div>
+<div class="card question" style="margin-top:18px"><strong>Ask students</strong><p>If we want ascending order, should 9 and 3 stay where they are?</p><button class="swapQ" data-a="no">No, swap them</button><button class="swapQ" data-a="yes">Yes, keep them</button><div id="swapFeedback" class="feedback"></div></div>
+<div class="card teacher"><strong>Explain the temporary variable</strong><p>“If I overwrite one value too early, I lose it. So Java temporarily saves one value while the two positions exchange contents.”</p><pre>int temp = arr[i];
+arr[i] = arr[j];
+arr[j] = temp;</pre></div>
+<details class="card javacode" data-class="SwapDemo"><summary><strong>Show Java after the movement makes sense — complete SwapDemo.java</strong></summary>
+<div class="copyrow"><button type="button" class="copyBtn">Copy code</button><button type="button" class="copyBtn" data-main="1" title="Same program with the class renamed to Main — what Programiz, JDoodle and OnlineGDB expect">Copy as Main.java</button></div>
+<div class="codewrap">
+<div class="codelines"></div>
+<div class="expl"><p class="note muted">Click or hover on any line of code — its complete explanation appears here.</p></div>
+</div>
+<div class="outbox"><span class="small muted">Expected output:</span><pre>9 3
+3 9</pre></div>
+<script type="text/plain" class="src">
+public class SwapDemo {
+    public static void main(String[] args) {
+        int[] arr = {9, 3};
+        System.out.println(arr[0] + " " + arr[1]);
+
+        // The three-step exchange from this scene
+        int temp = arr[0];
+        arr[0] = arr[1];
+        arr[1] = temp;
+
+        System.out.println(arr[0] + " " + arr[1]);
+    }
+}
+</script>
+<script type="application/json" class="notes">
+[
+"The scene's swap, as a complete program you can run.",
+"Start.",
+"The two values from the demo above: 9 at index 0, 3 at index 1.",
+"Prints 9 3 - the before picture.",
+"",
+"Why three steps? With two, arr[0] = arr[1] would destroy the 9 before anyone saved it.",
+"Step 1: SAVE one value. temp now holds the 9.",
+"Step 2: overwrite index 0 with the 3. The 9 is safe in temp.",
+"Step 3: put the saved 9 into index 1. Exchange complete - nothing lost.",
+"",
+"Prints 3 9 - ascending order, exactly what the question above asked for.",
+"Closes main().",
+"Closes the class."
+]
+</script>
+</details>
+<div class="navrow"><button data-next="s1">← Back</button><button data-next="s3">Next →</button></div>
+</section>
+
+<section id="s3" class="story panel">
+<div class="eyebrow">Scene 3 • How expensive is the algorithm?</div><h2>Big-O: how the work grows</h2>
+<div class="grid3"><div class="card"><h3>O(n)</h3><p>Double the data → roughly double the work.</p></div><div class="card"><h3>O(n²)</h3><p>Double the data → roughly four times the work.</p></div><div class="card"><h3>O(n log n)</h3><p>Much better scaling for large input.</p></div></div>
+<div class="card question" style="margin-top:18px"><strong>Prediction</strong><p>Which grows faster for large n?</p><button class="bigOQ" data-a="n2">O(n²)</button><button class="bigOQ" data-a="nlogn">O(n log n)</button><div id="bigOFeedback" class="feedback"></div></div>
+<div class="card soft teacher"><strong>Instructor wording</strong><p>“Big-O is not a stopwatch. It tells us how the amount of work grows as the input size grows.”</p></div>
+<div class="navrow"><button data-next="s2">← Back</button><button data-next="s4">Next →</button></div>
+</section>
+
+<section id="s4" class="story panel">
+<div class="eyebrow">Scene 4 • Bubble Sort</div><h2>Bubble Sort: compare neighbors</h2><p class="big">Rule: compare adjacent values. If the left one is larger, swap them.</p>
+<div class="card soft teacher"><strong>Story to tell</strong><p>“The largest unsorted value moves step by step toward the far right. After a full pass, it is in its final position.”</p></div>
+<div class="card"><div id="bubbleArray" class="arr"></div><div id="bubbleText" class="feedback" style="text-align:center">Press “Next comparison.”</div><div style="text-align:center;margin-top:12px"><button id="bubbleNext">Next comparison</button><button id="bubbleReset">Reset</button></div></div>
+<div class="card question"><strong>Ask after one pass</strong><p>What is guaranteed?</p><button class="bubbleQ" data-a="largest">Largest unsorted value reaches the right</button><button class="bubbleQ" data-a="smallest">Smallest always reaches the left immediately</button><div id="bubbleFeedback" class="feedback"></div></div>
+<details class="card javacode" data-class="BubbleSort"><summary><strong>Show Java after the movement makes sense — complete BubbleSort.java</strong></summary>
+<div class="copyrow"><button type="button" class="copyBtn">Copy code</button><button type="button" class="copyBtn" data-main="1" title="Same program with the class renamed to Main — what Programiz, JDoodle and OnlineGDB expect">Copy as Main.java</button></div>
+<div class="codewrap">
+<div class="codelines"></div>
+<div class="expl"><p class="note muted">Click or hover on any line of code — its complete explanation appears here.</p></div>
+</div>
+<div class="outbox"><span class="small muted">Expected output — one line per step of the demo above:</span><pre>after pass 1: [1, 4, 2, 5, 8]
+after pass 2: [1, 2, 4, 5, 8]
+after pass 3: [1, 2, 4, 5, 8]
+no swaps - already sorted, stop early</pre></div>
+<script type="text/plain" class="src">
+import java.util.Arrays;
+
+public class BubbleSort {
+    public static void main(String[] args) {
+        int[] numbers = {5, 1, 4, 2, 8};
+
+        for (int i = 0; i < numbers.length - 1; i++) {
+            boolean swapped = false;
+            for (int j = 0; j < numbers.length - i - 1; j++) {
+                if (numbers[j] > numbers[j + 1]) {
+                    int temp = numbers[j];
+                    numbers[j] = numbers[j + 1];
+                    numbers[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            System.out.println("after pass " + (i + 1) + ": " + Arrays.toString(numbers));
+            if (!swapped) {
+                System.out.println("no swaps - already sorted, stop early");
+                break;
+            }
+        }
+    }
+}
+</script>
+<script type="application/json" class="notes">
+[
+"Arrays.toString() lets us print the array after every pass - one line per frame of the demo above.",
+"",
+"The scene's code, now complete and runnable - same loop, same variable names, plus one print per pass.",
+"Start.",
+"The same array as the step-through demo: 5, 1, 4, 2, 8.",
+"",
+"One pass per trip along the array. Each pass parks the largest unsorted value at the far right, so at most length - 1 passes.",
+"The no-swaps flag: did THIS pass do any work?",
+"Compare NEIGHBORS only. The - i shortens each pass: the last i values are already final (the green cells above).",
+"The scene's rule: if the left one is larger...",
+"...swap them. Step 1: save one value in temp (Scene 2!)...",
+"...step 2: overwrite it...",
+"...step 3: restore the saved value on the other side.",
+"Record that this pass swapped something.",
+"Closes the if.",
+"Closes the inner loop - one full pass done.",
+"The film strip: each printed line matches one full pass of the Next comparison button above.",
+"A pass with ZERO swaps can only mean the array is already sorted...",
+"...say so...",
+"...and stop early. This is the * in Scene 8's table: the O(n) best case.",
+"Closes the if.",
+"Closes the outer loop.",
+"Closes main().",
+"Closes the class."
+]
+</script>
+</details>
+<div class="navrow"><button data-next="s3">← Back</button><button data-next="s5">Next →</button></div>
+</section>
+
+<section id="s5" class="story panel">
+<div class="eyebrow">Scene 5 • Selection Sort</div><h2>Selection Sort: find the smallest remaining value</h2>
+<div class="card soft teacher"><strong>Story to tell</strong><p>“Split the array mentally into a sorted region on the left and an unsorted region on the right. Find the minimum on the unsorted side and move it into the next open position.”</p></div>
+<div class="card"><div id="selectionArray" class="arr"></div><div id="selectionText" class="feedback" style="text-align:center">Press “Select next minimum.”</div><div style="text-align:center;margin-top:12px"><button id="selectionNext">Select next minimum</button><button id="selectionReset">Reset</button></div></div>
+<div class="card question"><strong>Ask students</strong><p>What is Selection Sort selecting?</p><button class="selectionQ" data-a="min">Minimum from the unsorted region</button><button class="selectionQ" data-a="neighbor">Two neighbors</button><div id="selectionFeedback" class="feedback"></div></div>
+<details class="card javacode" data-class="SelectionSort"><summary><strong>Show Java after the movement makes sense — complete SelectionSort.java</strong></summary>
+<div class="copyrow"><button type="button" class="copyBtn">Copy code</button><button type="button" class="copyBtn" data-main="1" title="Same program with the class renamed to Main — what Programiz, JDoodle and OnlineGDB expect">Copy as Main.java</button></div>
+<div class="codewrap">
+<div class="codelines"></div>
+<div class="expl"><p class="note muted">Click or hover on any line of code — its complete explanation appears here.</p></div>
+</div>
+<div class="outbox"><span class="small muted">Expected output — one line per step of the demo above:</span><pre>round 1: [11, 25, 12, 22, 64]
+round 2: [11, 12, 25, 22, 64]
+round 3: [11, 12, 22, 25, 64]
+round 4: [11, 12, 22, 25, 64]</pre></div>
+<script type="text/plain" class="src">
+import java.util.Arrays;
+
+public class SelectionSort {
+    public static void main(String[] args) {
+        int[] numbers = {64, 25, 12, 22, 11};
+
+        for (int i = 0; i < numbers.length - 1; i++) {
+            int min = i;
+            for (int j = i + 1; j < numbers.length; j++) {
+                if (numbers[j] < numbers[min]) {
+                    min = j;
+                }
+            }
+            int temp = numbers[i];
+            numbers[i] = numbers[min];
+            numbers[min] = temp;
+            System.out.println("round " + (i + 1) + ": " + Arrays.toString(numbers));
+        }
+    }
+}
+</script>
+<script type="application/json" class="notes">
+[
+"For printing one line per round - matching the Select next minimum button above.",
+"",
+"The complete, runnable Selection Sort from this scene.",
+"Start.",
+"The same array as the demo above: 64, 25, 12, 22, 11.",
+"",
+"One round per position: round i fills index i. The last index fills itself, so length - 1 rounds.",
+"Assume index i already holds the minimum - for now.",
+"Scan the whole unsorted region (everything after i)...",
+"...found something smaller?",
+"Remember WHERE it is. Look first - the swap happens once, after the scan.",
+"Closes the if.",
+"Closes the scan. min now points at the minimum of the unsorted region.",
+"ONE swap per round: save (Scene 2's temp)...",
+"...move the minimum into the next open position...",
+"...and the old occupant into the minimum's old spot.",
+"One line per round - the sorted region (green above) grows from the left: 11, then 12, then 22.",
+"Closes the round loop. Always a full scan, no early exit: O(n squared) in every case - see Scene 8.",
+"Closes main().",
+"Closes the class."
+]
+</script>
+</details>
+<div class="navrow"><button data-next="s4">← Back</button><button data-next="s6">Next →</button></div>
+</section>
+
+<section id="s6" class="story panel">
+<div class="eyebrow">Scene 6 • Insertion Sort</div><h2>Insertion Sort: build a sorted section</h2>
+<div class="card soft teacher"><strong>Best analogy</strong><p>“Think about arranging playing cards in your hand. Pick the next card, shift larger cards to the right, then insert the card into the correct gap.”</p></div>
+<div class="card"><div id="insertionArray" class="arr"></div><div id="insertionText" class="feedback" style="text-align:center">Press “Insert next value.”</div><div style="text-align:center;margin-top:12px"><button id="insertionNext">Insert next value</button><button id="insertionReset">Reset</button></div></div>
+<div class="card question"><strong>Ask students</strong><p>What does Insertion Sort often do?</p><button class="insertionQ" data-a="shift">Shift larger values right, then insert the key</button><button class="insertionQ" data-a="pivot">Choose a pivot</button><div id="insertionFeedback" class="feedback"></div></div>
+<details class="card javacode" data-class="InsertionSort"><summary><strong>Show Java after the movement makes sense — complete InsertionSort.java</strong></summary>
+<div class="copyrow"><button type="button" class="copyBtn">Copy code</button><button type="button" class="copyBtn" data-main="1" title="Same program with the class renamed to Main — what Programiz, JDoodle and OnlineGDB expect">Copy as Main.java</button></div>
+<div class="codewrap">
+<div class="codelines"></div>
+<div class="expl"><p class="note muted">Click or hover on any line of code — its complete explanation appears here.</p></div>
+</div>
+<div class="outbox"><span class="small muted">Expected output — one line per step of the demo above:</span><pre>insert 11: [11, 12, 13, 5, 6]
+insert 13: [11, 12, 13, 5, 6]
+insert 5: [5, 11, 12, 13, 6]
+insert 6: [5, 6, 11, 12, 13]</pre></div>
+<script type="text/plain" class="src">
+import java.util.Arrays;
+
+public class InsertionSort {
+    public static void main(String[] args) {
+        int[] numbers = {12, 11, 13, 5, 6};
+
+        for (int i = 1; i < numbers.length; i++) {
+            int key = numbers[i];
+            int j = i - 1;
+            while (j >= 0 && numbers[j] > key) {
+                numbers[j + 1] = numbers[j];
+                j = j - 1;
+            }
+            numbers[j + 1] = key;
+            System.out.println("insert " + key + ": " + Arrays.toString(numbers));
+        }
+    }
+}
+</script>
+<script type="application/json" class="notes">
+[
+"For printing one line per insertion - matching the Insert next value button above.",
+"",
+"The complete, runnable Insertion Sort from this scene.",
+"Start.",
+"The same array as the demo above: 12, 11, 13, 5, 6.",
+"",
+"Start at 1: index 0 alone is already a sorted section of size one.",
+"The key - the card you just picked up (this scene's analogy). Save it: its slot is about to be overwritten by the shifting.",
+"j starts on the last card of the sorted section, just left of the key.",
+"While sorted cards are LARGER than the key...",
+"...shift each one a step right, opening the gap...",
+"...and look one card further left.",
+"Closes the while. j + 1 is now the gap.",
+"Insert the key into the gap. The sorted section grew by one.",
+"One line per insertion - same wording as the demo: take the key, shift, insert.",
+"Closes the round loop. Already-sorted input never enters the while: the O(n) best case in Scene 8's table.",
+"Closes main().",
+"Closes the class."
+]
+</script>
+</details>
+<div class="navrow"><button data-next="s5">← Back</button><button data-next="s7">Next →</button></div>
+</section>
+
+<section id="s7" class="story panel">
+<div class="eyebrow">Scene 7 • Quick Sort</div><h2>Quick Sort: choose a pivot and divide the problem</h2>
+<div class="card soft teacher"><strong>Story to tell</strong><p>“Choose a pivot, send smaller values to the left and larger values to the right, then repeat the same idea on the smaller sections.”</p></div>
+<div class="card"><div id="quickArray" class="arr"></div><div id="quickText" class="feedback" style="text-align:center">Press “Show partition.”</div><div style="text-align:center;margin-top:12px"><button id="quickPartition">Show partition</button><button id="quickReset">Reset</button></div></div>
+<div class="card question"><strong>Ask students</strong><p>What is the pivot for?</p><button class="quickQ" data-a="divide">Divide values into smaller and larger groups</button><button class="quickQ" data-a="minimum">It must be the minimum</button><div id="quickFeedback" class="feedback"></div></div>
+<details class="card javacode" data-class="QuickSort"><summary><strong>Show Java after the movement makes sense — complete QuickSort.java</strong></summary>
+<div class="copyrow"><button type="button" class="copyBtn">Copy code</button><button type="button" class="copyBtn" data-main="1" title="Same program with the class renamed to Main — what Programiz, JDoodle and OnlineGDB expect">Copy as Main.java</button></div>
+<div class="codewrap">
+<div class="codelines"></div>
+<div class="expl"><p class="note muted">Click or hover on any line of code — its complete explanation appears here.</p></div>
+</div>
+<div class="outbox"><span class="small muted">Expected output — one line per step of the demo above:</span><pre>pivot 5 placed: [1, 5, 8, 9, 10, 7]
+pivot 7 placed: [1, 5, 7, 9, 10, 8]
+pivot 8 placed: [1, 5, 7, 8, 10, 9]
+pivot 9 placed: [1, 5, 7, 8, 9, 10]
+sorted: [1, 5, 7, 8, 9, 10]</pre></div>
+<script type="text/plain" class="src">
+import java.util.Arrays;
+
+public class QuickSort {
+
+    static void quickSort(int[] a, int low, int high) {
+        if (low < high) {
+            int p = partition(a, low, high);
+            System.out.println("pivot " + a[p] + " placed: " + Arrays.toString(a));
+            quickSort(a, low, p - 1);
+            quickSort(a, p + 1, high);
+        }
+    }
+
+    static int partition(int[] a, int low, int high) {
+        int pivot = a[high];
+        int border = low;
+        for (int j = low; j < high; j++) {
+            if (a[j] <= pivot) {
+                int temp = a[j];
+                a[j] = a[border];
+                a[border] = temp;
+                border = border + 1;
+            }
+        }
+        int temp = a[border];
+        a[border] = a[high];
+        a[high] = temp;
+        return border;
+    }
+
+    public static void main(String[] args) {
+        int[] numbers = {10, 7, 8, 9, 1, 5};
+        quickSort(numbers, 0, numbers.length - 1);
+        System.out.println("sorted: " + Arrays.toString(numbers));
+    }
+}
+</script>
+<script type="application/json" class="notes">
+[
+"Printing helper.",
+"",
+"The complete, runnable Quick Sort from this scene.",
+"",
+"quickSort sorts the piece of the array between low and high - and calls ITSELF on smaller pieces (recursion).",
+"A piece of 0 or 1 elements is already sorted - that is where the repeating stops.",
+"partition does this scene's move. p = where the pivot landed: its FINAL position, never touched again.",
+"One line per partition - like pressing Show partition on each remaining piece.",
+"Repeat the same idea on the piece LEFT of the pivot...",
+"...and the piece RIGHT of it.",
+"Closes the if.",
+"Closes quickSort().",
+"",
+"partition: the Show partition button, as code.",
+"The pivot: the LAST value of the piece - the same choice as the demo above.",
+"border marks the end of the smaller group: everything left of it is <= pivot.",
+"Walk the piece (the pivot itself excluded)...",
+"...does this value belong in the smaller group?",
+"Swap it leftward to the border: save...",
+"...move...",
+"...restore.",
+"The smaller group grew - push the border one step right.",
+"Closes the if.",
+"Closes the walk: smaller group, then larger group, pivot still at the end.",
+"Final move: swap the pivot off the end...",
+"...into the border spot, right between the two groups...",
+"...done - its final sorted position.",
+"Report where the pivot landed.",
+"Closes partition().",
+"",
+"Demo.",
+"The same array as the demo above: 10, 7, 8, 9, 1, 5.",
+"Sort the whole array: first index to last.",
+"Prints the frames, then the sorted array. Average O(n log n); an already-sorted input with last-value pivots degrades to O(n squared) - Scene 8 tells the truth.",
+"Closes main().",
+"Closes the class."
+]
+</script>
+</details>
+<div class="navrow"><button data-next="s6">← Back</button><button data-next="s8">Next →</button></div>
+</section>
+
+<section id="s8" class="story panel">
+<div class="eyebrow">Scene 8 • Compare the ideas</div><h2>Which algorithm thinks in which way?</h2>
+<div class="tableWrap"><table><thead><tr><th>Algorithm</th><th>Core idea</th><th>Best</th><th>Average</th><th>Worst</th><th>Extra space</th><th>Stable?</th></tr></thead><tbody>
+<tr><td>Bubble</td><td>Compare neighbors</td><td>O(n)*</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+<tr><td>Selection</td><td>Select minimum</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>No</td></tr>
+<tr><td>Insertion</td><td>Insert into sorted region</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+<tr><td>Quick</td><td>Partition around pivot</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>Typically O(log n) stack</td><td>No</td></tr>
+</tbody></table></div>
+<p class="small muted">*Bubble Sort reaches O(n) in the best case with the no-swaps optimization.</p>
+<div class="card soft teacher"><strong>Instructor summary</strong><p>Bubble = neighbors. Selection = minimum. Insertion = sorted left side. Quick = pivot and divide.</p></div>
+<div class="navrow"><button data-next="s7">← Back</button><button data-next="s9">Next →</button></div>
+</section>
+
+<section id="s9" class="story panel">
+<div class="eyebrow">Scene 9 • Final understanding check</div><h2>Can students predict the next move?</h2>
+<div class="card question"><strong>1. Bubble Sort</strong><p><code>[7, 2, 5, 1]</code>. First comparison is 7 and 2.</p><button class="finalQ" data-q="1" data-a="right">Swap → [2, 7, 5, 1]</button><button class="finalQ" data-q="1" data-a="wrong">No change</button><div id="fQ1" class="feedback"></div></div>
+<div class="card question"><strong>2. Selection Sort</strong><p><code>[8, 3, 6, 1, 5]</code>. What is selected first?</p><button class="finalQ" data-q="2" data-a="right">1</button><button class="finalQ" data-q="2" data-a="wrong">8</button><div id="fQ2" class="feedback"></div></div>
+<div class="card question"><strong>3. Insertion Sort</strong><p>Sorted region is <code>[3, 6, 8]</code>, next key is 5.</p><button class="finalQ" data-q="3" data-a="right">Between 3 and 6</button><button class="finalQ" data-q="3" data-a="wrong">After 8</button><div id="fQ3" class="feedback"></div></div>
+<div class="card question"><strong>4. Quick Sort</strong><p>What does partitioning accomplish?</p><button class="finalQ" data-q="4" data-a="right">Smaller values on one side, larger on the other</button><button class="finalQ" data-q="4" data-a="wrong">Only compare neighbors</button><div id="fQ4" class="feedback"></div></div>
+<div class="card soft teacher"><strong>Closing statement</strong><p>“Do not memorize four pieces of code. Memorize four ideas. Once the movement makes sense, the loops become much easier to read.”</p></div>
+<div class="navrow"><button data-next="s8">← Back</button><button data-next="s1">Restart Lecture</button></div>
+</section>
+
+<p class="small muted" style="margin-top:20px">Teaching note: array diagrams show logical indexed elements. Avoid treating Java arrays as a promise of directly observable physical memory layout.</p>
+</div>
+
+<script>
+(function(){
+const panels=[...document.querySelectorAll('.story')],tabs=[...document.querySelectorAll('.tab')];
+function show(id){panels.forEach(p=>p.classList.toggle('active',p.id===id));tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===id));window.scrollTo({top:0,behavior:'smooth'});}
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.tab)));document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.next)));
+document.querySelectorAll('.sortWhy').forEach(b=>b.addEventListener('click',()=>document.getElementById('whyFeedback').textContent=b.textContent==='All of these'?'Correct. Sorting helps with all of these.':'Yes, that is one benefit. The best answer is “All of these.”'));
+document.querySelectorAll('.swapQ').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.a==='no'){document.getElementById('swapFeedback').textContent='Correct. Swap 9 and 3.';document.getElementById('swapA').innerHTML='<small>index 0</small><br><strong>3</strong>';document.getElementById('swapB').innerHTML='<small>index 1</small><br><strong>9</strong>';}else document.getElementById('swapFeedback').textContent='For ascending order, the smaller value comes first.';}));
+document.querySelectorAll('.bigOQ').forEach(b=>b.addEventListener('click',()=>document.getElementById('bigOFeedback').textContent=b.dataset.a==='n2'?'Correct. O(n²) grows faster.':'O(n log n) scales better; O(n²) grows faster.'));
+
+let bubbleBase=[5,1,4,2,8],bubble=[],bi=0,bpass=0;
+function renderBubble(a=-1,b=-1){const box=document.getElementById('bubbleArray');box.innerHTML='';bubble.forEach((v,i)=>{const d=document.createElement('div');d.className='cell';if(i===a||i===b)d.classList.add('mark');if(i>=bubble.length-bpass)d.classList.add('sorted');d.innerHTML='<small>['+i+']</small><br><strong>'+v+'</strong>';box.appendChild(d);});}
+function resetBubble(){bubble=[...bubbleBase];bi=0;bpass=0;renderBubble();document.getElementById('bubbleText').textContent='Press “Next comparison.”';}
+document.getElementById('bubbleReset').addEventListener('click',resetBubble);document.getElementById('bubbleNext').addEventListener('click',()=>{if(bpass>=bubble.length-1){document.getElementById('bubbleText').textContent='Sorted!';return;}if(bi>=bubble.length-1-bpass){bpass++;bi=0;if(bpass>=bubble.length-1){renderBubble();document.getElementById('bubbleText').textContent='Sorted!';return;}}let l=bubble[bi],r=bubble[bi+1],text='';if(l>r){bubble[bi]=r;bubble[bi+1]=l;text='Swap '+l+' and '+r+'.';}else text='No swap: '+l+' ≤ '+r+'.';renderBubble(bi,bi+1);document.getElementById('bubbleText').textContent=text;bi++;});resetBubble();
+document.querySelectorAll('.bubbleQ').forEach(b=>b.addEventListener('click',()=>document.getElementById('bubbleFeedback').textContent=b.dataset.a==='largest'?'Correct. The largest remaining value reaches the right.':'Not necessarily. Focus on the largest unsorted value moving right.'));
+
+let selBase=[64,25,12,22,11],sel=[],si=0;
+function renderSel(){const box=document.getElementById('selectionArray');box.innerHTML='';sel.forEach((v,i)=>{const d=document.createElement('div');d.className='cell';if(i<si)d.classList.add('sorted');d.innerHTML='<small>['+i+']</small><br><strong>'+v+'</strong>';box.appendChild(d);});}
+function resetSel(){sel=[...selBase];si=0;renderSel();document.getElementById('selectionText').textContent='Press “Select next minimum.”';}
+document.getElementById('selectionReset').addEventListener('click',resetSel);document.getElementById('selectionNext').addEventListener('click',()=>{if(si>=sel.length-1){document.getElementById('selectionText').textContent='Sorted!';return;}let min=si;for(let j=si+1;j<sel.length;j++)if(sel[j]<sel[min])min=j;let v=sel[min];[sel[si],sel[min]]=[sel[min],sel[si]];document.getElementById('selectionText').textContent='Minimum is '+v+'. Place it at index '+si+'.';si++;renderSel();});resetSel();
+document.querySelectorAll('.selectionQ').forEach(b=>b.addEventListener('click',()=>document.getElementById('selectionFeedback').textContent=b.dataset.a==='min'?'Correct. Selection Sort chooses the minimum.':'That is closer to Bubble Sort.'));
+
+let insBase=[12,11,13,5,6],ins=[],ii=1;
+function renderIns(){const box=document.getElementById('insertionArray');box.innerHTML='';ins.forEach((v,i)=>{const d=document.createElement('div');d.className='cell';if(i<ii)d.classList.add('sorted');d.innerHTML='<small>['+i+']</small><br><strong>'+v+'</strong>';box.appendChild(d);});}
+function resetIns(){ins=[...insBase];ii=1;renderIns();document.getElementById('insertionText').textContent='Press “Insert next value.”';}
+document.getElementById('insertionReset').addEventListener('click',resetIns);document.getElementById('insertionNext').addEventListener('click',()=>{if(ii>=ins.length){document.getElementById('insertionText').textContent='Sorted!';return;}const key=ins[ii];let j=ii-1;while(j>=0&&ins[j]>key){ins[j+1]=ins[j];j--;}ins[j+1]=key;document.getElementById('insertionText').textContent='Take '+key+', shift larger values right, insert at index '+(j+1)+'.';ii++;renderIns();});resetIns();
+document.querySelectorAll('.insertionQ').forEach(b=>b.addEventListener('click',()=>document.getElementById('insertionFeedback').textContent=b.dataset.a==='shift'?'Correct. Shift, then insert.':'Choosing a pivot belongs to Quick Sort.'));
+
+let quickBase=[10,7,8,9,1,5],quick=[...quickBase],shown=false;
+function renderQuick(){const box=document.getElementById('quickArray');box.innerHTML='';quick.forEach((v,i)=>{const d=document.createElement('div');d.className='cell';if(i===quick.length-1&&!shown)d.classList.add('pivot');d.innerHTML='<small>['+i+']</small><br><strong>'+v+'</strong>';box.appendChild(d);});}
+document.getElementById('quickReset').addEventListener('click',()=>{quick=[...quickBase];shown=false;renderQuick();document.getElementById('quickText').textContent='Press “Show partition.”';});document.getElementById('quickPartition').addEventListener('click',()=>{if(shown)return;const pivot=quick[quick.length-1],small=quick.slice(0,-1).filter(x=>x<=pivot),large=quick.slice(0,-1).filter(x=>x>pivot);quick=[...small,pivot,...large];shown=true;renderQuick();document.querySelectorAll('#quickArray .cell')[small.length].classList.add('pivot');document.getElementById('quickText').textContent='Pivot = '+pivot+'. Smaller values left; larger values right.';});renderQuick();
+document.querySelectorAll('.quickQ').forEach(b=>b.addEventListener('click',()=>document.getElementById('quickFeedback').textContent=b.dataset.a==='divide'?'Correct. The pivot divides the problem.':'No. The pivot does not have to be the minimum.'));
+document.querySelectorAll('.finalQ').forEach(b=>b.addEventListener('click',()=>document.getElementById('fQ'+b.dataset.q).textContent=b.dataset.a==='right'?'Correct.':'Not quite — revisit the algorithm’s core idea.'));
+})();
+</script>
+<script>
+(function(){
+var KW=/\b(public|private|static|void|class|new|return|if|else|while|for|break|continue|import|this)\b/g;
+var TY=/\b(int|boolean|double|char|long|String|Integer|Arrays|System)\b/g;
+var NUM=/\b(\d+)\b/g;
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function splitComment(line){var inStr=false;for(var i=0;i<line.length-1;i++){var ch=line.charAt(i);if(ch==='"')inStr=!inStr;if(!inStr&&ch==='/'&&line.charAt(i+1)==='/')return[line.slice(0,i),line.slice(i)];}return[line,''];}
+function highlight(line){
+  var parts=splitComment(line),code=parts[0],comment=parts[1],strings=[];
+  code=code.replace(/"([^"\\]|\\.)*"/g,function(m){strings.push(m);return'\u0001'+String.fromCharCode(64+strings.length)+'\u0001';});
+  code=esc(code).replace(KW,'<span class="tk-kw">$1</span>').replace(TY,'<span class="tk-typ">$1</span>').replace(NUM,'<span class="tk-num">$1</span>');
+  code=code.replace(/\u0001([A-Z])\u0001/g,function(m,c){return'<span class="tk-str">'+esc(strings[c.charCodeAt(0)-65])+'</span>';});
+  if(comment)code+='<span class="tk-com">'+esc(comment)+'</span>';
+  return code||'&nbsp;';
+}
+document.querySelectorAll('details.javacode').forEach(function(box){
+  var srcEl=box.querySelector('script.src'),notesEl=box.querySelector('script.notes');
+  if(!srcEl)return;
+  var raw=srcEl.textContent.replace(/^\n/,'').replace(/\s+$/,'');
+  var lines=raw.split('\n'),notes=[];
+  try{notes=JSON.parse(notesEl.textContent);}catch(e){}
+  var holder=box.querySelector('.codelines'),expl=box.querySelector('.expl'),pinned=null;
+  lines.forEach(function(text,idx){
+    var row=document.createElement('div');row.className='cl';row.tabIndex=0;
+    row.setAttribute('role','button');row.setAttribute('aria-label','Line '+(idx+1));
+    row.innerHTML='<span class="ln">'+(idx+1)+'</span><span class="ct">'+highlight(text)+'</span>';
+    holder.appendChild(row);
+    var note=(notes[idx]||'').trim()||(text.trim()===''?'A blank line separating two groups of statements.':'Part of the statement explained on the neighboring lines.');
+    function show(pin){
+      holder.querySelectorAll('.cl.active').forEach(function(el){el.classList.remove('active');});
+      row.classList.add('active');
+      expl.innerHTML='<span class="lineno">line '+(idx+1)+'</span><pre class="echo">'+(esc(text.trim())||'&nbsp;')+'</pre><p class="note">'+note+'</p>'
+        +'<p class="pinstate">'+(pin?'📌 pinned — click again or press Esc to release':'hover to preview · click to pin · ↑↓ to walk')+'</p>';
+    }
+    row.addEventListener('mouseenter',function(){if(!pinned)show(false);});
+    row.addEventListener('focus',function(){if(!pinned)show(false);});
+    row.addEventListener('click',function(){if(pinned===row){pinned=null;show(false);}else{pinned=row;show(true);}});
+    row.addEventListener('keydown',function(ev){
+      if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();row.click();}
+      else if(ev.key==='ArrowDown'&&row.nextElementSibling){ev.preventDefault();pinned=null;row.nextElementSibling.focus();}
+      else if(ev.key==='ArrowUp'&&row.previousElementSibling){ev.preventDefault();pinned=null;row.previousElementSibling.focus();}
+      else if(ev.key==='Escape'){pinned=null;show(false);}
+    });
+  });
+  box.querySelectorAll('.copyBtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var text=raw,cls=box.getAttribute('data-class');
+      if(btn.getAttribute('data-main'))text=raw.replace(new RegExp('\\b'+cls+'\\b','g'),'Main');
+      var old=btn.textContent;
+      function done(){btn.textContent='Copied ✓';setTimeout(function(){btn.textContent=old;},1400);}
+      function fb(){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);}
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fb);}else{fb();}
+    });
+  });
+});
+})();
+</script>
+</body></html>
