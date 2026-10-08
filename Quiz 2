@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAC286 – Arrays, References &amp; Memory Assignment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow worksheet column; a sticky status strip on top; code panels stay dark in both themes. */
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --ink:#18212c; --muted:#5b6878; --line:#d5dbe4;
+  --accent:#d8432b; --accent-ink:#ffffff; --accent-soft:#fde9e4;
+  --good:#1c7c4a; --good-soft:#e0f3e8; --warn:#96650a; --warn-soft:#fbf0d4; --bad:#b3261e; --bad-soft:#fbe4e2;
+  --code-bg:#161d27; --code-ink:#e3e9f2; --code-line:#2a3545;
+  --tk-kw:#ff8f73; --tk-str:#9fd89a; --tk-num:#7cc4f5; --tk-com:#7d8a9c;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#10161e; --surface:#19212c; --ink:#e7ecf3; --muted:#9aa7b8; --line:#2c3847;
+    --accent:#ff7455; --accent-ink:#1a0d09; --accent-soft:#3a1d16;
+    --good:#5fd093; --good-soft:#143524; --warn:#e9bb55; --warn-soft:#3a2e10; --bad:#ff8a80; --bad-soft:#3d1a18;
+    --code-bg:#0b1017; --code-line:#222c3a;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:28px 80px;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(1.7rem,5vw,2.4rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.25rem;font-weight:800}
+p{margin:0}
+code{font-family:var(--mono);font-size:.88em;background:var(--accent-soft);color:var(--ink);padding:.08em .35em;border-radius:4px;overflow-wrap:anywhere}
+.eyebrow{font:600 .75rem/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.head{display:flex;flex-direction:column;gap:10px}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:.92rem}
+.facts b{color:var(--ink);font-weight:600}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+label.fld{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.92rem}
+input[type=text],input[type=password],textarea,select{
+  font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0}
+input.mono,textarea.mono{font-family:var(--mono);font-size:.92rem}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+input:disabled,select:disabled,textarea:disabled{opacity:.85}
+.err{color:var(--bad);font-size:.9rem;font-weight:500}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row>.grow{flex:1 1 200px;min-width:0}
+
+button{font:600 .95rem var(--body);cursor:pointer;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 16px}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{cursor:default;opacity:.6}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.small{padding:6px 10px;font-size:.85rem}
+button.link{border:0;background:none;padding:0;color:var(--muted);text-decoration:underline;font-weight:500;font-size:.85rem}
+
+.bar{position:sticky;top:0;z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bar .meter{flex:1 1 160px;height:8px;background:var(--bg);border-radius:99px;overflow:hidden}
+.bar .meter i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.bar .count{font-variant-numeric:tabular-nums;font-weight:600;font-size:.92rem}
+@media (prefers-reduced-motion: reduce){.bar .meter i{transition:none}}
+
+.sec{display:flex;flex-direction:column;gap:14px}
+.sec>header{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:6px}
+.sec>header span{color:var(--muted);font-size:.85rem;margin-left:auto;white-space:nowrap}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.q .top{display:flex;gap:10px;align-items:flex-start}
+.q .num{font:800 1rem var(--display);color:var(--accent);min-width:1.8em}
+.q .prompt{flex:1;min-width:0;font-weight:500}
+.q .pts{font-size:.8rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:12px 14px;overflow-x:auto;font:400 .86rem/1.6 var(--mono);tab-size:4}
+.kw{color:var(--tk-kw)}.str{color:var(--tk-str)}.num2{color:var(--tk-num)}.com{color:var(--tk-com)}.blank{background:var(--accent);color:var(--accent-ink);border-radius:3px;padding:0 4px}
+
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;font-weight:400;width:100%}
+.opt .dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);margin-top:3px}
+.opt[aria-checked=true]{border-color:var(--accent);background:var(--accent-soft)}
+.opt[aria-checked=true] .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.opt span:last-child{min-width:0;overflow-wrap:anywhere}
+
+.fields{display:flex;flex-wrap:wrap;gap:12px}
+.fields label.fld{flex:1 1 180px;min-width:0;font-weight:500;color:var(--muted)}
+.fields label.fld.wide{flex-basis:100%}
+.fields label.fld code{background:none;padding:0;color:var(--ink)}
+
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:0;padding-bottom:0}
+.item .what{flex:1 1 200px;min-width:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{padding:6px 12px;font-size:.88rem;font-family:var(--mono)}
+.seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.item select{width:auto;max-width:100%}
+
+.chunks{display:flex;flex-direction:column;gap:6px;list-style:none;margin:0;padding:0}
+.chunk{display:flex;gap:8px;align-items:center;background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:6px 8px 6px 12px;border:1.5px solid var(--code-line)}
+.chunk.dragging{opacity:.5}
+.chunk pre{flex:1;min-width:0;margin:0;overflow-x:auto;font:400 .84rem/1.5 var(--mono)}
+.chunk button{padding:4px 9px;background:transparent;color:var(--code-ink);border-color:var(--code-line);font-size:.9rem}
+.lines{background:var(--code-bg);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:2px;overflow-x:auto}
+.lines button{display:flex;gap:12px;text-align:left;background:transparent;border:1.5px solid transparent;color:var(--code-ink);font:400 .86rem/1.6 var(--mono);padding:2px 8px;border-radius:6px;white-space:pre;min-width:max-content;width:100%}
+.lines button .ln{color:var(--tk-com);min-width:1.2em;text-align:right}
+.lines button:hover:not(:disabled){border-color:var(--code-line)}
+.lines button[aria-pressed=true]{border-color:var(--accent);background:rgba(255,116,85,.18)}
+.lines button:disabled{opacity:1}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.part{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.fb{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px;font-size:.93rem}
+.fb .ans{font-family:var(--mono);font-size:.86rem;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border-radius:6px;padding:8px 10px}
+
+.status{border-width:2px}
+.status.locked{border-color:var(--warn)}
+.status.open{border-color:var(--good)}
+.score{font:800 clamp(2.4rem,9vw,3.4rem)/1 var(--display);font-variant-numeric:tabular-nums}
+.score small{font-size:.45em;color:var(--muted);font-weight:600}
+.receipt{font-family:var(--mono);font-size:.74rem;line-height:1.4;overflow-wrap:anywhere;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:10px;max-height:7.5em;overflow-y:auto;user-select:all}
+
+.instr{border:2px solid var(--ink)}
+.codebig{font:800 2rem/1 var(--mono);letter-spacing:.14em;user-select:all}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td.wrapc{white-space:normal;min-width:160px}
+footer{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <span class="eyebrow">MAC286 · Data Structures · Assignment</span>
+    <h1>Java Arrays, References &amp; Memory</h1>
+    <p class="muted">Based on the Java Arrays, References &amp; Memory lecture. Answer every question, then submit once. Your grade stays hidden until your professor releases it.</p>
+    <div class="facts"><span><b id="fQ"></b> questions</span><span><b id="fP"></b> points</span><span>Multiple choice, memory traces, stack or heap, predict the output</span></div>
+  </header>
+
+  <section class="panel instr" id="instrPanel" hidden>
+    <span class="eyebrow">Instructor view · only on this device</span>
+    <div class="row">
+      <div class="grow"><div class="muted" style="font-size:.85rem">Grade release code to give your class</div><div class="codebig" id="relCode"></div></div>
+      <button class="small" id="copyCode">Copy code</button>
+    </div>
+    <label class="fld" for="rcIn">Student receipts
+      <textarea class="mono" id="rcIn" rows="4" placeholder="Paste one or many receipts here (each starts with MAC286-)"></textarea>
+    </label>
+    <div class="row"><button class="primary" id="rcGo">Show grades</button><button id="rcCsv" hidden>Copy as CSV</button><span class="muted" id="rcMsg" style="font-size:.88rem"></span></div>
+    <div class="tblwrap" id="rcOut" hidden></div>
+    <div class="row"><button class="link" id="resetAttempt">Clear the attempt saved on this device</button><button class="link" id="forgetInstr">Leave instructor view</button></div>
+  </section>
+
+  <section class="panel status" id="statusPanel" hidden></section>
+
+  <section class="panel" id="namePanel">
+    <label class="fld" for="lastName">Last name
+      <input type="text" id="lastName" autocomplete="family-name" maxlength="40" placeholder="Last name only">
+    </label>
+    <p class="muted" style="font-size:.88rem">Enter your last name only. Do not enter a student ID.</p>
+    <p class="err" id="nameErr" hidden></p>
+  </section>
+
+  <div class="bar" id="bar">
+    <span class="count" id="count"></span>
+    <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+    <button class="primary" id="submitBtn">Submit</button>
+  </div>
+
+  <section class="panel" id="confirmPanel" hidden>
+    <h2>Submit your assignment?</h2>
+    <p id="confirmMsg"></p>
+    <div class="row"><button class="primary" id="confirmYes">Yes, submit</button><button id="confirmNo">Keep working</button></div>
+  </section>
+
+  <p class="err" id="fatal" hidden></p>
+  <main id="quiz" style="display:flex;flex-direction:column;gap:28px"></main>
+
+  <footer>
+    <span>Prof. Khalid Kassou · LaGuardia Community College</span>
+    <button class="link" id="instrLink">Instructor</button>
+  </footer>
+  <section class="panel" id="instrLogin" hidden>
+    <label class="fld" for="instrPw">Instructor password
+      <input type="password" id="instrPw" autocomplete="off">
+    </label>
+    <div class="row"><button class="primary" id="instrGo">Unlock on this device</button><span class="err" id="instrErr" hidden>That password did not work.</span></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var D = {"id":"mac286-references-memory-a1","salt":"Om+leL4/mKvn","sections":["Arrays & variables","Stack & heap","References & element access","Aliasing","null & garbage collection","Full memory trace"],"questions":[{"id":"q1","s":0,"type":"mc","prompt":"You need to store the grades of 30 students. Why is an array a better choice than 30 separate `int` variables?","pts":5,"options":["An array can mix `int`, `double` and `String` values in one place","An array holds many values of the same type under one name, each reached by an index","An array is stored on the stack, so it is faster than variables","An array never needs to be created with `new` or an initializer"],"parts":[["1wnvzqrlnrs"]]},{"id":"q2","s":0,"type":"text","prompt":"Use the array below to answer both parts.","pts":5,"code":"int[] grades = {90, 85, 100, 75};","fields":[{"label":"grades[2]","norm":"nums","wide":false},{"label":"grades.length","norm":"nums","wide":false}],"parts":[["hm4aqyds7x"],["rw6y1khaaw"]]},{"id":"q3","s":1,"type":"classify","prompt":"In the stack and heap model from the lecture, where does each of these live?","pts":5,"code":"public static void main(String[] args) {\n    int x = 10;\n    int[] scores = new int[4];\n}","choices":["Stack","Heap"],"items":["The local variable `x`","The array object created by `new int[4]`","The local reference variable `scores`","The elements `[0]` to `[3]`"],"codeItems":false,"parts":[["1x7bym8y4mh"],["1qhlxbnz1z1"],["1pe9gm6ifbz"],["kvsv6q73tb"]]},{"id":"q4","s":1,"type":"mc","prompt":"`x` is a local variable declared as `int x = 10;`. What does the variable itself hold?","pts":5,"options":["A reference to an object in the heap","The actual integer value 10","The memory address of the `main` method","Nothing until `new` is called"],"parts":[["1ou2x96ar34"]]},{"id":"q5","s":1,"type":"text","prompt":"Type the values stored in the array right after this line runs, from index 0 to index 3.","pts":5,"code":"int[] scores = new int[4];","fields":[{"label":"Values (separate with spaces)","norm":"nums","wide":true}],"parts":[["8gx8io5vpa"]]},{"id":"q6","s":2,"type":"mc","prompt":"After `int[] scores = new int[4];`, what does the stack variable `scores` contain?","pts":5,"options":["The four array elements","The number 4","A reference to the array object in the heap","The value of the first element"],"parts":[["mdsve33b76"]]},{"id":"q7","s":2,"type":"order","prompt":"Put the steps Java takes to evaluate `scores[2]` in the correct order.","pts":5,"chunks":[{"id":"bf0ff1","text":"Go to index 2 of that array"},{"id":"0ce6fe","text":"Find the variable scores in the stack"},{"id":"936a08","text":"Read the value stored there"},{"id":"8afa56","text":"Follow its reference to the array object in the heap"}],"parts":[["2elqwqd4mwt"]],"plain":true},{"id":"q8","s":2,"type":"mc","prompt":"In the lecture diagrams, an arrow runs from a stack variable to a heap array. What does that arrow represent?","pts":5,"options":["A raw memory address you can print and do arithmetic on","A second copy of the array kept on the stack","A conceptual reference relationship showing which object the variable refers to","The order in which the elements were created"],"parts":[["fez6zmpni3"]]},{"id":"q9","s":2,"type":"text","prompt":"Trace the code and type what each `println` prints.","pts":5,"code":"int[] scores = {90, 85, 100, 75};\nscores[1] = scores[3] + 5;\nSystem.out.println(scores[1]);\nSystem.out.println(scores[0] + scores[2]);","fields":[{"label":"First println","norm":"nums","wide":false},{"label":"Second println","norm":"nums","wide":false}],"parts":[["7y0k0e8puz"],["21yjjp0i8p0"]]},{"id":"q10","s":3,"type":"text","prompt":"Trace the code and type what each `println` prints.","pts":5,"code":"int[] a = {10, 20, 30};\nint[] b = a;\nb[0] = 99;\nSystem.out.println(a[0]);\nSystem.out.println(b[2]);","fields":[{"label":"First println","norm":"nums","wide":false},{"label":"Second println","norm":"nums","wide":false}],"parts":[["1obgnkzaegv"],["13sczljnabu"]]},{"id":"q11","s":3,"type":"mc","prompt":"How many array objects exist in the heap after these two lines run?","pts":5,"code":"int[] a = {10, 20, 30};\nint[] b = a;","options":["0","1","2","3"],"parts":[["13wwbvsnl70"]]},{"id":"q12","s":3,"type":"mc","prompt":"What exactly does the assignment `int[] b = a;` copy?","pts":5,"options":["Every element of the array, into a new array","The reference, so both variables refer to the same array","Only the first element","The length of the array"],"parts":[["9o2771owx"]]},{"id":"q13","s":3,"type":"classify","prompt":"After all five lines run, which array does each variable refer to?","pts":5,"code":"int[] p = {1, 2};      // array A\nint[] q = {7, 8};      // array B\nint[] r = p;\nint[] s = null;\np = q;","choices":["Array A","Array B","null"],"items":["p","q","r","s"],"codeItems":true,"parts":[["1onpmbrk2a6"],["14jq1a87d9i"],["23tv7qkal10"],["ttssrpvvrx"]]},{"id":"q14","s":3,"type":"text","prompt":"Trace the code and type what each `println` prints.","pts":5,"code":"int[] p = {1, 2};\nint[] q = {7, 8};\nint[] r = p;\np = q;\nr[0] = 5;\nSystem.out.println(p[0]);\nSystem.out.println(r[0] + q[1]);","fields":[{"label":"First println","norm":"nums","wide":false},{"label":"Second println","norm":"nums","wide":false}],"parts":[["207du7ba4ez"],["1zdf0cj9qxc"]]},{"id":"q15","s":4,"type":"line","prompt":"This program compiles but crashes while running. Tap the line that throws the `NullPointerException`.","pts":5,"lines":["int[] data = {5, 10, 15};","int total = data[0] + data[1];","data = null;","int size = data.length;","System.out.println(total);"],"fieldLabel":"","parts":[["31urzrmouf"]]},{"id":"q16","s":4,"type":"mc","prompt":"How should the memory picture look right after `int[] data = null;`?","pts":5,"options":["`data` points to an empty array of length 0 in the heap","`data` holds null, there is no array object, and no arrow is drawn","`data` points to an array filled with zeros","`data` does not exist on the stack yet"],"parts":[["1e3oddd4bl4"]]},{"id":"q17","s":4,"type":"mc","prompt":"What happens to the array `{5, 10, 15}` after the second line runs?","pts":5,"code":"int[] data = {5, 10, 15};\ndata = null;","options":["It is erased from memory at that exact instant","It becomes unreachable, and the JVM may reclaim its memory later through garbage collection","It stays reachable through `data`","It is moved from the heap to the stack"],"parts":[["i3v5out79m"]]},{"id":"q18","s":4,"type":"mc","prompt":"These two lines are inside `main`. What happens?","pts":5,"code":"int[] data;\nSystem.out.println(data.length);","options":["It prints 0","It throws a NullPointerException when it runs","It does not compile, because `data` has not been assigned","It prints null"],"parts":[["dxpm0rmam5"]]},{"id":"q19","s":4,"type":"classify","prompt":"After all five lines run, is each array still reachable, or unreachable and eligible for garbage collection?","pts":5,"code":"int[] x = {1, 2, 3};   // array A\nint[] y = {4, 5, 6};   // array B\nint[] z = x;\nx = null;\ny = null;","choices":["Reachable","Unreachable"],"items":["Array A","Array B"],"codeItems":false,"parts":[["mm5zjhli03"],["bb70af4ika"]]},{"id":"q20","s":5,"type":"text","prompt":"Draw the memory picture for this code, then type the final contents of the array from index 0 to index 2.","pts":5,"code":"int[] first = {4, 8, 12};\nint[] second = first;\nsecond[1] = 50;\nfirst[2] = second[0] + 1;","fields":[{"label":"Final contents (separate with spaces)","norm":"nums","wide":true}],"parts":[["19s4sbapmyl"]]}],"pub":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwpn2MWPeaTFItWgoy98SeCoHvxpQTnwejWdRFBIygzab4z/NfqB1pQxLfJWOWXGv8V2QBdxOg6EDQ+Z30jYk9PEaNRR4fDxdFC2T8InyFmti+BgQh9tcPtb17HyjvC+YVVl0Znq7VDKz+A8DEBEMmEkWFKX3qc9OY38tJfs78pvMA49kTxScCLrL5EJA+ehERUhWx1LPF3S6W8mcEcC+3fTomseBGnPthdLYx1v2B1KBxsFarlCCJQRZHpBaPjnptdEm6ZZJFQNOY6aDM0E7Ze8rJHUou5g/y4IEAUTJIbd72coJfEmY6rEtT27jk5KgzcjiR40HP536LwKOqyeGpwIDAQAB","review":{"s":"Aijvge6vwbxQOv1ACEfvnQ==","i":"Hk2nWhQ6bJ73eApV","c":"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","n":150000},"instr":{"s":"0oQ1bZLwcGJI1WytaVaQyA==","i":"ddgTAmix9C7Eh7JO","c":"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","n":250000}};
+var $ = function(id){ return document.getElementById(id); };
+var KEY = D.id + ":state", IKEY = D.id + ":instructor";
+var store = {
+  get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  del: function(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+var S = { name:"", answers:{}, submitted:null, released:null };
+try { var saved = JSON.parse(store.get(KEY) || "null"); if (saved && saved.answers) S = saved; } catch(e){}
+var instr = null;      // {code, pk} once the instructor unlocks
+var review = null;     // decrypted answer explanations
+function save(){ store.set(KEY, JSON.stringify(S)); }
+
+/* ---------- helpers ---------- */
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function inline(s){ return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+var TOK = /(\/\/.*$)|("(?:\\.|[^"\\])*")|\b(public|static|void|int|double|boolean|new|null|if|else|for|while|return|class|true|false)\b|\b(\d+(?:\.\d+)?)\b|(____)/gm;
+function hl(src){
+  var out = "", last = 0, m; TOK.lastIndex = 0;
+  while ((m = TOK.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    var cls = m[1] ? "com" : m[2] ? "str" : m[3] ? "kw" : m[4] ? "num2" : "blank";
+    out += '<span class="' + cls + '">' + esc(m[0]) + "</span>";
+    last = m.index + m[0].length;
+  }
+  return out + esc(src.slice(last));
+}
+function cyrb53(str){
+  var h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (var i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+function H(s){ return cyrb53(D.salt + "|" + s); }
+function norm(v, mode){
+  v = String(v == null ? "" : v);
+  if (mode === "nums") return (v.match(/-?\d+(\.\d+)?/g) || []).map(function(x){ return String(parseFloat(x)); }).join(",");
+  return v.toLowerCase().replace(/["'`\u201c\u201d\u2018\u2019]/g, "").replace(/\s+/g, " ").trim();
+}
+function b2u(b64){ var s = atob(b64), u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+function u2b(buf){ var u = new Uint8Array(buf), s = ""; for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s); }
+var subtle = window.crypto && window.crypto.subtle;
+function unseal(box, secret){
+  return subtle.importKey("raw", new TextEncoder().encode(secret), "PBKDF2", false, ["deriveKey"]).then(function(base){
+    return subtle.deriveKey({name:"PBKDF2", salt:b2u(box.s), iterations:box.n, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  }).then(function(key){
+    return subtle.decrypt({name:"AES-GCM", iv:b2u(box.i)}, key, b2u(box.c));
+  }).then(function(pt){ return new TextDecoder().decode(pt); });
+}
+function copyText(text, btn){
+  var done = function(){ var t = btn.textContent; btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = t; }, 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+  function fallback(){
+    var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch(e){} document.body.removeChild(ta);
+  }
+}
+
+/* ---------- grading ---------- */
+function partsCorrect(q, a){
+  var res = q.parts.map(function(){ return false; });
+  if (a == null) return res;
+  var hit = function(i, s){ return q.parts[i].indexOf(H(s)) >= 0; };
+  if (q.type === "mc") res[0] = hit(0, q.id + ":" + a);
+  if (q.type === "text") q.fields.forEach(function(f, i){ res[i] = hit(i, q.id + ":" + i + ":" + norm(a[i], f.norm)); });
+  if (q.type === "classify") q.items.forEach(function(_, i){ res[i] = !!a[i] && hit(i, q.id + ":" + i + ":" + a[i]); });
+  if (q.type === "order") res[0] = hit(0, q.id + ":" + a.join(","));
+  if (q.type === "line") { res[0] = a.line != null && hit(0, q.id + ":line:" + a.line); if (q.parts.length > 1) res[1] = hit(1, q.id + ":kw:" + norm(a.kw, "text")); }
+  return res;
+}
+function quarters(q, a){ // points earned x4, always a whole number
+  var r = partsCorrect(q, a), c = r.filter(Boolean).length;
+  return Math.round(q.pts * 4 * c / r.length);
+}
+function isAnswered(q){
+  var a = S.answers[q.id];
+  if (a == null) return false;
+  if (q.type === "mc") return true;
+  if (q.type === "text") return q.fields.every(function(_, i){ return (a[i] || "").trim() !== ""; });
+  if (q.type === "classify") return q.items.every(function(_, i){ return !!a[i]; });
+  if (q.type === "order") return true;
+  if (q.type === "line") return a.line != null && (!q.fieldLabel || (a.kw || "").trim() !== "");
+  return false;
+}
+var TOTAL = D.questions.reduce(function(s, q){ return s + q.pts; }, 0);
+function fmt(n){ return String(Math.round(n * 100) / 100); }
+
+/* ---------- rendering ---------- */
+function locked(){ return !!S.submitted; }
+function canSeeGrade(){ return !!S.submitted && !!review && (!!S.released || !!instr); }
+
+function renderQuiz(){
+  var root = $("quiz"); root.innerHTML = "";
+  var n = 0, showGrade = canSeeGrade();
+  D.sections.forEach(function(title, si){
+    var qs = D.questions.filter(function(q){ return q.s === si; });
+    if (!qs.length) return;
+    var sec = document.createElement("section"); sec.className = "sec";
+    sec.innerHTML = "<header><h2>" + esc(title) + "</h2><span>" + qs.length + (qs.length === 1 ? " question" : " questions") + "</span></header>";
+    qs.forEach(function(q){ n++; sec.appendChild(renderQ(q, n, showGrade)); });
+    root.appendChild(sec);
+  });
+}
+function renderQ(q, n, showGrade){
+  var el = document.createElement("article"); el.className = "q"; el.id = q.id;
+  var dis = locked() ? " disabled" : "";
+  var a = S.answers[q.id];
+  var h = '<div class="top"><span class="num">' + n + '.</span><div class="prompt">' + inline(q.prompt) + '</div><span class="pts" data-pts>' + q.pts + " pts</span></div>";
+  if (q.code) h += '<pre class="code">' + hl(q.code) + "</pre>";
+  if (q.type === "mc") {
+    h += '<div class="opts" role="radiogroup">' + q.options.map(function(o, i){
+      return '<button type="button" class="opt" role="radio" aria-checked="' + (a === i) + '" data-i="' + i + '"' + dis + '><span class="dot"></span><span>' + inline(o) + "</span></button>";
+    }).join("") + "</div>";
+  }
+  if (q.type === "text") {
+    h += '<div class="fields">' + q.fields.map(function(f, i){
+      var id = q.id + "_f" + i;
+      return '<label class="fld' + (f.wide ? " wide" : "") + '" for="' + id + '"><span>' + (/[()\[\]]/.test(f.label) ? "<code>" + esc(f.label) + "</code>" : esc(f.label)) + '</span><input type="text" class="mono" id="' + id + '" data-i="' + i + '" maxlength="60" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="' + esc(a && a[i] || "") + '"' + dis + "></label>";
+    }).join("") + "</div>";
+  }
+  if (q.type === "classify") {
+    h += '<div class="items">' + q.items.map(function(it, i){
+      var cur = a && a[i] || "", ctl;
+      if (q.choices.length <= 2) {
+        ctl = '<div class="seg">' + q.choices.map(function(c){ return '<button type="button" aria-pressed="' + (cur === c) + '" data-i="' + i + '" data-c="' + esc(c) + '"' + dis + ">" + esc(c) + "</button>"; }).join("") + "</div>";
+      } else {
+        ctl = '<select id="' + q.id + "_s" + i + '" data-i="' + i + '" aria-label="Choice for ' + esc(it) + '"' + dis + '><option value="">Choose…</option>' + q.choices.map(function(c){ return '<option' + (cur === c ? " selected" : "") + ">" + esc(c) + "</option>"; }).join("") + "</select>";
+      }
+      return '<div class="item"><div class="what">' + (q.codeItems ? "<code>" + esc(it) + "</code>" : inline(it)) + "</div>" + ctl + "</div>";
+    }).join("") + "</div>";
+  }
+  if (q.type === "order") {
+    var order = a || q.chunks.map(function(c){ return c.id; });
+    h += '<ol class="chunks">' + order.map(function(id, i){
+      var c = q.chunks.filter(function(x){ return x.id === id; })[0];
+      return '<li class="chunk" draggable="' + !locked() + '" data-id="' + id + '"><pre' + (q.plain ? ' style="font-family:var(--body);white-space:normal"' : '') + '>' + (q.plain ? esc(c.text) : hl(c.text)) + '</pre><button type="button" data-mv="-1" aria-label="Move line up"' + (i === 0 ? " disabled" : dis) + '>↑</button><button type="button" data-mv="1" aria-label="Move line down"' + (i === order.length - 1 ? " disabled" : dis) + ">↓</button></li>";
+    }).join("") + "</ol>" + (locked() ? "" : '<p class="muted" style="font-size:.85rem">Use the arrows, or drag a line, to reorder.</p>');
+  }
+  if (q.type === "line") {
+    h += '<div class="lines">' + q.lines.map(function(l, i){
+      return '<button type="button" aria-pressed="' + (!!a && a.line === i) + '" data-line="' + i + '"' + dis + '><span class="ln">' + (i + 1) + "</span><span>" + hl(l) + "</span></button>";
+    }).join("") + "</div>";
+    if (q.fieldLabel) h += '<div class="fields"><label class="fld" for="' + q.id + '_kw"><span>' + esc(q.fieldLabel) + '</span><input type="text" class="mono" id="' + q.id + '_kw" maxlength="30" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="' + esc(a && a.kw || "") + '"' + dis + "></label></div>";
+  }
+  el.innerHTML = h;
+  if (showGrade) addFeedback(el, q, n);
+  if (!locked()) wire(el, q);
+  return el;
+}
+function addFeedback(el, q, n){
+  var qt = quarters(q, S.answers[q.id]), full = q.pts * 4;
+  var cls = qt === full ? "good" : qt === 0 ? "bad" : "part";
+  var word = qt === full ? "Correct" : qt === 0 ? "Incorrect" : "Partly correct";
+  el.querySelector("[data-pts]").outerHTML = '<span class="chip ' + cls + '">' + word + " · " + fmt(qt / 4) + "/" + q.pts + "</span>";
+  var r = review[n - 1], fb = document.createElement("div"); fb.className = "fb";
+  fb.innerHTML = '<div class="muted">Correct answer</div><div class="ans">' + esc(r.a) + "</div><div>" + inline(r.w) + "</div>";
+  el.appendChild(fb);
+}
+function wire(el, q){
+  var set = function(v){ S.answers[q.id] = v; save(); progress(); };
+  if (q.type === "mc") el.querySelectorAll(".opt").forEach(function(b){
+    b.addEventListener("click", function(){
+      el.querySelectorAll(".opt").forEach(function(x){ x.setAttribute("aria-checked", "false"); });
+      b.setAttribute("aria-checked", "true"); set(+b.dataset.i);
+    });
+  });
+  if (q.type === "text") el.querySelectorAll("input").forEach(function(inp){
+    inp.addEventListener("input", function(){ var a = S.answers[q.id] || []; a[+inp.dataset.i] = inp.value; set(a); });
+  });
+  if (q.type === "classify") {
+    el.querySelectorAll(".seg button").forEach(function(b){
+      b.addEventListener("click", function(){
+        b.parentNode.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true");
+        var a = S.answers[q.id] || []; a[+b.dataset.i] = b.dataset.c; set(a);
+      });
+    });
+    el.querySelectorAll("select").forEach(function(s){
+      s.addEventListener("change", function(){ var a = S.answers[q.id] || []; a[+s.dataset.i] = s.value; set(a); });
+    });
+  }
+  if (q.type === "order") {
+    var list = el.querySelector(".chunks");
+    var commit = function(){
+      set(Array.prototype.map.call(list.children, function(li){ return li.dataset.id; }));
+      var num = el.querySelector(".num").textContent; var fresh = renderQ(q, parseInt(num, 10), false); el.replaceWith(fresh);
+    };
+    list.querySelectorAll("button[data-mv]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var li = b.parentNode;
+        if (b.dataset.mv === "-1" && li.previousElementSibling) list.insertBefore(li, li.previousElementSibling);
+        else if (b.dataset.mv === "1" && li.nextElementSibling) list.insertBefore(li.nextElementSibling, li);
+        commit();
+      });
+    });
+    var drag = null;
+    list.querySelectorAll(".chunk").forEach(function(li){
+      li.addEventListener("dragstart", function(e){ drag = li; li.classList.add("dragging"); try { e.dataTransfer.setData("text/plain", li.dataset.id); } catch(x){} });
+      li.addEventListener("dragover", function(e){
+        if (!drag || drag === li) return; e.preventDefault();
+        var r = li.getBoundingClientRect(); list.insertBefore(drag, e.clientY < r.top + r.height / 2 ? li : li.nextSibling);
+      });
+      li.addEventListener("dragend", function(){ if (drag) { drag = null; commit(); } });
+    });
+  }
+  if (q.type === "line") {
+    var cur = function(){ return S.answers[q.id] || {line:null, kw:""}; };
+    el.querySelectorAll(".lines button").forEach(function(b){
+      b.addEventListener("click", function(){
+        el.querySelectorAll(".lines button").forEach(function(x){ x.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true"); var a = cur(); a.line = +b.dataset.line; set(a);
+      });
+    });
+    var kw = el.querySelector("input"); if (kw) kw.addEventListener("input", function(){ var a = cur(); a.kw = kw.value; set(a); });
+  }
+}
+function progress(){
+  var done = D.questions.filter(isAnswered).length;
+  $("count").textContent = done + " of " + D.questions.length + " answered";
+  $("meter").style.width = (100 * done / D.questions.length) + "%";
+}
+
+/* ---------- submit ---------- */
+function cleanName(){
+  var v = $("lastName").value.replace(/\s+/g, " ").trim(), err = "";
+  if (!v) err = "Enter your last name before you submit.";
+  else if (/\d/.test(v)) err = "Enter your last name only. Numbers and student IDs are not accepted.";
+  else if (!/^[A-Za-z\u00C0-\u024F][A-Za-z\u00C0-\u024F' \-]*$/.test(v)) err = "Use letters only (spaces, hyphens and apostrophes are fine).";
+  $("nameErr").textContent = err; $("nameErr").hidden = !err;
+  return err ? null : v;
+}
+function makeReceipt(name, ts){
+  var q4 = D.questions.map(function(q){ return quarters(q, S.answers[q.id]).toString(36); }).join("");
+  var payload = "1|" + name + "|" + q4 + "|" + Math.floor(ts / 1000).toString(36);
+  return subtle.importKey("spki", b2u(D.pub), {name:"RSA-OAEP", hash:"SHA-256"}, false, ["encrypt"]).then(function(k){
+    return subtle.encrypt({name:"RSA-OAEP"}, k, new TextEncoder().encode(payload));
+  }).then(function(ct){ return "MAC286-" + u2b(ct).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); });
+}
+$("submitBtn").addEventListener("click", function(){
+  var name = cleanName();
+  if (!name) { $("namePanel").scrollIntoView({block:"center"}); $("lastName").focus(); return; }
+  var missing = D.questions.length - D.questions.filter(isAnswered).length;
+  $("confirmMsg").textContent = (missing ? missing + (missing === 1 ? " question is" : " questions are") + " not fully answered and will lose points. " : "Every question is answered. ") + "You can submit only once, and you cannot change answers afterwards.";
+  $("confirmPanel").hidden = false; $("confirmPanel").scrollIntoView({block:"center"});
+});
+$("confirmNo").addEventListener("click", function(){ $("confirmPanel").hidden = true; });
+$("confirmYes").addEventListener("click", function(){
+  var name = cleanName(); if (!name) return;
+  var ts = Date.now(); $("confirmYes").disabled = true;
+  makeReceipt(name, ts).then(function(rc){
+    S.name = name; S.submitted = {ts: ts, receipt: rc}; save();
+    $("confirmYes").disabled = false; renderAll(); window.scrollTo(0, 0);
+  }, function(){ $("confirmYes").disabled = false; $("confirmMsg").textContent = "Could not submit in this browser. Open the assignment in an up-to-date Chrome, Safari, Edge or Firefox and try again."; });
+});
+
+/* ---------- status / release ---------- */
+function renderStatus(){
+  var p = $("statusPanel");
+  if (!S.submitted) { p.hidden = true; return; }
+  p.hidden = false;
+  var when = new Date(S.submitted.ts).toLocaleString();
+  var receipt = '<div><div class="muted" style="font-size:.85rem;margin-bottom:6px">Your submission receipt. Copy it and turn it in where your professor asked (for example, the Blackboard assignment).</div><div class="receipt" id="rcBox">' + esc(S.submitted.receipt) + '</div></div><div class="row"><button id="rcCopy">Copy receipt</button><button class="link" id="notMe">Not ' + esc(S.name) + '? Start your own attempt</button></div><div class="row" id="notMeAsk" hidden><span>This clears the attempt saved in this browser. The receipt above stays valid.</span><button class="small" id="notMeYes">Start a new attempt</button><button class="small" id="notMeNo">Cancel</button></div>';
+  if (canSeeGrade()) {
+    var total = D.questions.reduce(function(s, q){ return s + quarters(q, S.answers[q.id]); }, 0) / 4;
+    p.className = "panel status open";
+    p.innerHTML = '<span class="eyebrow">' + (S.released ? "Grade released" : "Instructor preview · students still see this as locked") + '</span><div class="score">' + fmt(total) + " <small>/ " + TOTAL + '</small></div><p><b>' + esc(S.name) + "</b> · submitted " + esc(when) + '. Each question below shows the correct answer and why.</p>' + receipt;
+  } else {
+    p.className = "panel status locked";
+    p.innerHTML = '<span class="eyebrow">Submitted · grade locked</span><h2>Thanks, ' + esc(S.name) + '. Your answers are in.</h2><p class="muted">Submitted ' + esc(when) + '. Your grade is hidden until your professor shares the release code.</p>' + receipt +
+      '<label class="fld" for="relIn">Release code<div class="row"><input type="text" class="mono grow" id="relIn" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Code from your professor"><button class="primary" id="relGo">Show my grade</button></div></label><p class="err" id="relErr" hidden>That code is not correct. Check it with your professor.</p>';
+    $("relGo").addEventListener("click", tryRelease);
+    $("relIn").addEventListener("keydown", function(e){ if (e.key === "Enter") tryRelease(); });
+  }
+  $("rcCopy").addEventListener("click", function(){ copyText(S.submitted.receipt, $("rcCopy")); });
+  $("notMe").addEventListener("click", function(){ $("notMeAsk").hidden = false; });
+  $("notMeNo").addEventListener("click", function(){ $("notMeAsk").hidden = true; });
+  $("notMeYes").addEventListener("click", function(){ store.del(KEY); location.reload(); });
+}
+function tryRelease(){
+  var code = $("relIn").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (!code) return;
+  $("relGo").disabled = true;
+  unseal(D.review, code).then(function(txt){
+    review = JSON.parse(txt); S.released = code; save(); renderAll();
+  }, function(){ $("relGo").disabled = false; $("relErr").hidden = false; });
+}
+
+/* ---------- instructor ---------- */
+function unlockInstructor(pw, quiet){
+  return unseal(D.instr, pw).then(function(txt){
+    instr = JSON.parse(txt); store.set(IKEY, pw);
+    return unseal(D.review, instr.code);
+  }).then(function(txt){
+    review = JSON.parse(txt);
+    $("instrLogin").hidden = true; $("instrLink").hidden = true; renderAll();
+  }, function(){ if (!quiet) $("instrErr").hidden = false; else store.del(IKEY); });
+}
+$("instrLink").addEventListener("click", function(){ $("instrLogin").hidden = false; $("instrPw").focus(); });
+$("instrGo").addEventListener("click", function(){ $("instrErr").hidden = true; unlockInstructor($("instrPw").value, false); });
+$("instrPw").addEventListener("keydown", function(e){ if (e.key === "Enter") $("instrGo").click(); });
+$("copyCode").addEventListener("click", function(){ copyText(instr.code, $("copyCode")); });
+$("forgetInstr").addEventListener("click", function(){ store.del(IKEY); location.reload(); });
+$("resetAttempt").addEventListener("click", function(){ store.del(KEY); location.reload(); });
+var decoded = [];
+$("rcGo").addEventListener("click", function(){
+  var found = ($("rcIn").value.match(/MAC286-[A-Za-z0-9_\-]{300,}/g) || []);
+  found = found.filter(function(x, i){ return found.indexOf(x) === i; });
+  if (!found.length) { $("rcMsg").textContent = "No receipts found in that text."; return; }
+  subtle.importKey("pkcs8", b2u(instr.pk), {name:"RSA-OAEP", hash:"SHA-256"}, false, ["decrypt"]).then(function(k){
+    return Promise.all(found.map(function(rc){
+      var b = rc.slice(7).replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "=";
+      return subtle.decrypt({name:"RSA-OAEP"}, k, b2u(b)).then(function(pt){
+        var f = new TextDecoder().decode(pt).split("|");
+        if (f[0] !== "1" || f[2].length !== D.questions.length) return null;
+        var qs = f[2].split("").map(function(c){ return parseInt(c, 36); });
+        var missed = []; qs.forEach(function(v, i){ if (v < D.questions[i].pts * 4) missed.push(i + 1); });
+        return { name: f[1], score: qs.reduce(function(a, b){ return a + b; }, 0) / 4, when: new Date(parseInt(f[3], 36) * 1000), missed: missed };
+      }, function(){ return null; });
+    }));
+  }).then(function(rows){
+    var bad = rows.filter(function(r){ return !r; }).length;
+    decoded = rows.filter(Boolean).sort(function(a, b){ return a.name.localeCompare(b.name) || a.when - b.when; });
+    $("rcMsg").textContent = decoded.length + (decoded.length === 1 ? " grade" : " grades") + (bad ? " · " + bad + " receipt" + (bad === 1 ? "" : "s") + " could not be read (damaged or from another assignment)" : "");
+    $("rcOut").hidden = !decoded.length; $("rcCsv").hidden = !decoded.length;
+    $("rcOut").innerHTML = "<table><thead><tr><th>Last name</th><th>Score</th><th>Submitted</th><th>Questions missed</th></tr></thead><tbody>" + decoded.map(function(r){
+      return "<tr><td>" + esc(r.name) + "</td><td>" + fmt(r.score) + " / " + TOTAL + "</td><td>" + esc(r.when.toLocaleString()) + '</td><td class="wrapc">' + (r.missed.join(", ") || "None") + "</td></tr>";
+    }).join("") + "</tbody></table>";
+  });
+});
+$("rcCsv").addEventListener("click", function(){
+  var csv = "Last name,Score,Out of,Submitted,Questions missed\n" + decoded.map(function(r){
+    return '"' + r.name.replace(/"/g, '""') + '",' + fmt(r.score) + "," + TOTAL + ',"' + r.when.toLocaleString() + '","' + r.missed.join(" ") + '"';
+  }).join("\n");
+  copyText(csv, $("rcCsv"));
+});
+
+/* ---------- boot ---------- */
+function renderAll(){
+  $("instrPanel").hidden = !instr;
+  if (instr) $("relCode").textContent = instr.code;
+  $("namePanel").hidden = locked(); $("bar").hidden = locked(); $("confirmPanel").hidden = true;
+  renderStatus(); renderQuiz(); progress();
+}
+$("fQ").textContent = D.questions.length; $("fP").textContent = TOTAL;
+$("lastName").value = S.name || "";
+$("lastName").addEventListener("input", function(){ S.name = $("lastName").value; save(); $("nameErr").hidden = true; });
+renderAll();
+if (!subtle) {
+  $("fatal").hidden = false;
+  $("fatal").textContent = "This browser cannot submit the assignment from here. Open the assignment link (https) in an up-to-date browser.";
+} else {
+  var pw = store.get(IKEY);
+  if (pw) unlockInstructor(pw, true);
+  else if (S.released) unseal(D.review, S.released).then(function(t){ review = JSON.parse(t); renderAll(); }, function(){ S.released = null; save(); renderAll(); });
+  if (location.hash === "#instructor" && !pw) { $("instrLogin").hidden = false; }
+}
+})();
+</script>
+</body>
+</html>
