@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAC286 · Stacks, Queues & Priority Queues</title>
+<style>
+/* ============================================================
+   THEME
+   ============================================================ */
+:root{
+  --bg:#f6f7fb; --card:#ffffff; --ink:#1d2433; --muted:#5b6478; --line:#e3e6ee;
+  --stack:#5b5bd6; --stack-soft:#eeeefc; --stack-ink:#3a3ab0;
+  --queue:#0f9d8a; --queue-soft:#e6f7f4; --queue-ink:#0a7a6b;
+  --pq:#f0742b; --pq-soft:#fff1e8; --pq-ink:#c55a16;
+  --gold:#f5c542; --red:#e5484d; --green:#2fb344;
+  --code-bg:#1b1f2a; --code-ink:#e8ecf5; --kw:#ff8bd0; --str:#ffd27a; --cmt:#7b8aa6; --num:#8be9fd; --typ:#7ee787; --fn:#c8b6ff;
+  --radius:18px; --shadow:0 10px 30px rgba(30,40,80,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;font-size:19px;line-height:1.6;color:var(--ink);background:var(--bg)}
+h1,h2,h3,h4{line-height:1.2;margin:0 0 .5em}
+h1{font-size:3rem}
+h2{font-size:2.2rem}
+h3{font-size:1.5rem}
+p{margin:.4em 0 .9em}
+code{font-family:"JetBrains Mono","Fira Code",Consolas,Menlo,monospace;background:#eceef5;padding:.1em .4em;border-radius:6px;font-size:.92em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.hidden{display:none !important}
+
+/* ============================================================
+   HERO + NAV
+   ============================================================ */
+header.hero{background:linear-gradient(135deg,#1b1f2a 0%,#2d2f6b 45%,#0f9d8a 100%);color:#fff;padding:70px 0 50px;position:relative;overflow:hidden}
+header.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.12),transparent 40%)}
+.hero .wrap{position:relative;z-index:1}
+.hero .course{display:inline-block;background:rgba(255,255,255,.15);padding:6px 16px;border-radius:999px;font-weight:600;letter-spacing:.5px;margin-bottom:18px}
+.hero p{font-size:1.25rem;max-width:760px;opacity:.95}
+nav.topnav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.topnav .wrap{display:flex;gap:6px;flex-wrap:wrap;padding:10px 22px}
+nav.topnav a{text-decoration:none;color:var(--muted);font-weight:600;padding:8px 14px;border-radius:999px;font-size:1rem;transition:.2s}
+nav.topnav a:hover{background:#eceef5;color:var(--ink)}
+nav.topnav a.stack:hover{background:var(--stack-soft);color:var(--stack-ink)}
+nav.topnav a.queue:hover{background:var(--queue-soft);color:var(--queue-ink)}
+nav.topnav a.pq:hover{background:var(--pq-soft);color:var(--pq-ink)}
+
+/* ============================================================
+   SECTIONS & CARDS
+   ============================================================ */
+section.topic{padding:60px 0 30px}
+.badge{display:inline-flex;align-items:center;gap:8px;font-weight:700;padding:6px 14px;border-radius:999px;font-size:.95rem;margin-bottom:10px}
+.badge.stack{background:var(--stack-soft);color:var(--stack-ink)}
+.badge.queue{background:var(--queue-soft);color:var(--queue-ink)}
+.badge.pq{background:var(--pq-soft);color:var(--pq-ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;box-shadow:var(--shadow);margin:22px 0}
+.card h3{display:flex;align-items:center;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+ul.defs{list-style:none;padding:0;margin:0}
+ul.defs li{padding:12px 0;border-bottom:1px dashed var(--line);display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+ul.defs li:last-child{border-bottom:none}
+ul.defs .word{font-weight:800;padding:3px 12px;border-radius:10px;white-space:nowrap;font-family:Consolas,monospace;font-size:1rem;margin-top:3px}
+.stack ul.defs .word{background:var(--stack-soft);color:var(--stack-ink)}
+.queue ul.defs .word{background:var(--queue-soft);color:var(--queue-ink)}
+.pq ul.defs .word{background:var(--pq-soft);color:var(--pq-ink)}
+ul.defs code.mini{display:inline-block;margin-top:4px;background:var(--code-bg);color:var(--code-ink);padding:4px 10px;border-radius:8px}
+.picture{background:#fffbea;border-left:5px solid var(--gold);padding:14px 18px;border-radius:0 12px 12px 0;margin:14px 0}
+.picture b{color:#8a6d00}
+.tip{background:#eef9f0;border-left:5px solid var(--green);padding:12px 18px;border-radius:0 12px 12px 0;margin:14px 0}
+.warn{background:#fdeeee;border-left:5px solid var(--red);padding:12px 18px;border-radius:0 12px 12px 0;margin:14px 0}
+
+/* ============================================================
+   DIAGRAMS (SVG)
+   ============================================================ */
+.diagram{width:100%;max-width:560px;margin:0 auto;display:block}
+.diagram text{font-family:"Segoe UI",system-ui,sans-serif;font-size:15px;fill:var(--ink)}
+.diagram .lbl{font-size:13px;fill:var(--muted);font-weight:600}
+.diagram .box{stroke-width:2;rx:8}
+
+/* ============================================================
+   VISUALIZER (interactive playground)
+   ============================================================ */
+.play{border:2px dashed var(--line);border-radius:var(--radius);padding:20px;background:#fafbff}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.controls input{font-size:1.05rem;padding:10px 14px;border:2px solid var(--line);border-radius:12px;width:130px;font-family:Consolas,monospace}
+.controls input:focus{outline:none;border-color:var(--stack)}
+button.btn{font-size:1rem;font-weight:700;padding:10px 18px;border:none;border-radius:12px;cursor:pointer;color:#fff;transition:transform .1s,filter .2s}
+button.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button.btn:active{transform:translateY(1px)}
+button.btn.stack{background:var(--stack)}
+button.btn.queue{background:var(--queue)}
+button.btn.pq{background:var(--pq)}
+button.btn.gray{background:#8a93a8}
+.log{font-family:Consolas,monospace;font-size:1rem;background:var(--code-bg);color:var(--code-ink);padding:12px 16px;border-radius:12px;min-height:50px;margin-top:14px;white-space:pre-wrap}
+.log .ok{color:#7ee787}.log .bad{color:#ff8b8b}.log .hi{color:var(--gold)}
+
+/* stack visual */
+.stackvis{display:flex;flex-direction:column-reverse;align-items:center;gap:8px;min-height:260px;justify-content:flex-start;padding:16px;border-bottom:6px solid var(--stack);width:220px;margin:0 auto;position:relative}
+.stackvis::before,.stackvis::after{content:"";position:absolute;top:0;bottom:-6px;width:6px;background:var(--stack);border-radius:4px 4px 0 0}
+.stackvis::before{left:0}.stackvis::after{right:0}
+.item{width:150px;padding:12px;text-align:center;font-weight:800;font-family:Consolas,monospace;font-size:1.2rem;border-radius:12px;color:#fff;animation:pop-in .35s ease;position:relative}
+.stackvis .item{background:linear-gradient(135deg,#6e6ee8,#4949c0)}
+.item.top::after{content:"← top";position:absolute;right:-70px;top:50%;transform:translateY(-50%);color:var(--stack-ink);font-size:.95rem;font-weight:800}
+.item.leaving{animation:pop-out .35s ease forwards}
+@keyframes pop-in{from{transform:translateY(-40px) scale(.7);opacity:0}to{transform:none;opacity:1}}
+@keyframes pop-out{to{transform:translateY(-60px) scale(.6);opacity:0}}
+/* queue visual */
+.queuevis{display:flex;align-items:center;gap:10px;min-height:110px;padding:16px;border-top:6px solid var(--queue);border-bottom:6px solid var(--queue);overflow-x:auto;position:relative}
+.queuevis .item{background:linear-gradient(135deg,#19b89f,#0a7a6b);width:auto;min-width:80px;flex:0 0 auto}
+.queuevis .item.front::before{content:"front";position:absolute;top:-28px;left:50%;transform:translateX(-50%);color:var(--queue-ink);font-size:.85rem;font-weight:800}
+.queuevis .item.rear::after{content:"rear";position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);color:var(--queue-ink);font-size:.85rem;font-weight:800}
+.queuevis .item.leaving{animation:slide-out .35s ease forwards}
+@keyframes slide-out{to{transform:translateX(-80px);opacity:0}}
+.qlabels{display:flex;justify-content:space-between;font-weight:800;color:var(--queue-ink);padding:0 10px;margin-top:6px}
+/* heap visual */
+.heapwrap{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:start}
+@media(max-width:800px){.heapwrap{grid-template-columns:1fr}}
+.heaparr{display:flex;gap:6px;flex-wrap:wrap}
+.heaparr .cell{width:58px;text-align:center;font-family:Consolas,monospace}
+.heaparr .cell .v{background:linear-gradient(135deg,#ff9757,#e4621a);color:#fff;font-weight:800;padding:10px 0;border-radius:10px;font-size:1.1rem;animation:pop-in .3s ease}
+.heaparr .cell .i{font-size:.8rem;color:var(--muted);margin-top:3px}
+#heapSvg{width:100%;height:260px}
+#heapSvg circle{fill:#ff9757;stroke:#c55a16;stroke-width:3;transition:.3s}
+#heapSvg circle.root{fill:#f0742b}
+#heapSvg text{fill:#fff;font-weight:800;font-size:16px;text-anchor:middle;dominant-baseline:middle;font-family:Consolas,monospace}
+#heapSvg line{stroke:#c55a16;stroke-width:3}
+
+/* ============================================================
+   CODE + HOVER EXPLANATION
+   ============================================================ */
+.codeblock{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.9fr);gap:0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);margin:18px 0}
+@media(max-width:860px){.codeblock{grid-template-columns:1fr}}
+.codehead{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;background:#121520;color:#aeb8cc;padding:10px 16px;font-size:.95rem;font-family:Consolas,monospace;border-bottom:1px solid #2a3040}
+.codehead .dots span{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px}
+.codehead button{font-size:.9rem;background:#2a3040;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+.codehead button:hover{background:#3b4358}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);padding:14px 0;overflow-x:auto;font-family:"JetBrains Mono","Fira Code",Consolas,Menlo,monospace;font-size:1rem;line-height:1.55;counter-reset:ln}
+pre.code .ln{display:block;padding:2px 18px 2px 14px;cursor:pointer;border-left:4px solid transparent;transition:background .15s;white-space:pre}
+pre.code .ln::before{counter-increment:ln;content:counter(ln);display:inline-block;width:2.2em;color:#4b5570;text-align:right;margin-right:16px;user-select:none}
+pre.code .ln:hover,pre.code .ln.active{background:#2a3147;border-left-color:var(--gold)}
+pre.code .ln.active::before{color:var(--gold)}
+.kw{color:var(--kw)}.str{color:var(--str)}.cmt{color:var(--cmt);font-style:italic}.num{color:var(--num)}.typ{color:var(--typ)}.fn{color:var(--fn)}
+.explain{background:#fffdf5;padding:18px 20px;border-left:1px solid var(--line);font-size:1.02rem;position:sticky;top:60px;align-self:start;min-height:120px}
+.explain .hint{color:var(--muted);font-style:italic}
+.explain .lineno{display:inline-block;background:var(--gold);color:#3a2d00;font-weight:800;padding:2px 10px;border-radius:999px;font-size:.85rem;margin-bottom:8px}
+.explain h4{margin:0 0 6px;font-size:1.1rem}
+.explain p{margin:0}
+.explain code{background:#f1ecd9}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+table.cmp{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:1rem}
+table.cmp th,table.cmp td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line)}
+table.cmp th{background:#eceef5;font-weight:800}
+table.cmp tr:last-child td{border-bottom:none}
+table.cmp td.o1{color:var(--green);font-weight:800;font-family:Consolas,monospace}
+table.cmp td.on{color:var(--red);font-weight:800;font-family:Consolas,monospace}
+table.cmp td.olog{color:#c55a16;font-weight:800;font-family:Consolas,monospace}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 24px;margin:16px 0}
+.q .opts{display:grid;gap:8px;margin-top:10px}
+.q .opt{padding:10px 16px;border:2px solid var(--line);border-radius:12px;cursor:pointer;background:#fff;font-size:1rem;text-align:left;font-family:inherit;transition:.15s}
+.q .opt:hover{border-color:#aab3cc;background:#f7f8fc}
+.q .opt.right{border-color:var(--green);background:#eef9f0}
+.q .opt.wrong{border-color:var(--red);background:#fdeeee}
+.q .fb{margin-top:10px;font-weight:600;display:none}
+.scorebar{font-size:1.3rem;font-weight:800;text-align:center;padding:16px;background:var(--stack-soft);border-radius:14px}
+
+footer{padding:40px 0;color:var(--muted);text-align:center;font-size:.95rem}
+.emoji{font-size:1.3em}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="course">MAC286 · Data Structures in Java</span>
+    <h1>Stacks, Queues &amp; Priority Queues</h1>
+    <p>Three ways to <b>line things up</b> and decide <b>who gets served next</b>.
+       Hover (or tap) any line of code to see what it does. Play with the live demos. 🚀</p>
+  </div>
+</header>
+
+<nav class="topnav">
+  <div class="wrap">
+    <a href="#intro">🧭 Why</a>
+    <a href="#stack" class="stack">📚 Stack</a>
+    <a href="#queue" class="queue">🎢 Queue</a>
+    <a href="#pq" class="pq">🚑 Priority Queue</a>
+    <a href="#compare">⚖️ Compare</a>
+    <a href="#quiz">🧠 Quiz</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     INTRO
+     ============================================================ -->
+<section class="topic" id="intro">
+  <div class="wrap">
+    <h2>🧭 Why do we need these?</h2>
+    <div class="card">
+      <ul class="defs">
+        <li><span class="word" style="background:#eceef5">Problem</span><div>An array lets you grab <b>any</b> element (<code>a[5]</code>). Sometimes that freedom is a <b>bug</b>: you want a strict rule for <i>what comes out next</i>.</div></li>
+        <li><span class="word" style="background:#eceef5">Idea</span><div>A <b>restricted</b> collection: you can only add/remove at specific ends. Fewer operations → simpler, safer, faster code.</div></li>
+        <li><span class="word" style="background:#eceef5">Three rules</span><div>
+          <b>Stack</b> → last one in is the first one out. &nbsp;
+          <b>Queue</b> → first one in is the first one out. &nbsp;
+          <b>Priority Queue</b> → the <i>most important</i> one is out first.
+        </div></li>
+      </ul>
+      <div class="picture"><b>Picture it:</b> 📚 a pile of plates (Stack) · 🎢 a line at a theme park (Queue) · 🚑 an emergency room (Priority Queue). Here the <i>plate / person / patient</i> is the <b>element</b>, and the <i>rule for who leaves next</i> is the <b>data structure</b>.</div>
+    </div>
+
+    <div class="card">
+      <h3>🗺️ The big picture</h3>
+      <svg class="diagram" viewBox="0 0 560 230" style="max-width:720px">
+        <!-- stack -->
+        <rect x="20" y="20" width="160" height="190" rx="14" fill="#eeeefc" stroke="#5b5bd6" stroke-width="2"/>
+        <text x="100" y="48" text-anchor="middle" font-weight="800" fill="#3a3ab0">STACK · LIFO</text>
+        <rect x="60" y="150" width="80" height="26" rx="6" fill="#4949c0"/><text x="100" y="168" text-anchor="middle" fill="#fff">A</text>
+        <rect x="60" y="118" width="80" height="26" rx="6" fill="#4949c0"/><text x="100" y="136" text-anchor="middle" fill="#fff">B</text>
+        <rect x="60" y="86" width="80" height="26" rx="6" fill="#6e6ee8"/><text x="100" y="104" text-anchor="middle" fill="#fff">C</text>
+        <text x="100" y="72" class="lbl" text-anchor="middle">⬇ in / out ⬆</text>
+        <text x="100" y="200" class="lbl" text-anchor="middle">one open end</text>
+        <!-- queue -->
+        <rect x="200" y="20" width="160" height="190" rx="14" fill="#e6f7f4" stroke="#0f9d8a" stroke-width="2"/>
+        <text x="280" y="48" text-anchor="middle" font-weight="800" fill="#0a7a6b">QUEUE · FIFO</text>
+        <rect x="212" y="105" width="40" height="30" rx="6" fill="#0a7a6b"/><text x="232" y="125" text-anchor="middle" fill="#fff">A</text>
+        <rect x="260" y="105" width="40" height="30" rx="6" fill="#0f9d8a"/><text x="280" y="125" text-anchor="middle" fill="#fff">B</text>
+        <rect x="308" y="105" width="40" height="30" rx="6" fill="#19b89f"/><text x="328" y="125" text-anchor="middle" fill="#fff">C</text>
+        <text x="232" y="92" class="lbl" text-anchor="middle">out ⬅</text>
+        <text x="328" y="92" class="lbl" text-anchor="middle">⬅ in</text>
+        <text x="280" y="200" class="lbl" text-anchor="middle">two ends</text>
+        <!-- pq -->
+        <rect x="380" y="20" width="160" height="190" rx="14" fill="#fff1e8" stroke="#f0742b" stroke-width="2"/>
+        <text x="460" y="48" text-anchor="middle" font-weight="800" fill="#c55a16">PRIORITY QUEUE</text>
+        <circle cx="460" cy="90" r="16" fill="#f0742b"/><text x="460" y="95" text-anchor="middle" fill="#fff">1</text>
+        <circle cx="425" cy="135" r="16" fill="#ff9757"/><text x="425" y="140" text-anchor="middle" fill="#fff">5</text>
+        <circle cx="495" cy="135" r="16" fill="#ff9757"/><text x="495" y="140" text-anchor="middle" fill="#fff">3</text>
+        <line x1="449" y1="102" x2="436" y2="121" stroke="#c55a16" stroke-width="2"/><line x1="471" y1="102" x2="484" y2="121" stroke="#c55a16" stroke-width="2"/>
+        <text x="460" y="175" class="lbl" text-anchor="middle">best on top (heap)</text>
+        <text x="460" y="200" class="lbl" text-anchor="middle">out = most important</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STACK
+     ============================================================ -->
+<section class="topic stack" id="stack">
+  <div class="wrap">
+    <span class="badge stack">📚 Part 1</span>
+    <h2>Stack — Last In, First Out (LIFO)</h2>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>📖 Definitions (one word at a time)</h3>
+        <ul class="defs">
+          <li><span class="word">Stack</span><div>A collection where you add and remove <b>only at one end</b>, called the <b>top</b>.<br><code class="mini">Deque&lt;Integer&gt; s = new ArrayDeque&lt;&gt;();</code></div></li>
+          <li><span class="word">push</span><div>Put a new element <b>on the top</b>.<br><code class="mini">s.push(7);</code></div></li>
+          <li><span class="word">pop</span><div><b>Remove</b> the top element and give it back.<br><code class="mini">int x = s.pop();  // 7</code></div></li>
+          <li><span class="word">peek</span><div><b>Look</b> at the top without removing it.<br><code class="mini">int t = s.peek();</code></div></li>
+          <li><span class="word">isEmpty</span><div>Ask "is there anything in there?" — check <b>before</b> you pop!<br><code class="mini">if (!s.isEmpty()) s.pop();</code></div></li>
+          <li><span class="word">LIFO</span><div><b>L</b>ast <b>I</b>n, <b>F</b>irst <b>O</b>ut — the last thing pushed is the first thing popped.</div></li>
+        </ul>
+        <div class="picture"><b>Picture it:</b> a stack of plates 🍽️. You put a clean plate <b>on top</b> (push), you take a plate <b>from the top</b> (pop). Nobody pulls a plate from the middle — that's how you break dishes. The plate = <b>element</b>, the pile = <b>stack</b>, the top plate = <b>top</b>.</div>
+      </div>
+
+      <div class="card">
+        <h3>🖼️ How it looks</h3>
+        <svg class="diagram" viewBox="0 0 520 300">
+          <!-- walls -->
+          <path d="M150 40 V260 H370 V40" fill="none" stroke="#5b5bd6" stroke-width="6" stroke-linecap="round"/>
+          <!-- items -->
+          <rect x="180" y="218" width="160" height="34" rx="8" fill="#4949c0"/><text x="260" y="241" text-anchor="middle" fill="#fff" font-weight="700">10  (first pushed)</text>
+          <rect x="180" y="176" width="160" height="34" rx="8" fill="#5555cc"/><text x="260" y="199" text-anchor="middle" fill="#fff" font-weight="700">20</text>
+          <rect x="180" y="134" width="160" height="34" rx="8" fill="#6060d8"/><text x="260" y="157" text-anchor="middle" fill="#fff" font-weight="700">30</text>
+          <rect x="180" y="92" width="160" height="34" rx="8" fill="#7a7ae8" stroke="#f5c542" stroke-width="3"/><text x="260" y="115" text-anchor="middle" fill="#fff" font-weight="700">40  ← top</text>
+          <!-- push arrow -->
+          <path d="M70 70 L70 115" stroke="#2fb344" stroke-width="5" marker-end="url(#ag)"/><text x="70" y="60" text-anchor="middle" class="lbl" fill="#2fb344">push(50)</text>
+          <rect x="30" y="20" width="80" height="30" rx="8" fill="#2fb344" opacity=".85"/><text x="70" y="40" text-anchor="middle" fill="#fff" font-weight="700">50</text>
+          <!-- pop arrow -->
+          <path d="M450 115 L450 70" stroke="#e5484d" stroke-width="5" marker-end="url(#ar)"/><text x="450" y="60" text-anchor="middle" class="lbl" fill="#e5484d">pop() → 40</text>
+          <text x="260" y="285" text-anchor="middle" class="lbl">Only the TOP is touched. Bottom = oldest.</text>
+          <defs>
+            <marker id="ag" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2fb344"/></marker>
+            <marker id="ar" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e5484d"/></marker>
+          </defs>
+        </svg>
+        <div class="tip">💡 Real life in code: the <b>Undo</b> button (Ctrl+Z), the browser <b>Back</b> button, checking matching parentheses <code>( [ { } ] )</code>, and the <b>call stack</b> that runs your Java methods.</div>
+      </div>
+    </div>
+
+    <!-- stack playground -->
+    <div class="card">
+      <h3>🎮 Try it — Stack playground</h3>
+      <div class="play">
+        <div class="controls">
+          <input id="stackIn" type="text" value="10" maxlength="6" placeholder="value">
+          <button class="btn stack" onclick="stackPush()">push()</button>
+          <button class="btn stack" onclick="stackPop()">pop()</button>
+          <button class="btn stack" onclick="stackPeek()">peek()</button>
+          <button class="btn gray" onclick="stackClear()">clear</button>
+          <span style="color:var(--muted);font-size:1rem">size: <b id="stackSize">0</b></span>
+        </div>
+        <div class="stackvis" id="stackVis"></div>
+        <div class="log" id="stackLog"><span class="hi">// Push a few numbers, then pop. Watch which one leaves first.</span></div>
+      </div>
+    </div>
+
+    <!-- stack code 1: using ArrayDeque -->
+    <div class="card">
+      <h3>💻 Code 1 — Using Java's built-in stack</h3>
+      <p>Java gives you a stack for free with <code>ArrayDeque</code>. Hover the lines →</p>
+      <div class="codeblock" data-code="stackUse"></div>
+      <div class="warn">⚠️ Java also has an old class called <code>Stack</code>. It works, but it's slow and outdated. The Java docs themselves say: <b>use <code>ArrayDeque</code> instead</b>.</div>
+    </div>
+
+    <!-- stack code 2: build your own -->
+    <div class="card">
+      <h3>🔧 Code 2 — Build your own stack with an array</h3>
+      <p>Now let's see <b>what's inside the box</b>. A stack is just an array + one number (<code>top</code>) that remembers where the top is.</p>
+      <svg class="diagram" viewBox="0 0 560 150" style="max-width:600px">
+        <text x="20" y="30" class="lbl">data[]</text>
+        <g>
+          <rect x="20" y="45" width="60" height="44" rx="6" fill="#4949c0"/><text x="50" y="73" text-anchor="middle" fill="#fff" font-weight="700">10</text>
+          <rect x="90" y="45" width="60" height="44" rx="6" fill="#4949c0"/><text x="120" y="73" text-anchor="middle" fill="#fff" font-weight="700">20</text>
+          <rect x="160" y="45" width="60" height="44" rx="6" fill="#4949c0"/><text x="190" y="73" text-anchor="middle" fill="#fff" font-weight="700">30</text>
+          <rect x="230" y="45" width="60" height="44" rx="6" fill="#fff" stroke="#c9cde0" stroke-width="2"/>
+          <rect x="300" y="45" width="60" height="44" rx="6" fill="#fff" stroke="#c9cde0" stroke-width="2"/>
+          <rect x="370" y="45" width="60" height="44" rx="6" fill="#fff" stroke="#c9cde0" stroke-width="2"/>
+        </g>
+        <text x="50" y="110" text-anchor="middle" class="lbl">0</text><text x="120" y="110" text-anchor="middle" class="lbl">1</text><text x="190" y="110" text-anchor="middle" class="lbl">2</text><text x="260" y="110" text-anchor="middle" class="lbl">3</text><text x="330" y="110" text-anchor="middle" class="lbl">4</text><text x="400" y="110" text-anchor="middle" class="lbl">5</text>
+        <path d="M190 140 L190 122" stroke="#f5c542" stroke-width="4" marker-end="url(#ay)"/><text x="215" y="142" class="lbl" fill="#a07a00">top = 2</text>
+        <text x="470" y="73" class="lbl">push → top++ then write</text>
+        <text x="470" y="95" class="lbl">pop  → read then top--</text>
+        <defs><marker id="ay" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5c542"/></marker></defs>
+      </svg>
+      <div class="codeblock" data-code="stackBuild"></div>
+    </div>
+
+    <!-- stack code 3: application -->
+    <div class="card">
+      <h3>🧩 Code 3 — A real use: balanced brackets</h3>
+      <p>Every compiler does this. Is <code>{ [ ( ) ] }</code> balanced? Is <code>( [ ) ]</code>? A stack answers in one pass.</p>
+      <div class="codeblock" data-code="stackBrackets"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     QUEUE
+     ============================================================ -->
+<section class="topic queue" id="queue">
+  <div class="wrap">
+    <span class="badge queue">🎢 Part 2</span>
+    <h2>Queue — First In, First Out (FIFO)</h2>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>📖 Definitions (one word at a time)</h3>
+        <ul class="defs">
+          <li><span class="word">Queue</span><div>A collection with <b>two ends</b>: elements enter at the <b>rear</b> and leave from the <b>front</b>.<br><code class="mini">Queue&lt;String&gt; q = new ArrayDeque&lt;&gt;();</code></div></li>
+          <li><span class="word">offer</span><div>Add to the <b>rear</b> (also called <i>enqueue</i>).<br><code class="mini">q.offer("Ana");</code></div></li>
+          <li><span class="word">poll</span><div><b>Remove</b> from the <b>front</b> and give it back (also called <i>dequeue</i>). Returns <code>null</code> if empty.<br><code class="mini">String next = q.poll();</code></div></li>
+          <li><span class="word">peek</span><div><b>Look</b> at the front without removing.<br><code class="mini">String who = q.peek();</code></div></li>
+          <li><span class="word">FIFO</span><div><b>F</b>irst <b>I</b>n, <b>F</b>irst <b>O</b>ut — fair: whoever came first is served first.</div></li>
+          <li><span class="word">Deque</span><div>"<b>D</b>ouble-<b>e</b>nded <b>que</b>ue" — can add/remove at <b>both</b> ends. <code>ArrayDeque</code> is a Deque, so it can act as a stack <i>or</i> a queue.</div></li>
+        </ul>
+        <div class="picture"><b>Picture it:</b> the line at the DMV 🏢. You join at the <b>back</b> (offer). The clerk calls the person at the <b>front</b> (poll). Cutting the line = not allowed. Person = <b>element</b>, the line = <b>queue</b>, the clerk's window = <b>front</b>.</div>
+      </div>
+
+      <div class="card">
+        <h3>🖼️ How it looks</h3>
+        <svg class="diagram" viewBox="0 0 560 240">
+          <path d="M60 80 H500 M60 170 H500" stroke="#0f9d8a" stroke-width="6" stroke-linecap="round"/>
+          <rect x="90" y="100" width="70" height="50" rx="8" fill="#0a7a6b" stroke="#f5c542" stroke-width="3"/><text x="125" y="131" text-anchor="middle" fill="#fff" font-weight="700">Ana</text>
+          <rect x="175" y="100" width="70" height="50" rx="8" fill="#0f9d8a"/><text x="210" y="131" text-anchor="middle" fill="#fff" font-weight="700">Bo</text>
+          <rect x="260" y="100" width="70" height="50" rx="8" fill="#13ab97"/><text x="295" y="131" text-anchor="middle" fill="#fff" font-weight="700">Cal</text>
+          <rect x="345" y="100" width="70" height="50" rx="8" fill="#19b89f"/><text x="380" y="131" text-anchor="middle" fill="#fff" font-weight="700">Dee</text>
+          <text x="125" y="65" text-anchor="middle" class="lbl" fill="#0a7a6b">FRONT</text>
+          <text x="380" y="65" text-anchor="middle" class="lbl" fill="#0a7a6b">REAR</text>
+          <path d="M80 125 L25 125" stroke="#e5484d" stroke-width="5" marker-end="url(#ar2)"/><text x="40" y="200" text-anchor="middle" class="lbl" fill="#e5484d">poll() → Ana</text>
+          <path d="M470 125 L430 125" stroke="#2fb344" stroke-width="5" marker-end="url(#ag2)"/><text x="490" y="200" text-anchor="middle" class="lbl" fill="#2fb344">offer("Eli")</text>
+          <rect x="480" y="100" width="60" height="50" rx="8" fill="#2fb344" opacity=".85"/><text x="510" y="131" text-anchor="middle" fill="#fff" font-weight="700">Eli</text>
+          <text x="280" y="228" text-anchor="middle" class="lbl">Enter on the right, exit on the left. Oldest = front.</text>
+          <defs>
+            <marker id="ag2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2fb344"/></marker>
+            <marker id="ar2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e5484d"/></marker>
+          </defs>
+        </svg>
+        <div class="tip">💡 Real life in code: a <b>printer queue</b> 🖨️, customer-support tickets, tasks waiting for a CPU, <b>Breadth-First Search</b> in graphs, and the messages in a chat server.</div>
+      </div>
+    </div>
+
+    <!-- queue playground -->
+    <div class="card">
+      <h3>🎮 Try it — Queue playground</h3>
+      <div class="play">
+        <div class="controls">
+          <input id="queueIn" type="text" value="Ana" maxlength="6" placeholder="value">
+          <button class="btn queue" onclick="queueOffer()">offer()</button>
+          <button class="btn queue" onclick="queuePoll()">poll()</button>
+          <button class="btn queue" onclick="queuePeek()">peek()</button>
+          <button class="btn gray" onclick="queueClear()">clear</button>
+          <span style="color:var(--muted);font-size:1rem">size: <b id="queueSize">0</b></span>
+        </div>
+        <div class="queuevis" id="queueVis"></div>
+        <div class="qlabels"><span>⬅ poll() removes here (front)</span><span>offer() adds here (rear) ⬅</span></div>
+        <div class="log" id="queueLog"><span class="hi">// Offer a few names, then poll. The first name in is the first name out.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💻 Code 1 — Using Java's built-in queue</h3>
+      <div class="codeblock" data-code="queueUse"></div>
+      <div class="warn">⚠️ Two families of methods. <code>offer / poll / peek</code> return <b>false/null</b> when something's wrong. <code>add / remove / element</code> <b>throw an exception</b>. Beginners: use the first family and check <code>isEmpty()</code>.</div>
+    </div>
+
+    <div class="card">
+      <h3>🔧 Code 2 — Build your own queue (circular array)</h3>
+      <p>A naive array queue "walks forward" and wastes space on the left. The trick: <b>wrap around</b> with <code>%</code> like a clock 🕐.</p>
+      <svg class="diagram" viewBox="0 0 560 170" style="max-width:600px">
+        <text x="20" y="28" class="lbl">data[] (capacity 6) — after many offers/polls the queue has wrapped around:</text>
+        <rect x="20" y="45" width="60" height="44" rx="6" fill="#0f9d8a"/><text x="50" y="73" text-anchor="middle" fill="#fff" font-weight="700">Dee</text>
+        <rect x="90" y="45" width="60" height="44" rx="6" fill="#19b89f"/><text x="120" y="73" text-anchor="middle" fill="#fff" font-weight="700">Eli</text>
+        <rect x="160" y="45" width="60" height="44" rx="6" fill="#fff" stroke="#c9cde0" stroke-width="2"/>
+        <rect x="230" y="45" width="60" height="44" rx="6" fill="#fff" stroke="#c9cde0" stroke-width="2"/>
+        <rect x="300" y="45" width="60" height="44" rx="6" fill="#0a7a6b" stroke="#f5c542" stroke-width="3"/><text x="330" y="73" text-anchor="middle" fill="#fff" font-weight="700">Bo</text>
+        <rect x="370" y="45" width="60" height="44" rx="6" fill="#0d8f7d"/><text x="400" y="73" text-anchor="middle" fill="#fff" font-weight="700">Cal</text>
+        <text x="50" y="110" text-anchor="middle" class="lbl">0</text><text x="120" y="110" text-anchor="middle" class="lbl">1</text><text x="190" y="110" text-anchor="middle" class="lbl">2</text><text x="260" y="110" text-anchor="middle" class="lbl">3</text><text x="330" y="110" text-anchor="middle" class="lbl">4</text><text x="400" y="110" text-anchor="middle" class="lbl">5</text>
+        <text x="330" y="140" text-anchor="middle" class="lbl" fill="#a07a00">front = 4</text>
+        <text x="190" y="140" text-anchor="middle" class="lbl" fill="#2fb344">next free = (front+size)%6 = 2</text>
+        <text x="470" y="73" class="lbl">order: Bo, Cal, Dee, Eli</text>
+      </svg>
+      <div class="codeblock" data-code="queueBuild"></div>
+    </div>
+
+    <div class="card">
+      <h3>🧩 Code 3 — A real use: simulating a help desk</h3>
+      <div class="codeblock" data-code="queueSim"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRIORITY QUEUE
+     ============================================================ -->
+<section class="topic pq" id="pq">
+  <div class="wrap">
+    <span class="badge pq">🚑 Part 3</span>
+    <h2>Priority Queue — the most important goes first</h2>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>📖 Definitions (one word at a time)</h3>
+        <ul class="defs">
+          <li><span class="word">Priority Queue</span><div>A queue where <code>poll()</code> gives you the element with the <b>highest priority</b>, not the oldest.<br><code class="mini">PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;();</code></div></li>
+          <li><span class="word">priority</span><div>A rule for comparing two elements. Java's default: <b>smaller = more important</b> (a <i>min-priority queue</i>).</div></li>
+          <li><span class="word">offer</span><div>Insert; the structure quietly reorganizes itself.<br><code class="mini">pq.offer(42);</code></div></li>
+          <li><span class="word">poll</span><div>Remove and return the <b>smallest</b> (by default).<br><code class="mini">int best = pq.poll();</code></div></li>
+          <li><span class="word">Comparator</span><div>An object that tells Java <b>how to compare</b> — this is how you make "largest first", or "shortest name first".<br><code class="mini">new PriorityQueue&lt;&gt;(Comparator.reverseOrder())</code></div></li>
+          <li><span class="word">heap</span><div>The data structure <b>inside</b> a PriorityQueue: a tree stored in an array where every parent is ≤ its children. That's why the smallest is always at the top (index 0).</div></li>
+        </ul>
+        <div class="picture"><b>Picture it:</b> an emergency room 🏥. Patients arrive in some order, but the doctor sees the <b>most critical</b> one first, no matter who came first. Patient = <b>element</b>, severity score = <b>priority</b>, the triage board = <b>heap</b>.</div>
+      </div>
+
+      <div class="card">
+        <h3>🖼️ The heap: a tree hiding in an array</h3>
+        <svg class="diagram" viewBox="0 0 560 300">
+          <!-- edges -->
+          <line x1="280" y1="50" x2="180" y2="120" stroke="#c55a16" stroke-width="3"/>
+          <line x1="280" y1="50" x2="380" y2="120" stroke="#c55a16" stroke-width="3"/>
+          <line x1="180" y1="120" x2="120" y2="190" stroke="#c55a16" stroke-width="3"/>
+          <line x1="180" y1="120" x2="240" y2="190" stroke="#c55a16" stroke-width="3"/>
+          <line x1="380" y1="120" x2="330" y2="190" stroke="#c55a16" stroke-width="3"/>
+          <!-- nodes -->
+          <circle cx="280" cy="50" r="22" fill="#f0742b" stroke="#c55a16" stroke-width="3"/><text x="280" y="56" text-anchor="middle" fill="#fff" font-weight="800">3</text>
+          <circle cx="180" cy="120" r="22" fill="#ff9757" stroke="#c55a16" stroke-width="3"/><text x="180" y="126" text-anchor="middle" fill="#fff" font-weight="800">7</text>
+          <circle cx="380" cy="120" r="22" fill="#ff9757" stroke="#c55a16" stroke-width="3"/><text x="380" y="126" text-anchor="middle" fill="#fff" font-weight="800">5</text>
+          <circle cx="120" cy="190" r="22" fill="#ffb07c" stroke="#c55a16" stroke-width="3"/><text x="120" y="196" text-anchor="middle" fill="#fff" font-weight="800">12</text>
+          <circle cx="240" cy="190" r="22" fill="#ffb07c" stroke="#c55a16" stroke-width="3"/><text x="240" y="196" text-anchor="middle" fill="#fff" font-weight="800">9</text>
+          <circle cx="330" cy="190" r="22" fill="#ffb07c" stroke="#c55a16" stroke-width="3"/><text x="330" y="196" text-anchor="middle" fill="#fff" font-weight="800">8</text>
+          <!-- index labels -->
+          <text x="312" y="45" class="lbl">[0]</text><text x="212" y="112" class="lbl">[1]</text><text x="412" y="112" class="lbl">[2]</text>
+          <text x="152" y="182" class="lbl">[3]</text><text x="272" y="182" class="lbl">[4]</text><text x="362" y="182" class="lbl">[5]</text>
+          <!-- array -->
+          <g transform="translate(100,240)">
+            <rect x="0" y="0" width="60" height="36" rx="6" fill="#f0742b"/><text x="30" y="24" text-anchor="middle" fill="#fff" font-weight="800">3</text>
+            <rect x="60" y="0" width="60" height="36" rx="6" fill="#ff9757"/><text x="90" y="24" text-anchor="middle" fill="#fff" font-weight="800">7</text>
+            <rect x="120" y="0" width="60" height="36" rx="6" fill="#ff9757"/><text x="150" y="24" text-anchor="middle" fill="#fff" font-weight="800">5</text>
+            <rect x="180" y="0" width="60" height="36" rx="6" fill="#ffb07c"/><text x="210" y="24" text-anchor="middle" fill="#fff" font-weight="800">12</text>
+            <rect x="240" y="0" width="60" height="36" rx="6" fill="#ffb07c"/><text x="270" y="24" text-anchor="middle" fill="#fff" font-weight="800">9</text>
+            <rect x="300" y="0" width="60" height="36" rx="6" fill="#ffb07c"/><text x="330" y="24" text-anchor="middle" fill="#fff" font-weight="800">8</text>
+            <text x="30" y="52" text-anchor="middle" class="lbl">0</text><text x="90" y="52" text-anchor="middle" class="lbl">1</text><text x="150" y="52" text-anchor="middle" class="lbl">2</text><text x="210" y="52" text-anchor="middle" class="lbl">3</text><text x="270" y="52" text-anchor="middle" class="lbl">4</text><text x="330" y="52" text-anchor="middle" class="lbl">5</text>
+          </g>
+          <text x="20" y="262" class="lbl">array:</text>
+        </svg>
+        <div class="tip">🧮 <b>Magic formulas</b> (no pointers needed!):<br>
+          children of index <code>i</code> → <code>2i+1</code> and <code>2i+2</code><br>
+          parent of index <code>i</code> → <code>(i-1)/2</code><br>
+          Rule: <b>parent ≤ children</b> everywhere → smallest sits at index 0.</div>
+      </div>
+    </div>
+
+    <!-- PQ playground -->
+    <div class="card">
+      <h3>🎮 Try it — Priority Queue (min-heap) playground</h3>
+      <div class="play">
+        <div class="controls">
+          <input id="pqIn" type="number" value="4" placeholder="number">
+          <button class="btn pq" onclick="pqOffer()">offer()</button>
+          <button class="btn pq" onclick="pqPoll()">poll()</button>
+          <button class="btn pq" onclick="pqPeek()">peek()</button>
+          <button class="btn gray" onclick="pqRandom()">🎲 random 7</button>
+          <button class="btn gray" onclick="pqClear()">clear</button>
+          <span style="color:var(--muted);font-size:1rem">size: <b id="pqSize">0</b></span>
+        </div>
+        <div class="heapwrap">
+          <svg id="heapSvg" viewBox="0 0 520 260"></svg>
+          <div>
+            <div style="font-weight:800;color:var(--pq-ink);margin-bottom:6px">Same heap as an array:</div>
+            <div class="heaparr" id="heapArr"></div>
+          </div>
+        </div>
+        <div class="log" id="pqLog"><span class="hi">// Offer numbers in ANY order. poll() always returns the smallest. Watch the tree bubble!</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💻 Code 1 — Using Java's PriorityQueue</h3>
+      <div class="codeblock" data-code="pqUse"></div>
+      <div class="warn">⚠️ <b>Trap:</b> printing a PriorityQueue with <code>System.out.println(pq)</code> does <b>not</b> show sorted order — it shows the raw heap array. Only <code>poll()</code> guarantees "smallest next".</div>
+    </div>
+
+    <div class="card">
+      <h3>🎛️ Code 2 — Changing the priority with a Comparator</h3>
+      <p>Largest first? Shortest string first? Objects with a <code>severity</code> field? A <b>Comparator</b> is the dial you turn.</p>
+      <div class="codeblock" data-code="pqComparator"></div>
+    </div>
+
+    <div class="card">
+      <h3>🔧 Code 3 — Build your own min-heap (the inside of PriorityQueue)</h3>
+      <p>Two moves and you're done: <b>bubble up</b> after insert, <b>sink down</b> after remove.</p>
+      <svg class="diagram" viewBox="0 0 560 200" style="max-width:640px">
+        <text x="140" y="24" text-anchor="middle" font-weight="800" fill="#c55a16">offer(2): bubble UP ⬆</text>
+        <line x1="140" y1="55" x2="90" y2="110" stroke="#c55a16" stroke-width="3"/><line x1="140" y1="55" x2="190" y2="110" stroke="#c55a16" stroke-width="3"/><line x1="190" y1="110" x2="220" y2="165" stroke="#c55a16" stroke-width="3" stroke-dasharray="5,4"/>
+        <circle cx="140" cy="55" r="18" fill="#ff9757"/><text x="140" y="61" text-anchor="middle" fill="#fff" font-weight="800">3</text>
+        <circle cx="90" cy="110" r="18" fill="#ffb07c"/><text x="90" y="116" text-anchor="middle" fill="#fff" font-weight="800">7</text>
+        <circle cx="190" cy="110" r="18" fill="#ffb07c"/><text x="190" y="116" text-anchor="middle" fill="#fff" font-weight="800">5</text>
+        <circle cx="220" cy="165" r="18" fill="#2fb344"/><text x="220" y="171" text-anchor="middle" fill="#fff" font-weight="800">2</text>
+        <path d="M232 148 L205 127 M200 95 L155 70" stroke="#2fb344" stroke-width="3" fill="none" marker-end="url(#ag3)"/>
+        <text x="140" y="192" text-anchor="middle" class="lbl">2 &lt; 5 → swap · 2 &lt; 3 → swap · done</text>
+
+        <text x="420" y="24" text-anchor="middle" font-weight="800" fill="#c55a16">poll(): last→root, sink DOWN ⬇</text>
+        <line x1="420" y1="55" x2="370" y2="110" stroke="#c55a16" stroke-width="3"/><line x1="420" y1="55" x2="470" y2="110" stroke="#c55a16" stroke-width="3"/><line x1="370" y1="110" x2="340" y2="165" stroke="#c55a16" stroke-width="3"/>
+        <circle cx="420" cy="55" r="18" fill="#e5484d"/><text x="420" y="61" text-anchor="middle" fill="#fff" font-weight="800">9</text>
+        <circle cx="370" cy="110" r="18" fill="#ffb07c"/><text x="370" y="116" text-anchor="middle" fill="#fff" font-weight="800">7</text>
+        <circle cx="470" cy="110" r="18" fill="#ffb07c"/><text x="470" y="116" text-anchor="middle" fill="#fff" font-weight="800">5</text>
+        <circle cx="340" cy="165" r="18" fill="#ffb07c"/><text x="340" y="171" text-anchor="middle" fill="#fff" font-weight="800">12</text>
+        <path d="M435 72 L458 95" stroke="#e5484d" stroke-width="3" fill="none" marker-end="url(#ar3)"/>
+        <text x="420" y="192" text-anchor="middle" class="lbl">smaller child is 5 → swap 9 ↔ 5 · done</text>
+        <defs>
+          <marker id="ag3" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2fb344"/></marker>
+          <marker id="ar3" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e5484d"/></marker>
+        </defs>
+      </svg>
+      <div class="codeblock" data-code="pqBuild"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     COMPARE
+     ============================================================ -->
+<section class="topic" id="compare">
+  <div class="wrap">
+    <h2>⚖️ Side by side</h2>
+    <div class="card">
+      <table class="cmp">
+        <thead><tr><th></th><th>📚 Stack</th><th>🎢 Queue</th><th>🚑 Priority Queue</th></tr></thead>
+        <tbody>
+          <tr><td><b>Rule</b></td><td>LIFO — last in, first out</td><td>FIFO — first in, first out</td><td>Best priority out first</td></tr>
+          <tr><td><b>Java class</b></td><td><code>ArrayDeque</code> (as Deque)</td><td><code>ArrayDeque</code> or <code>LinkedList</code> (as Queue)</td><td><code>PriorityQueue</code></td></tr>
+          <tr><td><b>Add</b></td><td><code>push(x)</code></td><td><code>offer(x)</code></td><td><code>offer(x)</code></td></tr>
+          <tr><td><b>Remove</b></td><td><code>pop()</code></td><td><code>poll()</code></td><td><code>poll()</code></td></tr>
+          <tr><td><b>Look</b></td><td><code>peek()</code></td><td><code>peek()</code></td><td><code>peek()</code></td></tr>
+          <tr><td><b>Add cost</b></td><td class="o1">O(1)</td><td class="o1">O(1)</td><td class="olog">O(log n)</td></tr>
+          <tr><td><b>Remove cost</b></td><td class="o1">O(1)</td><td class="o1">O(1)</td><td class="olog">O(log n)</td></tr>
+          <tr><td><b>Look cost</b></td><td class="o1">O(1)</td><td class="o1">O(1)</td><td class="o1">O(1)</td></tr>
+          <tr><td><b>Inside</b></td><td>array + <code>top</code> index</td><td>circular array (or linked list)</td><td>binary heap in an array</td></tr>
+          <tr><td><b>Use when</b></td><td>undo, recursion, matching brackets, DFS</td><td>fair waiting lines, buffering, BFS</td><td>scheduling, Dijkstra's shortest path, "top-k" problems</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">🧠 <b>One sentence to remember:</b> Stack = <i>newest</i> first · Queue = <i>oldest</i> first · Priority Queue = <i>best</i> first.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     QUIZ
+     ============================================================ -->
+<section class="topic" id="quiz">
+  <div class="wrap">
+    <h2>🧠 Quick quiz</h2>
+    <div id="quizBox"></div>
+    <div class="scorebar" id="scoreBar">Score: 0 / 0</div>
+  </div>
+</section>
+
+<footer>MAC286 · Data Structures in Java · LaGuardia Community College · Prof. K. Kassou</footer>
+
+<script>
+/* ============================================================
+   CODE LISTINGS  —  [ "line of code", "explanation" ]
+   ============================================================ */
+const CODE = {
+
+/* ---------- STACK: use ---------- */
+stackUse: { title:"StackDemo.java", lines:[
+["import java.util.ArrayDeque;","We need <code>ArrayDeque</code> — Java's fast, modern stack (and queue). It lives in <code>java.util</code>."],
+["import java.util.Deque;","<code>Deque</code> is the <b>interface</b> (the contract: push, pop, peek…). We program to the interface, not the class — good habit."],
+["","" ],
+["public class StackDemo {","Our program. Rename to <code>Main</code> if your online compiler needs it (use the Copy as Main.java button)."],
+["    public static void main(String[] args) {","Where Java starts running."],
+["        Deque<Integer> s = new ArrayDeque<>();","Create an empty stack of integers. Left side = the interface type, right side = the real object. <code>&lt;Integer&gt;</code> = it holds Integers only."],
+["","" ],
+["        s.push(10);","Put 10 on top. Stack: [10]"],
+["        s.push(20);","Put 20 on top of 10. Stack: [10, 20] — 20 is the top now."],
+["        s.push(30);","Put 30 on top. Stack: [10, 20, 30] — 30 is the top."],
+["","" ],
+["        System.out.println(\"top = \" + s.peek()); // 30","<b>peek</b> looks at the top (30) but does NOT remove it. Size is still 3."],
+["        System.out.println(\"pop = \" + s.pop());  // 30","<b>pop</b> removes and returns the top. 30 leaves. Stack: [10, 20]"],
+["        System.out.println(\"pop = \" + s.pop());  // 20","Again: 20 leaves. Stack: [10]. Notice the order: 30, then 20 — the <b>reverse</b> of how they went in. That's LIFO."],
+["","" ],
+["        while (!s.isEmpty()) {","Safety first: keep popping only while there's something left. Popping an empty <code>ArrayDeque</code> throws <code>NoSuchElementException</code>."],
+["            System.out.println(\"pop = \" + s.pop()); // 10","The last element (10) comes out. Now the stack is empty and the loop stops."],
+["        }","End of the while loop."],
+["        System.out.println(\"empty? \" + s.isEmpty()); // true","Confirm it's empty. <code>isEmpty()</code> returns a boolean."],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- STACK: build ---------- */
+stackBuild: { title:"MyStack.java", lines:[
+["public class MyStack {","We're building the stack ourselves — no imports needed. Just an array and one integer."],
+["    private int[] data;   // where the elements live","The storage. A plain int array. <code>private</code> = nobody outside can poke it directly."],
+["    private int top;      // index of the top element, -1 when empty","The ONE number that makes a stack a stack: where is the top? <code>-1</code> is the secret code for \"nothing in here yet\"."],
+["","" ],
+["    public MyStack(int capacity) {","Constructor: how many elements can we hold at most?"],
+["        data = new int[capacity];","Make the array of that size. All zeros for now — but zeros below <code>top</code> don't count."],
+["        top = -1;","Start empty. Index -1 doesn't exist, which is exactly the point."],
+["    }","End of constructor."],
+["","" ],
+["    public boolean isEmpty() { return top == -1; }","Empty means the top pointer is still at -1. One comparison — O(1)."],
+["    public boolean isFull()  { return top == data.length - 1; }","Full means the top is sitting on the last index. (Arrays don't grow by themselves!)"],
+["","" ],
+["    public void push(int x) {","Add on top."],
+["        if (isFull()) throw new RuntimeException(\"Stack overflow\");","Yes — this is where the famous website name comes from! No room → stop with a clear error."],
+["        top++;","Step 1: move the top pointer up to the next free slot."],
+["        data[top] = x;","Step 2: write the value there. (Some people write <code>data[++top] = x;</code> — same thing in one line.)"],
+["    }","Done. Two tiny steps → O(1)."],
+["","" ],
+["    public int pop() {","Remove from top."],
+["        if (isEmpty()) throw new RuntimeException(\"Stack underflow\");","Can't pop from nothing. Underflow = the opposite of overflow."],
+["        int x = data[top];","Step 1: read the top value and save it."],
+["        top--;","Step 2: move the pointer down. We don't even erase the old value — it's simply \"above the top\" now and ignored."],
+["        return x;","Give the value back to whoever called pop()."],
+["    }","Also O(1)."],
+["","" ],
+["    public int peek() {","Look but don't touch."],
+["        if (isEmpty()) throw new RuntimeException(\"Stack is empty\");","Same guard."],
+["        return data[top];","Just return it. <code>top</code> doesn't move."],
+["    }","End of peek."],
+["","" ],
+["    public static void main(String[] args) {","A small test so you can run this file alone."],
+["        MyStack s = new MyStack(5);","A stack that holds up to 5 ints."],
+["        s.push(10); s.push(20); s.push(30);","top goes -1 → 0 → 1 → 2. data = [10,20,30,0,0]"],
+["        System.out.println(s.pop()); // 30","top 2 → 1. Prints 30."],
+["        System.out.println(s.pop()); // 20","top 1 → 0. Prints 20."],
+["        System.out.println(s.peek()); // 10","top stays 0. Prints 10."],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- STACK: brackets ---------- */
+stackBrackets: { title:"Brackets.java", lines:[
+["import java.util.ArrayDeque;","Our stack class."],
+["import java.util.Deque;","Our stack interface."],
+["","" ],
+["public class Brackets {","Checks whether brackets are balanced."],
+["    public static boolean isBalanced(String s) {","Returns true if every opener has a matching closer in the right order."],
+["        Deque<Character> stack = new ArrayDeque<>();","A stack of characters. We'll store <b>openers</b> here while waiting for their closer."],
+["        for (char c : s.toCharArray()) {","Walk through the string one character at a time."],
+["            if (c == '(' || c == '[' || c == '{') {","Is it an opener?"],
+["                stack.push(c);","Remember it — push it on top. The MOST RECENT opener must close FIRST → that's why a stack is perfect."],
+["            } else if (c == ')' || c == ']' || c == '}') {","Is it a closer?"],
+["                if (stack.isEmpty()) return false;","A closer with nothing open → like \")(\" → unbalanced. Also protects the next line from popping an empty stack."],
+["                char open = stack.pop();","Take the most recent opener off the top."],
+["                if (!matches(open, c)) return false;","Does the pair fit? \"(\" with \")\" ok; \"(\" with \"]\" is wrong → unbalanced."],
+["            }","Any other character (letters, digits) is ignored."],
+["        }","End of loop."],
+["        return stack.isEmpty();","If openers are still waiting (like \"((\"), it's unbalanced. Empty = everything matched."],
+["    }","End of isBalanced."],
+["","" ],
+["    private static boolean matches(char open, char close) {","Little helper: do these two form a pair?"],
+["        return (open == '(' && close == ')')","Round with round…"],
+["            || (open == '[' && close == ']')","…square with square…"],
+["            || (open == '{' && close == '}');","…curly with curly."],
+["    }","End of helper."],
+["","" ],
+["    public static void main(String[] args) {","Test it."],
+["        System.out.println(isBalanced(\"{[()]}\")); // true","Opens { [ ( then closes ) ] } in perfect reverse order."],
+["        System.out.println(isBalanced(\"([)]\"));   // false","Pops '[' when it sees ')' → mismatch → false."],
+["        System.out.println(isBalanced(\"((\"));     // false","Loop ends with two '(' still on the stack → false."],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- QUEUE: use ---------- */
+queueUse: { title:"QueueDemo.java", lines:[
+["import java.util.ArrayDeque;","The same class as before! <code>ArrayDeque</code> can be a stack OR a queue, depending on which methods you call."],
+["import java.util.Queue;","This time we use the <code>Queue</code> interface — it only exposes queue-style methods (offer/poll/peek). That protects us from accidentally using push/pop."],
+["","" ],
+["public class QueueDemo {","Our program."],
+["    public static void main(String[] args) {","Start here."],
+["        Queue<String> q = new ArrayDeque<>();","An empty queue of Strings."],
+["","" ],
+["        q.offer(\"Ana\");","Ana joins the line. Queue: [Ana]"],
+["        q.offer(\"Bo\");","Bo joins behind Ana. Queue: [Ana, Bo]"],
+["        q.offer(\"Cal\");","Cal joins at the rear. Queue: [Ana, Bo, Cal]. Ana is still the front."],
+["","" ],
+["        System.out.println(\"front = \" + q.peek()); // Ana","<b>peek</b> shows who's next (Ana) without removing her."],
+["        System.out.println(\"served: \" + q.poll()); // Ana","<b>poll</b> removes the FRONT. Ana is served first because she came first. Queue: [Bo, Cal]"],
+["        System.out.println(\"served: \" + q.poll()); // Bo","Then Bo. Same order as arrival → FIFO."],
+["","" ],
+["        q.offer(\"Dee\");","Dee arrives late. She goes to the rear: [Cal, Dee]. She does NOT cut in front of Cal."],
+["","" ],
+["        while (!q.isEmpty()) {","Serve everyone left."],
+["            System.out.println(\"served: \" + q.poll()); // Cal, Dee","Cal, then Dee — still arrival order."],
+["        }","End of loop."],
+["        System.out.println(q.poll()); // null","On an empty queue, <code>poll()</code> returns <code>null</code> instead of crashing. (<code>remove()</code> would throw.)"],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- QUEUE: build ---------- */
+queueBuild: { title:"MyQueue.java", lines:[
+["public class MyQueue {","Our own queue built on an array."],
+["    private int[] data;","Storage."],
+["    private int front;   // index of the first element","Where the next poll() reads from."],
+["    private int size;    // how many elements are stored","How many are currently inside. (We compute the rear from front + size.)"],
+["","" ],
+["    public MyQueue(int capacity) {","Constructor with a maximum size."],
+["        data = new int[capacity];","Allocate the array."],
+["        front = 0;","Start reading at index 0."],
+["        size = 0;","Nothing stored yet."],
+["    }","End of constructor."],
+["","" ],
+["    public boolean isEmpty() { return size == 0; }","Nothing inside?"],
+["    public boolean isFull()  { return size == data.length; }","Every slot used?"],
+["","" ],
+["    public void offer(int x) {","Add to the rear."],
+["        if (isFull()) throw new RuntimeException(\"Queue is full\");","Guard."],
+["        int rear = (front + size) % data.length;","⭐ The clock trick. The next free slot is <code>front + size</code>… but if that runs past the end, <code>%</code> wraps it back to 0. Like 11 o'clock + 2 hours = 1 o'clock."],
+["        data[rear] = x;","Write the value at the rear."],
+["        size++;","One more element."],
+["    }","O(1) — no shifting of elements, ever."],
+["","" ],
+["    public int poll() {","Remove from the front."],
+["        if (isEmpty()) throw new RuntimeException(\"Queue is empty\");","Guard."],
+["        int x = data[front];","Read the front value."],
+["        front = (front + 1) % data.length;","Move front forward — and wrap around with <code>%</code> if we hit the end. The old slot becomes free for a future offer()."],
+["        size--;","One fewer element."],
+["        return x;","Hand it back."],
+["    }","Also O(1)."],
+["","" ],
+["    public int peek() {","Look at the front."],
+["        if (isEmpty()) throw new RuntimeException(\"Queue is empty\");","Guard."],
+["        return data[front];","No movement."],
+["    }","End of peek."],
+["","" ],
+["    public static void main(String[] args) {","Test the wrap-around."],
+["        MyQueue q = new MyQueue(3);","Tiny capacity of 3 so we can see the wrap."],
+["        q.offer(1); q.offer(2); q.offer(3);  // full","Slots 0,1,2 filled. front=0, size=3."],
+["        System.out.println(q.poll()); // 1","Reads data[0]=1. front → 1, size → 2. Slot 0 is now free."],
+["        q.offer(4);  // goes into slot 0 (wrap-around!)","rear = (1+2)%3 = 0. The 4 is stored in slot 0 — we reused the space. Array: [4,2,3]"],
+["        while (!q.isEmpty()) System.out.println(q.poll()); // 2 3 4","front walks 1 → 2 → 0 (wrapping) and prints 2, 3, 4 — correct FIFO order even though 4 sits at index 0."],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- QUEUE: simulation ---------- */
+queueSim: { title:"HelpDesk.java", lines:[
+["import java.util.ArrayDeque;","Stack/queue class."],
+["import java.util.Queue;","Queue interface."],
+["","" ],
+["public class HelpDesk {","A tiny simulation of a support desk."],
+["    public static void main(String[] args) {","Start."],
+["        Queue<String> tickets = new ArrayDeque<>();","The waiting line of support tickets."],
+["        String[] arrivals = {\"T101\", \"T102\", \"T103\", \"T104\", \"T105\"};","Five tickets arrive in this order."],
+["","" ],
+["        for (String t : arrivals) {","For each arriving ticket…"],
+["            tickets.offer(t);","…add it to the back of the line."],
+["            System.out.println(t + \" arrived. Waiting: \" + tickets.size());","Show how long the line is now: 1, 2, 3, 4, 5."],
+["        }","End of arrivals."],
+["","" ],
+["        int minute = 0;","A simple clock."],
+["        while (!tickets.isEmpty()) {","While someone is still waiting…"],
+["            String t = tickets.poll();","…take the ticket that has waited the LONGEST (the front)."],
+["            minute += 3;","Each ticket takes 3 minutes to solve."],
+["            System.out.println(\"min \" + minute + \": solved \" + t + \" | left: \" + tickets.size());","Print: min 3 solved T101, min 6 solved T102 … Fair order, no favorites."],
+["        }","End of the day."],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- PQ: use ---------- */
+pqUse: { title:"PQDemo.java", lines:[
+["import java.util.PriorityQueue;","Java's built-in priority queue. It's a <b>min-heap</b> by default: smallest comes out first."],
+["","" ],
+["public class PQDemo {","Our program."],
+["    public static void main(String[] args) {","Start."],
+["        PriorityQueue<Integer> pq = new PriorityQueue<>();","An empty priority queue of Integers. No Comparator given → natural order (numbers: small to large)."],
+["","" ],
+["        pq.offer(42);","Insert 42. Heap: [42]"],
+["        pq.offer(7);","Insert 7. It bubbles up above 42 because 7 &lt; 42. Heap: [7, 42]"],
+["        pq.offer(19);","Insert 19. Heap: [7, 42, 19] — 7 is still the root (smallest)."],
+["        pq.offer(3);","Insert 3. It bubbles all the way to the top. Heap: [3, 7, 19, 42]"],
+["","" ],
+["        System.out.println(pq);  // [3, 7, 19, 42]  (heap order, NOT sorted!)","⚠️ Printing shows the internal array. It LOOKS sorted here by luck. Try adding 5 more numbers and it won't be. Never rely on it."],
+["        System.out.println(\"smallest = \" + pq.peek()); // 3","<b>peek</b> = the root of the heap = the smallest. O(1)."],
+["","" ],
+["        while (!pq.isEmpty()) {","Empty it out…"],
+["            System.out.println(pq.poll()); // 3, 7, 19, 42","…and the numbers come out <b>sorted</b>: 3, 7, 19, 42. Insert in any order, poll in priority order. That's the whole superpower."],
+["        }","End of loop."],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- PQ: comparator ---------- */
+pqComparator: { title:"PQComparator.java", lines:[
+["import java.util.Comparator;","<code>Comparator</code> = an object whose job is to say which of two things goes first."],
+["import java.util.PriorityQueue;","The priority queue."],
+["","" ],
+["public class PQComparator {","Three flavors of priority."],
+["    // A simple class for our ER patients","" ],
+["    static class Patient {","A patient has a name and a severity (1 = critical, 10 = sneeze)."],
+["        String name; int severity;","Two fields."],
+["        Patient(String n, int s) { name = n; severity = s; }","Constructor shortcut."],
+["        public String toString() { return name + \"(\" + severity + \")\"; }","So printing shows \"Ana(2)\" instead of gibberish."],
+["    }","End of Patient."],
+["","" ],
+["    public static void main(String[] args) {","Start."],
+["        // 1) LARGEST first: reverse the natural order","" ],
+["        PriorityQueue<Integer> maxPQ = new PriorityQueue<>(Comparator.reverseOrder());","Pass a Comparator to the constructor. <code>reverseOrder()</code> flips the rule → now the BIGGEST is the most important (a max-heap)."],
+["        maxPQ.offer(5); maxPQ.offer(50); maxPQ.offer(15);","Insert in random order."],
+["        System.out.println(maxPQ.poll()); // 50","50 comes out first."],
+["","" ],
+["        // 2) SHORTEST string first","" ],
+["        PriorityQueue<String> byLen = new PriorityQueue<>(Comparator.comparingInt(String::length));","<code>comparingInt(String::length)</code> = \"compare strings by their length\". Shorter = higher priority."],
+["        byLen.offer(\"banana\"); byLen.offer(\"fig\"); byLen.offer(\"apple\");","Three fruits."],
+["        System.out.println(byLen.poll()); // fig","\"fig\" (3 letters) wins."],
+["","" ],
+["        // 3) ER triage: lowest severity number = most urgent","" ],
+["        PriorityQueue<Patient> er = new PriorityQueue<>(Comparator.comparingInt(p -> p.severity));","A lambda: for each patient <code>p</code>, use <code>p.severity</code> as the key. Smallest severity first."],
+["        er.offer(new Patient(\"Ana\", 6));","Ana: moderate."],
+["        er.offer(new Patient(\"Bo\", 1));","Bo: critical (1)."],
+["        er.offer(new Patient(\"Cal\", 3));","Cal: urgent."],
+["        while (!er.isEmpty()) System.out.println(\"Treat \" + er.poll());","Bo(1), Cal(3), Ana(6) — not arrival order, severity order. 🚑"],
+["    }","End of main."],
+["}","End of class."]
+]},
+
+/* ---------- PQ: build ---------- */
+pqBuild: { title:"MinHeap.java", lines:[
+["public class MinHeap {","Our own min-heap. This is roughly what <code>PriorityQueue</code> does inside."],
+["    private int[] data;","The tree lives in a plain array."],
+["    private int size;","How many elements are used."],
+["","" ],
+["    public MinHeap(int capacity) { data = new int[capacity]; size = 0; }","Constructor."],
+["    public boolean isEmpty() { return size == 0; }","Empty check."],
+["    public int peek() { return data[0]; }","The smallest is ALWAYS at index 0. That's the heap rule paying off."],
+["","" ],
+["    private void swap(int i, int j) { int t = data[i]; data[i] = data[j]; data[j] = t; }","Tiny helper to exchange two slots."],
+["","" ],
+["    public void offer(int x) {","Insert."],
+["        data[size] = x;","Step 1: put it in the first free slot (the bottom of the tree)."],
+["        int i = size;","Remember where it landed."],
+["        size++;","One more element."],
+["        // bubble UP while smaller than parent","" ],
+["        while (i > 0 && data[i] < data[(i - 1) / 2]) {","While we're not the root AND we're smaller than our parent… (parent index = (i-1)/2)"],
+["            swap(i, (i - 1) / 2);","…swap with the parent."],
+["            i = (i - 1) / 2;","Move up to the parent's position and check again."],
+["        }","Stops when parent ≤ us, or we reached the root. At most log n steps (tree height)."],
+["    }","O(log n)."],
+["","" ],
+["    public int poll() {","Remove the smallest."],
+["        int min = data[0];","Save the root — that's what we return."],
+["        size--;","Shrink."],
+["        data[0] = data[size];","Move the LAST element to the root. The tree stays a complete shape, but the root is now probably too big."],
+["        int i = 0;","Start sinking from the root."],
+["        // sink DOWN while bigger than the smaller child","" ],
+["        while (true) {","Loop until we break."],
+["            int left = 2 * i + 1, right = 2 * i + 2, small = i;","Children indexes. <code>small</code> will track the smallest of {me, left, right}."],
+["            if (left < size && data[left] < data[small]) small = left;","If the left child exists and is smaller, it's the candidate."],
+["            if (right < size && data[right] < data[small]) small = right;","If the right child is even smaller, it wins instead."],
+["            if (small == i) break;","If I'm already the smallest, the heap rule is restored → stop."],
+["            swap(i, small);","Otherwise swap with the smaller child…"],
+["            i = small;","…and continue from there."],
+["        }","End of sink."],
+["        return min;","Return the old root."],
+["    }","O(log n)."],
+["","" ],
+["    public static void main(String[] args) {","Test."],
+["        MinHeap h = new MinHeap(10);","Room for 10."],
+["        int[] in = {9, 4, 7, 1, 8, 3};","Insert in a messy order."],
+["        for (int v : in) h.offer(v);","After all inserts the array is a valid heap, e.g. [1, 4, 3, 9, 8, 7]. Not sorted — but every parent ≤ its children."],
+["        while (!h.isEmpty()) System.out.print(h.poll() + \" \"); // 1 3 4 7 8 9","Polling repeatedly prints them sorted. (Congratulations: you just wrote <b>heap sort</b>.)"],
+["    }","End of main."],
+["}","End of class."]
+]}
+};
+
+/* ============================================================
+   RENDER CODE BLOCKS WITH HOVER EXPLANATIONS
+   ============================================================ */
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function highlight(line){
+  let s = esc(line);
+  // comments
+  const ci = s.indexOf("//");
+  let comment = "";
+  if (ci >= 0 && !/["'].*\/\/.*["']/.test(s)) { comment = s.slice(ci); s = s.slice(0, ci); }
+  s = s.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, '<span class="str">$1</span>');
+  s = s.replace(/\b(public|private|static|class|void|int|boolean|char|return|new|if|else|while|for|throw|true|false|null|import|this|break)\b/g, '<span class="kw">$1</span>');
+  s = s.replace(/\b(String|Integer|Character|Deque|ArrayDeque|Queue|PriorityQueue|Comparator|RuntimeException|MyStack|MyQueue|MinHeap|Patient|System)\b/g, '<span class="typ">$1</span>');
+  s = s.replace(/\b(\d+)\b/g, '<span class="num">$1</span>');
+  s = s.replace(/\b([a-zA-Z_]\w*)(?=\()/g, '<span class="fn">$1</span>');
+  if (comment) s += '<span class="cmt">' + comment + '</span>';
+  return s;
+}
+function renderCodeBlocks(){
+  document.querySelectorAll(".codeblock").forEach(block => {
+    const key = block.dataset.code, def = CODE[key];
+    const head = document.createElement("div"); head.className = "codehead";
+    head.innerHTML = `<span><span class="dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></span>${def.title}</span>
+      <span><button data-act="copy">📋 Copy</button> <button data-act="main">📋 Copy as Main.java</button></span>`;
+    const pre = document.createElement("pre"); pre.className = "code";
+    const aside = document.createElement("aside"); aside.className = "explain";
+    aside.innerHTML = `<p class="hint">👈 Hover or tap a line of code to see what it does.</p>`;
+    def.lines.forEach((pair, idx) => {
+      const [code, text] = pair;
+      const span = document.createElement("span"); span.className = "ln";
+      span.innerHTML = code === "" ? " " : highlight(code);
+      const show = () => {
+        pre.querySelectorAll(".ln.active").forEach(e => e.classList.remove("active"));
+        if (!text) return;
+        span.classList.add("active");
+        aside.innerHTML = `<span class="lineno">line ${idx+1}</span><h4><code>${esc(code.trim()).slice(0,60)}${code.trim().length>60?"…":""}</code></h4><p>${text}</p>`;
+      };
+      span.addEventListener("mouseenter", show);
+      span.addEventListener("click", show);
+      pre.appendChild(span);
+    });
+    head.addEventListener("click", e => {
+      const act = e.target.dataset.act; if (!act) return;
+      let src = def.lines.map(p => p[0]).join("\n");
+      if (act === "main") src = src.replace(/public class \w+/, "public class Main");
+      navigator.clipboard.writeText(src).then(() => { e.target.textContent = "✅ Copied!"; setTimeout(()=> e.target.textContent = act==="main" ? "📋 Copy as Main.java" : "📋 Copy", 1500); });
+    });
+    block.append(head, pre, aside);
+  });
+}
+
+/* ============================================================
+   STACK PLAYGROUND
+   ============================================================ */
+const stackData = [];
+function logTo(id, html){ const el = document.getElementById(id); el.innerHTML = html + "\n" + el.innerHTML.split("\n").slice(0,5).join("\n"); }
+function stackRender(){
+  const v = document.getElementById("stackVis"); v.innerHTML = "";
+  stackData.forEach((x,i)=>{ const d=document.createElement("div"); d.className="item"+(i===stackData.length-1?" top":""); d.textContent=x; v.appendChild(d); });
+  document.getElementById("stackSize").textContent = stackData.length;
+}
+function stackPush(){
+  const inp = document.getElementById("stackIn"); const x = inp.value.trim(); if(!x) return;
+  if (stackData.length >= 7) { logTo("stackLog", `<span class="bad">push(${x}) → Stack overflow! (demo limit 7)</span>`); return; }
+  stackData.push(x); stackRender();
+  logTo("stackLog", `<span class="ok">push(${x})</span>  stack = [${stackData.join(", ")}]  ← top is ${x}`);
+  if (!isNaN(x)) inp.value = String(Number(x)+10);
+}
+function stackPop(){
+  if (!stackData.length) { logTo("stackLog", `<span class="bad">pop() → NoSuchElementException: stack is empty! Always check isEmpty() first.</span>`); return; }
+  const top = document.querySelector("#stackVis .item.top"); top.classList.add("leaving");
+  const x = stackData.pop();
+  setTimeout(()=>{ stackRender(); logTo("stackLog", `<span class="ok">pop() → ${x}</span>  stack = [${stackData.join(", ")}]`); }, 320);
+}
+function stackPeek(){
+  if (!stackData.length) { logTo("stackLog", `<span class="bad">peek() → empty stack, nothing to see.</span>`); return; }
+  logTo("stackLog", `<span class="hi">peek() → ${stackData[stackData.length-1]}</span>  (nothing removed, size still ${stackData.length})`);
+}
+function stackClear(){ stackData.length=0; stackRender(); document.getElementById("stackLog").innerHTML = '<span class="hi">// cleared</span>'; }
+
+/* ============================================================
+   QUEUE PLAYGROUND
+   ============================================================ */
+const queueData = []; const names = ["Ana","Bo","Cal","Dee","Eli","Fay","Gus","Hal","Ivy","Jo"];
+function queueRender(){
+  const v = document.getElementById("queueVis"); v.innerHTML = "";
+  queueData.forEach((x,i)=>{ const d=document.createElement("div"); d.className="item"+(i===0?" front":"")+(i===queueData.length-1?" rear":""); d.textContent=x; v.appendChild(d); });
+  document.getElementById("queueSize").textContent = queueData.length;
+}
+function queueOffer(){
+  const inp = document.getElementById("queueIn"); const x = inp.value.trim(); if(!x) return;
+  if (queueData.length >= 8) { logTo("queueLog", `<span class="bad">offer(${x}) → false (demo limit 8)</span>`); return; }
+  queueData.push(x); queueRender();
+  logTo("queueLog", `<span class="ok">offer("${x}")</span>  queue = [${queueData.join(", ")}]  front = ${queueData[0]}`);
+  const ni = names.indexOf(x); inp.value = ni >= 0 ? names[(ni+1)%names.length] : x;
+}
+function queuePoll(){
+  if (!queueData.length) { logTo("queueLog", `<span class="bad">poll() → null (queue is empty, no crash)</span>`); return; }
+  document.querySelector("#queueVis .item.front").classList.add("leaving");
+  const x = queueData.shift();
+  setTimeout(()=>{ queueRender(); logTo("queueLog", `<span class="ok">poll() → "${x}"</span>  queue = [${queueData.join(", ")}]`); }, 320);
+}
+function queuePeek(){
+  if (!queueData.length) { logTo("queueLog", `<span class="bad">peek() → null</span>`); return; }
+  logTo("queueLog", `<span class="hi">peek() → "${queueData[0]}"</span>  (front stays, size still ${queueData.length})`);
+}
+function queueClear(){ queueData.length=0; queueRender(); document.getElementById("queueLog").innerHTML='<span class="hi">// cleared</span>'; }
+
+/* ============================================================
+   PRIORITY QUEUE (MIN-HEAP) PLAYGROUND
+   ============================================================ */
+const heap = [];
+function heapRender(){
+  const arr = document.getElementById("heapArr"); arr.innerHTML = "";
+  heap.forEach((v,i)=>{ const c=document.createElement("div"); c.className="cell"; c.innerHTML=`<div class="v">${v}</div><div class="i">[${i}]</div>`; arr.appendChild(c); });
+  document.getElementById("pqSize").textContent = heap.length;
+  const svg = document.getElementById("heapSvg"); svg.innerHTML = "";
+  if (!heap.length) { svg.innerHTML = `<text x="260" y="130" style="fill:#8a93a8;font-size:16px">empty heap — offer a number</text>`; return; }
+  const pos = i => { const depth = Math.floor(Math.log2(i+1)); const idxInLevel = i - (2**depth - 1); const count = 2**depth; return { x: 520*(idxInLevel+0.5)/count, y: 40 + depth*62 }; };
+  let edges = "", nodes = "";
+  heap.forEach((v,i)=>{ const p = pos(i); if (i>0){ const q = pos(Math.floor((i-1)/2)); edges += `<line x1="${q.x}" y1="${q.y}" x2="${p.x}" y2="${p.y}"/>`; }
+    nodes += `<g><circle cx="${p.x}" cy="${p.y}" r="20" class="${i===0?'root':''}"/><text x="${p.x}" y="${p.y+1}">${v}</text></g>`; });
+  svg.innerHTML = edges + nodes;
+}
+function pqOffer(){
+  const inp = document.getElementById("pqIn"); const x = Number(inp.value); if (inp.value === "" || isNaN(x)) return;
+  if (heap.length >= 15) { logTo("pqLog", `<span class="bad">demo limit 15</span>`); return; }
+  heap.push(x); let i = heap.length-1; const steps=[];
+  while (i > 0 && heap[i] < heap[Math.floor((i-1)/2)]) { const p=Math.floor((i-1)/2); steps.push(`${heap[i]}↔${heap[p]}`); [heap[i],heap[p]]=[heap[p],heap[i]]; i=p; }
+  heapRender();
+  logTo("pqLog", `<span class="ok">offer(${x})</span>  ${steps.length? "bubble up: "+steps.join(", ") : "no swaps needed"}  → heap = [${heap.join(", ")}]  min = ${heap[0]}`);
+  inp.value = Math.floor(Math.random()*50)+1;
+}
+function pqPoll(){
+  if (!heap.length) { logTo("pqLog", `<span class="bad">poll() → null (empty)</span>`); return; }
+  const min = heap[0]; const last = heap.pop(); const steps=[];
+  if (heap.length) { heap[0] = last; let i = 0;
+    while (true) { const l=2*i+1, r=2*i+2; let s=i; if (l<heap.length && heap[l]<heap[s]) s=l; if (r<heap.length && heap[r]<heap[s]) s=r; if (s===i) break; steps.push(`${heap[i]}↔${heap[s]}`); [heap[i],heap[s]]=[heap[s],heap[i]]; i=s; } }
+  heapRender();
+  logTo("pqLog", `<span class="ok">poll() → ${min}</span>  moved ${last} to root, ${steps.length? "sink down: "+steps.join(", ") : "no swaps"}  → heap = [${heap.join(", ")}]`);
+}
+function pqPeek(){ if(!heap.length){logTo("pqLog",`<span class="bad">peek() → null</span>`);return;} logTo("pqLog", `<span class="hi">peek() → ${heap[0]}</span>  (always index 0)`); }
+function pqRandom(){ heap.length=0; for(let k=0;k<7;k++){ document.getElementById("pqIn").value = Math.floor(Math.random()*50)+1; pqOffer(); } }
+function pqClear(){ heap.length=0; heapRender(); document.getElementById("pqLog").innerHTML='<span class="hi">// cleared</span>'; }
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+const QUIZ = [
+ { q:"You push 1, 2, 3 onto a stack, then pop twice. What comes out?", a:["1 then 2","3 then 2","2 then 3","3 then 1"], c:1, why:"LIFO: the last pushed (3) leaves first, then 2." },
+ { q:"You offer \"A\", \"B\", \"C\" to a queue, then poll once. What's returned?", a:["\"C\"","\"B\"","\"A\"","null"], c:2, why:"FIFO: \"A\" arrived first, so it's served first." },
+ { q:"Which Java class is recommended for a stack today?", a:["java.util.Stack","ArrayDeque","ArrayList","HashMap"], c:1, why:"ArrayDeque is faster; the old Stack class is legacy." },
+ { q:"A default PriorityQueue<Integer> holds 9, 2, 7. What does poll() return?", a:["9","7","2","whatever was added first"], c:2, why:"Default = min-priority queue → smallest (2) first." },
+ { q:"In a heap stored in an array, where are the children of index 3?", a:["4 and 5","6 and 7","7 and 8","1 and 2"], c:2, why:"children = 2i+1 and 2i+2 → 7 and 8." },
+ { q:"What's the cost of offer() on a PriorityQueue with n elements?", a:["O(1)","O(log n)","O(n)","O(n log n)"], c:1, why:"Bubble-up climbs at most the tree height, which is log n." },
+ { q:"Which structure checks if \"{[()]}\" is balanced?", a:["Queue","Priority Queue","Stack","Array sorted first"], c:2, why:"The most recent opener must close first → LIFO → stack." },
+ { q:"Why does a circular queue use the % operator?", a:["to sort elements","to wrap indexes back to 0 and reuse free slots","to compute priority","to avoid null"], c:1, why:"(front + size) % capacity wraps around like a clock, so no space is wasted." }
+];
+let score=0, answered=0;
+function renderQuiz(){
+  const box = document.getElementById("quizBox");
+  QUIZ.forEach((item, qi) => {
+    const d = document.createElement("div"); d.className="q";
+    d.innerHTML = `<b>Q${qi+1}.</b> ${item.q}<div class="opts">${item.a.map((t,i)=>`<button class="opt" data-i="${i}">${esc(t)}</button>`).join("")}</div><div class="fb"></div>`;
+    d.querySelectorAll(".opt").forEach(btn => btn.addEventListener("click", () => {
+      if (d.dataset.done) return; d.dataset.done = 1; answered++;
+      const i = Number(btn.dataset.i); const fb = d.querySelector(".fb"); fb.style.display="block";
+      if (i === item.c) { btn.classList.add("right"); score++; fb.innerHTML = "✅ Correct! " + item.why; fb.style.color="var(--green)"; }
+      else { btn.classList.add("wrong"); d.querySelectorAll(".opt")[item.c].classList.add("right"); fb.innerHTML = "❌ Not quite. " + item.why; fb.style.color="var(--red)"; }
+      document.getElementById("scoreBar").textContent = `Score: ${score} / ${answered}` + (answered===QUIZ.length ? (score===QUIZ.length ? " — perfect! 🏆" : " — review the misses and try the playgrounds again 💪") : "");
+    }));
+    box.appendChild(d);
+  });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderCodeBlocks(); stackRender(); queueRender(); heapRender(); renderQuiz();
+// Enter key convenience in playgrounds
+document.getElementById("stackIn").addEventListener("keydown", e=>{ if(e.key==="Enter") stackPush(); });
+document.getElementById("queueIn").addEventListener("keydown", e=>{ if(e.key==="Enter") queueOffer(); });
+document.getElementById("pqIn").addEventListener("keydown", e=>{ if(e.key==="Enter") pqOffer(); });
+</script>
+</body>
+</html>
