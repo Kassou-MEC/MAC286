@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MAC286 · Linked Lists | Instructor Narration</title><style>
+:root{--bg:#0b1220;--panel:#141f32;--panel2:#1e2e46;--text:#e9f0fc;--muted:#a6b7ce;--a:#68d2ff;--gold:#ffc278;--green:#8ce5aa}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:17px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}header{padding:40px max(24px,calc((100% - 1200px)/2));background:linear-gradient(135deg,#172f51,#101728);border-bottom:1px solid #33465c}h1{font-size:2.35rem;margin:0}header p{max-width:850px;color:var(--muted)}.layout{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1500px;margin:auto}nav{position:sticky;top:0;height:100vh;overflow:auto;padding:22px;background:#111b2c;border-right:1px solid #2c3d57}nav a{display:block;padding:8px 10px;color:#bcd2eb;text-decoration:none;border-radius:8px;font-size:.85rem}nav a:hover{background:#2b3e59;color:white}main{padding:26px clamp(18px,4vw,55px) 100px;max-width:1150px}section{margin:20px 0 56px;scroll-margin-top:18px;border-bottom:1px solid #2d3d55;padding-bottom:30px}h2{font-size:1.65rem;color:var(--a);margin:0 0 10px}h3{font-size:1.05rem;color:var(--gold);margin-bottom:8px}.time{font-size:.8rem;border:1px solid #546276;padding:3px 9px;border-radius:99px;margin-left:10px;color:var(--muted)}.box{background:var(--panel);border:1px solid #2c415c;border-radius:14px;padding:17px 22px;margin:14px 0}.talk{border-left:4px solid var(--a)}.questions{border-left:4px solid var(--gold)}.notes{border-left:4px solid var(--green)}.box p{margin:0 0 8px}.box ul{margin:0;padding-left:23px}.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#21314a;padding:8px 15px;font-size:.82rem;color:#d7e7ff}.bar button,.topbtn{border:1px solid #506582;border-radius:8px;padding:6px 12px;background:#304562;color:white;cursor:pointer}.code{border-radius:12px;overflow:hidden;border:1px solid #304360;margin:18px 0}.code pre{background:#09111e;color:#d7e7f7;padding:15px 21px;margin:0;overflow:auto;font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:4}.code .kw{color:#cba6f7}.code .str{color:#a5e5a0}.code .cm{color:#778ca9}.code .num{color:#ffc078}.expected{background:#0d1d24;border-top:1px solid #345c62;padding:12px 20px;font:14px/1.6 monospace;white-space:pre-wrap;color:#b4e9ca}.tip{color:var(--muted);font-size:.9rem}.mini{margin:10px 0;padding:10px 16px;border-left:3px solid #68d2ff;color:#d5edff;background:#1a2a40}footer{color:var(--muted);padding:20px}@media(max-width:800px){.layout{display:block}nav{position:relative;height:auto;display:flex;flex-wrap:wrap}nav a{display:inline-block}header{padding:24px}h1{font-size:1.7rem}}@media print{body{background:white;color:black}header{background:white;color:black}nav,.bar button{display:none}.layout{display:block}main{max-width:none}.box{background:#fafafa;color:#111}.code pre{white-space:pre-wrap;background:#f3f3f3;color:black}.code pre span{color:#111!important}h2{color:#104065}section{break-inside:avoid}}
+
+/* Classroom projector-friendly typography */
+body{font-size:21px;line-height:1.75}
+h1{font-size:3rem;line-height:1.2}
+h2{font-size:2.15rem;line-height:1.3}
+h3{font-size:1.45rem}
+nav a{font-size:1.05rem;line-height:1.45}
+.layout{grid-template-columns:270px minmax(0,1fr)}
+.time{font-size:1rem}
+.bar{font-size:1.05rem}
+.bar button,.topbtn{font-size:1rem}
+.code pre{font-size:19px;line-height:1.7}
+.expected{font-size:19px;line-height:1.7}
+.tip{font-size:1.06rem}
+.box{padding:22px 26px}
+@media(max-width:800px){.layout{display:block}h1{font-size:2.2rem}}
+
+/* Instructor answers, kept legible on classroom projectors */
+.questions li{margin-bottom:18px;font-size:21px;line-height:1.65}
+.questions .instructor-answer{margin:7px 0 4px;padding:10px 14px;background:#173347;border-left:4px solid #8ce5aa;border-radius:7px;color:#effff6;font-size:20px;line-height:1.65}
+.questions .instructor-answer strong{color:#9ff4be}
+
+/* Beginner-first classroom scaffolding */
+.beginner{border:2px solid #42aed1;background:#112c40;border-radius:16px;padding:20px 23px;margin:20px 0 26px;font-size:21px;line-height:1.75}
+.beginner h3{font-size:26px;color:#8de2ff;margin:0 0 12px}
+.beginner p{margin:10px 0 15px}
+.beginner pre{white-space:pre-wrap;font-size:22px;font-weight:650;color:#f0d99b;background:#0b1726;border:1px solid #35566b;border-radius:10px;padding:16px;line-height:1.6;overflow-x:auto}
+.beginner .meaning{background:#1e3640;padding:12px 16px;border-left:5px solid #82dbb0;border-radius:8px}
+.beginner .teacherprompt{border-left:5px solid #ffcf83;padding:12px 16px;background:#342c2c;border-radius:8px}
+.beginner code{font-size:.95em;color:#9de6ff}
+</style></head><body><header><h1>🔗 MAC286 · Linked Lists — Instructor Narration</h1><p>Beginner-first speaking script: everyday analogy → picture → simple definition → original explanations → student questions with answers → complete Java programs.</p><a href="https://kassou-mec.github.io/MAC286/LinkedLIst.html" style="color:#8bdfff">Open original interactive lecture ↗</a></header><div class="layout"><nav><strong style="color:#68d2ff">Lecture sections</strong><a href="#s0">0 · Why Linked Lists?</a><a href="#s1">1 · References</a><a href="#s2">2 · Simple Linked List</a><a href="#s3">3 · Find and Delete</a><a href="#s4">4 · Double-Ended Linked List</a><a href="#s5">5 · Sorted Linked List</a><a href="#s6">6 · Efficiency</a><a href="#s7">7 · Doubly Linked List</a><a href="#s8">8a · Hand-Written Iterator</a><a href="#s9">8b · Java Iterator and for-each</a><a href="#s10">9–10 · Playground and Quick Check</a></nav><main><p class="tip">Teaching cycle: <b>Say → Ask → Predict → Trace → Run.</b> Each code listing is a self-contained .java file: save using the filename shown and run separately to avoid duplicate class names. No imports are needed unless shown.</p><p class="tip">Code note: ReferencesDemo and SimpleLinkedListApp are transcribed from the original page. Other listings reproduce the same concepts and method names with complete runnable driver programs; verify against the original page when literal source identity is required.</p><section id="s0"><h2>0 · Why Linked Lists?<span class="time">5 min</span></h2><div class="beginner"><h3>🌱 Start here — A train made of connected cars</h3><p><b>Say this first:</b> Imagine three train cars. Each car carries a number and has a connector to the next car. To add a car at the front, we attach it to the old first car. That is the basic idea of a linked list.</p><pre>10 → 20 → 30 → END</pre><p class="meaning"><b>Introduce the vocabulary:</b> A <b>node</b> is one car. <b>data</b> is its number. <b>next</b> is its connector. <b>null</b> means there is no next car.</p><p class="teacherprompt"><b>Teaching move:</b> Before discussing performance, draw three boxes. Ask students to point at the first car, then at the car after it. Only then say “node” and “reference”.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>Start with a simple situation: imagine an array with 100 values. We want to insert a new value at position 2. What must happen to the existing values? They shift. In a linked list, nodes are not required to sit next to each other in memory. Each node contains data and a reference to the next node. Inserting can therefore change references instead of shifting the elements.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>Does a linked list have a fixed capacity like an array?<p class="instructor-answer"><strong>Instructor answer: </strong>No. A linked list grows or shrinks as nodes are allocated or removed; it is limited by available memory. A Java array has a fixed length once created.</p></li><li>Can we instantly jump to element number 50 in a singly linked list?<p class="instructor-answer"><strong>Instructor answer: </strong>No. You must follow next links from the head until reaching that position: O(n) time.</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Use this diagram throughout: first → [10 | next] → [20 | next] → [30 | null]. A node carries data and a link; null marks the end.</p></div></section><section id="s1"><h2>1 · References<span class="time">8 min</span></h2><div class="beginner"><h3>🌱 Start here — Two labels, one box</h3><p><b>Say this first:</b> Suppose I put one notebook on a desk and give it two labels, X and Y. There are not two notebooks—both labels identify the same one. Java reference variables work similarly: x and y can refer to one object.</p><pre>x ─┐
+   ├──→ [ Node: data = 7 ]
+y ─┘</pre><p class="meaning"><b>Introduce the vocabulary:</b> A primitive such as <code>int</code> stores a value; a variable of a class type such as <code>Node</code> stores a <b>reference</b> to an object. <code>null</code> means no object is referenced.</p><p class="teacherprompt"><b>Teaching move:</b> First draw int a=5, int b=a: two separate values. Then draw Node x=new Node(7), Node y=x: two reference labels pointing to one box. Have students predict x.data after changing y.data.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>Before writing a list, we need to understand references. Look at int a = 5 and int b = a. Changing b does not change a. Now look at Node y = x: that copies a reference, not a separate Node object. Both variables point to the same object. When y.data becomes 99, x.data also reads 99.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>Before running: what prints for a?<p class="instructor-answer"><strong>Instructor answer: </strong>The value assigned to a by the program. Trace the actual assignment and distinguish a primitive value from a node reference; use the displayed program output to confirm.</p></li><li>If y.data = 99, what does x.data print, and why?<p class="instructor-answer"><strong>Instructor answer: </strong>99, if x and y refer to the same Node object. Updating its data through y is visible through x.</p></li><li>Does Node z = null create a Node object?<p class="instructor-answer"><strong>Instructor answer: </strong>No. It declares a reference variable containing null; no Node object is allocated.</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Trace new Node(7): an object is created, x refers to it, then y receives the same reference. Node next is a reference field that can point to another Node. No import is needed for this example.</p></div><div class="code"><div class="bar"><strong>ReferencesDemo.java</strong><button onclick="copyCode(1,this)">Copy Java code</button></div><pre><code><span class="kw">public</span> <span class="kw">class</span> ReferencesDemo {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        <span class="cm">// --- primitives: copied by VALUE ---</span>
+        <span class="kw">int</span> a = <span class="num">5</span>;
+        <span class="kw">int</span> b = a;
+        b = <span class="num">10</span>;
+        System.out.println(<span class="str">"a = "</span> + a);   <span class="cm">// 5</span>
+
+        <span class="cm">// --- objects: copied by REFERENCE ---</span>
+        Node x = <span class="kw">new</span> Node(<span class="num">7</span>);
+        Node y = x;
+        y.data = <span class="num">99</span>;
+        System.out.println(<span class="str">"x.data = "</span> + x.data);   <span class="cm">// 99</span>
+
+        Node z = <span class="kw">null</span>;
+        <span class="kw">if</span> (z == <span class="kw">null</span>) System.out.println(<span class="str">"z points to nothing"</span>);
+    }
+}
+
+<span class="kw">class</span> Node {
+    <span class="kw">int</span> data;
+    Node next;
+    Node(<span class="kw">int</span> d) { data = d; }
+}</code></pre><div class="expected"><b>Expected output</b>
+a = 5
+x.data = 99
+z points to nothing</div></div></section><section id="s2"><h2>2 · Simple Linked List<span class="time">12 min</span></h2><div class="beginner"><h3>🌱 Start here — Build the first chain, one node at a time</h3><p><b>Say this first:</b> We have an empty train track. Our class keeps a variable called first, which tells us where the chain begins. Let us add 22. Now let us put 44 in front of 22. The trick is to connect 44 to 22 BEFORE changing first to 44.</p><pre>Empty:  first → null
+Add 22: first → [22] → null
+Add 44: first → [44] → [22] → null</pre><p class="meaning"><b>Introduce the vocabulary:</b> <code>Link</code> represents one node. <code>LinkList</code> manages the chain. <code>first</code> is a reference to the first node. <code>insertFirst</code> adds a node at the beginning.</p><p class="teacherprompt"><b>Teaching move:</b> Trace the two crucial lines slowly: <code>newLink.next = first;</code> then <code>first = newLink;</code>. Ask students to draw the picture after each line, not merely after the method finishes.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>Now we build a list ourselves. A Link object stores the integer data and a Link next. The LinkList class stores first, a reference to the first node. When first == null, the list is empty. To insert a new first node, we connect its next to the old first, then update first. Read those two assignment lines in order.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>After insertFirst(22), what does first reference?<p class="instructor-answer"><strong>Instructor answer: </strong>first refers to the newly created node containing 22.</p></li><li>After insertFirst(44) and insertFirst(66), what is the order?<p class="instructor-answer"><strong>Instructor answer: </strong>66 → 44 → 22 → null, because each new item is placed at the head.</p></li><li>What breaks if we reverse the two insertFirst assignment statements?<p class="instructor-answer"><strong>Instructor answer: </strong>If first = newNode happens before newNode.next = first, newNode.next points back to newNode itself. The prior chain is lost from the head and traversal may loop forever.</p></li><li>Why must traversal update current = current.next?<p class="instructor-answer"><strong>Instructor answer: </strong>It moves the reference to the next node. Without that statement, the loop stays on the same node forever (unless it breaks for another reason).</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Explain the roles of Link (node), LinkList (manager), and SimpleLinkedListApp (driver). Emphasize that import java.util.NoSuchElementException is required for the explicit empty-list exception. deleteFirst returns the removed node; because the caller still holds removed, it is not immediately unreachable or eligible for collection. In traversal, current = current.next prevents an infinite loop.</p></div><div class="code"><div class="bar"><strong>SimpleLinkedListApp.java</strong><button onclick="copyCode(2,this)">Copy Java code</button></div><pre><code><span class="kw">import</span> java.util.NoSuchElementException;
+
+<span class="kw">class</span> Link {
+    <span class="kw">public</span> <span class="kw">int</span> data;
+    <span class="kw">public</span> Link next;
+    <span class="kw">public</span> Link(<span class="kw">int</span> d) { data = d; next = <span class="kw">null</span>; }
+    <span class="kw">public</span> <span class="kw">void</span> display() { System.out.print(data + <span class="str">" "</span>); }
+}
+
+<span class="kw">class</span> LinkList {
+    <span class="kw">private</span> Link first;
+    <span class="kw">public</span> LinkList() { first = <span class="kw">null</span>; }
+    <span class="kw">public</span> <span class="kw">boolean</span> isEmpty() { <span class="kw">return</span> first == <span class="kw">null</span>; }
+
+    <span class="kw">public</span> <span class="kw">void</span> insertFirst(<span class="kw">int</span> d) {
+        Link newLink = <span class="kw">new</span> Link(d);
+        newLink.next = first;
+        first = newLink;
+    }
+
+    <span class="kw">public</span> Link deleteFirst() {
+        <span class="kw">if</span> (isEmpty()) <span class="kw">throw</span> <span class="kw">new</span> NoSuchElementException(<span class="str">"List is empty"</span>);
+        Link temp = first;
+        first = first.next;
+        <span class="kw">return</span> temp;
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> displayList() {
+        System.out.print(<span class="str">"List (first --&gt; last): "</span>);
+        Link current = first;
+        <span class="kw">while</span> (current != <span class="kw">null</span>) {
+            current.display();
+            current = current.next;
+        }
+        System.out.println();
+    }
+}
+
+<span class="kw">public</span> <span class="kw">class</span> SimpleLinkedListApp {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        LinkList list = <span class="kw">new</span> LinkList();
+        list.insertFirst(<span class="num">22</span>);
+        list.insertFirst(<span class="num">44</span>);
+        list.insertFirst(<span class="num">66</span>);
+        list.displayList();
+        Link removed = list.deleteFirst();
+        System.out.println(<span class="str">"Deleted: "</span> + removed.data);
+        list.displayList();
+    }
+}</code></pre><div class="expected"><b>Expected output</b>
+List (first --&gt; last): 66 44 22
+Deleted: 66
+List (first --&gt; last): 44 22</div></div></section><section id="s3"><h2>3 · Find and Delete<span class="time">12 min</span></h2><div class="beginner"><h3>🌱 Start here — Find a person in a line, then remove them</h3><p><b>Say this first:</b> Imagine people holding hands in a line. To find student 44, start at the front and ask each person for their number. To remove 44, student 66 must link directly to student 22. We do not pick up or physically move the other students.</p><pre>Before: [66] → [44] → [22] → null
+After:  [66] ───────→ [22] → null</pre><p class="meaning"><b>Introduce the vocabulary:</b> <code>current</code> is the node we are examining. <code>previous</code> is the node immediately before it. <code>previous.next = current.next</code> makes the chain skip the node being removed.</p><p class="teacherprompt"><b>Teaching move:</b> Use your finger as current and a second finger as previous. Move both along the drawing; pause when current reaches 44. Explain why deleting the first node is different: no previous node exists.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>Suppose we have 66 → 44 → 22. How can we find 44? We start with current = first and move current to current.next until data matches. To delete 44, we also need previous, because previous.next must skip current and point to current.next. Nobody moves in memory; only the reference changes.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>Which variables do we need for deleting a middle node?<p class="instructor-answer"><strong>Instructor answer: </strong>Usually current and previous: current identifies the node to remove, and previous.next can be redirected to current.next.</p></li><li>What special case appears when deleting the first node?<p class="instructor-answer"><strong>Instructor answer: </strong>There is no previous node. Instead set first = first.next; if that was the sole node, first becomes null.</p></li><li>What should find return if the value is absent?<p class="instructor-answer"><strong>Instructor answer: </strong>Typically null for a method returning a Node (or false/-1 for other API designs). Match the return type used by this implementation.</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Walk current and previous on the board. When current.data == key, if previous == null, use first = first.next; otherwise use previous.next = current.next. Never dereference current before checking that current != null.</p></div><div class="code"><div class="bar"><strong>FindDeleteApp.java</strong><button onclick="copyCode(3,this)">Copy Java code</button></div><pre><code><span class="kw">class</span> Link {
+    <span class="kw">public</span> <span class="kw">int</span> data;
+    <span class="kw">public</span> Link next;
+    <span class="kw">public</span> Link(<span class="kw">int</span> d) { data = d; }
+}
+
+<span class="kw">class</span> LinkList {
+    <span class="kw">private</span> Link first;
+
+    <span class="kw">public</span> <span class="kw">void</span> insertFirst(<span class="kw">int</span> d) {
+        Link newLink = <span class="kw">new</span> Link(d);
+        newLink.next = first;
+        first = newLink;
+    }
+
+    <span class="kw">public</span> Link find(<span class="kw">int</span> key) {
+        Link current = first;
+        <span class="kw">while</span> (current != <span class="kw">null</span>) {
+            <span class="kw">if</span> (current.data == key) <span class="kw">return</span> current;
+            current = current.next;
+        }
+        <span class="kw">return</span> <span class="kw">null</span>;
+    }
+
+    <span class="kw">public</span> Link delete(<span class="kw">int</span> key) {
+        Link current = first;
+        Link previous = <span class="kw">null</span>;
+        <span class="kw">while</span> (current != <span class="kw">null</span> &amp;&amp; current.data != key) {
+            previous = current;
+            current = current.next;
+        }
+        <span class="kw">if</span> (current == <span class="kw">null</span>) <span class="kw">return</span> <span class="kw">null</span>;
+        <span class="kw">if</span> (previous == <span class="kw">null</span>)
+            first = first.next;
+        <span class="kw">else</span>
+            previous.next = current.next;
+        <span class="kw">return</span> current;
+    }
+
+    <span class="kw">public</span> <span class="kw">void</span> displayList() {
+        Link current = first;
+        <span class="kw">while</span> (current != <span class="kw">null</span>) {
+            System.out.print(current.data + <span class="str">" "</span>);
+            current = current.next;
+        }
+        System.out.println();
+    }
+}
+
+<span class="kw">public</span> <span class="kw">class</span> FindDeleteApp {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        LinkList list = <span class="kw">new</span> LinkList();
+        list.insertFirst(<span class="num">22</span>);
+        list.insertFirst(<span class="num">44</span>);
+        list.insertFirst(<span class="num">66</span>);
+        list.displayList();
+        Link found = list.find(<span class="num">44</span>);
+        System.out.println(<span class="str">"Found: "</span> + (found == <span class="kw">null</span> ? <span class="str">"none"</span> : found.data));
+        Link removed = list.delete(<span class="num">44</span>);
+        System.out.println(<span class="str">"Deleted: "</span> + (removed == <span class="kw">null</span> ? <span class="str">"none"</span> : removed.data));
+        list.displayList();
+    }
+}</code></pre><div class="expected"><b>Expected output</b>
+66 44 22
+Found: 44
+Deleted: 44
+66 22</div></div></section><section id="s4"><h2>4 · Double-Ended Linked List<span class="time">9 min</span></h2><div class="beginner"><h3>🌱 Start here — Remember the first and last cars</h3><p><b>Say this first:</b> If our train knows only its first car, we have to walk through the train to find the end. What if we also kept a label on the last car? We could attach a new car directly at the end.</p><pre>first → [10] → [20] → [30] ← last
+                   [30].next → null</pre><p class="meaning"><b>Introduce the vocabulary:</b> A <b>double-ended</b> list remembers <code>first</code> and <code>last</code>. This does <b>not</b> mean nodes point backward. The nodes are still connected by <code>next</code> only.</p><p class="teacherprompt"><b>Teaching move:</b> Compare adding 40 with and without last. Explain that removing the last node still requires finding the one before it in a singly linked list.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>Until now, we have only first. To insert at the end, we would otherwise have to visit every node. A double-ended singly linked list stores first and last. Now we can insert at the beginning or end in constant time. This does NOT make the list doubly linked: each node still has only next.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>When inserting the very first item, which references must be updated?<p class="instructor-answer"><strong>Instructor answer: </strong>Both first and last must refer to the new node; its next is null.</p></li><li>Is deleteLast O(1) merely because we have last? Why not?<p class="instructor-answer"><strong>Instructor answer: </strong>No. In a singly linked list, last does not link backward. To remove it and update last, you must find its predecessor by traversing from first: O(n).</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>For an empty list, first and last must both refer to the new node. For a nonempty list, last.next = newLink, then last = newLink. Deleting the tail remains O(n) since the nodes do not know their predecessors.</p></div><div class="code"><div class="bar"><strong>DoubleEndedApp.java</strong><button onclick="copyCode(4,this)">Copy Java code</button></div><pre><code><span class="kw">class</span> Link {
+    <span class="kw">int</span> data;
+    Link next;
+    Link(<span class="kw">int</span> d) { data = d; }
+}
+<span class="kw">class</span> FirstLastList {
+    <span class="kw">private</span> Link first;
+    <span class="kw">private</span> Link last;
+    <span class="kw">public</span> <span class="kw">boolean</span> isEmpty() { <span class="kw">return</span> first == <span class="kw">null</span>; }
+    <span class="kw">public</span> <span class="kw">void</span> insertFirst(<span class="kw">int</span> d) {
+        Link newLink = <span class="kw">new</span> Link(d);
+        <span class="kw">if</span> (isEmpty()) last = newLink;
+        newLink.next = first;
+        first = newLink;
+    }
+    <span class="kw">public</span> <span class="kw">void</span> insertLast(<span class="kw">int</span> d) {
+        Link newLink = <span class="kw">new</span> Link(d);
+        <span class="kw">if</span> (isEmpty()) first = newLink;
+        <span class="kw">else</span> last.next = newLink;
+        last = newLink;
+    }
+    <span class="kw">public</span> Link deleteFirst() {
+        <span class="kw">if</span> (isEmpty()) <span class="kw">return</span> <span class="kw">null</span>;
+        Link temp = first;
+        first = first.next;
+        <span class="kw">if</span> (first == <span class="kw">null</span>) last = <span class="kw">null</span>;
+        <span class="kw">return</span> temp;
+    }
+    <span class="kw">public</span> <span class="kw">void</span> displayList() {
+        Link current = first;
+        <span class="kw">while</span> (current != <span class="kw">null</span>) {
+            System.out.print(current.data + <span class="str">" "</span>);
+            current = current.next;
+        }
+        System.out.println();
+    }
+}
+<span class="kw">public</span> <span class="kw">class</span> DoubleEndedApp {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        FirstLastList list = <span class="kw">new</span> FirstLastList();
+        list.insertFirst(<span class="num">22</span>);
+        list.insertLast(<span class="num">44</span>);
+        list.insertLast(<span class="num">66</span>);
+        list.displayList();
+        list.deleteFirst();
+        list.displayList();
+    }
+}</code></pre><div class="expected"><b>Expected output</b>
+22 44 66
+44 66</div></div></section><section id="s5"><h2>5 · Sorted Linked List<span class="time">10 min</span></h2><div class="beginner"><h3>🌱 Start here — Keep the line in number order</h3><p><b>Say this first:</b> Think of a classroom line sorted by student ID. A new student numbered 40 arrives. They do not go first or last; they go between 30 and 50. A sorted linked list finds the right neighbors and inserts the new node between them.</p><pre>Before: [20] → [30] → [50] → null
+After:  [20] → [30] → [40] → [50] → null</pre><p class="meaning"><b>Introduce the vocabulary:</b> <b>Sorted</b> means values remain in order. We search using <code>current</code> and <code>previous</code>; then change a couple of links to insert at that location.</p><p class="teacherprompt"><b>Teaching move:</b> Ask students where 10, 35, and 99 belong. Discuss the special case of a new smallest value before showing the insertion loop.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>A sorted list stays ordered. When inserting 40 into 20 → 30 → 50, we cannot simply attach it at the front. We search for the insertion position while keeping previous and current. We place 40 between 30 and 50. This traversal makes insertion O(n), but removing the smallest value from the front is O(1).</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>Where does 35 belong in 20 → 30 → 50?<p class="instructor-answer"><strong>Instructor answer: </strong>Between 30 and 50: 20 → 30 → 35 → 50.</p></li><li>What changes if the list is empty?<p class="instructor-answer"><strong>Instructor answer: </strong>Set first to the new node; there is no predecessor to link.</p></li><li>Why is remove-min fast?<p class="instructor-answer"><strong>Instructor answer: </strong>The smallest element is at first in an ascending sorted list, so removing it is a head update: O(1).</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>The loop searches until the first node whose data is at least the new key. The inserted node points to current, while previous.next points to it, or first is updated for a new minimum.</p></div><div class="code"><div class="bar"><strong>SortedListApp.java</strong><button onclick="copyCode(5,this)">Copy Java code</button></div><pre><code><span class="kw">class</span> Link {
+    <span class="kw">int</span> data;
+    Link next;
+    Link(<span class="kw">int</span> d) { data = d; }
+}
+<span class="kw">class</span> SortedList {
+    <span class="kw">private</span> Link first;
+    <span class="kw">public</span> <span class="kw">void</span> insert(<span class="kw">int</span> key) {
+        Link newLink = <span class="kw">new</span> Link(key);
+        Link previous = <span class="kw">null</span>;
+        Link current = first;
+        <span class="kw">while</span> (current != <span class="kw">null</span> &amp;&amp; current.data &lt; key) {
+            previous = current;
+            current = current.next;
+        }
+        <span class="kw">if</span> (previous == <span class="kw">null</span>) first = newLink;
+        <span class="kw">else</span> previous.next = newLink;
+        newLink.next = current;
+    }
+    <span class="kw">public</span> Link remove() {
+        <span class="kw">if</span> (first == <span class="kw">null</span>) <span class="kw">return</span> <span class="kw">null</span>;
+        Link temp = first;
+        first = first.next;
+        <span class="kw">return</span> temp;
+    }
+    <span class="kw">public</span> <span class="kw">void</span> displayList() {
+        Link current = first;
+        <span class="kw">while</span> (current != <span class="kw">null</span>) {
+            System.out.print(current.data + <span class="str">" "</span>);
+            current = current.next;
+        }
+        System.out.println();
+    }
+}
+<span class="kw">public</span> <span class="kw">class</span> SortedListApp {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        SortedList list = <span class="kw">new</span> SortedList();
+        list.insert(<span class="num">50</span>);
+        list.insert(<span class="num">20</span>);
+        list.insert(<span class="num">40</span>);
+        list.insert(<span class="num">30</span>);
+        list.displayList();
+        System.out.println(<span class="str">"Removed minimum: "</span> + list.remove().data);
+        list.displayList();
+    }
+}</code></pre><div class="expected"><b>Expected output</b>
+20 30 40 50
+Removed minimum: 20
+30 40 50</div></div></section><section id="s6"><h2>6 · Efficiency<span class="time">6 min</span></h2><div class="beginner"><h3>🌱 Start here — Count the steps, not the seconds</h3><p><b>Say this first:</b> How much work do we do? If I put a new car at the beginning, I change two arrows even for a very long train. But if I need the car at position 50, I have to follow the chain through 49 earlier cars.</p><pre>Insert at front: fixed number of steps → O(1)
+Find by position: steps grow with list length → O(n)</pre><p class="meaning"><b>Introduce the vocabulary:</b> <code>O(1)</code> means the number of steps does not grow with the length of the list. <code>O(n)</code> means the work can grow approximately with the number of nodes.</p><p class="teacherprompt"><b>Teaching move:</b> Draw a list of 3 nodes, then 10 nodes. Have students compare work to insertFirst versus work to find the last node. Emphasize that O(1) does not mean zero work.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>Now let's compare operations rather than memorizing slogans. Arrays access any known index in O(1), but insertion at the beginning costs O(n) because values shift. Singly linked lists can insert at the front in O(1), but finding the kth node is O(n). Keeping last speeds insertLast but does not speed deleteLast in a singly linked list. Sorted insertion requires finding the right position.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>Which is preferable for frequent indexed lookups?<p class="instructor-answer"><strong>Instructor answer: </strong>An array or ArrayList, because indexed access is O(1), whereas a linked list must traverse: O(n).</p></li><li>Which implementation allows O(1) insertLast?<p class="instructor-answer"><strong>Instructor answer: </strong>A double-ended singly linked list with a last (tail) pointer can append in O(1), assuming no traversal is needed.</p></li><li>Does searching a linked list become O(1) just because insertion is O(1)?<p class="instructor-answer"><strong>Instructor answer: </strong>No. Finding a value still requires traversing up to n nodes: O(n).</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Distinguish searching for a position, which may be O(n), from rewiring references after a node has been located, which is O(1). No additional Java demo is necessary: use the previous four programs.</p></div></section><section id="s7"><h2>7 · Doubly Linked List<span class="time">12 min</span></h2><div class="beginner"><h3>🌱 Start here — A two-way street</h3><p><b>Say this first:</b> Until now, our arrows only point forward. Think of a one-way street. If each node also knows the node behind it, we can travel in either direction. That is a doubly linked list.</p><pre>null ← [10] ⇄ [20] ⇄ [30] → null</pre><p class="meaning"><b>Introduce the vocabulary:</b> Each node has two links: <code>next</code> (forward) and <code>previous</code> (backward). Updating one direction alone is not enough; both directions must remain correct.</p><p class="teacherprompt"><b>Teaching move:</b> Start with two boxes and draw both arrows. Insert a third box between them. Have students identify the four arrow changes before displaying the Java code.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>A singly linked node knows who comes next but not who comes before. What if a node also stored previous? Now we can traverse both directions and delete the last node directly when we maintain last. But each insertion and deletion must update two directions correctly.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>What must first.previous be?<p class="instructor-answer"><strong>Instructor answer: </strong>null. The head node has no predecessor.</p></li><li>What must last.next be?<p class="instructor-answer"><strong>Instructor answer: </strong>null. The tail node has no successor.</p></li><li>When inserting after 22, what references must be repaired?<p class="instructor-answer"><strong>Instructor answer: </strong>Connect the new node to both neighbors: newNode.previous = node22; newNode.next = oldNext; node22.next = newNode; and if oldNext exists, oldNext.previous = newNode. Otherwise update last.</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Use 44 ⇄ 22 ⇄ 66. Inserting 33 after 22 requires connections between 22, 33, and 66 in both directions. Show forward and backward traversal, then deleteLast. This example is a self-contained demonstration of the operations in your lecture.</p></div><div class="code"><div class="bar"><strong>DoublyLinkedApp.java</strong><button onclick="copyCode(7,this)">Copy Java code</button></div><pre><code><span class="kw">class</span> Node {
+    <span class="kw">int</span> data;
+    Node next;
+    Node previous;
+    Node(<span class="kw">int</span> d) { data = d; }
+}
+<span class="kw">class</span> DoublyLinkedList {
+    <span class="kw">private</span> Node first;
+    <span class="kw">private</span> Node last;
+    <span class="kw">public</span> <span class="kw">void</span> insertFirst(<span class="kw">int</span> d) {
+        Node n = <span class="kw">new</span> Node(d);
+        n.next = first;
+        <span class="kw">if</span> (first == <span class="kw">null</span>) last = n;
+        <span class="kw">else</span> first.previous = n;
+        first = n;
+    }
+    <span class="kw">public</span> <span class="kw">void</span> insertLast(<span class="kw">int</span> d) {
+        Node n = <span class="kw">new</span> Node(d);
+        n.previous = last;
+        <span class="kw">if</span> (last == <span class="kw">null</span>) first = n;
+        <span class="kw">else</span> last.next = n;
+        last = n;
+    }
+    <span class="kw">public</span> <span class="kw">boolean</span> insertAfter(<span class="kw">int</span> key, <span class="kw">int</span> d) {
+        Node current = first;
+        <span class="kw">while</span> (current != <span class="kw">null</span> &amp;&amp; current.data != key) current = current.next;
+        <span class="kw">if</span> (current == <span class="kw">null</span>) <span class="kw">return</span> <span class="kw">false</span>;
+        Node n = <span class="kw">new</span> Node(d);
+        n.previous = current;
+        n.next = current.next;
+        <span class="kw">if</span> (current.next == <span class="kw">null</span>) last = n;
+        <span class="kw">else</span> current.next.previous = n;
+        current.next = n;
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+    <span class="kw">public</span> Node deleteFirst() {
+        <span class="kw">if</span> (first == <span class="kw">null</span>) <span class="kw">return</span> <span class="kw">null</span>;
+        Node old = first;
+        first = first.next;
+        <span class="kw">if</span> (first == <span class="kw">null</span>) last = <span class="kw">null</span>;
+        <span class="kw">else</span> first.previous = <span class="kw">null</span>;
+        <span class="kw">return</span> old;
+    }
+    <span class="kw">public</span> Node deleteLast() {
+        <span class="kw">if</span> (last == <span class="kw">null</span>) <span class="kw">return</span> <span class="kw">null</span>;
+        Node old = last;
+        last = last.previous;
+        <span class="kw">if</span> (last == <span class="kw">null</span>) first = <span class="kw">null</span>;
+        <span class="kw">else</span> last.next = <span class="kw">null</span>;
+        <span class="kw">return</span> old;
+    }
+    <span class="kw">public</span> <span class="kw">void</span> displayForward() {
+        System.out.print(<span class="str">"Forward: "</span>);
+        <span class="kw">for</span> (Node n = first; n != <span class="kw">null</span>; n = n.next) System.out.print(n.data + <span class="str">" "</span>);
+        System.out.println();
+    }
+    <span class="kw">public</span> <span class="kw">void</span> displayBackward() {
+        System.out.print(<span class="str">"Backward: "</span>);
+        <span class="kw">for</span> (Node n = last; n != <span class="kw">null</span>; n = n.previous) System.out.print(n.data + <span class="str">" "</span>);
+        System.out.println();
+    }
+}
+<span class="kw">public</span> <span class="kw">class</span> DoublyLinkedApp {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        DoublyLinkedList list = <span class="kw">new</span> DoublyLinkedList();
+        list.insertFirst(<span class="num">22</span>);
+        list.insertFirst(<span class="num">44</span>);
+        list.insertLast(<span class="num">66</span>);
+        list.insertAfter(<span class="num">22</span>, <span class="num">33</span>);
+        list.displayForward();
+        list.displayBackward();
+        list.deleteLast();
+        list.deleteFirst();
+        list.displayForward();
+    }
+}</code></pre><div class="expected"><b>Expected output</b>
+Forward: 44 22 33 66
+Backward: 66 33 22 44
+Forward: 22 33</div></div></section><section id="s8"><h2>8a · Hand-Written Iterator<span class="time">12 min</span></h2><div class="beginner"><h3>🌱 Start here — A bookmark that remembers your place</h3><p><b>Say this first:</b> When reading a book, you can move a bookmark page by page instead of reopening at page one. An iterator plays a similar role: it remembers where we are in the linked list.</p><pre>list: [10] → [20] → [30]
+                  ↑
+             iterator.current</pre><p class="meaning"><b>Introduce the vocabulary:</b> The <b>list</b> stores the nodes. The <b>iterator</b> remembers a position and provides operations for moving through the list. An iterator that can delete may also need to remember the previous node.</p><p class="teacherprompt"><b>Teaching move:</b> Trace current and previous in different colors. Ask students which node the iterator points at after one move and after two moves.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>An iterator is a bookmark: instead of forcing outside code to access first and next, the iterator remembers a current position. We can reset the bookmark, move it forward, insert after it, or delete the current node. Our own iterator must remember previous as well because deletion needs to bypass the current node.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>What is the difference between a list and an iterator?<p class="instructor-answer"><strong>Instructor answer: </strong>The list stores the nodes; an iterator stores traversal state (such as current and previous) and defines how to visit or modify nodes.</p></li><li>Why does deleteCurrent need previous?<p class="instructor-answer"><strong>Instructor answer: </strong>For deletion in a singly linked list, previous is needed to bypass the node: previous.next = current.next. Head deletion is a special case.</p></li><li>Can two iterators point to different nodes in the same list?<p class="instructor-answer"><strong>Instructor answer: </strong>Yes. Each iterator can maintain independent position references while sharing the same underlying list. Structural changes may affect them.</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>The original lecture uses reset, atEnd, nextLink, getCurrent, insertAfter, and deleteCurrent. Follow current and previous after each call. Guard empty or invalid iterator positions to avoid dereferencing null.</p></div><div class="code"><div class="bar"><strong>IteratorApp.java</strong><button onclick="copyCode(8,this)">Copy Java code</button></div><pre><code><span class="kw">class</span> Link {
+    <span class="kw">int</span> data;
+    Link next;
+    Link(<span class="kw">int</span> d) { data = d; }
+}
+<span class="kw">class</span> LinkList {
+    <span class="kw">private</span> Link first;
+    <span class="kw">public</span> Link getFirst() { <span class="kw">return</span> first; }
+    <span class="kw">public</span> <span class="kw">void</span> setFirst(Link f) { first = f; }
+    <span class="kw">public</span> <span class="kw">boolean</span> isEmpty() { <span class="kw">return</span> first == <span class="kw">null</span>; }
+    <span class="kw">public</span> ListIterator getIterator() { <span class="kw">return</span> <span class="kw">new</span> ListIterator(this); }
+    <span class="kw">public</span> <span class="kw">void</span> displayList() {
+        <span class="kw">for</span> (Link p = first; p != <span class="kw">null</span>; p = p.next) System.out.print(p.data + <span class="str">" "</span>);
+        System.out.println();
+    }
+}
+<span class="kw">class</span> ListIterator {
+    <span class="kw">private</span> Link current;
+    <span class="kw">private</span> Link previous;
+    <span class="kw">private</span> <span class="kw">final</span> LinkList ourList;
+    <span class="kw">public</span> ListIterator(LinkList list) { ourList = list; reset(); }
+    <span class="kw">public</span> <span class="kw">void</span> reset() { current = ourList.getFirst(); previous = <span class="kw">null</span>; }
+    <span class="kw">public</span> <span class="kw">boolean</span> atEnd() { <span class="kw">return</span> current == <span class="kw">null</span> || current.next == <span class="kw">null</span>; }
+    <span class="kw">public</span> <span class="kw">void</span> nextLink() {
+        <span class="kw">if</span> (current == <span class="kw">null</span>) <span class="kw">throw</span> <span class="kw">new</span> IllegalStateException(<span class="str">"No current node"</span>);
+        previous = current;
+        current = current.next;
+    }
+    <span class="kw">public</span> Link getCurrent() { <span class="kw">return</span> current; }
+    <span class="kw">public</span> <span class="kw">void</span> insertAfter(<span class="kw">int</span> d) {
+        Link n = <span class="kw">new</span> Link(d);
+        <span class="kw">if</span> (ourList.isEmpty()) {
+            ourList.setFirst(n);
+            current = n;
+            previous = <span class="kw">null</span>;
+        } <span class="kw">else</span> {
+            <span class="kw">if</span> (current == <span class="kw">null</span>) <span class="kw">throw</span> <span class="kw">new</span> IllegalStateException(<span class="str">"No current node"</span>);
+            n.next = current.next;
+            current.next = n;
+            previous = current;
+            current = n;
+        }
+    }
+    <span class="kw">public</span> <span class="kw">int</span> deleteCurrent() {
+        <span class="kw">if</span> (current == <span class="kw">null</span>) <span class="kw">throw</span> <span class="kw">new</span> IllegalStateException(<span class="str">"No current node"</span>);
+        <span class="kw">int</span> value = current.data;
+        <span class="kw">if</span> (previous == <span class="kw">null</span>) ourList.setFirst(current.next);
+        <span class="kw">else</span> previous.next = current.next;
+        current = (previous == <span class="kw">null</span>) ? ourList.getFirst() : previous.next;
+        <span class="kw">return</span> value;
+    }
+}
+<span class="kw">public</span> <span class="kw">class</span> IteratorApp {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        LinkList list = <span class="kw">new</span> LinkList();
+        ListIterator it = list.getIterator();
+        it.insertAfter(<span class="num">20</span>);
+        it.insertAfter(<span class="num">40</span>);
+        it.insertAfter(<span class="num">80</span>);
+        it.reset();
+        it.nextLink();
+        it.insertAfter(<span class="num">60</span>);
+        list.displayList();
+        it.reset();
+        <span class="kw">while</span> (<span class="kw">true</span>) {
+            System.out.print(<span class="str">"["</span> + it.getCurrent().data + <span class="str">"] "</span>);
+            <span class="kw">if</span> (it.atEnd()) <span class="kw">break</span>;
+            it.nextLink();
+        }
+        System.out.println();
+        it.reset();
+        it.nextLink();
+        System.out.println(<span class="str">"Deleted "</span> + it.deleteCurrent());
+        list.displayList();
+    }
+}</code></pre><div class="expected"><b>Expected output</b>
+20 40 60 80
+[20] [40] [60] [80]
+Deleted 40
+20 60 80</div></div></section><section id="s9"><h2>8b · Java Iterator and for-each<span class="time">10 min</span></h2><div class="beginner"><h3>🌱 Start here — Java can move the bookmark for us</h3><p><b>Say this first:</b> We just built our own way of walking through a list. Java also gives us standard tools. The Iterator interface uses hasNext() to ask whether another item exists and next() to get it. The for-each loop uses that idea for us.</p><pre>while (it.hasNext()) { print(it.next()); }
+
+for (int number : list) { print(number); }</pre><p class="meaning"><b>Introduce the vocabulary:</b> <code>Iterator</code> is a Java interface. <code>Iterable</code> means a class knows how to provide an iterator. The enhanced <code>for</code> loop visits items one by one.</p><p class="teacherprompt"><b>Teaching move:</b> Run the explicit iterator loop first. Ask the students to compare its output with for-each; both should visit the same values in the same order.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>Java already defines Iterator with hasNext and next. If our list implements Iterable&lt;Integer&gt; and supplies iterator(), the enhanced for loop works automatically. Students should recognize that for-each repeatedly asks hasNext() then next(). We first demonstrate the explicit loop, and then compare with the shorter for-each syntax.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>What is the role of implements Iterable&lt;Integer&gt;?<p class="instructor-answer"><strong>Instructor answer: </strong>It promises an iterator() method returning an Iterator&lt;Integer&gt;, allowing the list to be used in enhanced for loops.</p></li><li>What happens if next is called after hasNext becomes false?<p class="instructor-answer"><strong>Instructor answer: </strong>The standard Iterator contract requires throwing NoSuchElementException if next() is called when nothing remains.</p></li><li>Does for-each avoid traversal costs?<p class="instructor-answer"><strong>Instructor answer: </strong>No. A for-each loop uses an iterator behind the scenes; visiting all n nodes is still O(n).</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Explain import java.util.Iterator and NoSuchElementException. The iterator starts at first, next returns the current data and advances the reference. The enhanced for loop uses exactly this iterator machinery behind the scenes.</p></div><div class="code"><div class="bar"><strong>ForEachApp.java</strong><button onclick="copyCode(9,this)">Copy Java code</button></div><pre><code><span class="kw">import</span> java.util.Iterator;
+<span class="kw">import</span> java.util.NoSuchElementException;
+
+<span class="kw">class</span> Link {
+    <span class="kw">public</span> <span class="kw">int</span> data;
+    <span class="kw">public</span> Link next;
+    <span class="kw">public</span> Link(<span class="kw">int</span> d) { data = d; }
+}
+<span class="kw">class</span> LinkList <span class="kw">implements</span> Iterable&lt;Integer&gt; {
+    <span class="kw">private</span> Link first;
+    <span class="kw">public</span> <span class="kw">void</span> insertFirst(<span class="kw">int</span> d) {
+        Link newLink = <span class="kw">new</span> Link(d);
+        newLink.next = first;
+        first = newLink;
+    }
+    @Override
+    <span class="kw">public</span> Iterator&lt;Integer&gt; iterator() {
+        <span class="kw">return</span> <span class="kw">new</span> Iterator&lt;Integer&gt;() {
+            <span class="kw">private</span> Link current = first;
+            @Override
+            <span class="kw">public</span> <span class="kw">boolean</span> hasNext() { <span class="kw">return</span> current != <span class="kw">null</span>; }
+            @Override
+            <span class="kw">public</span> Integer next() {
+                <span class="kw">if</span> (current == <span class="kw">null</span>) <span class="kw">throw</span> <span class="kw">new</span> NoSuchElementException();
+                <span class="kw">int</span> value = current.data;
+                current = current.next;
+                <span class="kw">return</span> value;
+            }
+        };
+    }
+}
+<span class="kw">public</span> <span class="kw">class</span> ForEachApp {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] args) {
+        LinkList list = <span class="kw">new</span> LinkList();
+        list.insertFirst(<span class="num">30</span>);
+        list.insertFirst(<span class="num">20</span>);
+        list.insertFirst(<span class="num">10</span>);
+        Iterator&lt;Integer&gt; it = list.iterator();
+        <span class="kw">while</span> (it.hasNext()) {
+            System.out.print(it.next() + <span class="str">" "</span>);
+        }
+        System.out.println();
+        <span class="kw">int</span> sum = <span class="num">0</span>;
+        <span class="kw">for</span> (<span class="kw">int</span> value : list) {
+            sum += value;
+        }
+        System.out.println(<span class="str">"Sum: "</span> + sum);
+    }
+}</code></pre><div class="expected"><b>Expected output</b>
+10 20 30
+Sum: 60</div></div></section><section id="s10"><h2>9–10 · Playground and Quick Check<span class="time">8 min</span></h2><div class="beginner"><h3>🌱 Start here — Students build and explain the chain</h3><p><b>Say this first:</b> Now we test whether we understand the arrows. Start empty, add 22, add 44 at the beginning, add 66 at the end, and delete 44. After every operation, draw the chain before checking the visualizer.</p><pre>empty → [22] → [44,22] → [44,22,66] → [22,66]</pre><p class="meaning"><b>Introduce the vocabulary:</b> The goal is to explain <b>why the references change</b>, not just remember method names. If you can draw before and after, the code becomes easier to read.</p><p class="teacherprompt"><b>Teaching move:</b> Give students 30 seconds to draw each step. Then ask them to explain the exact Java assignment responsible for the change.</p></div><div class="box talk"><h3>🎙️ What to say</h3><p>We finish by predicting changes before pressing a control. Start with an empty list. Insert 22, then 44 at the front, then 66 at the end. Ask students to sketch the chain before showing the visualizer. Find 44, delete 44, and compare the before/after arrows. Toggle doubly linked and explain the backward connections. Finally, have students explain one line of code in their own words.</p></div><div class="box questions"><h3>🙋 Ask students — pause for answers</h3><ul><li>Why does insertFirst not require a loop?<p class="instructor-answer"><strong>Instructor answer: </strong>It changes only a fixed number of references: newNode.next = first; first = newNode. No nodes need to be visited.</p></li><li>What happens if delete(999) is called?<p class="instructor-answer"><strong>Instructor answer: </strong>If 999 is absent, no node should be deleted. The method should indicate failure according to its API (for example, false or null).</p></li><li>What changes in a doubly linked node?<p class="instructor-answer"><strong>Instructor answer: </strong>Each node has both next and previous references, enabling traversal in both directions and easier local relinking.</p></li><li>Which data structure is better for instant indexed access?<p class="instructor-answer"><strong>Instructor answer: </strong>An array or ArrayList: O(1) indexed access.</p></li></ul></div><div class="box notes"><h3>🧠 Explanation / board walkthrough</h3><p>Use the original course playground for live manipulation. End with a two-minute exit ticket: draw a 3-node chain, give the result of insertFirst(7), and write the two essential insertFirst assignments.</p></div></section><footer>MAC286 · LaGuardia Community College · Teaching companion based on the linked original lecture.</footer></main></div><script>const examples={"1": "public class ReferencesDemo {\n    public static void main(String[] args) {\n        // --- primitives: copied by VALUE ---\n        int a = 5;\n        int b = a;\n        b = 10;\n        System.out.println(\"a = \" + a);   // 5\n\n        // --- objects: copied by REFERENCE ---\n        Node x = new Node(7);\n        Node y = x;\n        y.data = 99;\n        System.out.println(\"x.data = \" + x.data);   // 99\n\n        Node z = null;\n        if (z == null) System.out.println(\"z points to nothing\");\n    }\n}\n\nclass Node {\n    int data;\n    Node next;\n    Node(int d) { data = d; }\n}", "2": "import java.util.NoSuchElementException;\n\nclass Link {\n    public int data;\n    public Link next;\n    public Link(int d) { data = d; next = null; }\n    public void display() { System.out.print(data + \" \"); }\n}\n\nclass LinkList {\n    private Link first;\n    public LinkList() { first = null; }\n    public boolean isEmpty() { return first == null; }\n\n    public void insertFirst(int d) {\n        Link newLink = new Link(d);\n        newLink.next = first;\n        first = newLink;\n    }\n\n    public Link deleteFirst() {\n        if (isEmpty()) throw new NoSuchElementException(\"List is empty\");\n        Link temp = first;\n        first = first.next;\n        return temp;\n    }\n\n    public void displayList() {\n        System.out.print(\"List (first --> last): \");\n        Link current = first;\n        while (current != null) {\n            current.display();\n            current = current.next;\n        }\n        System.out.println();\n    }\n}\n\npublic class SimpleLinkedListApp {\n    public static void main(String[] args) {\n        LinkList list = new LinkList();\n        list.insertFirst(22);\n        list.insertFirst(44);\n        list.insertFirst(66);\n        list.displayList();\n        Link removed = list.deleteFirst();\n        System.out.println(\"Deleted: \" + removed.data);\n        list.displayList();\n    }\n}", "3": "class Link {\n    public int data;\n    public Link next;\n    public Link(int d) { data = d; }\n}\n\nclass LinkList {\n    private Link first;\n\n    public void insertFirst(int d) {\n        Link newLink = new Link(d);\n        newLink.next = first;\n        first = newLink;\n    }\n\n    public Link find(int key) {\n        Link current = first;\n        while (current != null) {\n            if (current.data == key) return current;\n            current = current.next;\n        }\n        return null;\n    }\n\n    public Link delete(int key) {\n        Link current = first;\n        Link previous = null;\n        while (current != null && current.data != key) {\n            previous = current;\n            current = current.next;\n        }\n        if (current == null) return null;\n        if (previous == null)\n            first = first.next;\n        else\n            previous.next = current.next;\n        return current;\n    }\n\n    public void displayList() {\n        Link current = first;\n        while (current != null) {\n            System.out.print(current.data + \" \");\n            current = current.next;\n        }\n        System.out.println();\n    }\n}\n\npublic class FindDeleteApp {\n    public static void main(String[] args) {\n        LinkList list = new LinkList();\n        list.insertFirst(22);\n        list.insertFirst(44);\n        list.insertFirst(66);\n        list.displayList();\n        Link found = list.find(44);\n        System.out.println(\"Found: \" + (found == null ? \"none\" : found.data));\n        Link removed = list.delete(44);\n        System.out.println(\"Deleted: \" + (removed == null ? \"none\" : removed.data));\n        list.displayList();\n    }\n}", "4": "class Link {\n    int data;\n    Link next;\n    Link(int d) { data = d; }\n}\nclass FirstLastList {\n    private Link first;\n    private Link last;\n    public boolean isEmpty() { return first == null; }\n    public void insertFirst(int d) {\n        Link newLink = new Link(d);\n        if (isEmpty()) last = newLink;\n        newLink.next = first;\n        first = newLink;\n    }\n    public void insertLast(int d) {\n        Link newLink = new Link(d);\n        if (isEmpty()) first = newLink;\n        else last.next = newLink;\n        last = newLink;\n    }\n    public Link deleteFirst() {\n        if (isEmpty()) return null;\n        Link temp = first;\n        first = first.next;\n        if (first == null) last = null;\n        return temp;\n    }\n    public void displayList() {\n        Link current = first;\n        while (current != null) {\n            System.out.print(current.data + \" \");\n            current = current.next;\n        }\n        System.out.println();\n    }\n}\npublic class DoubleEndedApp {\n    public static void main(String[] args) {\n        FirstLastList list = new FirstLastList();\n        list.insertFirst(22);\n        list.insertLast(44);\n        list.insertLast(66);\n        list.displayList();\n        list.deleteFirst();\n        list.displayList();\n    }\n}", "5": "class Link {\n    int data;\n    Link next;\n    Link(int d) { data = d; }\n}\nclass SortedList {\n    private Link first;\n    public void insert(int key) {\n        Link newLink = new Link(key);\n        Link previous = null;\n        Link current = first;\n        while (current != null && current.data < key) {\n            previous = current;\n            current = current.next;\n        }\n        if (previous == null) first = newLink;\n        else previous.next = newLink;\n        newLink.next = current;\n    }\n    public Link remove() {\n        if (first == null) return null;\n        Link temp = first;\n        first = first.next;\n        return temp;\n    }\n    public void displayList() {\n        Link current = first;\n        while (current != null) {\n            System.out.print(current.data + \" \");\n            current = current.next;\n        }\n        System.out.println();\n    }\n}\npublic class SortedListApp {\n    public static void main(String[] args) {\n        SortedList list = new SortedList();\n        list.insert(50);\n        list.insert(20);\n        list.insert(40);\n        list.insert(30);\n        list.displayList();\n        System.out.println(\"Removed minimum: \" + list.remove().data);\n        list.displayList();\n    }\n}", "7": "class Node {\n    int data;\n    Node next;\n    Node previous;\n    Node(int d) { data = d; }\n}\nclass DoublyLinkedList {\n    private Node first;\n    private Node last;\n    public void insertFirst(int d) {\n        Node n = new Node(d);\n        n.next = first;\n        if (first == null) last = n;\n        else first.previous = n;\n        first = n;\n    }\n    public void insertLast(int d) {\n        Node n = new Node(d);\n        n.previous = last;\n        if (last == null) first = n;\n        else last.next = n;\n        last = n;\n    }\n    public boolean insertAfter(int key, int d) {\n        Node current = first;\n        while (current != null && current.data != key) current = current.next;\n        if (current == null) return false;\n        Node n = new Node(d);\n        n.previous = current;\n        n.next = current.next;\n        if (current.next == null) last = n;\n        else current.next.previous = n;\n        current.next = n;\n        return true;\n    }\n    public Node deleteFirst() {\n        if (first == null) return null;\n        Node old = first;\n        first = first.next;\n        if (first == null) last = null;\n        else first.previous = null;\n        return old;\n    }\n    public Node deleteLast() {\n        if (last == null) return null;\n        Node old = last;\n        last = last.previous;\n        if (last == null) first = null;\n        else last.next = null;\n        return old;\n    }\n    public void displayForward() {\n        System.out.print(\"Forward: \");\n        for (Node n = first; n != null; n = n.next) System.out.print(n.data + \" \");\n        System.out.println();\n    }\n    public void displayBackward() {\n        System.out.print(\"Backward: \");\n        for (Node n = last; n != null; n = n.previous) System.out.print(n.data + \" \");\n        System.out.println();\n    }\n}\npublic class DoublyLinkedApp {\n    public static void main(String[] args) {\n        DoublyLinkedList list = new DoublyLinkedList();\n        list.insertFirst(22);\n        list.insertFirst(44);\n        list.insertLast(66);\n        list.insertAfter(22, 33);\n        list.displayForward();\n        list.displayBackward();\n        list.deleteLast();\n        list.deleteFirst();\n        list.displayForward();\n    }\n}", "8": "class Link {\n    int data;\n    Link next;\n    Link(int d) { data = d; }\n}\nclass LinkList {\n    private Link first;\n    public Link getFirst() { return first; }\n    public void setFirst(Link f) { first = f; }\n    public boolean isEmpty() { return first == null; }\n    public ListIterator getIterator() { return new ListIterator(this); }\n    public void displayList() {\n        for (Link p = first; p != null; p = p.next) System.out.print(p.data + \" \");\n        System.out.println();\n    }\n}\nclass ListIterator {\n    private Link current;\n    private Link previous;\n    private final LinkList ourList;\n    public ListIterator(LinkList list) { ourList = list; reset(); }\n    public void reset() { current = ourList.getFirst(); previous = null; }\n    public boolean atEnd() { return current == null || current.next == null; }\n    public void nextLink() {\n        if (current == null) throw new IllegalStateException(\"No current node\");\n        previous = current;\n        current = current.next;\n    }\n    public Link getCurrent() { return current; }\n    public void insertAfter(int d) {\n        Link n = new Link(d);\n        if (ourList.isEmpty()) {\n            ourList.setFirst(n);\n            current = n;\n            previous = null;\n        } else {\n            if (current == null) throw new IllegalStateException(\"No current node\");\n            n.next = current.next;\n            current.next = n;\n            previous = current;\n            current = n;\n        }\n    }\n    public int deleteCurrent() {\n        if (current == null) throw new IllegalStateException(\"No current node\");\n        int value = current.data;\n        if (previous == null) ourList.setFirst(current.next);\n        else previous.next = current.next;\n        current = (previous == null) ? ourList.getFirst() : previous.next;\n        return value;\n    }\n}\npublic class IteratorApp {\n    public static void main(String[] args) {\n        LinkList list = new LinkList();\n        ListIterator it = list.getIterator();\n        it.insertAfter(20);\n        it.insertAfter(40);\n        it.insertAfter(80);\n        it.reset();\n        it.nextLink();\n        it.insertAfter(60);\n        list.displayList();\n        it.reset();\n        while (true) {\n            System.out.print(\"[\" + it.getCurrent().data + \"] \");\n            if (it.atEnd()) break;\n            it.nextLink();\n        }\n        System.out.println();\n        it.reset();\n        it.nextLink();\n        System.out.println(\"Deleted \" + it.deleteCurrent());\n        list.displayList();\n    }\n}", "9": "import java.util.Iterator;\nimport java.util.NoSuchElementException;\n\nclass Link {\n    public int data;\n    public Link next;\n    public Link(int d) { data = d; }\n}\nclass LinkList implements Iterable<Integer> {\n    private Link first;\n    public void insertFirst(int d) {\n        Link newLink = new Link(d);\n        newLink.next = first;\n        first = newLink;\n    }\n    @Override\n    public Iterator<Integer> iterator() {\n        return new Iterator<Integer>() {\n            private Link current = first;\n            @Override\n            public boolean hasNext() { return current != null; }\n            @Override\n            public Integer next() {\n                if (current == null) throw new NoSuchElementException();\n                int value = current.data;\n                current = current.next;\n                return value;\n            }\n        };\n    }\n}\npublic class ForEachApp {\n    public static void main(String[] args) {\n        LinkList list = new LinkList();\n        list.insertFirst(30);\n        list.insertFirst(20);\n        list.insertFirst(10);\n        Iterator<Integer> it = list.iterator();\n        while (it.hasNext()) {\n            System.out.print(it.next() + \" \");\n        }\n        System.out.println();\n        int sum = 0;\n        for (int value : list) {\n            sum += value;\n        }\n        System.out.println(\"Sum: \" + sum);\n    }\n}"};async function copyCode(i,b){try{await navigator.clipboard.writeText(examples[i]);b.textContent="Copied!";setTimeout(()=>b.textContent="Copy Java code",1400)}catch(e){const t=document.createElement("textarea");t.value=examples[i];document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();b.textContent="Copied!"}}</script></body></html>
