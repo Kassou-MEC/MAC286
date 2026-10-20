@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAC286 · Linked Lists</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2538; --line:#2b3650;
+    --text:#e8ecf5; --muted:#9aa6c2; --accent:#5ec8ff; --accent2:#ffb454;
+    --green:#7ee787; --pink:#ff7eb6; --purple:#c792ea; --red:#ff6b6b;
+    --code-bg:#0b101a; --kw:#c792ea; --str:#ecc48d; --cm:#6d7d9c; --typ:#82aaff; --num:#f78c6c;
+    --radius:14px; --font:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono","Fira Code",Consolas,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:19px;line-height:1.6}
+  a{color:var(--accent)}
+  h1,h2,h3{line-height:1.2;margin:0 0 .5em}
+  h1{font-size:2.6rem}
+  h2{font-size:2rem;color:var(--accent);margin-top:0;padding-top:.2em}
+  h3{font-size:1.45rem;color:var(--accent2);margin-top:1.4em}
+  code{font-family:var(--mono);background:#232c42;padding:.1em .4em;border-radius:6px;font-size:.92em;color:#ffd9a0}
+  em.key{color:var(--accent2);font-style:normal;font-weight:700}
+
+  /* ---------- Layout ---------- */
+  .wrap{display:grid;grid-template-columns:250px minmax(0,1fr) 400px;gap:0;min-height:100vh}
+  nav.side{position:sticky;top:0;height:100vh;overflow:auto;background:var(--panel);border-right:1px solid var(--line);padding:22px 16px}
+  nav.side .brand{font-weight:800;color:var(--accent);font-size:1.05rem;letter-spacing:.5px;margin-bottom:14px}
+  nav.side a{display:block;color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:9px;font-size:.98rem;margin:2px 0}
+  nav.side a:hover,nav.side a.active{background:var(--panel2);color:var(--text)}
+  nav.side a .n{display:inline-block;width:26px;color:var(--accent2);font-weight:700}
+  main{padding:34px 42px 120px;min-width:0}
+  section{margin-bottom:72px;scroll-margin-top:20px}
+
+  /* explanation panel */
+  aside.explain{position:sticky;top:0;height:100vh;background:var(--panel);border-left:1px solid var(--line);padding:22px 22px;overflow:auto}
+  aside.explain .title{font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  aside.explain .codeline{font-family:var(--mono);font-size:.95rem;background:var(--code-bg);border:1px solid var(--line);border-left:4px solid var(--accent);padding:10px 12px;border-radius:8px;white-space:pre-wrap;word-break:break-word;color:#ffd9a0;margin-bottom:14px;min-height:44px}
+  aside.explain .text{font-size:1.05rem;line-height:1.6}
+  aside.explain .text .hint{color:var(--muted);font-style:italic}
+  aside.explain .pinned{display:inline-block;background:#3b2a12;color:var(--accent2);border:1px solid #6b4b1e;border-radius:999px;font-size:.78rem;padding:2px 10px;margin-left:8px;vertical-align:middle;display:none}
+  aside.explain.locked .pinned{display:inline-block}
+
+  /* ---------- Cards / callouts ---------- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 24px;margin:18px 0}
+  .def{border-left:5px solid var(--green)}
+  .def .lbl{font-weight:800;color:var(--green);letter-spacing:.5px;font-size:.9rem;text-transform:uppercase}
+  .pic{border-left:5px solid var(--pink)}
+  .pic .lbl{font-weight:800;color:var(--pink);letter-spacing:.5px;font-size:.9rem;text-transform:uppercase}
+  .warn{border-left:5px solid var(--red)}
+  .warn .lbl{font-weight:800;color:var(--red);letter-spacing:.5px;font-size:.9rem;text-transform:uppercase}
+  .tip{border-left:5px solid var(--accent2)}
+  .tip .lbl{font-weight:800;color:var(--accent2);letter-spacing:.5px;font-size:.9rem;text-transform:uppercase}
+  ul.bul{margin:.4em 0 .2em;padding-left:1.3em}
+  ul.bul li{margin:.35em 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+
+  /* ---------- Code blocks ---------- */
+  .codebox{background:var(--code-bg);border:1px solid var(--line);border-radius:var(--radius);margin:18px 0;overflow:hidden}
+  .codebox .bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel2);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .codebox .bar .fname{font-family:var(--mono);color:var(--accent2);font-size:.95rem;flex:1}
+  .codebox .bar .hintbar{color:var(--muted);font-size:.85rem}
+  .btn{background:#26324c;color:var(--text);border:1px solid #3b4a6b;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.9rem;font-family:var(--font)}
+  .btn:hover{background:#30405f}
+  .btn.ok{background:#1e4d2e;border-color:#2f7a48}
+  .codebox pre{margin:0;padding:12px 0;overflow-x:auto;font-family:var(--mono);font-size:1.02rem;line-height:1.55}
+  .ln{display:block;padding:1px 18px 1px 60px;position:relative;white-space:pre;cursor:pointer;border-left:4px solid transparent}
+  .ln::before{content:attr(data-n);position:absolute;left:0;width:44px;text-align:right;color:#3f4c69;font-size:.85em;top:3px}
+  .ln:hover{background:#15203a;border-left-color:var(--accent)}
+  .ln.sel{background:#1d2b4d;border-left-color:var(--accent2)}
+  .ln.noexp{cursor:default}
+  .kw{color:var(--kw)} .str{color:var(--str)} .cm{color:var(--cm);font-style:italic} .typ{color:var(--typ)} .num{color:var(--num)}
+
+  /* ---------- SVG diagrams ---------- */
+  .fig{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:18px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .fig .cap{color:var(--muted);font-size:.95rem;margin-top:8px}
+  .nodebox{fill:#1c2538;stroke:#5ec8ff;stroke-width:2}
+  .nextbox{fill:#2a2136;stroke:#c792ea;stroke-width:2}
+  .lbl{fill:#e8ecf5;font-family:var(--mono);font-size:18px}
+  .lbls{fill:#9aa6c2;font-family:var(--font);font-size:14px}
+  .arrow{stroke:#ffb454;stroke-width:2.5;fill:none;marker-end:url(#ah)}
+  .arrowp{stroke:#ff7eb6;stroke-width:2.5;fill:none;marker-end:url(#ahp)}
+  .ghost{stroke:#ff6b6b;stroke-width:2.5;fill:none;stroke-dasharray:6 5;marker-end:url(#ahr)}
+  .nullx{fill:#ff6b6b;font-family:var(--mono);font-size:18px;font-weight:700}
+
+  /* ---------- Table ---------- */
+  table.cmp{width:100%;border-collapse:collapse;margin:16px 0;font-size:1rem}
+  table.cmp th,table.cmp td{border:1px solid var(--line);padding:10px 12px;text-align:center}
+  table.cmp th{background:var(--panel2);color:var(--accent)}
+  table.cmp td:first-child{text-align:left;font-weight:600}
+  .good{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}.meh{color:var(--accent2);font-weight:700}
+
+  /* ---------- Playground ---------- */
+  .play{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:18px 0}
+  .play .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  .play input[type=number]{width:90px;padding:7px 10px;border-radius:8px;border:1px solid #3b4a6b;background:#0b101a;color:var(--text);font-size:1rem}
+  .play label.sw{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.95rem;margin-left:8px}
+  .stage{min-height:120px;display:flex;align-items:center;gap:0;overflow-x:auto;padding:16px 8px;background:#0b101a;border-radius:10px;border:1px solid var(--line)}
+  .pnode{display:flex;border:2px solid var(--accent);border-radius:10px;overflow:hidden;background:var(--panel2);animation:pop .3s ease;flex:0 0 auto}
+  .pnode.hit{border-color:var(--green);box-shadow:0 0 0 3px #2f7a4855}
+  .pnode.dying{border-color:var(--red);opacity:.4}
+  .pnode .d{padding:10px 16px;font-family:var(--mono);font-size:1.2rem;min-width:62px;text-align:center}
+  .pnode .nx{padding:10px 10px;border-left:1px solid var(--line);background:#2a2136;color:var(--purple);font-family:var(--mono);font-size:.8rem;display:flex;align-items:center}
+  .pnode .pv{padding:10px 10px;border-right:1px solid var(--line);background:#36212a;color:var(--pink);font-family:var(--mono);font-size:.8rem;display:flex;align-items:center}
+  .parrow{color:var(--accent2);font-size:1.5rem;padding:0 6px;flex:0 0 auto;font-family:var(--mono)}
+  .parrow.both{color:var(--pink)}
+  .pnull{color:var(--red);font-family:var(--mono);font-weight:700;padding:0 10px;flex:0 0 auto}
+  .ptag{color:var(--muted);font-size:.85rem;font-family:var(--mono);padding:0 8px;flex:0 0 auto}
+  .log{font-family:var(--mono);font-size:.92rem;color:var(--green);margin-top:10px;min-height:1.4em}
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+
+  /* ---------- Quiz ---------- */
+  .quiz .q{margin:12px 0;padding:12px 16px;border-radius:10px;background:var(--panel2)}
+  .quiz button{margin:4px 6px 4px 0}
+  .quiz .fb{margin-top:8px;font-size:.98rem}
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:1250px){
+    .wrap{grid-template-columns:220px minmax(0,1fr)}
+    aside.explain{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;max-height:38vh;border-left:0;border-top:2px solid var(--accent);z-index:50}
+    main{padding-bottom:42vh}
+  }
+  @media(max-width:800px){
+    .wrap{grid-template-columns:1fr}
+    nav.side{position:relative;height:auto;display:flex;flex-wrap:wrap;gap:4px}
+    nav.side .brand{width:100%}
+    main{padding:20px 16px 42vh}
+    h1{font-size:2rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================= NAV ================= -->
+<nav class="side" id="nav">
+  <div class="brand">MAC286 · Data Structures</div>
+  <a href="#intro"><span class="n">0</span>Why Linked Lists?</a>
+  <a href="#refs"><span class="n">1</span>References</a>
+  <a href="#simple"><span class="n">2</span>Simple Linked List</a>
+  <a href="#insdel"><span class="n">3</span>Insert &amp; Delete</a>
+  <a href="#double"><span class="n">4</span>Double-Ended List</a>
+  <a href="#sorted"><span class="n">5</span>Sorted List</a>
+  <a href="#eff"><span class="n">6</span>Efficiency</a>
+  <a href="#doubly"><span class="n">7</span>Doubly Linked List</a>
+  <a href="#iter"><span class="n">8</span>Iterators</a>
+  <a href="#play"><span class="n">9</span>Playground</a>
+  <a href="#quiz"><span class="n">10</span>Quick Check</a>
+</nav>
+
+<!-- ================= MAIN ================= -->
+<main>
+
+<section id="intro">
+  <h1>🔗 Linked Lists</h1>
+  <p style="color:var(--muted);font-size:1.15rem">References · Simple Lists · Insert/Delete · Double-Ended · Sorted · Efficiency · Doubly Linked · Iterators</p>
+
+  <div class="card tip"><span class="lbl">How to use this page</span>
+    <ul class="bul">
+      <li><em class="key">Hover</em> any line of Java code → its explanation appears in the panel on the right.</li>
+      <li><em class="key">Click</em> a line to pin the explanation (click again to unpin).</li>
+      <li><em class="key">Copy</em> copies the full program. <em class="key">Copy as Main.java</em> renames the public class to <code>Main</code> for online compilers.</li>
+    </ul>
+  </div>
+
+  <h3>The problem with arrays</h3>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li>An <em class="key">array</em> has a <b>fixed size</b> chosen when it is created.</li>
+      <li>Inserting or deleting in the middle means <b>shifting</b> every item after it → slow (O(n)).</li>
+      <li>A <em class="key">linked list</em> grows one item at a time and inserts/deletes <b>without shifting</b>.</li>
+    </ul>
+  </div>
+  <div class="card pic"><span class="lbl">Picture it 🎢</span>
+    An array is a row of <b>theater seats</b>: to add a person in the middle, everyone after them must stand up and move one seat over.
+    A linked list is a <b>treasure hunt</b>: each clue (a <i>node</i>) holds a prize (<i>data</i>) and the location of the next clue (<i>next</i>). To add a clue in the middle, you only rewrite one location — nobody else moves.
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ffb454"/></marker>
+        <marker id="ahp" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff7eb6"/></marker>
+        <marker id="ahr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff6b6b"/></marker>
+      </defs>
+      <text x="20" y="40" class="lbls">first</text>
+      <rect x="18" y="50" width="60" height="40" rx="6" class="nextbox"/>
+      <path d="M78 70 L128 70" class="arrow"/>
+      <!-- node 1 -->
+      <rect x="130" y="45" width="80" height="50" rx="6" class="nodebox"/><text x="170" y="78" text-anchor="middle" class="lbl">22</text>
+      <rect x="210" y="45" width="50" height="50" rx="6" class="nextbox"/><text x="235" y="78" text-anchor="middle" class="lbls">next</text>
+      <path d="M260 70 L318 70" class="arrow"/>
+      <!-- node 2 -->
+      <rect x="320" y="45" width="80" height="50" rx="6" class="nodebox"/><text x="360" y="78" text-anchor="middle" class="lbl">44</text>
+      <rect x="400" y="45" width="50" height="50" rx="6" class="nextbox"/><text x="425" y="78" text-anchor="middle" class="lbls">next</text>
+      <path d="M450 70 L508 70" class="arrow"/>
+      <!-- node 3 -->
+      <rect x="510" y="45" width="80" height="50" rx="6" class="nodebox"/><text x="550" y="78" text-anchor="middle" class="lbl">66</text>
+      <rect x="590" y="45" width="50" height="50" rx="6" class="nextbox"/><text x="615" y="78" text-anchor="middle" class="lbls">next</text>
+      <path d="M640 70 L690 70" class="arrow"/>
+      <text x="700" y="77" class="nullx">null</text>
+      <text x="170" y="125" text-anchor="middle" class="lbls">data</text>
+      <text x="235" y="125" text-anchor="middle" class="lbls">reference</text>
+    </svg>
+    <div class="cap">A linked list of three nodes. <code>first</code> points to the first node; the last node's <code>next</code> is <code>null</code>.</div>
+  </div>
+</section>
+
+<!-- ================= 1 REFERENCES ================= -->
+<section id="refs">
+  <h2>1 · References</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li>A <em class="key">reference</em> is a variable that holds the <b>address</b> of an object, not the object itself.</li>
+      <li><code>Node y = x;</code> copies the <b>address</b> → <code>x</code> and <code>y</code> now point to the <b>same</b> object.</li>
+      <li><code>null</code> means "points to <b>nothing</b>".</li>
+      <li>Every linked-list node is reached through a reference called <code>next</code>.</li>
+    </ul>
+  </div>
+  <div class="card pic"><span class="lbl">Picture it 🏠</span>
+    Imagine the <b>object</b> is a house and the <b>reference</b> is a sticky note with the house's address. Copying the note (<code>y = x</code>) gives you two notes for the <b>same house</b>. Repainting the house through either note (<code>y.data = 99</code>) changes the one house. A blank note is <code>null</code>.
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg">
+      <text x="40" y="40" class="lbls">int a</text>
+      <rect x="30" y="50" width="70" height="44" rx="6" class="nodebox"/><text x="65" y="80" text-anchor="middle" class="lbl">5</text>
+      <text x="40" y="135" class="lbls">int b</text>
+      <rect x="30" y="145" width="70" height="44" rx="6" class="nodebox"/><text x="65" y="175" text-anchor="middle" class="lbl">10</text>
+      <text x="140" y="120" class="lbls">primitives: separate boxes</text>
+
+      <text x="390" y="40" class="lbls">Node x</text>
+      <rect x="380" y="50" width="70" height="44" rx="6" class="nextbox"/>
+      <text x="390" y="135" class="lbls">Node y</text>
+      <rect x="380" y="145" width="70" height="44" rx="6" class="nextbox"/>
+      <path d="M450 72 L545 100" class="arrow"/>
+      <path d="M450 167 L545 125" class="arrow"/>
+      <rect x="550" y="85" width="120" height="50" rx="8" class="nodebox"/>
+      <text x="610" y="118" text-anchor="middle" class="lbl">data: 99</text>
+      <text x="470" y="40" class="lbls">one object, two references</text>
+    </svg>
+    <div class="cap">Left: primitives are copied by value. Right: references are copied by address — same object.</div>
+  </div>
+
+  <div class="codebox" data-prog="refs"></div>
+</section>
+
+<!-- ================= 2 SIMPLE LINKED LIST ================= -->
+<section id="simple">
+  <h2>2 · Simple Linked List</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li>A <em class="key">node</em> (we call the class <code>Link</code>) holds <b>data</b> + a reference <code>next</code> to the following node.</li>
+      <li>The <em class="key">list</em> class stores only <b>one</b> reference: <code>first</code>.</li>
+      <li>The list is <em class="key">empty</em> when <code>first == null</code>.</li>
+      <li>To visit every node: start at <code>first</code>, follow <code>next</code> until you hit <code>null</code> → this is <em class="key">traversal</em>.</li>
+    </ul>
+  </div>
+
+  <h3>Tiny steps first</h3>
+  <div class="grid2">
+    <div class="card"><b>Step 1 — a node class</b>
+<pre style="font-family:var(--mono);font-size:1rem;color:#ffd9a0;margin:6px 0 0">class Link {
+    int data;
+    Link next;
+}</pre></div>
+    <div class="card"><b>Step 2 — chain two nodes by hand</b>
+<pre style="font-family:var(--mono);font-size:1rem;color:#ffd9a0;margin:6px 0 0">Link a = new Link();  a.data = 10;
+Link b = new Link();  b.data = 20;
+a.next = b;        // 10 → 20
+b.next = null;     // end</pre></div>
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="35" class="lbls">insertFirst(66) on list 44 → 22</text>
+      <text x="20" y="90" class="lbls">first</text>
+      <rect x="18" y="100" width="55" height="40" rx="6" class="nextbox"/>
+      <!-- old arrow (dashed red) -->
+      <path d="M73 112 C150 60, 260 60, 335 100" class="ghost"/>
+      <text x="200" y="62" text-anchor="middle" class="lbls" style="fill:#ff6b6b">old first (step 2 replaces it)</text>
+      <!-- new arrow -->
+      <path d="M73 125 L148 125" class="arrow"/>
+      <!-- new node -->
+      <rect x="150" y="100" width="70" height="50" rx="6" class="nodebox" style="stroke:#7ee787"/><text x="185" y="133" text-anchor="middle" class="lbl">66</text>
+      <rect x="220" y="100" width="45" height="50" rx="6" class="nextbox"/>
+      <path d="M265 125 L335 125" class="arrow"/>
+      <text x="192" y="172" text-anchor="middle" class="lbls" style="fill:#7ee787">newLink (step 1: newLink.next = first)</text>
+      <!-- node 44 -->
+      <rect x="338" y="100" width="70" height="50" rx="6" class="nodebox"/><text x="373" y="133" text-anchor="middle" class="lbl">44</text>
+      <rect x="408" y="100" width="45" height="50" rx="6" class="nextbox"/>
+      <path d="M453 125 L518 125" class="arrow"/>
+      <rect x="520" y="100" width="70" height="50" rx="6" class="nodebox"/><text x="555" y="133" text-anchor="middle" class="lbl">22</text>
+      <rect x="590" y="100" width="45" height="50" rx="6" class="nextbox"/>
+      <path d="M635 125 L665 125" class="arrow"/>
+      <text x="668" y="131" class="nullx">∅</text>
+    </svg>
+    <div class="cap"><b>insertFirst</b>: (1) the new node points to the old first, (2) <code>first</code> points to the new node. Order matters!</div>
+  </div>
+
+  <div class="codebox" data-prog="simple"></div>
+
+  <div class="card warn"><span class="lbl">Common mistake</span>
+    Doing <code>first = newLink;</code> <b>before</b> <code>newLink.next = first;</code> loses the whole old list — the new node ends up pointing to itself. Always connect the new node first, then move <code>first</code>.
+  </div>
+</section>
+
+<!-- ================= 3 INSERT & DELETE ================= -->
+<section id="insdel">
+  <h2>3 · Inserting and Deleting Nodes</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li><em class="key">find(key)</em>: walk from <code>first</code> until <code>current.data == key</code> (or <code>null</code> = not found).</li>
+      <li><em class="key">delete(key)</em>: you need <b>two</b> references while walking: <code>current</code> (the one to remove) and <code>previous</code> (the one before it).</li>
+      <li>Deleting = making <code>previous.next</code> <b>skip over</b> <code>current</code>. The skipped node is garbage-collected.</li>
+      <li>Special case: deleting the <b>first</b> node → just move <code>first</code> forward.</li>
+    </ul>
+  </div>
+  <div class="card pic"><span class="lbl">Picture it 🚂</span>
+    Removing a train car: the car before it (<code>previous</code>) must couple to the car after it (<code>current.next</code>). You can't do that if you're only standing on the car you want to remove — so we always keep track of the car behind us.
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="35" class="lbls">delete(44):  previous.next = current.next</text>
+      <text x="20" y="90" class="lbls">first</text>
+      <rect x="18" y="100" width="55" height="40" rx="6" class="nextbox"/>
+      <path d="M73 120 L148 120" class="arrow"/>
+      <rect x="150" y="95" width="70" height="50" rx="6" class="nodebox"/><text x="185" y="128" text-anchor="middle" class="lbl">66</text>
+      <rect x="220" y="95" width="45" height="50" rx="6" class="nextbox"/>
+      <text x="195" y="78" text-anchor="middle" class="lbls" style="fill:#7ee787">previous</text>
+      <!-- skip arrow -->
+      <path d="M265 112 C330 50, 460 50, 518 112" class="arrow" style="stroke:#7ee787"/>
+      <path d="M265 125 L335 125" class="ghost"/>
+      <rect x="338" y="95" width="70" height="50" rx="6" class="nodebox" style="stroke:#ff6b6b"/><text x="373" y="128" text-anchor="middle" class="lbl">44</text>
+      <rect x="408" y="95" width="45" height="50" rx="6" class="nextbox"/>
+      <text x="383" y="78" text-anchor="middle" class="lbls" style="fill:#ff6b6b">current</text>
+      <path d="M453 125 L518 125" class="arrow"/>
+      <rect x="520" y="95" width="70" height="50" rx="6" class="nodebox"/><text x="555" y="128" text-anchor="middle" class="lbl">22</text>
+      <rect x="590" y="95" width="45" height="50" rx="6" class="nextbox"/>
+      <path d="M635 120 L665 120" class="arrow"/>
+      <text x="668" y="126" class="nullx">∅</text>
+    </svg>
+    <div class="cap">Green arrow = the one assignment that deletes 44. Nothing else moves.</div>
+  </div>
+
+  <div class="codebox" data-prog="insdel"></div>
+</section>
+
+<!-- ================= 4 DOUBLE-ENDED ================= -->
+<section id="double">
+  <h2>4 · Double-Ended Lists</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li>A <em class="key">double-ended list</em> keeps <b>two</b> references: <code>first</code> <i>and</i> <code>last</code>.</li>
+      <li>Benefit: <code>insertLast()</code> becomes <b>O(1)</b> — no need to walk the whole list to find the end.</li>
+      <li>Still a <b>singly</b> linked list: nodes only know <code>next</code>, so <code>deleteLast()</code> is still slow.</li>
+      <li>Watch the <b>empty-list</b> cases: the first insert must set <b>both</b> <code>first</code> and <code>last</code>.</li>
+    </ul>
+  </div>
+  <div class="card pic"><span class="lbl">Picture it 🎟️</span>
+    A ticket line with a sign at the <b>front</b> (<code>first</code>) and a sign at the <b>back</b> (<code>last</code>). New people join at the back instantly — you don't walk the whole line to find the end. This is exactly how a <b>queue</b> is built.
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="40" class="lbls">first</text>
+      <rect x="18" y="50" width="55" height="40" rx="6" class="nextbox"/>
+      <path d="M73 70 L128 70" class="arrow"/>
+      <rect x="130" y="45" width="70" height="50" rx="6" class="nodebox"/><text x="165" y="78" text-anchor="middle" class="lbl">22</text>
+      <rect x="200" y="45" width="45" height="50" rx="6" class="nextbox"/>
+      <path d="M245 70 L308 70" class="arrow"/>
+      <rect x="310" y="45" width="70" height="50" rx="6" class="nodebox"/><text x="345" y="78" text-anchor="middle" class="lbl">44</text>
+      <rect x="380" y="45" width="45" height="50" rx="6" class="nextbox"/>
+      <path d="M425 70 L488 70" class="arrow"/>
+      <rect x="490" y="45" width="70" height="50" rx="6" class="nodebox"/><text x="525" y="78" text-anchor="middle" class="lbl">66</text>
+      <rect x="560" y="45" width="45" height="50" rx="6" class="nextbox"/>
+      <path d="M605 70 L640 70" class="arrow"/>
+      <text x="645" y="77" class="nullx">∅</text>
+      <text x="660" y="130" class="lbls">last</text>
+      <rect x="655" y="100" width="55" height="40" rx="6" class="nextbox" transform="translate(0,-5)"/>
+      <path d="M655 118 C600 118, 560 110, 545 98" class="arrow"/>
+    </svg>
+    <div class="cap">Both ends are one hop away.</div>
+  </div>
+
+  <div class="codebox" data-prog="double"></div>
+</section>
+
+<!-- ================= 5 SORTED ================= -->
+<section id="sorted">
+  <h2>5 · Sorted Lists</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li>A <em class="key">sorted list</em> keeps its nodes in order (e.g., smallest → largest) <b>at all times</b>.</li>
+      <li>There is only one way to add: <code>insert(key)</code> walks forward until it finds the first node <b>bigger</b> than the key, then drops the new node right before it.</li>
+      <li>Insert is <b>O(n)</b> (walking), but removing the minimum (<code>remove()</code>) is <b>O(1)</b> — it's always at <code>first</code>.</li>
+      <li>Great for a <em class="key">priority queue</em>: the most urgent item is always at the front.</li>
+    </ul>
+  </div>
+  <div class="card pic"><span class="lbl">Picture it 📚</span>
+    Books on a shelf sorted by height. To add a new book, slide along until you meet the first taller book and squeeze in just before it. The shortest book is always at the far left — grabbing it takes no searching.
+  </div>
+
+  <div class="codebox" data-prog="sorted"></div>
+</section>
+
+<!-- ================= 6 EFFICIENCY ================= -->
+<section id="eff">
+  <h2>6 · Efficiency</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li><b>O(1)</b> = constant time: the number of items doesn't matter.</li>
+      <li><b>O(n)</b> = linear time: twice the items → twice the work.</li>
+      <li>Linked lists win on <b>insert/delete at the ends</b> and never need resizing.</li>
+      <li>Arrays win on <b>random access</b> (<code>arr[500]</code>) because nodes aren't side-by-side in memory.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Operation</th><th>Array (unsorted)</th><th>Linked List</th><th>Double-Ended</th><th>Sorted List</th></tr>
+    <tr><td>Insert at front</td><td class="bad">O(n) shift</td><td class="good">O(1)</td><td class="good">O(1)</td><td class="meh">O(n)</td></tr>
+    <tr><td>Insert at end</td><td class="good">O(1)*</td><td class="bad">O(n) walk</td><td class="good">O(1)</td><td class="meh">O(n)</td></tr>
+    <tr><td>Delete at front</td><td class="bad">O(n) shift</td><td class="good">O(1)</td><td class="good">O(1)</td><td class="good">O(1)</td></tr>
+    <tr><td>Delete at end</td><td class="good">O(1)</td><td class="bad">O(n)</td><td class="bad">O(n)</td><td class="bad">O(n)</td></tr>
+    <tr><td>Search by value</td><td class="meh">O(n)</td><td class="meh">O(n)</td><td class="meh">O(n)</td><td class="meh">O(n)</td></tr>
+    <tr><td>Access by index</td><td class="good">O(1)</td><td class="bad">O(n)</td><td class="bad">O(n)</td><td class="bad">O(n)</td></tr>
+    <tr><td>Memory</td><td>fixed, may waste space</td><td colspan="3">grows as needed, + 1 reference per node</td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:.95rem">* if the array is not full.</p>
+
+  <div class="card tip"><span class="lbl">Rule of thumb</span>
+    Lots of <b>inserting/removing</b> at the ends, unknown size → <b>linked list</b>. Lots of <b>jumping to position i</b> → <b>array</b>. In Java, <code>ArrayList</code> is the array; <code>LinkedList</code> is the (doubly) linked list.
+  </div>
+</section>
+
+<!-- ================= 7 DOUBLY LINKED ================= -->
+<section id="doubly">
+  <h2>7 · Doubly Linked Lists</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li>Each node has <b>two</b> references: <code>next</code> and <code>previous</code>.</li>
+      <li>You can traverse <b>forward or backward</b>.</li>
+      <li><code>deleteLast()</code> becomes <b>O(1)</b> (we can reach the node before <code>last</code> via <code>last.previous</code>).</li>
+      <li>Cost: every insert/delete must fix <b>twice as many</b> references, and each node uses a little more memory.</li>
+    </ul>
+  </div>
+  <div class="card pic"><span class="lbl">Picture it 🚪</span>
+    A hallway of rooms where every door opens <b>both ways</b>. In a singly linked list, doors only open forward — to go back you must return to the entrance and walk again.
+  </div>
+
+  <div class="fig">
+    <svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="45" class="lbls">first</text>
+      <rect x="18" y="55" width="55" height="40" rx="6" class="nextbox"/>
+      <path d="M73 75 L123 75" class="arrow"/>
+      <g>
+        <rect x="125" y="50" width="40" height="50" rx="6" class="nextbox" style="stroke:#ff7eb6"/><text x="145" y="82" text-anchor="middle" class="lbls">prev</text>
+        <rect x="165" y="50" width="60" height="50" rx="6" class="nodebox"/><text x="195" y="83" text-anchor="middle" class="lbl">22</text>
+        <rect x="225" y="50" width="40" height="50" rx="6" class="nextbox"/><text x="245" y="82" text-anchor="middle" class="lbls">next</text>
+      </g>
+      <path d="M265 65 L320 65" class="arrow"/>
+      <path d="M320 88 L265 88" class="arrowp"/>
+      <g>
+        <rect x="322" y="50" width="40" height="50" rx="6" class="nextbox" style="stroke:#ff7eb6"/><text x="342" y="82" text-anchor="middle" class="lbls">prev</text>
+        <rect x="362" y="50" width="60" height="50" rx="6" class="nodebox"/><text x="392" y="83" text-anchor="middle" class="lbl">44</text>
+        <rect x="422" y="50" width="40" height="50" rx="6" class="nextbox"/><text x="442" y="82" text-anchor="middle" class="lbls">next</text>
+      </g>
+      <path d="M462 65 L517 65" class="arrow"/>
+      <path d="M517 88 L462 88" class="arrowp"/>
+      <g>
+        <rect x="519" y="50" width="40" height="50" rx="6" class="nextbox" style="stroke:#ff7eb6"/><text x="539" y="82" text-anchor="middle" class="lbls">prev</text>
+        <rect x="559" y="50" width="60" height="50" rx="6" class="nodebox"/><text x="589" y="83" text-anchor="middle" class="lbl">66</text>
+        <rect x="619" y="50" width="40" height="50" rx="6" class="nextbox"/><text x="639" y="82" text-anchor="middle" class="lbls">next</text>
+      </g>
+      <path d="M659 75 L690 75" class="arrow"/><text x="693" y="82" class="nullx">∅</text>
+      <path d="M125 100 L100 130" class="arrowp"/><text x="60" y="145" class="nullx">∅</text>
+      <text x="600" y="150" class="lbls">last ──▶ 66</text>
+    </svg>
+    <div class="cap">Orange arrows = <code>next</code>, pink arrows = <code>previous</code>. First node's <code>previous</code> and last node's <code>next</code> are <code>null</code>.</div>
+  </div>
+
+  <div class="codebox" data-prog="doubly"></div>
+</section>
+
+<!-- ================= 8 ITERATORS ================= -->
+<section id="iter">
+  <h2>8 · Iterators</h2>
+  <div class="card def"><span class="lbl">Definition</span>
+    <ul class="bul">
+      <li>An <em class="key">iterator</em> is an object that <b>remembers a position</b> in the list (a "bookmark") and can move it.</li>
+      <li>It lets the <b>user</b> of the list walk through nodes <b>without</b> seeing <code>first</code>/<code>next</code> or knowing how the list is built.</li>
+      <li>Typical methods: <code>reset()</code>, <code>atEnd()</code>, <code>nextLink()</code>, <code>getCurrent()</code>, <code>insertAfter()</code>, <code>deleteCurrent()</code>.</li>
+      <li>Java's built-in version is <code>java.util.Iterator</code> with <code>hasNext()</code> / <code>next()</code> — it's what powers the <b>for-each</b> loop.</li>
+    </ul>
+  </div>
+  <div class="card pic"><span class="lbl">Picture it 🔖</span>
+    The list is a book; the iterator is a <b>bookmark</b> plus a hand that can flip one page (<code>nextLink()</code>), tell you the current page (<code>getCurrent()</code>), or tear out the current page (<code>deleteCurrent()</code>). Two readers can hold two bookmarks in the same book.
+  </div>
+
+  <h3>8a · A hand-written iterator (list + bookmark)</h3>
+  <div class="codebox" data-prog="iter"></div>
+
+  <h3>8b · Java's <code>Iterator</code> &amp; the for-each loop</h3>
+  <div class="codebox" data-prog="iter2"></div>
+</section>
+
+<!-- ================= 9 PLAYGROUND ================= -->
+<section id="play">
+  <h2>9 · Playground 🎮</h2>
+  <p>Build a list and watch the references change. Toggle <b>doubly linked</b> to show <code>prev</code> boxes; toggle <b>sorted</b> to make <i>Insert</i> keep order.</p>
+  <div class="play">
+    <div class="controls">
+      <input type="number" id="pval" value="42" placeholder="value">
+      <button class="btn" onclick="pg.insertFirst()">insertFirst</button>
+      <button class="btn" onclick="pg.insertLast()">insertLast</button>
+      <button class="btn" onclick="pg.insertSorted()">insert (sorted)</button>
+      <button class="btn" onclick="pg.find()">find</button>
+      <button class="btn" onclick="pg.deleteKey()">delete(key)</button>
+      <button class="btn" onclick="pg.deleteFirst()">deleteFirst</button>
+      <button class="btn" onclick="pg.deleteLast()">deleteLast</button>
+      <button class="btn" onclick="pg.clear()">clear</button>
+      <label class="sw"><input type="checkbox" id="pdbl" onchange="pg.render()"> doubly linked</label>
+      <label class="sw"><input type="checkbox" id="prnd" > random value</label>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div class="log" id="plog">Ready. The list is empty: first == null.</div>
+  </div>
+</section>
+
+<!-- ================= 10 QUIZ ================= -->
+<section id="quiz">
+  <h2>10 · Quick Check ✅</h2>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<p style="color:var(--muted);font-size:.9rem;margin-top:60px">MAC286 · Data Structures in Java · LaGuardia Community College (CUNY) · Linked Lists</p>
+</main>
+
+<!-- ================= EXPLANATION PANEL ================= -->
+<aside class="explain" id="explain">
+  <div class="title">Code explanation <span class="pinned">📌 pinned — click line again to unpin</span></div>
+  <div class="codeline" id="exCode">Hover a line of code…</div>
+  <div class="text" id="exText"><span class="hint">Move your mouse over any Java line on the left. Click a line to pin its explanation here.</span></div>
+</aside>
+</div>
+
+<script>
+/* ================================================================
+   PROGRAMS: each line is [code, explanation]. Empty explanation = no popup.
+   ================================================================ */
+const P = {};
+
+P.refs = { file:"ReferencesDemo.java", lines:[
+["public class ReferencesDemo {", "The program's entry class. Online compilers usually want this named <code>Main</code> — use the <b>Copy as Main.java</b> button."],
+["    public static void main(String[] args) {", "Where the program starts running."],
+["        // --- primitives: copied by VALUE ---", "Primitive types (int, double, boolean, char…) store the value itself inside the variable."],
+["        int a = 5;", "A box named <code>a</code> containing the number 5."],
+["        int b = a;", "A <b>new</b> box <code>b</code>. The value 5 is <b>copied</b> into it. Two separate boxes."],
+["        b = 10;", "Only <code>b</code>'s box changes."],
+["        System.out.println(\"a = \" + a);   // 5", "<code>a</code> is still 5 — primitives don't share."],
+["", ""],
+["        // --- objects: copied by REFERENCE ---", "Variables of a class type (Node, String, arrays…) hold an <b>address</b>, not the object."],
+["        Node x = new Node(7);", "<code>new</code> builds a Node object somewhere in memory (the heap). <code>x</code> stores its <b>address</b> — <code>x</code> is a <i>reference</i>."],
+["        Node y = x;", "Copies the <b>address</b>, not the object. Now <code>x</code> and <code>y</code> both point to the <b>same</b> Node. 🏠 Two sticky notes, one house."],
+["        y.data = 99;", "Follow <code>y</code> to the object and change its <code>data</code>."],
+["        System.out.println(\"x.data = \" + x.data);   // 99", "Looking through <code>x</code> we see 99 — because it's the same object. This is the key idea behind <code>next</code> references."],
+["", ""],
+["        Node z = null;", "<code>null</code> = a reference that points to <b>nothing</b>. In a list, the last node's <code>next</code> is <code>null</code>."],
+["        if (z == null) System.out.println(\"z points to nothing\");", "You can test for null with <code>==</code>. Calling <code>z.data</code> here would crash with a <b>NullPointerException</b>."],
+["    }", ""],
+["}", ""],
+["", ""],
+["class Node {", "A tiny class that will become a linked-list node."],
+["    int data;", "The value we store."],
+["    Node next;", "A reference to another Node. A class can contain a reference to its <b>own</b> type — this is what makes chains possible. Starts as <code>null</code>."],
+["    Node(int d) { data = d; }", "Constructor: set data; <code>next</code> stays <code>null</code>."],
+["}", ""]
+]};
+
+P.simple = { file:"SimpleLinkedListApp.java", lines:[
+["import java.util.NoSuchElementException;", "Imported so we can throw a clear error when deleting from an empty list."],
+["", ""],
+["class Link {", "One node of the list. (The textbook calls it <code>Link</code>; many people say <code>Node</code>.)"],
+["    public int data;", "The value stored in this node. Could be any type (String, an object, …)."],
+["    public Link next;", "Reference to the <b>next</b> node in the chain. <code>null</code> means \"I'm the last one\"."],
+["    public Link(int d) { data = d; next = null; }", "Constructor: store the data, explicitly start with no next node."],
+["    public void display() { System.out.print(data + \" \"); }", "Prints this node's data followed by a space."],
+["}", ""],
+["", ""],
+["class LinkList {", "The list itself. Notice it does <b>not</b> store the nodes — only a way to reach the first one."],
+["    private Link first;", "The only field: a reference to the first node. The whole list hangs off this one reference."],
+["    public LinkList() { first = null; }", "A new list is empty: <code>first</code> points to nothing."],
+["    public boolean isEmpty() { return first == null; }", "Empty test: is there a first node?"],
+["", ""],
+["    public void insertFirst(int d) {", "Add a new node at the front. O(1) — no walking needed."],
+["        Link newLink = new Link(d);", "Step 0: build the new node (its <code>next</code> is null for now)."],
+["        newLink.next = first;", "Step 1: new node points to the <b>old</b> first node (or null if the list was empty). ⚠️ Must happen BEFORE step 2."],
+["        first = newLink;", "Step 2: the list's <code>first</code> now points to the new node. Done — the new node is at the front."],
+["    }", ""],
+["", ""],
+["    public Link deleteFirst() {", "Remove the front node and return it."],
+["        if (isEmpty()) throw new NoSuchElementException(\"List is empty\");", "Guard: you can't delete from an empty list. Throwing an exception is clearer than crashing with NullPointerException."],
+["        Link temp = first;", "Remember the node we're removing so we can return it."],
+["        first = first.next;", "Move <code>first</code> one step forward. The old first node is now unreachable → Java's garbage collector frees it."],
+["        return temp;", "Give the removed node back to the caller."],
+["    }", ""],
+["", ""],
+["    public void displayList() {", "Traversal: visit every node from first to last."],
+["        System.out.print(\"List (first --> last): \");", ""],
+["        Link current = first;", "A \"finger\" that starts on the first node."],
+["        while (current != null) {", "Keep going until the finger falls off the end. This is <b>the</b> linked-list loop — memorize it."],
+["            current.display();", "Do something with this node (print it)."],
+["            current = current.next;", "Move the finger to the next node. Forgetting this line = infinite loop!"],
+["        }", ""],
+["        System.out.println();", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["public class SimpleLinkedListApp {", "The driver program. Rename to <code>Main</code> for online compilers (or use the button above)."],
+["    public static void main(String[] args) {", ""],
+["        LinkList list = new LinkList();", "Create an empty list."],
+["        list.insertFirst(22);", "List: 22"],
+["        list.insertFirst(44);", "List: 44 → 22 (44 is inserted at the FRONT)."],
+["        list.insertFirst(66);", "List: 66 → 44 → 22"],
+["        list.displayList();", "Prints: List (first --> last): 66 44 22"],
+["        Link removed = list.deleteFirst();", "Removes 66; <code>first</code> now points to 44."],
+["        System.out.println(\"Deleted: \" + removed.data);", "Prints: Deleted: 66"],
+["        list.displayList();", "Prints: List (first --> last): 44 22"],
+["    }", ""],
+["}", ""]
+]};
+
+P.insdel = { file:"FindDeleteApp.java", lines:[
+["class Link {", "Same node class as before."],
+["    public int data;", ""],
+["    public Link next;", ""],
+["    public Link(int d) { data = d; }", "<code>next</code> is automatically null."],
+["}", ""],
+["", ""],
+["class LinkList {", ""],
+["    private Link first;", ""],
+["", ""],
+["    public void insertFirst(int d) {", "Same as section 2."],
+["        Link newLink = new Link(d);", ""],
+["        newLink.next = first;", "Connect first…"],
+["        first = newLink;", "…then move <code>first</code>."],
+["    }", ""],
+["", ""],
+["    public Link find(int key) {", "Search for the first node whose data equals <code>key</code>. Returns the node, or <code>null</code> if not found."],
+["        Link current = first;", "Start the finger at the front."],
+["        while (current != null) {", "Walk until we fall off the end."],
+["            if (current.data == key) return current;", "Found it? Return immediately — no need to keep walking."],
+["            current = current.next;", "Otherwise step forward."],
+["        }", ""],
+["        return null;", "We reached the end without finding it."],
+["    }", ""],
+["", ""],
+["    public Link delete(int key) {", "Remove the first node with this key. Returns the removed node, or <code>null</code> if not found."],
+["        Link current = first;", "<code>current</code> = the node we're looking at."],
+["        Link previous = null;", "<code>previous</code> = the node <b>before</b> current. Starts null because nothing is before <code>first</code>. 🚂 We need the car behind us."],
+["        while (current != null && current.data != key) {", "Walk while (a) not at the end AND (b) not found yet. Order matters: checking <code>current != null</code> first avoids a NullPointerException."],
+["            previous = current;", "Drag <code>previous</code> along one step behind…"],
+["            current = current.next;", "…and move <code>current</code> forward."],
+["        }", ""],
+["        if (current == null) return null;", "Fell off the end → key is not in the list."],
+["        if (previous == null)", "Special case: the match is the <b>first</b> node (we never moved)."],
+["            first = first.next;", "Deleting the first node = just slide <code>first</code> forward."],
+["        else", "Normal case: the match is somewhere after the first node."],
+["            previous.next = current.next;", "⭐ The one line that deletes: <code>previous</code> skips over <code>current</code>. <code>current</code> is now unreachable and gets garbage-collected."],
+["        return current;", "Return the node we unlinked."],
+["    }", ""],
+["", ""],
+["    public void displayList() {", ""],
+["        Link current = first;", ""],
+["        while (current != null) {", ""],
+["            System.out.print(current.data + \" \");", ""],
+["            current = current.next;", ""],
+["        }", ""],
+["        System.out.println();", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["public class FindDeleteApp {", ""],
+["    public static void main(String[] args) {", ""],
+["        LinkList list = new LinkList();", ""],
+["        list.insertFirst(22);", ""],
+["        list.insertFirst(44);", ""],
+["        list.insertFirst(66);", ""],
+["        list.insertFirst(88);", "List: 88 → 66 → 44 → 22"],
+["        list.displayList();", "Prints: 88 66 44 22"],
+["", ""],
+["        Link f = list.find(44);", "Walks 88, 66, 44 → returns the node holding 44."],
+["        if (f != null) System.out.println(\"Found \" + f.data);", "Always check for null before using the result."],
+["        else System.out.println(\"Not found\");", ""],
+["", ""],
+["        Link d = list.delete(66);", "previous=88, current=66 → 88.next = 44. List: 88 → 44 → 22"],
+["        if (d != null) System.out.println(\"Deleted \" + d.data);", ""],
+["        list.delete(88);", "previous stays null → special case: first = 44. List: 44 → 22"],
+["        list.delete(999);", "Not in the list → returns null, nothing changes."],
+["        list.displayList();", "Prints: 44 22"],
+["    }", ""],
+["}", ""]
+]};
+
+P.double = { file:"FirstLastApp.java", lines:[
+["import java.util.NoSuchElementException;", ""],
+["", ""],
+["class Link {", ""],
+["    public int data;", ""],
+["    public Link next;", ""],
+["    public Link(int d) { data = d; }", ""],
+["}", ""],
+["", ""],
+["class FirstLastList {", "A double-ended list: it remembers <b>both</b> ends."],
+["    private Link first;", "Reference to the front node."],
+["    private Link last;", "Reference to the back node. This is the new ingredient. 🎟️ The sign at the back of the line."],
+["    public boolean isEmpty() { return first == null; }", ""],
+["", ""],
+["    public void insertFirst(int d) {", "Add at the front."],
+["        Link newLink = new Link(d);", ""],
+["        if (isEmpty()) last = newLink;", "⚠️ Empty-list case: the new node is also the <b>last</b> node, so <code>last</code> must point to it too."],
+["        newLink.next = first;", "Connect to the old front (null if empty)."],
+["        first = newLink;", "Move <code>first</code>."],
+["    }", ""],
+["", ""],
+["    public void insertLast(int d) {", "Add at the back — now O(1) because we know where the back is."],
+["        Link newLink = new Link(d);", ""],
+["        if (isEmpty()) first = newLink;", "⚠️ Empty-list case: the new node is also the <b>first</b> node."],
+["        else last.next = newLink;", "Otherwise hook it after the current last node."],
+["        last = newLink;", "Either way, the new node is now the last one."],
+["    }", ""],
+["", ""],
+["    public int deleteFirst() {", "Remove from the front (returns the data this time, not the node)."],
+["        if (isEmpty()) throw new NoSuchElementException(\"List is empty\");", ""],
+["        int temp = first.data;", "Save the value before we lose the node."],
+["        if (first.next == null) last = null;", "⚠️ If there was only ONE node, the list becomes empty: <code>last</code> must also become null."],
+["        first = first.next;", "Slide <code>first</code> forward."],
+["        return temp;", ""],
+["    }", ""],
+["", ""],
+["    public void displayList() {", ""],
+["        System.out.print(\"List (first --> last): \");", ""],
+["        Link current = first;", ""],
+["        while (current != null) {", ""],
+["            System.out.print(current.data + \" \");", ""],
+["            current = current.next;", ""],
+["        }", ""],
+["        System.out.println();", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["public class FirstLastApp {", ""],
+["    public static void main(String[] args) {", ""],
+["        FirstLastList list = new FirstLastList();", ""],
+["        list.insertFirst(22);", "List: 22  (first = last = 22)"],
+["        list.insertFirst(44);", "List: 44 → 22"],
+["        list.insertFirst(66);", "List: 66 → 44 → 22"],
+["        list.insertLast(11);", "List: 66 → 44 → 22 → 11 — no walking, we jumped straight to <code>last</code>."],
+["        list.insertLast(33);", "List: 66 → 44 → 22 → 11 → 33"],
+["        list.displayList();", "Prints: 66 44 22 11 33"],
+["        list.deleteFirst();", "Removes 66."],
+["        list.deleteFirst();", "Removes 44."],
+["        list.displayList();", "Prints: 22 11 33"],
+["    }", ""],
+["}", ""]
+]};
+
+P.sorted = { file:"SortedListApp.java", lines:[
+["import java.util.NoSuchElementException;", ""],
+["", ""],
+["class Link {", ""],
+["    public int data;", ""],
+["    public Link next;", ""],
+["    public Link(int d) { data = d; }", ""],
+["}", ""],
+["", ""],
+["class SortedList {", "A list that is always in ascending order."],
+["    private Link first;", ""],
+["    public boolean isEmpty() { return first == null; }", ""],
+["", ""],
+["    public void insert(int key) {", "The ONLY insert method: finds the right spot, then links the node in. 📚 Slide along the shelf until you meet a taller book."],
+["        Link newLink = new Link(key);", ""],
+["        Link previous = null;", "Node before the insertion point (null = insert at the very front)."],
+["        Link current = first;", "Node at/after the insertion point."],
+["        while (current != null && key > current.data) {", "Keep walking while the key is still bigger than the current node. Stop at the end OR at the first node ≥ key."],
+["            previous = current;", "previous follows one step behind…"],
+["            current = current.next;", "…current moves ahead."],
+["        }", ""],
+["        if (previous == null)", "We never moved → the new node belongs at the front (list was empty, or key is the smallest)."],
+["            first = newLink;", "New node becomes first."],
+["        else", "Normal case: insert between previous and current."],
+["            previous.next = newLink;", "previous now points to the new node…"],
+["        newLink.next = current;", "…and the new node points to current (may be null = we're at the end). Runs in both cases."],
+["    }", ""],
+["", ""],
+["    public Link remove() {", "Remove and return the <b>smallest</b> item. It's always at the front → O(1)."],
+["        if (isEmpty()) throw new NoSuchElementException(\"List is empty\");", ""],
+["        Link temp = first;", ""],
+["        first = first.next;", "Same as deleteFirst()."],
+["        return temp;", ""],
+["    }", ""],
+["", ""],
+["    public void displayList() {", ""],
+["        System.out.print(\"Sorted: \");", ""],
+["        Link current = first;", ""],
+["        while (current != null) {", ""],
+["            System.out.print(current.data + \" \");", ""],
+["            current = current.next;", ""],
+["        }", ""],
+["        System.out.println();", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["public class SortedListApp {", ""],
+["    public static void main(String[] args) {", ""],
+["        SortedList list = new SortedList();", ""],
+["        list.insert(20);", "List: 20"],
+["        list.insert(40);", "40 > 20 → walk past 20, reach end. List: 20 → 40"],
+["        list.insert(10);", "10 is not > 20 → stop immediately, previous==null → front. List: 10 → 20 → 40"],
+["        list.insert(30);", "Walk past 10, 20; 30 is not > 40 → insert before 40. List: 10 → 20 → 30 → 40"],
+["        list.insert(50);", "List: 10 → 20 → 30 → 40 → 50"],
+["        list.displayList();", "Prints: Sorted: 10 20 30 40 50"],
+["        System.out.println(\"Smallest: \" + list.remove().data);", "Prints: Smallest: 10 — no searching needed."],
+["        list.displayList();", "Prints: Sorted: 20 30 40 50"],
+["    }", ""],
+["}", ""]
+]};
+
+P.doubly = { file:"DoublyLinkedApp.java", lines:[
+["import java.util.NoSuchElementException;", ""],
+["", ""],
+["class Link {", ""],
+["    public int data;", ""],
+["    public Link next;", "Reference to the node after this one."],
+["    public Link previous;", "NEW: reference to the node <b>before</b> this one. 🚪 The door now opens both ways."],
+["    public Link(int d) { data = d; }", ""],
+["}", ""],
+["", ""],
+["class DoublyLinkedList {", ""],
+["    private Link first;", ""],
+["    private Link last;", "Doubly linked lists are almost always double-ended too."],
+["    public boolean isEmpty() { return first == null; }", ""],
+["", ""],
+["    public void insertFirst(int d) {", "Four things to fix: new.next, old first.previous, first, (and last if empty)."],
+["        Link newLink = new Link(d);", ""],
+["        if (isEmpty()) last = newLink;", "Empty list: the new node is also the last."],
+["        else first.previous = newLink;", "Otherwise the old first node must now point <b>back</b> to the new node."],
+["        newLink.next = first;", "New node points forward to the old first."],
+["        first = newLink;", "Move <code>first</code>."],
+["    }", ""],
+["", ""],
+["    public void insertLast(int d) {", "Mirror image of insertFirst."],
+["        Link newLink = new Link(d);", ""],
+["        if (isEmpty()) first = newLink;", "Empty list: new node is also first."],
+["        else {", ""],
+["            last.next = newLink;", "Old last points forward to the new node…"],
+["            newLink.previous = last;", "…and the new node points back to the old last."],
+["        }", ""],
+["        last = newLink;", "Move <code>last</code>."],
+["    }", ""],
+["", ""],
+["    public Link deleteFirst() {", ""],
+["        if (isEmpty()) throw new NoSuchElementException(\"List is empty\");", ""],
+["        Link temp = first;", ""],
+["        if (first.next == null) last = null;", "Only one node → list becomes empty."],
+["        else first.next.previous = null;", "The new first node has nothing before it."],
+["        first = first.next;", ""],
+["        return temp;", ""],
+["    }", ""],
+["", ""],
+["    public Link deleteLast() {", "⭐ Now O(1)! In a singly linked list we'd have to walk to find the node before <code>last</code>."],
+["        if (isEmpty()) throw new NoSuchElementException(\"List is empty\");", ""],
+["        Link temp = last;", ""],
+["        if (first.next == null) first = null;", "Only one node → list becomes empty."],
+["        else last.previous.next = null;", "The node before <code>last</code> becomes the end: its next → null. We reach it instantly via <code>last.previous</code>."],
+["        last = last.previous;", "Move <code>last</code> backward."],
+["        return temp;", ""],
+["    }", ""],
+["", ""],
+["    public boolean insertAfter(int key, int d) {", "Insert a new node right after the node holding <code>key</code>. Returns false if key not found."],
+["        Link current = first;", ""],
+["        while (current != null && current.data != key) current = current.next;", "Find the key (O(n))."],
+["        if (current == null) return false;", "Not found."],
+["        Link newLink = new Link(d);", ""],
+["        if (current == last) {", "Inserting after the last node = new last."],
+["            newLink.next = null;", ""],
+["            last = newLink;", ""],
+["        } else {", "Inserting in the middle: splice between current and current.next."],
+["            newLink.next = current.next;", "new → the node after current"],
+["            current.next.previous = newLink;", "the node after current ← new  (fix the backward link!)"],
+["        }", ""],
+["        newLink.previous = current;", "new ← current"],
+["        current.next = newLink;", "current → new. Four references touched in total."],
+["        return true;", ""],
+["    }", ""],
+["", ""],
+["    public void displayForward() {", "Walk using <code>next</code>."],
+["        System.out.print(\"Forward:  \");", ""],
+["        Link current = first;", ""],
+["        while (current != null) {", ""],
+["            System.out.print(current.data + \" \");", ""],
+["            current = current.next;", ""],
+["        }", ""],
+["        System.out.println();", ""],
+["    }", ""],
+["", ""],
+["    public void displayBackward() {", "Walk using <code>previous</code> — impossible in a singly linked list."],
+["        System.out.print(\"Backward: \");", ""],
+["        Link current = last;", "Start at the back."],
+["        while (current != null) {", ""],
+["            System.out.print(current.data + \" \");", ""],
+["            current = current.previous;", "Step backward."],
+["        }", ""],
+["        System.out.println();", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["public class DoublyLinkedApp {", ""],
+["    public static void main(String[] args) {", ""],
+["        DoublyLinkedList list = new DoublyLinkedList();", ""],
+["        list.insertFirst(22);", "List: 22"],
+["        list.insertFirst(44);", "List: 44 ⇄ 22"],
+["        list.insertLast(66);", "List: 44 ⇄ 22 ⇄ 66"],
+["        list.insertAfter(22, 33);", "List: 44 ⇄ 22 ⇄ 33 ⇄ 66"],
+["        list.displayForward();", "Prints: Forward:  44 22 33 66"],
+["        list.displayBackward();", "Prints: Backward: 66 33 22 44"],
+["        list.deleteLast();", "Removes 66 in O(1)."],
+["        list.deleteFirst();", "Removes 44."],
+["        list.displayForward();", "Prints: Forward:  22 33"],
+["    }", ""],
+["}", ""]
+]};
+
+P.iter = { file:"IteratorApp.java", lines:[
+["class Link {", ""],
+["    public int data;", ""],
+["    public Link next;", ""],
+["    public Link(int d) { data = d; }", ""],
+["}", ""],
+["", ""],
+["class LinkList {", "A simple list that knows how to hand out iterators."],
+["    private Link first;", ""],
+["    public Link getFirst() { return first; }", "The iterator needs to read/write <code>first</code>, so we expose it through methods."],
+["    public void setFirst(Link f) { first = f; }", ""],
+["    public boolean isEmpty() { return first == null; }", ""],
+["    public ListIterator getIterator() { return new ListIterator(this); }", "Factory method: creates a bookmark attached to <b>this</b> list. 🔖"],
+["    public void displayList() {", ""],
+["        Link current = first;", ""],
+["        while (current != null) {", ""],
+["            System.out.print(current.data + \" \");", ""],
+["            current = current.next;", ""],
+["        }", ""],
+["        System.out.println();", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["class ListIterator {", "The bookmark. It holds a <b>position</b> in the list and can move/insert/delete there."],
+["    private Link current;", "The node the bookmark is on."],
+["    private Link previous;", "The node before it — needed for deleting (same trick as section 3)."],
+["    private LinkList ourList;", "Which list this iterator belongs to."],
+["", ""],
+["    public ListIterator(LinkList list) {", ""],
+["        ourList = list;", ""],
+["        reset();", "Start at the beginning."],
+["    }", ""],
+["    public void reset() {", "Put the bookmark on the first node."],
+["        current = ourList.getFirst();", ""],
+["        previous = null;", ""],
+["    }", ""],
+["    public boolean atEnd() { return current.next == null; }", "Are we on the last node? (Assumes the list is not empty.)"],
+["    public void nextLink() {", "Flip one page forward."],
+["        previous = current;", ""],
+["        current = current.next;", ""],
+["    }", ""],
+["    public Link getCurrent() { return current; }", "What page are we on?"],
+["", ""],
+["    public void insertAfter(int d) {", "Insert a new node right after the bookmark, then move the bookmark onto it."],
+["        Link newLink = new Link(d);", ""],
+["        if (ourList.isEmpty()) {", "Empty list: new node becomes first and current."],
+["            ourList.setFirst(newLink);", ""],
+["            current = newLink;", ""],
+["        } else {", ""],
+["            newLink.next = current.next;", "new → whatever came after current"],
+["            current.next = newLink;", "current → new"],
+["            nextLink();", "Move the bookmark to the new node."],
+["        }", ""],
+["    }", ""],
+["", ""],
+["    public int deleteCurrent() {", "Tear out the page under the bookmark; return its value."],
+["        int value = current.data;", ""],
+["        if (previous == null) {", "Deleting the first node."],
+["            ourList.setFirst(current.next);", "List's first jumps forward."],
+["            reset();", "Bookmark back to the (new) start."],
+["        } else {", ""],
+["            previous.next = current.next;", "Skip over current — the delete trick."],
+["            if (atEnd()) reset();", "If we just deleted the last node, go back to the start…"],
+["            else current = current.next;", "…otherwise land on the next node."],
+["        }", ""],
+["        return value;", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["public class IteratorApp {", ""],
+["    public static void main(String[] args) {", ""],
+["        LinkList list = new LinkList();", ""],
+["        ListIterator it = list.getIterator();", "Get a bookmark for this list."],
+["        it.insertAfter(20);", "List: 20 (bookmark on 20)"],
+["        it.insertAfter(40);", "List: 20 → 40 (bookmark on 40)"],
+["        it.insertAfter(80);", "List: 20 → 40 → 80 (bookmark on 80)"],
+["        it.reset();", "Bookmark back to 20."],
+["        it.nextLink();", "Bookmark on 40."],
+["        it.insertAfter(60);", "List: 20 → 40 → 60 → 80 (bookmark on 60)"],
+["        list.displayList();", "Prints: 20 40 60 80"],
+["", ""],
+["        it.reset();", "Walk the whole list using only the iterator:"],
+["        while (true) {", ""],
+["            System.out.print(\"[\" + it.getCurrent().data + \"] \");", "Print the current page."],
+["            if (it.atEnd()) break;", "Stop after printing the last node."],
+["            it.nextLink();", ""],
+["        }", ""],
+["        System.out.println();", "Prints: [20] [40] [60] [80]"],
+["", ""],
+["        it.reset();", ""],
+["        it.nextLink();", "On 40."],
+["        System.out.println(\"Deleted \" + it.deleteCurrent());", "Removes 40, bookmark lands on 60. Prints: Deleted 40"],
+["        list.displayList();", "Prints: 20 60 80"],
+["    }", ""],
+["}", ""]
+]};
+
+P.iter2 = { file:"ForEachApp.java", lines:[
+["import java.util.Iterator;", "Java's standard iterator interface: <code>hasNext()</code> and <code>next()</code>."],
+["import java.util.NoSuchElementException;", ""],
+["", ""],
+["class Link {", ""],
+["    public int data;", ""],
+["    public Link next;", ""],
+["    public Link(int d) { data = d; }", ""],
+["}", ""],
+["", ""],
+["class LinkList implements Iterable<Integer> {", "<code>Iterable</code> is the promise: \"I can give you an Iterator\". That promise is what lets the <b>for-each</b> loop work on our list."],
+["    private Link first;", ""],
+["", ""],
+["    public void insertFirst(int d) {", ""],
+["        Link newLink = new Link(d);", ""],
+["        newLink.next = first;", ""],
+["        first = newLink;", ""],
+["    }", ""],
+["", ""],
+["    @Override", "We are fulfilling the Iterable promise."],
+["    public Iterator<Integer> iterator() {", "Must return an Iterator over Integer values."],
+["        return new Iterator<Integer>() {", "An <i>anonymous class</i>: a tiny Iterator defined right here, with access to <code>first</code>."],
+["            private Link current = first;", "The bookmark starts at the first node."],
+["", ""],
+["            @Override", ""],
+["            public boolean hasNext() { return current != null; }", "Is there a node under the bookmark? (false once we fall off the end.)"],
+["", ""],
+["            @Override", ""],
+["            public Integer next() {", "Return the current value AND move the bookmark forward."],
+["                if (current == null) throw new NoSuchElementException();", "Calling next() past the end is an error."],
+["                int value = current.data;", ""],
+["                current = current.next;", "Advance."],
+["                return value;", ""],
+["            }", ""],
+["        };", ""],
+["    }", ""],
+["}", ""],
+["", ""],
+["public class ForEachApp {", ""],
+["    public static void main(String[] args) {", ""],
+["        LinkList list = new LinkList();", ""],
+["        list.insertFirst(30);", ""],
+["        list.insertFirst(20);", ""],
+["        list.insertFirst(10);", "List: 10 → 20 → 30"],
+["", ""],
+["        // Explicit iterator", ""],
+["        Iterator<Integer> it = list.iterator();", "Ask the list for a bookmark."],
+["        while (it.hasNext()) {", "The classic iterator loop."],
+["            System.out.print(it.next() + \" \");", "Prints 10 20 30"],
+["        }", ""],
+["        System.out.println();", ""],
+["", ""],
+["        // for-each: Java calls iterator()/hasNext()/next() for us", "Syntactic sugar — exactly the same calls happen behind the scenes."],
+["        int sum = 0;", ""],
+["        for (int x : list) {", "Works ONLY because LinkList implements Iterable. Notice: no <code>first</code>, no <code>next</code> visible to the user."],
+["            sum += x;", ""],
+["        }", ""],
+["        System.out.println(\"Sum = \" + sum);", "Prints: Sum = 60"],
+["    }", ""],
+["}", ""]
+]};
+
+/* ================================================================
+   RENDER CODE BLOCKS
+   ================================================================ */
+const KW = /\b(public|private|protected|class|static|void|int|boolean|return|new|null|if|else|while|for|break|true|false|this|throw|throws|import|implements|extends|interface|final)\b/g;
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function highlight(line){
+  // tokenize comments and strings first so keywords inside them are not colored
+  const parts=[]; let i=0; const re=/(\/\/.*$)|("(?:[^"\\]|\\.)*")/g; let m;
+  while((m=re.exec(line))!==null){
+    if(m.index>i) parts.push({t:"code",v:line.slice(i,m.index)});
+    parts.push({t:m[1]?"cm":"str",v:m[0]}); i=m.index+m[0].length;
+  }
+  if(i<line.length) parts.push({t:"code",v:line.slice(i)});
+  return parts.map(p=>{
+    if(p.t==="cm") return '<span class="cm">'+esc(p.v)+'</span>';
+    if(p.t==="str") return '<span class="str">'+esc(p.v)+'</span>';
+    let h=esc(p.v);
+    h=h.replace(KW,'<span class="kw">$1</span>');
+    h=h.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g,'<span class="typ">$1</span>');
+    h=h.replace(/\b(\d+)\b/g,'<span class="num">$1</span>');
+    return h;
+  }).join("");
+}
+function buildCode(box){
+  const prog=P[box.dataset.prog]; const src=prog.lines.map(l=>l[0]).join("\n");
+  const bar=document.createElement("div"); bar.className="bar";
+  bar.innerHTML='<span class="fname">'+prog.file+'</span><span class="hintbar">hover = explain · click = pin</span>';
+  const b1=document.createElement("button"); b1.className="btn"; b1.textContent="Copy";
+  const b2=document.createElement("button"); b2.className="btn"; b2.textContent="Copy as Main.java";
+  b1.onclick=()=>copyText(src,b1,"Copy");
+  b2.onclick=()=>copyText(src.replace(/public class \w+/,"public class Main"),b2,"Copy as Main.java");
+  bar.append(b1,b2); box.appendChild(bar);
+  const pre=document.createElement("pre");
+  prog.lines.forEach((l,idx)=>{
+    const s=document.createElement("span"); s.className="ln"; s.dataset.n=idx+1;
+    s.innerHTML=highlight(l[0])||" ";
+    if(l[1]){ s.dataset.exp=l[1];
+      s.addEventListener("mouseenter",()=>showExp(s,false));
+      s.addEventListener("click",()=>togglePin(s));
+    } else s.classList.add("noexp");
+    pre.appendChild(s);
+  });
+  box.appendChild(pre);
+}
+function copyText(t,btn,label){
+  const done=()=>{btn.textContent="✓ Copied!";btn.classList.add("ok");setTimeout(()=>{btn.textContent=label;btn.classList.remove("ok");},1500);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done));}
+  else fallbackCopy(t,done);
+}
+function fallbackCopy(t,done){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();done();}
+
+/* ---------- explanation panel ---------- */
+const exCode=document.getElementById("exCode"), exText=document.getElementById("exText"), panel=document.getElementById("explain");
+let pinned=null;
+function showExp(el,force){
+  if(pinned&&!force) return;
+  exCode.textContent=el.textContent.trim()||"(blank line)";
+  exText.innerHTML=el.dataset.exp;
+}
+function togglePin(el){
+  if(pinned===el){pinned.classList.remove("sel");pinned=null;panel.classList.remove("locked");showExp(el,true);return;}
+  if(pinned) pinned.classList.remove("sel");
+  pinned=el; el.classList.add("sel"); panel.classList.add("locked"); showExp(el,true);
+}
+document.querySelectorAll(".codebox").forEach(buildCode);
+
+/* ---------- nav highlight ---------- */
+const navLinks=[...document.querySelectorAll("#nav a")];
+const secs=navLinks.map(a=>document.querySelector(a.getAttribute("href")));
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){navLinks.forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+e.target.id));}});},{rootMargin:"-30% 0px -60% 0px"});
+secs.forEach(s=>io.observe(s));
+
+/* ================================================================
+   PLAYGROUND
+   ================================================================ */
+const pg={
+  list:[],
+  val(){ const r=document.getElementById("prnd").checked; if(r){const v=Math.floor(Math.random()*90)+10;document.getElementById("pval").value=v;return v;} return parseInt(document.getElementById("pval").value)||0; },
+  log(m){document.getElementById("plog").textContent=m;},
+  insertFirst(){const v=this.val();this.list.unshift(v);this.render();this.log(`insertFirst(${v}): newLink.next = first;  first = newLink;  → O(1)`);},
+  insertLast(){const v=this.val();this.list.push(v);this.render();this.log(`insertLast(${v}): last.next = newLink;  last = newLink;  → O(1) with a double-ended list`);},
+  insertSorted(){const v=this.val();let i=0,steps=0;while(i<this.list.length&&v>this.list[i]){i++;steps++;}this.list.splice(i,0,v);this.render();this.log(`insert(${v}) sorted: walked past ${steps} node(s), inserted at position ${i} → O(n)`);},
+  find(){const v=this.val();const i=this.list.indexOf(v);this.render();if(i<0){this.log(`find(${v}): walked ${this.list.length} node(s), reached null → not found`);return;}this.hl(i,"hit");this.log(`find(${v}): found after ${i+1} comparison(s)`);},
+  deleteKey(){const v=this.val();const i=this.list.indexOf(v);if(i<0){this.log(`delete(${v}): not found, nothing changes`);return;}this.hl(i,"dying");setTimeout(()=>{this.list.splice(i,1);this.render();this.log(i===0?`delete(${v}): previous == null → first = first.next`:`delete(${v}): previous.next = current.next  (skipped over ${v})`);},450);},
+  deleteFirst(){if(!this.list.length){this.log("deleteFirst(): list is empty → NoSuchElementException");return;}this.hl(0,"dying");setTimeout(()=>{const v=this.list.shift();this.render();this.log(`deleteFirst(): first = first.next  → removed ${v}, O(1)`);},450);},
+  deleteLast(){if(!this.list.length){this.log("deleteLast(): list is empty → NoSuchElementException");return;}const n=this.list.length;this.hl(n-1,"dying");setTimeout(()=>{const v=this.list.pop();this.render();const d=document.getElementById("pdbl").checked;this.log(d?`deleteLast(): last.previous.next = null; last = last.previous → removed ${v}, O(1) (doubly linked)`:`deleteLast(): had to walk ${n} node(s) to find the one before last → removed ${v}, O(n) (singly linked)`);},450);},
+  clear(){this.list=[];this.render();this.log("first = null; last = null;");},
+  hl(i,c){const nodes=document.querySelectorAll("#stage .pnode");if(nodes[i])nodes[i].classList.add(c);},
+  render(){
+    const st=document.getElementById("stage"); const d=document.getElementById("pdbl").checked; st.innerHTML="";
+    const tag=(t)=>{const s=document.createElement("span");s.className="ptag";s.textContent=t;return s;};
+    st.appendChild(tag("first →"));
+    if(!this.list.length){const n=document.createElement("span");n.className="pnull";n.textContent="null";st.appendChild(n);return;}
+    this.list.forEach((v,i)=>{
+      const n=document.createElement("div");n.className="pnode";
+      if(d){const p=document.createElement("div");p.className="pv";p.textContent="prev";n.appendChild(p);}
+      const dd=document.createElement("div");dd.className="d";dd.textContent=v;n.appendChild(dd);
+      const nx=document.createElement("div");nx.className="nx";nx.textContent="next";n.appendChild(nx);
+      st.appendChild(n);
+      const a=document.createElement("span");a.className="parrow"+(d?" both":"");a.textContent=i<this.list.length-1?(d?"⇄":"→"):"→";st.appendChild(a);
+    });
+    const nl=document.createElement("span");nl.className="pnull";nl.textContent="null";st.appendChild(nl);
+    st.appendChild(tag("← last"));
+  }
+};
+pg.render();
+
+/* ================================================================
+   QUIZ
+   ================================================================ */
+const QUIZ=[
+ {q:"After <code>Node y = x;</code>, changing <code>y.data</code> also changes <code>x.data</code>. Why?",a:["Java copies the object","Both variables hold the same address","It doesn't change x.data"],c:1,fb:"References are copied by address — one object, two names."},
+ {q:"In <code>insertFirst</code>, which line must come first?",a:["first = newLink;","newLink.next = first;","Either order works"],c:1,fb:"Connect the new node to the old first BEFORE moving <code>first</code>, or you lose the list."},
+ {q:"To delete a middle node in a singly linked list you need…",a:["only current","current and previous","first and last"],c:1,fb:"<code>previous.next = current.next</code> — you must be standing on the node before the one you remove."},
+ {q:"What does a double-ended list make O(1)?",a:["insertLast","deleteLast","access by index"],c:0,fb:"<code>last</code> lets you append instantly; deleteLast still needs the node before last."},
+ {q:"In a sorted list, removing the smallest item is…",a:["O(n)","O(log n)","O(1)"],c:2,fb:"It's always at <code>first</code>."},
+ {q:"Which becomes O(1) in a doubly linked list?",a:["find(key)","deleteLast()","insert sorted"],c:1,fb:"<code>last.previous</code> gives instant access to the node before last."},
+ {q:"The for-each loop works on our list because LinkList…",a:["has a displayList() method","implements Iterable","is an array"],c:1,fb:"<code>Iterable</code> promises an <code>iterator()</code> that provides hasNext()/next()."}
+];
+const qz=document.getElementById("quiz");
+QUIZ.forEach((it,qi)=>{
+  const d=document.createElement("div");d.className="q";d.innerHTML=`<b>${qi+1}.</b> ${it.q}<br>`;
+  it.a.forEach((opt,ai)=>{const b=document.createElement("button");b.className="btn";b.innerHTML=opt;b.onclick=()=>{const fb=d.querySelector(".fb");if(ai===it.c){fb.innerHTML="✅ Correct! "+it.fb;fb.style.color="var(--green)";}else{fb.innerHTML="❌ Not quite. "+it.fb;fb.style.color="var(--red)";}};d.appendChild(b);});
+  const fb=document.createElement("div");fb.className="fb";d.appendChild(fb);qz.appendChild(d);
+});
+</script>
+</body>
+</html>
