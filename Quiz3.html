@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAC286 · Linked Lists · Assignment</title>
+<style>
+  :root{
+    --bg:#0f1420; --card:#171d2b; --ink:#e8ecf4; --muted:#9aa4b8; --line:#2a3345;
+    --accent:#5b8dff; --accent-soft:#1c2a4a; --ok:#2ecc7a; --ok-soft:#133526;
+    --bad:#ff5c5c; --bad-soft:#3b1a1f; --warn:#f0b35a; --warn-soft:#3a2c14;
+    --code:#dbe3f5; --code-bg:#0b101a; --field:#0f1522;
+  }
+  @media print{ :root{
+    --bg:#fff; --card:#fff; --ink:#1d2433; --muted:#5b6474; --line:#dfe3ea;
+    --accent:#2f6fed; --accent-soft:#e8f0ff; --ok:#1e9e5a; --ok-soft:#e4f7ec;
+    --bad:#d93f3f; --bad-soft:#fdeaea; --warn:#b7791f; --warn-soft:#fff6e0;
+    --code:#1f2937; --code-bg:#f1f3f8; --field:#fff;
+  } }
+  *{box-sizing:border-box}
+  html{font-size:18px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 80px}
+  header.top{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-bottom:22px}
+  .kicker{color:var(--accent);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}
+  h1{margin:4px 0 6px;font-size:1.9rem}
+  .sub{color:var(--muted);margin:0 0 14px}
+  .meta{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end}
+  label.field{display:block;font-weight:600;font-size:.95rem}
+  input[type=text]{width:100%;font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink)}
+  input[type=text]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .info{background:var(--accent-soft);border-radius:12px;padding:12px 16px;margin-top:16px;font-size:.95rem}
+  .info ol{margin:6px 0 0;padding-left:22px}
+  .info code{font-size:.9em}
+  .progress{position:sticky;top:0;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+  .bar{flex:1;height:8px;background:var(--line);border-radius:6px;margin:0 16px;overflow:hidden}
+  .bar>div{height:100%;width:0;background:var(--accent);transition:width .25s}
+  .section-tag{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.75rem;padding:3px 10px;border-radius:999px;margin-bottom:8px;letter-spacing:.03em}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin-bottom:16px;position:relative}
+  .q .num{position:absolute;top:18px;right:20px;color:var(--muted);font-weight:700;font-size:.9rem}
+  .q .type{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-left:8px}
+  .q h3{margin:6px 0 12px;font-size:1.08rem;font-weight:600;line-height:1.45;padding-right:60px}
+  pre{background:var(--code-bg);color:var(--code);border-radius:10px;padding:12px 14px;overflow:auto;font-size:.9rem;line-height:1.45;margin:0 0 12px;font-family:"JetBrains Mono",Consolas,Menlo,monospace}
+  code{font-family:"JetBrains Mono",Consolas,Menlo,monospace;background:var(--code-bg);padding:1px 5px;border-radius:5px}
+  .opts{display:grid;gap:8px}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;background:var(--field)}
+  .opt:hover{border-color:var(--accent)}
+  .opt input{margin-top:5px;accent-color:var(--accent)}
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .short input{max-width:420px}
+  .hint{font-size:.85rem;color:var(--muted);margin-top:6px}
+  .result{display:none;margin-top:12px;padding:10px 14px;border-radius:10px;font-size:.95rem}
+  .q.correct .result{display:block;background:var(--ok-soft);color:var(--ok)}
+  .q.wrong .result{display:block;background:var(--bad-soft);color:var(--bad)}
+  .q.correct{border-color:var(--ok)} .q.wrong{border-color:var(--bad)}
+  .badge{display:inline-block;font-weight:700;padding:2px 10px;border-radius:999px;font-size:.8rem;margin-right:8px}
+  .q.correct .badge{background:var(--ok);color:#06210f} .q.wrong .badge{background:var(--bad);color:#fff}
+  .actions{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:22px}
+  .btn{font:inherit;font-weight:700;padding:11px 20px;border-radius:10px;border:none;cursor:pointer;background:var(--accent);color:#fff}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.secondary{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+  .btn.ghost{background:transparent;color:var(--muted);border:1.5px solid var(--line)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .msg{margin-top:12px;font-size:.95rem;padding:10px 14px;border-radius:10px;display:none}
+  .msg.warn{display:block;background:var(--warn-soft);color:var(--warn)}
+  .msg.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+  .msg.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+  #gradePanel{display:none;margin-top:18px;padding-top:18px;border-top:1px dashed var(--line)}
+  #scoreCard{display:none;margin-top:16px;padding:18px 22px;border-radius:14px;background:linear-gradient(135deg,var(--accent-soft),var(--card));border:1px solid var(--accent)}
+  #scoreCard .big{font-size:2.2rem;font-weight:800;color:var(--accent)}
+  .locked .opt{cursor:default;opacity:.95} .locked .opt:hover{border-color:var(--line)}
+  footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:30px}
+
+  @media print{
+    html{font-size:12.5px;color-scheme:light}
+    body{background:#fff;color:#1d2433}
+    .wrap{max-width:100%;padding:0}
+    .progress,.actions,.info,.no-print{display:none !important}
+    .q{break-inside:avoid;page-break-inside:avoid;border-radius:8px;padding:10px 14px;margin-bottom:8px;box-shadow:none}
+    .opt{padding:4px 8px}
+    pre{font-size:.85rem;padding:8px 10px}
+    header.top{border-radius:8px;padding:12px 16px}
+    #scoreCard{display:block}
+    #printHeader{display:block !important}
+  }
+  #printHeader{display:none;margin:0 0 12px;font-size:.95rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="kicker">MAC286 · Data Structures in Java · LaGuardia Community College (CUNY)</div>
+  <h1>🔗 Linked Lists — Interactive Assignment</h1>
+  <p class="sub">Covers the <em>Linked Lists</em> lecture, sections 0 (Why Linked Lists?) through 7 (Doubly Linked Lists). 25 questions · multiple choice, true/false, short answer, and program output.</p>
+  <div id="printHeader"></div>
+  <div class="meta">
+    <div>
+      <label class="field" for="lastName">Last name (required)</label>
+      <input type="text" id="lastName" placeholder="e.g. Rodriguez" autocomplete="off">
+    </div>
+    <div>
+      <label class="field" for="dateField">Date</label>
+      <input type="text" id="dateField" readonly>
+    </div>
+  </div>
+  <div class="info">
+    <strong>How this works</strong>
+    <ol>
+      <li>Type your <strong>last name</strong> (no student ID) and answer all 25 questions. Your work is saved in this browser automatically.</li>
+      <li>Click <strong>Submit</strong>. Your answers lock.</li>
+      <li>Your professor will give you a <strong>grading code</strong>. Enter it to auto-grade; wrong answers show the correct one.</li>
+      <li>Click <strong>Save as PDF</strong> and choose <em>Save as PDF</em> in the print dialog. Submit that PDF.</li>
+    </ol>
+  </div>
+</header>
+
+<div class="progress no-print">
+  <span>Answered: <span id="count">0</span> / 25</span>
+  <div class="bar"><div id="barFill"></div></div>
+  <span id="status">In progress</span>
+</div>
+
+<div id="questions"></div>
+
+<div class="actions no-print">
+  <div class="row">
+    <button class="btn" id="submitBtn">Submit answers</button>
+    <button class="btn ghost" id="resetBtn">Start over</button>
+  </div>
+  <div class="msg" id="submitMsg"></div>
+
+  <div id="gradePanel">
+    <label class="field" for="codeInput">Grading code (from your professor)</label>
+    <div class="row" style="margin-top:6px">
+      <input type="text" id="codeInput" placeholder="Enter code" style="max-width:260px;text-transform:uppercase" autocomplete="off">
+      <button class="btn" id="gradeBtn">Grade</button>
+      <button class="btn secondary" id="pdfBtn">Save as PDF</button>
+    </div>
+    <div class="msg" id="gradeMsg"></div>
+  </div>
+</div>
+
+<div id="scoreCard">
+  <div style="font-weight:700;color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.05em">Result</div>
+  <div class="big" id="scoreText"></div>
+  <div id="scoreDetail"></div>
+</div>
+
+<footer>MAC286 · Linked Lists · Assignment (Sections 0–7) · Prof. Kassou</footer>
+</div>
+
+<script>
+// ============================================================
+//  QUESTIONS (no answers here — the key is encrypted below)
+// ============================================================
+const QUESTIONS = [
+  { n:1, sec:"0 · Why Linked Lists?", type:"mc",
+    text:"Why is inserting an item into the <em>middle</em> of an array O(n)?",
+    opts:["Arrays can only be modified at the end.",
+          "The array must be re-sorted after every insert.",
+          "Every item after the insertion point must be shifted one position over.",
+          "Java copies the entire array into a new object each time."] },
+
+  { n:2, sec:"1 · References", type:"mc",
+    code:`Link x = new Link();\nx.data = 5;\nLink y = x;\ny.data = 99;\nSystem.out.println(x.data);`,
+    text:"What does this program print?",
+    opts:["5","null","99","A compile error — y was never created with new"] },
+
+  { n:3, sec:"1 · References", type:"tf",
+    text:"<strong>True or False:</strong> In Java, <code>null</code> means the reference points to <em>nothing</em>." },
+
+  { n:4, sec:"2 · Simple Linked List", type:"short",
+    text:"In the <code>Link</code> class from the lecture, what is the name of the field that holds the reference to the following node?",
+    hint:"One word, exactly as it appears in the code." },
+
+  { n:5, sec:"2 · Simple Linked List", type:"mc",
+    text:"A simple linked list (class <code>LinkList</code>) is <em>empty</em> when…",
+    opts:["<code>first.next == null</code>",
+          "<code>first == null</code>",
+          "<code>first.data == 0</code>",
+          "<code>last == null</code>"] },
+
+  { n:6, sec:"2 · Simple Linked List", type:"output",
+    code:`Link a = new Link();  a.data = 10;\nLink b = new Link();  b.data = 20;\nLink c = new Link();  c.data = 30;\na.next = b;\nb.next = c;\nc.next = null;\n\nLink current = a;\nwhile (current != null) {\n    System.out.print(current.data + " ");\n    current = current.next;\n}`,
+    text:"Write the exact output of this traversal.",
+    hint:"Numbers separated by spaces, e.g. <code>1 2 3</code>" },
+
+  { n:7, sec:"2 · Simple Linked List", type:"mc",
+    text:"Which is the <strong>correct</strong> body of <code>insertFirst(int d)</code>?",
+    opts:["<code>Link newLink = new Link(d);<br>newLink.next = first;<br>first = newLink;</code>",
+          "<code>Link newLink = new Link(d);<br>first = newLink;<br>newLink.next = first;</code>",
+          "<code>Link newLink = new Link(d);<br>first.next = newLink;</code>",
+          "<code>Link newLink = new Link(d);<br>newLink.next = first.next;<br>first = newLink;</code>"] },
+
+  { n:8, sec:"2 · Simple Linked List", type:"mc",
+    text:"The lecture warns about doing <code>first = newLink;</code> <em>before</em> <code>newLink.next = first;</code>. What happens?",
+    opts:["Nothing — the two lines can be written in either order.",
+          "The compiler reports an error.",
+          "The new node is added at the end of the list instead of the front.",
+          "The new node ends up pointing to itself and the rest of the old list is lost."] },
+
+  { n:9, sec:"3 · Insert & Delete", type:"short",
+    text:"When deleting a node from the <em>middle</em> of a simple linked list, how many references do you need to keep track of while walking the list? (Give the number.)",
+    hint:"Just the number." },
+
+  { n:10, sec:"3 · Insert & Delete", type:"short",
+    code:`// current = node to remove, previous = node before it\nprevious.next = ________;`,
+    text:"Fill in the blank: the single assignment that makes <code>previous</code> skip over <code>current</code>.",
+    hint:"Write the expression that goes in the blank, e.g. <code>something.field</code>" },
+
+  { n:11, sec:"3 · Insert & Delete", type:"mc",
+    text:"In <code>delete(key)</code>, what is the special case when the node to remove is the <strong>first</strong> node?",
+    opts:["Set <code>first.next = null</code>",
+          "Move <code>first</code> forward: <code>first = first.next</code>",
+          "Set <code>previous.next = current.next</code> (same as any other node)",
+          "You cannot delete the first node of a singly linked list"] },
+
+  { n:12, sec:"3 · Insert & Delete", type:"mc",
+    text:"<code>find(key)</code> walks from <code>first</code> following <code>next</code>. What does it return if the key is <strong>not</strong> in the list?",
+    opts:["<code>-1</code>","<code>0</code>","<code>first</code>","<code>null</code>"] },
+
+  { n:13, sec:"3 · Insert & Delete", type:"output",
+    code:`LinkList list = new LinkList();\nlist.insertFirst(22);\nlist.insertFirst(44);\nlist.insertFirst(66);\nlist.delete(44);\nlist.displayList();   // prints data from first to last, space-separated`,
+    text:"Write the exact output of <code>displayList()</code>.",
+    hint:"Numbers separated by spaces." },
+
+  { n:14, sec:"4 · Double-Ended List", type:"short",
+    text:"A double-ended list keeps <strong>two</strong> references to the list instead of one. Name both.",
+    hint:"Two words, e.g. <code>x and y</code>" },
+
+  { n:15, sec:"4 · Double-Ended List", type:"mc",
+    text:"Which operation becomes <strong>O(1)</strong> in a double-ended list but is O(n) in a simple linked list?",
+    opts:["<code>insertFirst()</code>","<code>deleteLast()</code>","<code>insertLast()</code>","<code>find()</code>"] },
+
+  { n:16, sec:"4 · Double-Ended List", type:"tf",
+    text:"<strong>True or False:</strong> In a double-ended (singly linked) list, <code>deleteLast()</code> is O(1) because we have a <code>last</code> reference." },
+
+  { n:17, sec:"4 · Double-Ended List", type:"mc",
+    text:"When inserting into an <strong>empty</strong> double-ended list, the code must…",
+    opts:["set only <code>first</code> — <code>last</code> is updated automatically",
+          "set only <code>last</code>",
+          "throw an exception, since an empty list cannot be inserted into",
+          "set <strong>both</strong> <code>first</code> and <code>last</code> to the new node"] },
+
+  { n:18, sec:"5 · Sorted List", type:"output",
+    code:`SortedList list = new SortedList();   // keeps smallest → largest\nlist.insert(30);\nlist.insert(10);\nlist.insert(20);\nlist.insert(50);\nlist.insert(40);\nlist.displayList();`,
+    text:"Write the exact output.",
+    hint:"Numbers separated by spaces." },
+
+  { n:19, sec:"5 · Sorted List", type:"mc",
+    text:"Why is <code>remove()</code> (removing the minimum) <strong>O(1)</strong> in a sorted list?",
+    opts:["Because the list is stored in an array underneath.",
+          "Because the smallest item is always at <code>first</code> — no searching needed.",
+          "Because the list caches the minimum in a separate variable.",
+          "It isn't — it is O(n) like every other sorted-list operation."] },
+
+  { n:20, sec:"5 · Sorted List", type:"short",
+    text:"The lecture says a sorted list is <em>great</em> for building which data structure (the most urgent item is always at the front)?",
+    hint:"Two words." },
+
+  { n:21, sec:"6 · Efficiency", type:"mc",
+    text:"Access by index (e.g., get the 500th item). Which pair is correct?",
+    opts:["Array: O(1) · Linked list: O(n)",
+          "Array: O(n) · Linked list: O(1)",
+          "Both O(1)",
+          "Both O(n)"] },
+
+  { n:22, sec:"6 · Efficiency", type:"short",
+    text:"What is the Big-O of <strong>insert at front</strong> for a simple linked list?",
+    hint:"Write it like <code>O(...)</code>" },
+
+  { n:23, sec:"6 · Efficiency", type:"mc",
+    text:"According to the rule of thumb, which built-in Java class is the (doubly) linked list?",
+    opts:["<code>ArrayList</code>","<code>Vector</code>","<code>LinkedList</code>","<code>HashMap</code>"] },
+
+  { n:24, sec:"7 · Doubly Linked List", type:"short",
+    text:"In a doubly linked list, <code>deleteLast()</code> is O(1). Which reference lets us reach the node <em>before</em> <code>last</code> without walking the list?",
+    hint:"Write it as <code>reference.field</code>" },
+
+  { n:25, sec:"7 · Doubly Linked List", type:"mc",
+    text:"What is the <strong>cost</strong> of using a doubly linked list instead of a singly linked list?",
+    opts:["You can no longer traverse forward.",
+          "Every insert/delete must fix twice as many references, and each node uses more memory.",
+          "<code>insertFirst()</code> becomes O(n).",
+          "There is no cost — it is better in every way."] },
+];
+
+// Encrypted answer key (AES-GCM; key derived from the grading code with PBKDF2)
+const KEY_BLOB = "Q6jKJYLDX3T0eB2PmvyQJoDroDBSyqjrWFF0f3dCkoTbLPkAcxRpOdukBmt9rsvjgUXn18Xw/NdyHXAZdckIwXHWwCI2hx1dlGayMszzEP8Zao4I/lTaeF+RQ+u6YapetCbLUbNsBkimLnxt+r1yPDY7SyP397u5D5uyt7kB8pMTZ9B21NnDNiqclzcdx56t0VuM/R4QIuzpJLOwiq/h/bsV8SiYyNPcL8hq442toTTs3sl+I7ic6lOQzuC8Ca2rrIoE9pMyQ+u1lYFYHBSlkmXOiEUa3DNGX7w5AzYpOhtbYMABY5DF9DvN4H07S5lqa076Y1i/S9O3XXB5ciOhwEPSy9hBoeO8KVH31YnvhMR5RFfI/rXgV6vMBjSu78E+2bDxCuelRe8Zypvk7N20z0n7pE5F/sBjRfif4CpipbMFEeZKYOl759f0k8WXk1Hym73H/GYZSXim1dL42xJrA3JzK4ausv1ftUH5/H/P9k6Kf5Krw+WA2iwqJOmBx6nWi0lbaJuHK92sUdng3lAAJi2eTNkCCq9cgxas0Sa/KGtajoqOqm8C7YccGU3mGCdOBcucuq1S8egbRnf8EWayZ3zV23KnNVv6s24YbnP0iKpGX4YobLnKmT2E9RtgAkrh5kiY5Gc3E4nufP/4upJhz2aw3yF8A+7PZ6VpaJ3iT7bAx6S1QOGFYsjcGnf8PsfGpJhOkC8LwWKh90cIjHxi+JPXjQQMUkgwp2eDOiibFxKzUZWhRZMOM4PvvU6w9EcklaYLB3xVoI3QLmONehetHMMhXYhdhKONkp+wn0TmF7jWuRJzBkdq5zDvctlo7N4Ut/2rVeBQTZjhkNB9I9L1IeLrkKw58HuvAQpK9DpLqDIuNOBKHPnC3xmCR76wrjBu1HXlyf756XBEbOmBd/sv7b156JMd1MTQ/UhR7eBtChOm2buXm6xvJ3tPFhk/E0KhToriUdj/197SBMmeNcoetSJS0FdZr7JgHVpjh1wWfw9R+gXOGD8Fxdu+KeQKqQZEF4IAJ5+cRklY/lAwoN+CaUERWuRrc1KbVrESQlqMpyDNb/ojBIHPXFu5aHuEXRrHRLOC8ReR5q25RCrjwqehATmKqwgFmkG/048sKOI1fg6QqOHhGi70zrIPDtBruVGVLJKsFd1vNpYuSfgXHWlRcho2Ckytx/olLqlNkDP4qkfh1bwOLjZR8PusQFDBMHr7yRgZjfWHeBgagmelKneVP1ataHgVUj/2XphMqoKFBQu+cBtuIjIsIGUn3Wv18m6eySQUradqeWp3rjW//zMXVvXN0BXk/WGg4ne+eEia7wCf8bYcAeVUQZhd5nAPIF4MVFieXpTM2EwYEV7CQqsTkg7hyuskU67kYNpGowIaSLjLsIW0nSAW8utL9Vcg1SKAsYD/RkkW5MCCy83Zyr/pBSdgkNklxzFpipiw+l4uzKzqv/WE4h5EsDA8T4qf44FpyaidBHqXzE9Nw0U+iOzR2lXoLoIw4n7BTsDgB+gf6E7/WBc6F4Gb83V2QALRmJ8eWqPPOy0tOwaJ/4n+zhHHL2o4xp3BYO5Bm1BEqDWqBBPkdMI8vX4Cqkh5vW18KqfULKuJ0CIpKnymZYrvlItBdIosjwOj+O4TweIi0M6b8cFI";
+const SALT = "MAC286-LinkedLists-A1";
+const IV   = new Uint8Array([7,1,9,2,3,8,5,6,4,0,2,9]);
+const STORE = "mac286_ll_a1";
+
+// ============================================================
+let state = { name:"", answers:{}, submitted:false, graded:null };
+try { const s = JSON.parse(localStorage.getItem(STORE)); if (s) state = Object.assign(state, s); } catch(e){}
+
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function render(){
+  const host = $("questions"); host.innerHTML = "";
+  QUESTIONS.forEach(q => {
+    const d = document.createElement("div"); d.className = "q"; d.id = "q"+q.n;
+    const typeLabel = {mc:"Multiple choice", tf:"True / False", short:"Short answer", output:"Program output"}[q.type];
+    let html = `<div class="num">Q${q.n} / 25</div><span class="section-tag">§${q.sec}</span><span class="type">${typeLabel}</span>`;
+    if (q.code) html += `<pre>${esc(q.code)}</pre>`;
+    html += `<h3>${q.text}</h3>`;
+    if (q.type === "mc" || q.type === "tf") {
+      const opts = q.type === "tf" ? ["True","False"] : q.opts;
+      html += `<div class="opts">` + opts.map((o,i) => {
+        const val = q.type === "tf" ? o.toLowerCase() : i;
+        const checked = String(state.answers[q.n]) === String(val) ? "checked" : "";
+        return `<label class="opt ${checked?'sel':''}"><input type="radio" name="q${q.n}" value="${val}" ${checked}><span>${o}</span></label>`;
+      }).join("") + `</div>`;
+    } else {
+      const v = state.answers[q.n] || "";
+      html += `<div class="short"><input type="text" data-q="${q.n}" value="${esc(v)}" placeholder="Your answer" autocomplete="off" spellcheck="false"></div>`;
+      if (q.hint) html += `<div class="hint">${q.hint}</div>`;
+    }
+    html += `<div class="result"></div>`;
+    d.innerHTML = html; host.appendChild(d);
+  });
+  $("lastName").value = state.name || "";
+  $("dateField").value = new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+  bind(); updateProgress();
+  if (state.submitted) lock();
+  if (state.graded) showGrades(state.graded);
+}
+
+function bind(){
+  document.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener("change", e => {
+    const n = +e.target.name.slice(1); state.answers[n] = e.target.value;
+    e.target.closest(".opts").querySelectorAll(".opt").forEach(o => o.classList.remove("sel"));
+    e.target.closest(".opt").classList.add("sel"); save(); updateProgress();
+  }));
+  document.querySelectorAll('input[data-q]').forEach(i => i.addEventListener("input", e => {
+    state.answers[+e.target.dataset.q] = e.target.value; save(); updateProgress();
+  }));
+  $("lastName").addEventListener("input", e => { state.name = e.target.value; save(); });
+}
+
+function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
+
+function answeredCount(){ return QUESTIONS.filter(q => (state.answers[q.n] ?? "").toString().trim() !== "").length; }
+function updateProgress(){
+  const c = answeredCount(); $("count").textContent = c; $("barFill").style.width = (c/25*100)+"%";
+}
+
+function lock(){
+  document.body.classList.add("locked");
+  document.querySelectorAll("#questions input, #lastName").forEach(i => i.disabled = true);
+  $("submitBtn").disabled = true; $("status").textContent = "Submitted ✔";
+  $("gradePanel").style.display = "block";
+  $("printHeader").innerHTML = `<strong>Student:</strong> ${esc(state.name)} &nbsp;·&nbsp; <strong>Submitted:</strong> ${state.submittedAt || ""}`;
+}
+
+$("submitBtn").addEventListener("click", () => {
+  const msg = $("submitMsg"); msg.className = "msg";
+  state.name = $("lastName").value.trim();
+  if (!state.name) { msg.className = "msg bad"; msg.textContent = "Please enter your last name before submitting."; $("lastName").focus(); return; }
+  const missing = QUESTIONS.filter(q => (state.answers[q.n] ?? "").toString().trim() === "").map(q => q.n);
+  if (missing.length && !confirm(`You left ${missing.length} question(s) blank: ${missing.join(", ")}.\n\nSubmit anyway?`)) {
+    msg.className = "msg warn"; msg.textContent = "Unanswered: " + missing.join(", "); return;
+  }
+  state.submitted = true; state.submittedAt = new Date().toLocaleString("en-US"); save(); lock();
+  msg.className = "msg ok"; msg.textContent = "Submitted. Enter the grading code from your professor to see your score, then save as PDF.";
+});
+
+$("resetBtn").addEventListener("click", () => {
+  if (confirm("This erases your name and all answers. Start over?")) { localStorage.removeItem(STORE); location.reload(); }
+});
+
+// ---------- grading ----------
+const norm = s => (s||"").toString().toLowerCase().replace(/[^a-z0-9]/g, "");
+const normOut = s => (s||"").toString().replace(/[^0-9]+/g, " ").trim();
+
+async function deriveKey(code){
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey("raw", enc.encode(code.trim().toUpperCase()), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt:enc.encode(SALT), iterations:100000, hash:"SHA-256"},
+    base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+}
+async function decryptKey(code){
+  const key = await deriveKey(code);
+  const bytes = Uint8Array.from(atob(KEY_BLOB), c => c.charCodeAt(0));
+  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:IV}, key, bytes);
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+$("gradeBtn").addEventListener("click", async () => {
+  const msg = $("gradeMsg"); msg.className = "msg";
+  const code = $("codeInput").value;
+  if (!code.trim()) { msg.className = "msg bad"; msg.textContent = "Enter the grading code."; return; }
+  let keyData;
+  try { keyData = await decryptKey(code); }
+  catch(e) { msg.className = "msg bad"; msg.textContent = "Incorrect grading code."; return; }
+
+  const results = {}; let score = 0;
+  keyData.forEach(k => {
+    const q = QUESTIONS.find(x => x.n === k.q); const given = state.answers[k.q] ?? "";
+    let ok = false, correctText = "";
+    if (k.type === "mc")          { ok = String(given) === String(k.ans); correctText = q.opts[k.ans]; }
+    else if (k.type === "tf")     { ok = String(given).toLowerCase() === k.ans; correctText = k.ans === "true" ? "True" : "False"; }
+    else if (k.type === "output") { ok = normOut(given) === k.ans; correctText = "<code>"+k.ans+"</code>"; }
+    else if (k.type === "short")  { ok = k.ans.includes(norm(given)); correctText = "<code>"+esc(k.ans[0] === "firstandlast" ? "first and last" : k.ans[0] === "currentnext" ? "current.next" : k.ans[0] === "lastprevious" ? "last.previous" : k.ans[0] === "priorityqueue" ? "priority queue" : k.ans[0] === "o1" ? "O(1)" : k.ans[0])+"</code>"; }
+    if (ok) score++;
+    results[k.q] = { ok, correctText, given };
+  });
+  state.graded = { score, results, at: new Date().toLocaleString("en-US") }; save();
+  showGrades(state.graded);
+  msg.className = "msg ok"; msg.textContent = `Graded: ${score} / 25. Now click "Save as PDF".`;
+});
+
+function showGrades(g){
+  Object.entries(g.results).forEach(([n, r]) => {
+    const d = $("q"+n); d.classList.remove("correct","wrong"); d.classList.add(r.ok ? "correct" : "wrong");
+    const res = d.querySelector(".result");
+    const givenTxt = (r.given === "" || r.given === undefined) ? "<em>(blank)</em>" :
+      (QUESTIONS.find(x => x.n == n).type === "mc" ? QUESTIONS.find(x => x.n == n).opts[+r.given] :
+       QUESTIONS.find(x => x.n == n).type === "tf" ? (r.given === "true" ? "True" : "False") : "<code>"+esc(r.given)+"</code>");
+    res.innerHTML = r.ok ? `<span class="badge">Correct</span>` :
+      `<span class="badge">Incorrect</span> Your answer: ${givenTxt} &nbsp;·&nbsp; Correct answer: ${r.correctText}`;
+  });
+  const pct = Math.round(g.score / 25 * 100);
+  $("scoreText").textContent = `${g.score} / 25  (${pct}%)`;
+  $("scoreDetail").innerHTML = `<strong>${esc(state.name)}</strong> · graded ${g.at}`;
+  $("scoreCard").style.display = "block"; $("status").textContent = `Graded: ${g.score}/25`;
+  $("printHeader").innerHTML = `<strong>Student:</strong> ${esc(state.name)} &nbsp;·&nbsp; <strong>Submitted:</strong> ${state.submittedAt || ""} &nbsp;·&nbsp; <strong>Score:</strong> ${g.score} / 25 (${pct}%)`;
+}
+
+$("pdfBtn").addEventListener("click", () => {
+  const safe = (state.name || "student").replace(/[^A-Za-z0-9]/g, "");
+  const old = document.title;
+  document.title = `MAC286_LinkedLists_Assignment_${safe}`;
+  window.print();
+  setTimeout(() => document.title = old, 1000);
+});
+
+render();
+</script>
+</body>
+</html>
