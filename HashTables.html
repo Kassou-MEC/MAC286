@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAC286 · Hash Tables I &amp; II</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b1020; --card:#151c30; --ink:#e6e9f5; --muted:#9aa4bf; --line:#2a3350;
+  --p1:#818cf8; --p1soft:#262b55; --p2:#f472b6; --p2soft:#4a1d3a;
+  --def:#60a5fa; --defbg:#12233f; --pic:#fbbf24; --picbg:#2e2410;
+  --rem:#34d399; --rembg:#0f2a22; --warn:#f87171; --warnbg:#321618;
+  --code:#060a14; --codeline:#1e293b; --dark:#0b1020;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:19px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+code,.mono{font-family:"JetBrains Mono","Fira Code",Consolas,Menlo,monospace}
+p code,li code,td code,.panel code,.vlog code{background:#e9ecf8;color:#3730a3;padding:1px 6px;border-radius:5px;font-size:.92em}
+
+/* ---------- header + tabs ---------- */
+header.top{background:linear-gradient(120deg,#312e81,#4f46e5 55%,#db2777);color:#fff;padding:22px 28px 20px}
+header.top h1{margin:0;font-size:2.1rem;letter-spacing:-.5px}
+header.top p{margin:4px 0 0;opacity:.92;font-size:1.05rem}
+nav.tabs{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;padding:9px 16px;overflow-x:auto;box-shadow:0 2px 10px rgba(30,40,90,.06)}
+nav.tabs .part{flex:none;font-size:.72rem;font-weight:800;letter-spacing:1px;padding:4px 9px;border-radius:6px;color:#fff;background:var(--p1);margin-right:2px}
+nav.tabs .part.two{background:var(--p2);margin-left:10px}
+nav.tabs button{flex:none;border:1px solid var(--line);background:#fff;color:var(--ink);font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav.tabs button b{display:inline-block;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;border-radius:50%;background:var(--p1soft);color:var(--p1);margin-right:6px;font-size:.85em}
+nav.tabs button[data-part="2"] b{background:var(--p2soft);color:var(--p2)}
+nav.tabs button:hover{border-color:var(--p1)}
+nav.tabs button.on{background:var(--p1);border-color:var(--p1);color:#fff}
+nav.tabs button.on[data-part="2"]{background:var(--p2);border-color:var(--p2)}
+nav.tabs button.on b{background:rgba(255,255,255,.25);color:#fff}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1560px;margin:0 auto;padding:22px 22px 60px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:22px;align-items:start}
+.wrap.nopanel{grid-template-columns:minmax(0,1fr)}
+.wrap.nopanel aside.panel{display:none}
+section.tab{display:none}
+section.tab.on{display:block}
+section.tab>h2{font-size:1.85rem;margin:0 0 4px;letter-spacing:-.4px}
+section.tab>.goal{color:var(--muted);margin:0 0 16px;font-size:1.08rem}
+h3{font-size:1.3rem;margin:26px 0 10px}
+h3 .step{display:inline-block;background:var(--ink);color:#fff;border-radius:7px;font-size:.78rem;padding:3px 9px;margin-right:8px;vertical-align:middle;letter-spacing:.5px}
+ul{margin:8px 0;padding-left:1.3em} li{margin:5px 0}
+.box{border-radius:12px;padding:14px 18px 14px 20px;margin:14px 0;border-left:6px solid;background:var(--card)}
+.box .tag{font-weight:800;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+.box ul{margin:4px 0}
+.def{border-color:var(--def);background:var(--defbg)} .def .tag{color:var(--def)}
+.pic{border-color:var(--pic);background:var(--picbg)} .pic .tag{color:var(--pic)}
+.rem{border-color:var(--rem);background:var(--rembg)} .rem .tag{color:var(--rem)}
+.warn{border-color:var(--warn);background:var(--warnbg)} .warn .tag{color:var(--warn)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+table.cmp{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(30,40,90,.08);margin:12px 0}
+table.cmp th,table.cmp td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:left}
+table.cmp th{background:var(--ink);color:#fff;font-size:.95rem}
+table.cmp tr:last-child td{border-bottom:0}
+.good{color:#047857;font-weight:700}.bad{color:#b91c1c;font-weight:700}
+.star td{background:#f0fdf4}
+.navrow{display:flex;justify-content:space-between;margin-top:34px;gap:12px}
+.navrow button{font:600 1rem inherit;font-family:inherit;padding:11px 20px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.navrow button.next{background:var(--ink);color:#fff;border-color:var(--ink)}
+.navrow button:disabled{visibility:hidden}
+
+/* ---------- code ---------- */
+.codebox{background:var(--code);border-radius:12px;margin:12px 0;overflow:hidden;box-shadow:0 3px 12px rgba(15,23,42,.18)}
+.codebar{display:flex;align-items:center;justify-content:space-between;background:#1e293b;color:#cbd5e1;padding:7px 12px;font-size:.85rem}
+.codebar .fname{font-family:Consolas,Menlo,monospace}
+.codebar button,.copyrun{font:600 .85rem inherit;font-family:inherit;border:0;border-radius:7px;padding:6px 12px;cursor:pointer;background:#334155;color:#fff}
+.codebar button:hover{background:#475569}
+.copyrun{background:var(--rem);font-size:.98rem;padding:10px 16px;margin:6px 0}
+.copyrun:hover{filter:brightness(1.08)}
+.code{padding:8px 0;overflow-x:auto;font:17px/1.6 "JetBrains Mono","Fira Code",Consolas,Menlo,monospace;color:#e2e8f0}
+.ln{display:flex;white-space:pre;padding:0 14px 0 0;border-left:4px solid transparent;cursor:pointer;min-width:max-content}
+.ln .no{flex:none;width:3em;text-align:right;padding-right:14px;color:#64748b;user-select:none}
+.ln.blank{cursor:default}
+.ln:not(.blank):hover{background:#27344d}
+.ln.hot{background:#33415f;border-left-color:#fbbf24}
+.ln.pin{background:#3b3a6e;border-left-color:#f472b6}
+.k{color:#c4b5fd}.t{color:#7dd3fc}.s{color:#86efac}.c{color:#94a3b8;font-style:italic}.num{color:#fdba74}
+.output{background:#111827;border-radius:12px;margin:10px 0;overflow:hidden}
+.output .outbar{background:#064e3b;color:#a7f3d0;font-size:.8rem;font-weight:700;letter-spacing:1px;padding:5px 12px}
+.output pre{margin:0;padding:10px 14px;color:#d1fae5;font:16px/1.5 Consolas,Menlo,monospace;overflow-x:auto}
+details.full{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:12px 0}
+details.full summary{cursor:pointer;font-weight:700}
+
+/* ---------- right panel ---------- */
+aside.panel{position:sticky;top:74px;background:#fff;border:2px solid var(--p1);border-radius:14px;padding:16px 18px;box-shadow:0 6px 20px rgba(79,70,229,.14);max-height:calc(100vh - 92px);overflow:auto}
+aside.panel h4{margin:0 0 8px;font-size:.8rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--p1)}
+aside.panel .where{font-size:.85rem;color:var(--muted);margin-bottom:8px}
+aside.panel .pline{background:var(--code);color:#e2e8f0;border-radius:8px;padding:9px 11px;font:15px/1.5 Consolas,Menlo,monospace;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
+aside.panel .ptext{font-size:1.22rem;line-height:1.5}
+aside.panel .hint{color:var(--muted);font-size:1.05rem}
+aside.panel .keys{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);font-size:.85rem;color:var(--muted)}
+kbd{background:#eef0f6;border:1px solid #cfd5e3;border-bottom-width:2px;border-radius:5px;padding:0 6px;font-size:.85em}
+
+.viz{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;box-shadow:0 1px 4px rgba(30,40,90,.06)}
+.viz .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.viz input{width:86px;font:700 1.05rem inherit;font-family:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:9px}
+.viz button{font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:9px;border:0;background:var(--p1);color:#fff;cursor:pointer}
+.viz button.alt{background:#e8eaf3;color:var(--ink)}
+.viz button.pre{background:var(--p2)}
+.viz button:disabled{opacity:.45;cursor:not-allowed}
+.viz .stage{min-height:230px;display:flex;align-items:center;justify-content:center;overflow-x:auto;padding:6px 0}
+.vlog{background:#f3f4fa;border-radius:10px;padding:9px 14px;min-height:54px;font-size:1.02rem}
+.vlog div{padding:1px 0}
+.vlog .ok{color:#047857;font-weight:700}.vlog .bad{color:#b91c1c;font-weight:700}.vlog .info{color:#3730a3;font-weight:700}
+.vout{font:700 1.05rem Consolas,monospace;color:#9d174d;min-height:1.4em;margin-top:4px}
+
+/* vocabulary */
+.vocab{display:grid;grid-template-columns:minmax(300px,480px) 1fr;gap:18px;align-items:start}
+.vocab .pict{position:sticky;top:74px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.vocab .pict .cap{text-align:center;font-weight:700;color:var(--p1);min-height:1.6em}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.term{background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 13px;cursor:pointer;transition:.15s}
+.term:hover,.term.on{border-color:#f59e0b;background:#fffbeb;transform:translateY(-2px)}
+.term b{display:block;font-size:1.12rem;color:var(--p1)}
+.term span{font-size:.98rem}
+.term em{display:block;font-style:normal;font-size:.86rem;color:var(--muted);margin-top:3px}
+
+/* arrays */
+.arr{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.arr .cell{width:68px;border:2px solid var(--line);border-radius:10px;background:#fff;text-align:center;cursor:pointer;padding:5px 0}
+.arr .cell i{display:block;font:700 .8rem Consolas,monospace;color:var(--p2);font-style:normal}
+.arr .cell b{font-size:1.25rem}
+.arr .cell.a{background:#fde68a;border-color:#d97706}
+.arr .cell.b{background:#bfdbfe;border-color:#2563eb}
+.arr .cell.hole b{color:#c0c6d6}
+.formula{text-align:center;font:600 1.05rem Consolas,monospace;min-height:3.2em;color:#3730a3}
+.bigf{font:700 1.2rem Consolas,monospace;background:#fff;border-radius:10px;padding:10px 14px;text-align:center;border:2px solid var(--line)}
+.bigf small{display:block;font:600 .8rem "Segoe UI",sans-serif;color:var(--muted)}
+
+.codebox.hasfocus .ln:not(.focus) .src{opacity:.72}
+.codebox.hasfocus .ln:not(.focus):hover .src,.codebox.hasfocus .ln.pin .src{opacity:1}
+.codebox.hasfocus .ln.focus{background:#141d38;border-left-color:#818cf8}
+.codebox.hasfocus .ln.focus:hover,.codebox.hasfocus .ln.focus.hot{background:#33415f;border-left-color:#fbbf24}
+.codebar .star{color:#a5b4fc}
+h3 small{font-weight:500;font-size:.8em;color:var(--muted)}
+
+/* ---------- dark mode surfaces ---------- */
+p code,li code,td code,.panel code,.vlog code{background:#262b55;color:#c7d2fe}
+nav.tabs{background:#10162a;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+nav.tabs .part,nav.tabs button.on,nav.tabs button.on[data-part="2"]{color:var(--dark)}
+nav.tabs button{background:var(--card)}
+nav.tabs button.on b{background:rgba(0,0,0,.2);color:var(--dark)}
+h3 .step{background:#312e81;color:#e0e7ff}
+table.cmp{background:var(--card);box-shadow:none;border:1px solid var(--line)}
+table.cmp th{background:#1e2440;color:#c7d2fe}
+.star td{background:#0f2a22}
+.good{color:#34d399}.bad{color:#f87171}
+.navrow button{background:var(--card);color:var(--ink)}
+.navrow button.next{background:var(--p1);border-color:var(--p1);color:var(--dark)}
+.codebox{border:1px solid var(--line);box-shadow:none}
+.copyrun{color:#06281c}
+details.full,aside.panel,.viz,.vocab .pict,.term,.bigf{background:var(--card)}
+aside.panel{box-shadow:0 6px 24px rgba(0,0,0,.5)}
+aside.panel .pline{border:1px solid var(--line)}
+kbd{background:#1e2440;border-color:#3a4468;color:var(--ink)}
+.viz{box-shadow:none}
+.viz input{background:var(--dark);color:var(--ink)}
+.viz button{color:var(--dark)}
+.viz button.alt{background:#262e4a;color:var(--ink)}
+.vlog{background:#0f1528}
+.vlog .ok{color:#34d399}.vlog .bad{color:#f87171}.vlog .info{color:#a5b4fc}
+.vout{color:#f9a8d4}
+.term:hover,.term.on{background:#2e2410;border-color:#fbbf24}
+.arr .cell{background:var(--card)}
+.arr .cell.a,.arr .cell.b{color:#1c2333}
+.arr .cell.a i,.arr .cell.b i{color:#9d174d}
+.arr .cell.hole b{color:#4b5674}
+.formula{color:#a5b4fc}
+
+@media (max-width:1050px){
+  body{font-size:18px}
+  .wrap{grid-template-columns:minmax(0,1fr);padding-bottom:42vh}
+  aside.panel{position:fixed;left:8px;right:8px;bottom:8px;top:auto;max-height:36vh;z-index:30}
+  .cols,.cols3,.vocab{grid-template-columns:1fr}
+  .vocab .pict{position:static}
+}
+
+/* ---------- hash table widgets ---------- */
+.hv{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+.hv .ctl,.viz .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.hv input[type=number],.viz input[type=number]{width:96px;font:700 1.05rem inherit;font-family:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:9px;background:var(--dark);color:var(--ink)}
+.hv button{font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:9px;border:0;background:var(--p1);color:var(--dark);cursor:pointer}
+.hv button.alt{background:#262e4a;color:var(--ink)}
+.hv button.pre{background:var(--p2)}
+.hv button.mode{background:#262e4a;color:var(--ink);border:2px solid transparent}
+.hv button.mode.on{border-color:var(--pic);color:var(--pic)}
+.hv button:disabled{opacity:.45;cursor:not-allowed}
+.hv .formula{min-height:1.6em;margin:2px 0 8px}
+.hv .load{text-align:center;color:var(--muted);font-size:.95rem;margin-top:8px}
+.hrow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;align-items:flex-start;padding:6px 0}
+.hc{width:66px;text-align:center}
+.hc i{display:block;font:700 .8rem Consolas,monospace;color:var(--p2);font-style:normal}
+.hc .v{border:2px solid #3a4468;border-radius:10px;height:48px;line-height:44px;font-weight:700;font-size:1.2rem;background:var(--dark);transition:background .2s}
+.hc .v.empty{color:#4b5674}
+.hc .v.del{border-style:dashed;color:var(--warn);font-size:.9rem}
+.hc.a .v{background:#fde68a;border-color:#d97706;color:#1c2333}
+.hc.bad .v{background:#fecaca;border-color:#dc2626;color:#1c2333}
+.hc.ok .v{background:#86efac;border-color:#059669;color:#1c2333}
+.hc.dim .v{border-color:#6366f1}
+.hc .dn{color:#55607f;line-height:1;font-size:.95rem}
+.hc .lk{border:2px solid #6366f1;border-radius:8px;background:#e8ebfa;color:#1c2333;font-weight:700;padding:3px 0;margin:0 6px}
+.hc .lk.a{background:#fde68a;border-color:#d97706}.hc .lk.ok{background:#86efac;border-color:#059669}.hc .lk.bad{background:#fecaca;border-color:#dc2626}
+.hc .nul{font:italic .8rem Consolas,monospace;color:#55607f}
+.hrow.small .hc{width:40px}.hrow.small .hc .v{height:38px;line-height:34px;font-size:1rem}
+.hdiag{text-align:center}
+.flow,.blocks{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:6px 0}
+.dbox{border:2px solid #3a4468;border-radius:10px;padding:6px 12px;background:var(--dark);text-align:center}
+.dbox small{display:block;color:var(--muted);font-size:.78rem}
+.dbox b{font:700 1.15rem Consolas,monospace}
+.arrow,.darrow{color:var(--muted);font-size:1.3rem}
+.dnote{color:var(--warn);font-weight:700;margin-top:6px;border-radius:8px;display:inline-block;padding:2px 10px}
+.hdiag .a.dbox,.hdiag .hrow.a,.hdiag .dnote.a{background:#3a2f0d;border-color:#fbbf24;outline:2px solid #fbbf24}
+.hdiag .darrow.a{color:#fbbf24}
+.res{font:700 1.25rem Consolas,monospace;color:var(--rem)}
+.blk{border:2px solid #3a4468;border-radius:10px;padding:8px;background:var(--dark);display:flex;gap:5px;flex-wrap:wrap;width:170px;justify-content:center}
+.blk small{flex-basis:100%;text-align:center;color:var(--muted);font-size:.8rem}
+.blk span{width:42px;border:1px solid #3a4468;border-radius:6px;text-align:center;font-weight:700}
+.blk span.e{color:#4b5674}.blk.on{border-color:#fbbf24}.blk span.hit{background:#86efac;color:#1c2333}
+.ebar{display:grid;grid-template-columns:210px 1fr 60px;gap:10px;align-items:center;margin:6px 0;font-size:.98rem}
+.ebar .track{background:var(--dark);border-radius:6px;height:20px;overflow:hidden}
+.ebar .fill{height:100%;border-radius:6px;background:var(--p1);transition:width .15s}
+.ebar .fill.hot{background:var(--warn)}
+.ebar b{font-family:Consolas,monospace}
+@media (max-width:1050px){.ebar{grid-template-columns:130px 1fr 54px}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>#️⃣ Hash Tables I &amp; II</h1>
+  <p>MAC286 · Data Structures in Java — hover over any line of code to see what it does on the right.</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="wrap" id="wrap">
+<main>
+
+<!-- ====================== 1. WHY ====================== -->
+<section class="tab" id="why" data-title="Why Hashing?" data-part="1">
+  <h2>Why do we need hash tables?</h2>
+  <p class="goal">Goal: see the problem that hashing solves, before we learn any new words.</p>
+
+  <div class="box def"><span class="tag">The problem</span>
+    <ul>
+      <li>Every structure so far has to <b>search</b>: look at one item, then another, then another.</li>
+      <li>A <b>hash table</b> does not search. It <b>calculates</b> where the item is.</li>
+      <li>One calculation, then go straight to the right cell.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Structure</th><th>Find a value</th><th>Insert a value</th></tr>
+    <tr><td>Unsorted array</td><td class="bad">O(n)</td><td class="good">O(1)</td></tr>
+    <tr><td>Sorted array</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+    <tr><td>Binary search tree</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+    <tr class="star"><td><b>Hash table #️⃣</b></td><td class="good">O(1) on average</td><td class="good">O(1) on average</td></tr>
+  </table>
+
+  <div class="cols">
+    <div class="box rem"><span class="tag">What does O(1) mean here?</span>
+      <ul>
+        <li>The time does <b>not grow</b> when the table grows.</li>
+        <li>10 items or 10 million items: about the <b>same</b> number of steps.</li>
+      </ul>
+    </div>
+    <div class="box pic"><span class="tag">Picture it 📬</span>
+      <ul>
+        <li>Imagine a wall of numbered <b>mailboxes</b> in an apartment building.</li>
+        <li>The <b>mailboxes</b> are the array cells. The <b>apartment number</b> is the index.</li>
+        <li>The mail carrier does not open every box. The number on the letter says which box.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Here is one. Try a search.</h3>
+  <div class="hv" data-size="10" data-mode="lin" data-keys="37,52,18,90,5" data-ops="find" data-val="18"></div>
+
+  <div class="box warn"><span class="tag">Nothing is free ⚖️</span>
+    <ul>
+      <li>The keys are <b>not kept in order</b>. No sorted printing, no quick min or max.</li>
+      <li>The table works best when it is <b>not too full</b>, so we need to know roughly how much data is coming.</li>
+    </ul>
+  </div>
+  <div class="box rem"><span class="tag">What we will learn</span>
+    <ul>
+      <li><b>Part I:</b> the vocabulary, hash functions, collisions, linear probing, deleting.</li>
+      <li><b>Part II:</b> quadratic probing, double hashing, separate chaining, efficiency, external storage.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 2. VOCABULARY ====================== -->
+<section class="tab" id="vocab" data-title="Vocabulary" data-part="1">
+  <h2>Hashing vocabulary</h2>
+  <p class="goal">Goal: learn the words, one at a time. Hover over (or tap) a word to see it in the picture.</p>
+
+  <div class="vocab">
+    <div class="pict">
+      <div class="hdiag" id="hdiag">
+        <div class="flow">
+          <div class="dbox" data-p="key"><small>key</small><b>37</b></div><span class="arrow">→</span>
+          <div class="dbox" data-p="fn"><small>hash function</small><b>37 % 10</b></div><span class="arrow">→</span>
+          <div class="dbox" data-p="idx"><small>index</small><b>7</b></div>
+        </div>
+        <div class="darrow" data-p="idx">↓</div>
+        <div class="hrow small" data-p="table">
+          <div class="hc" data-c="0"><i>[0]</i><div class="v empty">--</div></div>
+          <div class="hc" data-c="1"><i>[1]</i><div class="v empty">--</div></div>
+          <div class="hc" data-c="2"><i>[2]</i><div class="v">52</div></div>
+          <div class="hc" data-c="3"><i>[3]</i><div class="v empty">--</div></div>
+          <div class="hc" data-c="4"><i>[4]</i><div class="v empty">--</div></div>
+          <div class="hc" data-c="5"><i>[5]</i><div class="v empty">--</div></div>
+          <div class="hc" data-c="6"><i>[6]</i><div class="v empty">--</div></div>
+          <div class="hc" data-c="7"><i>[7]</i><div class="v">37</div></div>
+          <div class="hc" data-c="8"><i>[8]</i><div class="v">18</div></div>
+          <div class="hc" data-c="9"><i>[9]</i><div class="v empty">--</div></div>
+        </div>
+        <div class="dnote" data-p="coll">47 % 10 = 7 too 💥</div>
+      </div>
+      <div class="cap" id="vocabCap">👆 Pick a word</div>
+    </div>
+    <div>
+      <div class="terms" id="terms">
+        <div class="term" data-hl='[data-p="key"]' data-cap="37 is the key"><b>Key</b><span>The value we store and search for.</span><em>Here: a number. It could be a name or an ID.</em></div>
+        <div class="term" data-hl='[data-p="table"]' data-cap="The array is the hash table"><b>Hash table</b><span>An array where each key's position is calculated from the key itself.</span><em>Java: an ordinary array</em></div>
+        <div class="term" data-hl='.hc' data-cap="10 cells, numbered 0 to 9"><b>Cell (slot)</b><span>One position in the array.</span><em>A cell is either empty or holds a key</em></div>
+        <div class="term" data-hl='[data-p="fn"]' data-cap="37 % 10 is the hash function at work"><b>Hash function</b><span>A calculation that turns a key into an array index.</span><em>Simplest one: key % size</em></div>
+        <div class="term" data-hl='[data-p="idx"],[data-c="7"]' data-cap="The hash function says: cell 7"><b>Index (hash value)</b><span>The number the hash function gives back. It says which cell to use.</span><em>Always from 0 to size - 1</em></div>
+        <div class="term" data-hl='[data-p="fn"]' data-cap="The remainder of 37 / 10 is 7"><b>Modulo %</b><span>The remainder after a division.</span><em>37 % 10 = 7 because 37 = 3 × 10 + 7</em></div>
+        <div class="term" data-hl='[data-p="coll"],[data-c="7"]' data-cap="37 and 47 both want cell 7"><b>Collision</b><span>Two different keys get the same index.</span><em>It cannot be avoided, only handled</em></div>
+        <div class="term" data-hl='[data-c="7"],[data-c="8"],[data-c="9"]' data-cap="Cell 7 is taken → look at 8 → look at 9"><b>Probe</b><span>One look at one cell while searching for a free place (or for a key).</span><em>Fewer probes = faster</em></div>
+        <div class="term" data-hl='[data-p="table"]' data-cap="The extra key goes into another cell of the same array"><b>Open addressing</b><span>Collision fix 1: put the key in another empty cell of the same array.</span><em>Linear, quadratic, double hashing</em></div>
+        <div class="term" data-hl='[data-c="7"]' data-cap="Cell 7 would hold a list: 47 → 37"><b>Separate chaining</b><span>Collision fix 2: each cell holds a linked list, so several keys can share a cell.</span><em>Array + linked lists</em></div>
+        <div class="term" data-hl='[data-c="2"],[data-c="7"],[data-c="8"]' data-cap="3 keys / 10 cells = load factor 0.3"><b>Load factor</b><span>How full the table is: number of keys divided by number of cells.</span><em>0.5 means half full</em></div>
+        <div class="term" data-hl='[data-p="table"]' data-cap="Bigger array, every key hashed again"><b>Rehashing</b><span>Making a bigger table and inserting every key again.</span><em>Done when the table gets too full</em></div>
+      </div>
+
+      <div class="box pic"><span class="tag">Picture it 🧥</span>
+        <ul>
+          <li>Imagine a <b>coat check</b> at a theater.</li>
+          <li>Your <b>coat</b> is the key. The <b>ticket number</b> is the index.</li>
+          <li>The <b>rule for choosing the hook</b> is the hash function.</li>
+          <li>The <b>row of hooks</b> is the hash table.</li>
+          <li>Two coats sent to the same hook is a <b>collision</b>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 3. HASH FUNCTIONS ====================== -->
+<section class="tab" id="fn" data-title="Hash Functions" data-part="1">
+  <h2>Hash functions</h2>
+  <p class="goal">Goal: turn any key into a legal array index with one calculation.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>A <b>hash function</b> takes a key and gives back an <b>index</b> from 0 to size - 1.</li>
+      <li>The simplest one: <code>index = key % size</code>.</li>
+      <li><code>%</code> (modulo) is the <b>remainder</b> of a division.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🕐</span>
+    <ul>
+      <li>Imagine a <b>clock</b>. The clock face is the table, with 12 cells.</li>
+      <li>The <b>number of hours</b> is the key. The <b>hour the hand points to</b> is the index.</li>
+      <li>15 hours after midnight the hand points to 3, because 15 % 12 = 3. The number always wraps around.</li>
+    </ul>
+  </div>
+
+  <h3>Try it</h3>
+  <div class="viz" id="calc">
+    <div class="ctl">key <input type="number" id="cKey" value="37" min="0" max="99999"> % size <input type="number" id="cSize" value="10" min="1" max="999"> = <b class="res" id="cRes"></b></div>
+    <div class="vlog" id="cWhy"></div>
+  </div>
+
+  <h3><span class="step">STEP 1</span>One calculation</h3>
+  <div data-code="T_mod"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Key 37 goes to index 7</pre></div>
+
+  <h3><span class="step">STEP 2</span>The hash function as a method</h3>
+  <div data-code="P_hashfn"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>37 -&gt; index 7
+52 -&gt; index 2
+18 -&gt; index 8
+90 -&gt; index 0
+5 -&gt; index 5</pre></div>
+
+  <div class="box def"><span class="tag">A good hash function is…</span>
+    <ul>
+      <li><b>Fast</b>: a few arithmetic steps, nothing more.</li>
+      <li><b>Consistent</b>: the same key always gives the same index.</li>
+      <li><b>Spreading</b>: it sends keys to all parts of the table, not to a few cells.</li>
+    </ul>
+  </div>
+  <div class="box warn"><span class="tag">Watch out: table size 🔢</span>
+    <ul>
+      <li>Make the table size a <b>prime number</b> (11, 23, 101, 1009).</li>
+      <li>With size 10, the index is just the <b>last digit</b>. Keys like 10, 20, 30, 40 all land in cell 0.</li>
+      <li>From now on our tables have <b>11</b> cells.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 3</span>Hashing a word</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>A key does not have to be a number. A <b>String</b> can be hashed too.</li>
+      <li>Every letter has a number code. We combine the codes into one number.</li>
+      <li>We multiply by 31 at each step so that the <b>order</b> of the letters matters.</li>
+    </ul>
+  </div>
+  <div data-code="P_strhash"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>cat -&gt; index 10
+act -&gt; index 9
+dog -&gt; index 6
+tree -&gt; index 10</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Hash function = key in, index out.</li>
+      <li><code>key % size</code> always gives 0 to size - 1.</li>
+      <li>Prime table sizes spread the keys better.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 4. COLLISIONS ====================== -->
+<section class="tab" id="coll" data-title="Collisions" data-part="1">
+  <h2>Collisions</h2>
+  <p class="goal">Goal: understand the one big problem of hashing, and the two families of solutions.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>A <b>collision</b> happens when two <b>different</b> keys hash to the <b>same</b> index.</li>
+      <li>Example with size 10: <code>37 % 10 = 7</code> and <code>47 % 10 = 7</code>.</li>
+      <li>There are far more possible keys than cells, so collisions <b>will</b> happen.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🎂</span>
+    <ul>
+      <li>Imagine a classroom of 30 students and a calendar of 365 days.</li>
+      <li>Each <b>student</b> is a key. Each <b>day</b> is a cell. The <b>birthday</b> is the hash function.</li>
+      <li>Two students with the same birthday is a <b>collision</b>. It happens much more often than people expect.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">SEE IT</span>Two keys, one cell</h3>
+  <div data-code="T_collide"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>37 -&gt; index 7
+47 -&gt; index 7
+Collision? true</pre></div>
+
+  <h3>Two ways to handle a collision</h3>
+  <table class="cmp">
+    <tr><th>Family</th><th>Idea</th><th>Where the extra key goes</th></tr>
+    <tr><td><b>Open addressing</b></td><td>Look for another empty cell</td><td>Somewhere else in the <b>same array</b></td></tr>
+    <tr><td><b>Separate chaining</b></td><td>Let a cell hold many keys</td><td>In a <b>linked list</b> hanging from that cell</td></tr>
+  </table>
+
+  <div class="cols">
+    <div class="box pic"><span class="tag">Picture it: open addressing 🚗</span>
+      <ul>
+        <li>Imagine a parking lot. Your <b>assigned space</b> is the index.</li>
+        <li>Someone is in your space, so you take <b>another free space</b> in the same lot.</li>
+      </ul>
+    </div>
+    <div class="box pic"><span class="tag">Picture it: separate chaining 🧥</span>
+      <ul>
+        <li>Imagine coat hooks. Your <b>hook number</b> is the index.</li>
+        <li>The hook is taken, so you hang your coat on a <b>hanger chained to the same hook</b>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Collision = different keys, same index.</li>
+      <li>Open addressing: next tab. Separate chaining: Part II.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 5. LINEAR PROBING ====================== -->
+<section class="tab" id="linear" data-title="Linear Probing" data-part="1">
+  <h2>Open addressing: linear probing</h2>
+  <p class="goal">Goal: when a cell is taken, step forward one cell at a time until a free one appears.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Open addressing</b> = on a collision, store the key in another empty cell of the same array.</li>
+      <li><b>Linear probing</b> = try the <b>next</b> cell, then the next, then the next: +1, +2, +3…</li>
+      <li>At the end of the array, <b>wrap around</b> to cell 0.</li>
+      <li><b>Find</b> follows exactly the same path. It stops at the key, or at an <b>empty</b> cell.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🎬</span>
+    <ul>
+      <li>Imagine a movie theater with numbered seats. Your <b>ticket</b> is the key, the <b>seat number</b> is the index.</li>
+      <li>Someone is in your seat, so you take the <b>next free seat</b> in the row.</li>
+      <li>Your friend looks for you by starting at <b>your seat number</b> and walking along the row.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="hv" data-size="11" data-mode="lin" data-keys="22,15,9" data-ops="insert,find" data-val="26" data-presets="insert:26:Insert 26|insert:37:Insert 37|find:37:Find 37|find:48:Find 48 (not there)"></div>
+
+  <h3><span class="step">STEP 1</span>One collision, one probe</h3>
+  <div data-code="T_probe"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>47 stored at index 8</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(insert and find are highlighted)</small></h3>
+  <div data-code="P_linear"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>0: 22
+1: --
+2: --
+3: --
+4: 15
+5: 26
+6: 37
+7: --
+8: --
+9: 9
+10: --
+Find 37: true
+Find 48: false</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out: clustering 🚧</span>
+    <ul>
+      <li>A <b>cluster</b> is a long run of filled cells next to each other.</li>
+      <li>Any key that hashes <b>anywhere</b> into the cluster must walk to its end, and then makes it one cell longer.</li>
+      <li>Big clusters grow faster. This is called <b>primary clustering</b>, and it slows everything down.</li>
+    </ul>
+  </div>
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Linear probing: home cell, then +1, +1, +1.</li>
+      <li>Find stops at the key or at the first empty cell.</li>
+      <li>Simple, but it builds clusters.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 6. DELETING ====================== -->
+<section class="tab" id="del" data-title="Deleting" data-part="1">
+  <h2>Deleting with open addressing</h2>
+  <p class="goal">Goal: remove a key without breaking the search for the keys behind it.</p>
+
+  <div class="box def"><span class="tag">The problem</span>
+    <ul>
+      <li>Find stops at the first <b>empty</b> cell.</li>
+      <li>If we delete a key by emptying its cell, we cut the path to every key that was probed <b>past</b> it.</li>
+      <li>Those keys are still in the table, but find can no longer reach them.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 1</span>See the bug</h3>
+  <div data-code="T_tomb"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Found 37? false</pre></div>
+
+  <div class="box def"><span class="tag">Definition: the DELETED marker</span>
+    <ul>
+      <li>Instead of emptying the cell, we store a special value: <b>DELETED</b>.</li>
+      <li><b>Find</b> treats it as "keep going".</li>
+      <li><b>Insert</b> treats it as "free, you may use this cell".</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🚪</span>
+    <ul>
+      <li>Imagine a hotel hallway. Each <b>room</b> is a cell.</li>
+      <li>A guest checks out. We hang a <b>"checked out" sign</b> on the door: that is the DELETED marker.</li>
+      <li>Someone searching the hallway reads the sign and <b>keeps walking</b>. A new guest may <b>take the room</b>.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="hv" data-size="11" data-mode="lin" data-del="1" data-keys="22,15,26,37,9" data-ops="insert,find,delete" data-val="26" data-presets="delete:26:Delete 26|find:37:Find 37|insert:48:Insert 48"></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the new lines are highlighted)</small></h3>
+  <div data-code="P_delete"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Find 37 after deleting 26: true
+0: 22
+1: --
+2: --
+3: --
+4: 15
+5: 48
+6: 37
+7: --
+8: --
+9: 9
+10: --</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Never empty a cell on delete. Leave a <b>DELETED</b> marker.</li>
+      <li>Find skips the marker. Insert may re-use it.</li>
+      <li>Many markers slow the table down. The cure is <b>rehashing</b> (Part II).</li>
+    </ul>
+  </div>
+  <div class="box def"><span class="tag">End of Part I ✅</span>
+    <ul><li>You can now hash keys, handle collisions with linear probing, and find, insert and delete.</li></ul>
+  </div>
+</section>
+
+<!-- ====================== 7. QUADRATIC + DOUBLE ====================== -->
+<section class="tab" id="quad" data-title="Quadratic &amp; Double Hashing" data-part="2">
+  <h2>Quadratic probing and double hashing</h2>
+  <p class="goal">Goal: break up the clusters by taking bigger, smarter jumps.</p>
+
+  <table class="cmp">
+    <tr><th>Method</th><th>Cells tried after the home cell</th><th>Result</th></tr>
+    <tr><td>Linear probing</td><td>+1, +2, +3, +4…</td><td class="bad">Long clusters</td></tr>
+    <tr><td><b>Quadratic probing</b></td><td>+1, +4, +9, +16…</td><td>Jumps out of a cluster quickly</td></tr>
+    <tr class="star"><td><b>Double hashing</b></td><td>+step, +2·step, +3·step… (step depends on the key)</td><td class="good">Each key takes its own path</td></tr>
+  </table>
+
+  <h3>Part A · Quadratic probing</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Quadratic probing</b> = probe number i looks <b>i × i</b> cells after the home cell.</li>
+      <li>The jumps get longer each time: 1, 4, 9, 16…</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🅿️</span>
+    <ul>
+      <li>Imagine looking for parking on a busy street. Each <b>parking space</b> is a cell.</li>
+      <li>The spaces near the store are a <b>cluster</b>. Checking the very next space is hopeless.</li>
+      <li>So you drive <b>a bit further each time</b>: 1 space, then 4, then 9.</li>
+    </ul>
+  </div>
+  <div data-code="T_quad"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Probe 0 looks at cell 4
+Probe 1 looks at cell 5
+Probe 2 looks at cell 8
+Probe 3 looks at cell 2
+Probe 4 looks at cell 9</pre></div>
+
+  <h3>Watch it</h3>
+  <div class="hv" data-size="11" data-mode="quad" data-keys="22,15" data-ops="insert,find" data-val="26" data-presets="insert:26:Insert 26|insert:37:Insert 37|insert:48:Insert 48|find:48:Find 48"></div>
+
+  <h3><span class="step">PROGRAM</span>Quadratic probing <small>(only one line changed, twice)</small></h3>
+  <div data-code="P_quad"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>0: 22
+1: --
+2: 48
+3: --
+4: 15
+5: 26
+6: --
+7: --
+8: 37
+9: --
+10: --
+Find 48: true</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out 🙃</span>
+    <ul>
+      <li>All keys with the same home cell still follow the <b>same jumps</b>. That is a milder problem called <b>secondary clustering</b>.</li>
+      <li>Quadratic probing is only sure to find a free cell when the size is <b>prime</b> and the table is <b>less than half full</b>.</li>
+    </ul>
+  </div>
+
+  <h3>Part B · Double hashing</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Double hashing</b> = use a <b>second hash function</b> to choose the step size.</li>
+      <li>First hash: <b>where to start</b>. Second hash: <b>how far to jump</b>.</li>
+      <li>Two keys with the same home cell usually have <b>different steps</b>, so they go different ways.</li>
+      <li>Our second hash: <code>step = 5 - (key % 5)</code>. It gives 1 to 5, never 0.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🚶</span>
+    <ul>
+      <li>Imagine people starting from the same <b>front door</b> (the home cell).</li>
+      <li>Each person has their own <b>stride length</b> (the step from the second hash).</li>
+      <li>Same door, different strides, so they land on <b>different tiles</b> (cells).</li>
+    </ul>
+  </div>
+  <div data-code="T_step"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Step for 26 is 4
+Probe 0 looks at cell 4
+Probe 1 looks at cell 8
+Probe 2 looks at cell 1
+Probe 3 looks at cell 5
+Probe 4 looks at cell 9</pre></div>
+
+  <h3>Watch it</h3>
+  <div class="hv" data-size="11" data-mode="dbl" data-keys="22,15" data-ops="insert,find" data-val="26" data-presets="insert:26:Insert 26|insert:37:Insert 37|insert:48:Insert 48|find:48:Find 48"></div>
+
+  <h3><span class="step">PROGRAM</span>Double hashing <small>(the new lines are highlighted)</small></h3>
+  <div data-code="P_double"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>0: 22
+1: --
+2: --
+3: --
+4: 15
+5: --
+6: 48
+7: 37
+8: 26
+9: --
+10: --
+Find 48: true</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out: use a prime size 🔢</span>
+    <ul>
+      <li>With a prime size, any step visits <b>every</b> cell before repeating.</li>
+      <li>With size 10 and step 5, the probes would only ever see 2 cells.</li>
+    </ul>
+  </div>
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Linear: +1 each time. Quadratic: +i². Double hashing: +i × step.</li>
+      <li>All three change <b>one line</b> of the program: how <code>index</code> is calculated.</li>
+      <li>Double hashing is usually the best open-addressing method.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 8. CHAINING ====================== -->
+<section class="tab" id="chain" data-title="Separate Chaining" data-part="2">
+  <h2>Separate chaining</h2>
+  <p class="goal">Goal: let every cell hold as many keys as it needs, using a linked list.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Separate chaining</b> = every cell of the array holds a <b>linked list</b>.</li>
+      <li>A key always goes into the list of its <b>own</b> cell. No probing.</li>
+      <li>A collision just makes that list one link longer.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🧥</span>
+    <ul>
+      <li>Imagine a row of coat hooks. Each <b>hook</b> is an array cell.</li>
+      <li>Each <b>coat on a hanger</b> is a link. Hangers hook onto each other to make a <b>chain</b>.</li>
+      <li>A full hook is not a problem. The chain simply gets longer.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="hv" data-size="5" data-mode="chain" data-keys="10,7,3" data-ops="insert,find,delete" data-val="15" data-presets="insert:15:Insert 15|insert:20:Insert 20|insert:22:Insert 22|find:10:Find 10|delete:15:Delete 15"></div>
+
+  <h3><span class="step">STEP 1</span>Two keys in one cell</h3>
+  <div data-code="T_chain"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Cell 7: 47 -&gt; 37</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(insert and find are highlighted)</small></h3>
+  <div data-code="P_chain"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>0: 20 -&gt; 15 -&gt; 10 -&gt; null
+1: null
+2: 22 -&gt; 7 -&gt; null
+3: 3 -&gt; null
+4: null
+Find 22: true
+Find 12: false</pre></div>
+
+  <table class="cmp">
+    <tr><th></th><th>Open addressing</th><th>Separate chaining</th></tr>
+    <tr><td>Where keys live</td><td>In the array itself</td><td>In linked lists</td></tr>
+    <tr><td>Can the table be over-full?</td><td class="bad">No. At most one key per cell.</td><td class="good">Yes. Lists just grow.</td></tr>
+    <tr><td>Deleting</td><td class="bad">Needs a DELETED marker</td><td class="good">Ordinary list deletion</td></tr>
+    <tr><td>Extra memory</td><td class="good">None</td><td class="bad">One reference per key</td></tr>
+  </table>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Array of linked lists. Insert at the <b>front</b> of the list: O(1).</li>
+      <li>Find and delete walk <b>one short list</b>, not the whole table.</li>
+      <li>Best choice when you do not know how much data is coming.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 9. EFFICIENCY ====================== -->
+<section class="tab" id="eff" data-title="Efficiency" data-part="2">
+  <h2>Hashing efficiency</h2>
+  <p class="goal">Goal: measure how full a table is, and see why a full table is a slow table.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Load factor</b> = number of keys ÷ number of cells.</li>
+      <li>0.25 = a quarter full. 0.5 = half full. 1.0 = completely full.</li>
+      <li>The <b>higher</b> the load factor, the <b>more probes</b> each operation needs.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🅿️</span>
+    <ul>
+      <li>Imagine a parking lot. The <b>spaces</b> are the cells, the <b>cars</b> are the keys.</li>
+      <li>Lot half empty: you park in the first place you try.</li>
+      <li>Lot 95% full: you drive around and around. Each loop past a taken space is a <b>probe</b>.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 1</span>Calculate a load factor</h3>
+  <div data-code="T_load"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Load factor: 0.55</pre></div>
+
+  <h3>Move the slider</h3>
+  <div class="viz" id="effW">
+    <div class="ctl">Load factor <input type="range" id="eLoad" min="5" max="95" value="50" step="5" style="width:260px"> <b class="res" id="eVal"></b></div>
+    <div id="eBars"></div>
+    <div class="vlog">Average number of probes. "Hit" = the key is in the table. "Miss" = it is not.</div>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Load factor</th><th>Linear probing · hit</th><th>Linear probing · miss</th><th>Chaining · hit</th><th>Chaining · miss</th></tr>
+    <tr><td>0.25</td><td>1.2</td><td>1.4</td><td>1.1</td><td>1.25</td></tr>
+    <tr><td>0.50</td><td>1.5</td><td>2.5</td><td>1.25</td><td>1.5</td></tr>
+    <tr><td>0.75</td><td>2.5</td><td class="bad">8.5</td><td>1.4</td><td>1.75</td></tr>
+    <tr><td>0.90</td><td class="bad">5.5</td><td class="bad">50.5</td><td>1.45</td><td>1.9</td></tr>
+  </table>
+
+  <h3><span class="step">STEP 2</span>Measure it yourself</h3>
+  <div data-code="P_probes"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Load 0.25 -&gt; 1.15 probes per insert
+Load 0.5 -&gt; 1.48 probes per insert
+Load 0.75 -&gt; 2.66 probes per insert
+Load 0.9 -&gt; 6.17 probes per insert</pre></div>
+
+  <div class="box rem"><span class="tag">Rules of thumb</span>
+    <ul>
+      <li>Open addressing: keep the load factor <b>below about 0.5</b> (at most 2/3).</li>
+      <li>Separate chaining: a load factor <b>around 1</b> is fine.</li>
+      <li>Hash tables are O(1) <b>only while they are not too full</b>.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 3</span>When the table gets too full: rehashing</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Rehashing</b> = create a bigger array and <b>insert every key again</b>.</li>
+      <li>We cannot just copy the cells. The index is <code>key % size</code>, and <b>size changed</b>.</li>
+      <li>It costs O(n), but it happens rarely.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🏢</span>
+    <ul>
+      <li>Imagine a company moving to a bigger office. Each <b>employee</b> is a key, each <b>desk</b> is a cell.</li>
+      <li>The new building has a <b>different desk numbering</b>, so nobody keeps their old desk number.</li>
+      <li>Everyone gets a <b>new desk assignment</b>: that is hashing each key again.</li>
+    </ul>
+  </div>
+  <div data-code="P_rehash"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Size with 2 keys: 5
+Size with 3 keys: 11
+0: --
+1: --
+2: --
+3: --
+4: 15
+5: 26
+6: 37
+7: --
+8: --
+9: --
+10: --</pre></div>
+  <div class="box warn"><span class="tag">Watch out 🔢</span>
+    <ul>
+      <li>Our <code>size * 2 + 1</code> is a shortcut. It gives 5 → 11 → 23 → 47, which happen to be prime.</li>
+      <li>A real hash table looks for the <b>next prime number</b> after doubling.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 10. EXTERNAL STORAGE ====================== -->
+<section class="tab" id="ext" data-title="External Storage" data-part="2">
+  <h2>Hashing and external storage</h2>
+  <p class="goal">Goal: use hashing to find a record in a huge disk file with only one disk read.</p>
+
+  <div class="box def"><span class="tag">Definitions</span>
+    <ul>
+      <li><b>External storage</b> = data kept in a <b>file on disk</b>, because it is too big for memory.</li>
+      <li>A <b>block</b> = a chunk of the file that is read or written <b>all at once</b>. One block holds several records.</li>
+      <li>A <b>disk access</b> = reading or writing one block. It is thousands of times <b>slower</b> than working in memory.</li>
+      <li>So the goal changes: not "few comparisons", but <b>"few disk accesses"</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 📦</span>
+    <ul>
+      <li>Imagine a warehouse of <b>boxes</b>. Each box is a block, each <b>folder</b> inside is a record.</li>
+      <li>Walking to the warehouse and carrying back a box is slow: that is a <b>disk access</b>.</li>
+      <li>A <b>rule on your desk</b> (the hash function) tells you which box to fetch. One trip, then you flip through the folders at your desk.</li>
+    </ul>
+  </div>
+
+  <h3>How it works</h3>
+  <div class="viz">
+    <div class="blocks">
+      <div class="dbox"><small>key</small><b>21</b></div><span class="arrow">→</span>
+      <div class="dbox"><small>hash</small><b>21 % 4</b></div><span class="arrow">→</span>
+      <div class="dbox"><small>block number</small><b>1</b></div>
+    </div>
+    <div class="blocks">
+      <div class="blk"><small>Block 0</small><span>8</span><span>12</span><span class="e">·</span></div>
+      <div class="blk on"><small>Block 1 · read this one</small><span>17</span><span class="hit">21</span><span>5</span></div>
+      <div class="blk"><small>Block 2</small><span>30</span><span class="e">·</span><span class="e">·</span></div>
+      <div class="blk"><small>Block 3</small><span class="e">·</span><span class="e">·</span><span class="e">·</span></div>
+    </div>
+  </div>
+
+  <div class="box def"><span class="tag">The steps</span>
+    <ul>
+      <li>Hash the key to get a <b>block number</b>.</li>
+      <li>Read that <b>one block</b> from the disk.</li>
+      <li>Search the few records inside it, in memory. That part is fast.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">PROGRAM</span>A pretend disk</h3>
+  <div data-code="P_blocks"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Block 0: 8 12 0
+Block 1: 17 21 5
+Block 2: 30 0 0
+Block 3: 0 0 0
+Key 21 is in block 1: only 1 disk read</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out: full blocks 📦</span>
+    <ul>
+      <li>A block can fill up. Block 1 in our example has no room left.</li>
+      <li>The next record for block 1 must go to a <b>neighbouring block</b> (like linear probing, but block by block). That costs a <b>second</b> disk access.</li>
+      <li>So external hash files are kept only about <b>half to two-thirds full</b>.</li>
+    </ul>
+  </div>
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>On disk we count <b>block reads</b>, not comparisons.</li>
+      <li>Hashing usually finds a record with <b>one</b> block read. Nothing is faster.</li>
+      <li>Weakness, same as always: the records are <b>not in order</b>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 11. FULL PROGRAMS ====================== -->
+<section class="tab" id="full" data-title="Full Programs" data-part="2">
+  <h2>The full programs</h2>
+  <p class="goal">Goal: both kinds of hash table, complete, to run and change.</p>
+
+  <table class="cmp">
+    <tr><th>Operation</th><th>Average (table not too full)</th><th>Worst case (very full, or a bad hash function)</th></tr>
+    <tr><td>insert</td><td class="good">O(1)</td><td class="bad">O(n)</td></tr>
+    <tr><td>find</td><td class="good">O(1)</td><td class="bad">O(n)</td></tr>
+    <tr><td>delete</td><td class="good">O(1)</td><td class="bad">O(n)</td></tr>
+    <tr><td>print in sorted order, min, max</td><td class="bad" colspan="2">Not supported. Use a tree for that.</td></tr>
+  </table>
+
+  <h3>Program A · Open addressing (linear probing, with delete)</h3>
+  <div data-code="P_fullA"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>0: 22
+1: --
+2: --
+3: --
+4: 15
+5: 26
+6: 37
+7: 48
+8: --
+9: 9
+10: --
+Find 48: true
+Find 59: false
+Delete 26: true
+Delete 26 again: false
+Find 48: true</pre></div>
+
+  <h3>Program B · Separate chaining</h3>
+  <div data-code="P_fullB"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>0: 20 -&gt; 15 -&gt; 10 -&gt; null
+1: null
+2: 22 -&gt; 7 -&gt; null
+3: 3 -&gt; null
+4: null
+Find 15: true
+Delete 15: true
+Find 15: false
+0: 20 -&gt; 10 -&gt; null
+1: null
+2: 22 -&gt; 7 -&gt; null
+3: 3 -&gt; null
+4: null</pre></div>
+
+  <div class="box rem"><span class="tag">Try this ✏️</span>
+    <ul>
+      <li>In Program A, change one line in each method to make it <b>quadratic probing</b>.</li>
+      <li>In Program A, insert 12 keys into the 11-cell table. What does the last <code>insert</code> return?</li>
+      <li>In Program B, write a method <code>int count()</code> that returns how many keys are stored.</li>
+      <li>In Program B, change the size from 5 to 1. What data structure do you have now?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 12. PLAYGROUND ====================== -->
+<section class="tab" id="play" data-title="Playground" data-part="2">
+  <h2>Playground</h2>
+  <p class="goal">Pick a method, then build any table you like. Predict where each key lands before you press the button.</p>
+  <div class="hv" data-size="11" data-mode="lin" data-modes="1" data-del="1" data-keys="22,15,9" data-ops="insert,find,delete" data-val="26" data-extras="random,clear"></div>
+  <div class="box rem"><span class="tag">Challenges</span>
+    <ul>
+      <li>Insert 15, 26, 37, 48 with each method. Which one spreads them best?</li>
+      <li>With linear probing, build a cluster of 5 cells. How many probes does the next colliding key need?</li>
+      <li>Delete a key from the middle of a cluster, then find a key behind it. What does the search do at the DEL cell?</li>
+      <li>With chaining, how many keys can you put in cell 0?</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<aside class="panel" id="panel">
+  <h4>💡 Code explainer</h4>
+  <div id="panelBody"></div>
+  <div class="keys">Every code box is a complete, runnable Main.java · Hover = preview · Click = pin a line · <kbd>↑</kbd> <kbd>↓</kbd> = step through pinned code · <kbd>←</kbd> <kbd>→</kbd> = change tab</div>
+</aside>
+</div>
+
+<script>
+/* =====================================================================
+   1.  JAVA CODE  +  LINE-BY-LINE EXPLANATIONS
+   Each line is [ code , explanation ].  `backticks` become <code>.
+   Every block on the page is a COMPLETE program (class Main + main).
+   ===================================================================== */
+const BLANK = [['', '']];
+const M_OPEN = [
+['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."],
+['    public static void main(String[] args) {', "The program starts running here."],
+];
+const M_CLOSE = [['    }', "End of main."], ['}', "End of the Main class."]];
+const B = {};
+
+/* ---------- hash functions ---------- */
+const F_MOD = [['        int index = key % size;', "The hash function. `%` gives the REMAINDER of a division. 37 / 10 = 3 remainder 7, so the index is 7."]];
+B.T_mod = {title:'Main.java', run:true, focus:F_MOD, lines:[...M_OPEN,
+['        int size = 10;', "Our table has 10 cells, numbered 0 to 9."],
+['        int key = 37;', "The key we want to store."],
+...F_MOD,
+['        System.out.println("Key " + key + " goes to index " + index);', "Print where the key belongs. No searching was needed, only one calculation."],
+...M_CLOSE]};
+
+const F_HASH = [
+['    static int hash(int key, int size) {', "The hash function as a method. It takes a key and the table size, and gives back an index."],
+['        return key % size;', "The remainder is always between 0 and size - 1, so it is always a legal array index."],
+['    }', "End of hash."],
+];
+B.P_hashfn = {title:'Main.java', run:true, focus:F_HASH, lines:[
+['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."],
+...F_HASH, ...BLANK,
+['    public static void main(String[] args) {', "The program starts running here."],
+['        int size = 10;', "A table with 10 cells."],
+['        int[] keys = {37, 52, 18, 90, 5};', "Five keys to hash."],
+['        for (int k : keys) {', "Go through the keys, one at a time. `k` is the current key."],
+['            System.out.println(k + " -> index " + hash(k, size));', "Call the hash function and print the index it gives for this key."],
+['        }', "End of the loop."],
+...M_CLOSE]};
+
+const F_STR = [
+['    static int hash(String word, int size) {', "A hash function for text. It turns a word into an index."],
+['        int total = 0;', "We build up one number from all the letters. It starts at 0."],
+['        for (int i = 0; i < word.length(); i++) {', "Visit every letter of the word, from left to right."],
+['            total = (total * 31 + word.charAt(i)) % size;', "Multiply what we have by 31, add the number code of this letter, and keep the remainder so the number stays small. Multiplying makes the ORDER of the letters matter."],
+['        }', "End of the loop."],
+['        return total;', "The result is between 0 and size - 1: a legal index."],
+['    }', "End of hash."],
+];
+B.P_strhash = {title:'Main.java', run:true, focus:F_STR, lines:[
+['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."],
+...F_STR, ...BLANK,
+['    public static void main(String[] args) {', "The program starts running here."],
+['        int size = 11;', "A table with 11 cells."],
+['        String[] words = {"cat", "act", "dog", "tree"};', "Four words. Notice that cat and act use the same three letters."],
+['        for (String w : words) {', "Go through the words, one at a time."],
+['            System.out.println(w + " -> index " + hash(w, size));', "Hash the word and print its index. cat and act get different indexes because the order of the letters matters."],
+['        }', "End of the loop."],
+...M_CLOSE]};
+
+/* ---------- collisions ---------- */
+const F_COLL = [
+['        int indexA = a % size;', "37 % 10 = 7."],
+['        int indexB = b % size;', "47 % 10 = 7 as well. Two different keys, same index."],
+];
+B.T_collide = {title:'Main.java', run:true, focus:F_COLL, lines:[...M_OPEN,
+['        int size = 10;', "A table with 10 cells."],
+['        int a = 37;', "The first key."],
+['        int b = 47;', "The second key. It is a different number."],
+...F_COLL,
+['        System.out.println(a + " -> index " + indexA);', "Prints 7."],
+['        System.out.println(b + " -> index " + indexB);', "Prints 7 again."],
+['        System.out.println("Collision? " + (indexA == indexB));', "Both keys want the same cell, so this prints true. That is a collision."],
+...M_CLOSE]};
+
+/* ---------- linear probing: tiny ---------- */
+const F_PROBE = [
+['        while (table[index] != -1) {', "Is this cell taken? (-1 means empty.)"],
+['            index = (index + 1) % size;', "Yes: PROBE the next cell. `% size` wraps around to cell 0 after the last cell."],
+['        }', "When the loop ends, `index` is an empty cell."],
+];
+B.T_probe = {title:'Main.java', run:true, focus:F_PROBE, lines:[...M_OPEN,
+['        int size = 10;', "A table with 10 cells."],
+['        int[] table = new int[size];', "Create the array."],
+['        for (int i = 0; i < size; i++) {', "Go through every cell."],
+['            table[i] = -1;', "Mark the cell as empty. We use -1 to mean empty."],
+['        }', "End of the loop. The whole table is empty now."],
+['        table[7] = 37;', "37 % 10 = 7, so 37 already sits in cell 7."],
+['', ''],
+['        int key = 47;', "The new key. It also hashes to 7: a collision is coming."],
+['        int index = key % size;', "Start at the home cell: 47 % 10 = 7."],
+...F_PROBE,
+['        table[index] = key;', "Store the key in the empty cell we found."],
+['        System.out.println(key + " stored at index " + index);', "Cell 7 was taken, so 47 ended up in cell 8."],
+...M_CLOSE]};
+
+/* ---------- the open-addressing HashTable class, in several versions ---------- */
+function HT(o){            // o.probe: 'lin' | 'quad' | 'dbl'    o.del    o.rehash
+  o = o || {}; const p = {};
+  const probeLine = o.probe === 'quad'
+    ? ['            int index = (start + i * i) % size;', "Quadratic probing: probe number i looks i * i cells after the home cell. The jumps are 0, 1, 4, 9, 16..."]
+    : o.probe === 'dbl'
+    ? ['            int index = (start + i * step) % size;', "Double hashing: probe number i looks i * step cells after the home cell. The step is different for different keys."]
+    : ['            int index = (start + i) % size;', "Linear probing: probe number i looks i cells after the home cell. `% size` wraps around to cell 0 at the end."];
+  const stepLine = ['        int step = hash2(key);', "Ask the SECOND hash function how far to jump for this key."];
+  p.probeIns = [probeLine.slice()]; p.probeFind = [probeLine.slice()]; p.probeDel = [probeLine.slice()];   // separate copies, so each can be highlighted on its own
+  p.stepIns = [stepLine.slice()]; p.stepFind = [stepLine.slice()]; p.stepDel = [stepLine.slice()];
+  p.deletedField = ['    static final int DELETED = -2;', "A second special number. It means: a key used to be here, but it was deleted."];
+  p.countField = ['    int count;', "How many keys are stored right now. It starts at 0."];
+  p.open = [['class HashTable {', "A blueprint for a hash table that solves collisions with open addressing."]];
+  p.fields = [
+    ['    static final int EMPTY = -1;', "A special number that means: this cell is empty. Our keys are never negative, so -1 is safe to use."],
+    ...(o.del ? [p.deletedField] : []),
+    ['    int[] table;', "The array that stores the keys."],
+    ['    int size;', "How many cells the array has."],
+    ...(o.rehash ? [p.countField] : []),
+  ];
+  p.ctor = [
+    ['    HashTable(int size) {', "The constructor. It runs when we write `new HashTable(11)`."],
+    ['        this.size = size;', "Remember the size."],
+    ['        table = new int[size];', "Create the array."],
+    ['        for (int i = 0; i < size; i++) {', "Go through every cell."],
+    ['            table[i] = EMPTY;', "Mark the cell as empty."],
+    ['        }', "End of the loop."],
+    ['    }', "End of the constructor."],
+  ];
+  p.hash = [
+    ['    int hash(int key) {', "The hash function: turns a key into an index."],
+    ['        return key % size;', "The remainder is always between 0 and size - 1."],
+    ['    }', "End of hash."],
+  ];
+  p.hash2 = [
+    ['    int hash2(int key) {', "The SECOND hash function. It does not give an index. It gives the STEP size for this key."],
+    ['        return 5 - (key % 5);', "`key % 5` is 0 to 4, so the answer is 1 to 5. The step can never be 0 (a step of 0 would never move)."],
+    ['    }', "End of hash2."],
+  ];
+  p.insCond = o.del
+    ? ['            if (table[index] == EMPTY || table[index] == DELETED) {', "Is this cell free? A cell is free if it is empty OR if it holds the DELETED marker. `||` means or."]
+    : ['            if (table[index] == EMPTY) {', "Is this cell empty?"];
+  p.rehashCall = [
+    ['        if (count + 1 > size / 2) {', "Would this new key make the table more than half full?"],
+    ['            rehash();', "Yes: grow the table first."],
+    ['        }', "End of the check."],
+  ];
+  p.countInc = ['                count++;', "One more key is stored now."];
+  p.insert = [
+    ['    boolean insert(int key) {', "Store a key. Returns true if it worked, false if the table is full."],
+    ...(o.rehash ? p.rehashCall : []),
+    ['        int start = hash(key);', "The home cell: where the key WANTS to go."],
+    ...(o.probe === 'dbl' ? p.stepIns : []),
+    ['        for (int i = 0; i < size; i++) {', "Try at most `size` cells. `i` is the probe number: 0 is the home cell."],
+    ...p.probeIns,
+    p.insCond,
+    ['                table[index] = key;', "Free cell found: store the key here."],
+    ...(o.rehash ? [p.countInc] : []),
+    ['                return true;', "Done."],
+    ['            }', "The cell was taken. Go around the loop and probe again."],
+    ['        }', "End of the loop."],
+    ['        return false;', "We tried `size` cells and none was free."],
+    ['    }', "End of insert."],
+  ];
+  p.find = [
+    ['    boolean find(int key) {', "Is this key in the table? Returns true or false."],
+    ['        int start = hash(key);', "Start at the home cell, exactly like insert."],
+    ...(o.probe === 'dbl' ? p.stepFind : []),
+    ['        for (int i = 0; i < size; i++) {', "Try at most `size` cells."],
+    ...p.probeFind,
+    ['            if (table[index] == EMPTY) {', "Did we reach an empty cell?"],
+    ['                return false;', "Then the key is not here. If it were in the table, insert would have put it before this empty cell."],
+    ['            }', "End of the empty check."],
+    ['            if (table[index] == key) {', "Is this the key we are looking for?"],
+    ['                return true;', "Yes: found it."],
+    ['            }', o.del ? "Some other key (or a DELETED marker) is here. Keep probing." : "Some other key is here. Keep probing."],
+    ['        }', "End of the loop."],
+    ['        return false;', "We looked at every cell without finding it."],
+    ['    }', "End of find."],
+  ];
+  p.del = [
+    ['    boolean delete(int key) {', "Remove a key. Returns true if it was found and removed."],
+    ['        int start = hash(key);', "Start at the home cell."],
+    ...(o.probe === 'dbl' ? p.stepDel : []),
+    ['        for (int i = 0; i < size; i++) {', "Probe exactly like find."],
+    ...p.probeDel,
+    ['            if (table[index] == EMPTY) {', "Did we reach an empty cell?"],
+    ['                return false;', "The key is not in the table. Nothing to delete."],
+    ['            }', "End of the empty check."],
+    ['            if (table[index] == key) {', "Is this the key to delete?"],
+    ['                table[index] = DELETED;', "Do NOT make the cell empty. Leave the DELETED marker, so searches for other keys keep going past this cell."],
+    ['                return true;', "Done."],
+    ['            }', "Not the key. Keep probing."],
+    ['        }', "End of the loop."],
+    ['        return false;', "We looked at every cell without finding it."],
+    ['    }', "End of delete."],
+  ];
+  p.rehash = [
+    ['    void rehash() {', "Make the table bigger and move every key into it."],
+    ['        int[] old = table;', "Keep a reference to the old array so we do not lose the keys."],
+    ['        size = size * 2 + 1;', "The new size: about twice as big. 5 becomes 11, 11 becomes 23."],
+    ['        table = new int[size];', "Create the new, bigger array."],
+    ['        for (int i = 0; i < size; i++) {', "Go through every new cell."],
+    ['            table[i] = EMPTY;', "Mark it empty."],
+    ['        }', "End of the loop."],
+    ['        count = 0;', "The new table holds nothing yet. insert will count the keys again."],
+    ['        for (int key : old) {', "Go through every cell of the OLD array."],
+    ['            if (key != EMPTY) {', "Is there a real key in this old cell?"],
+    ['                insert(key);', "Insert it again. We cannot just copy it to the same index: the index depends on `size`, and `size` changed."],
+    ['            }', "End of the check."],
+    ['        }', "End of the loop. Every key now lives in the new table."],
+    ['    }', "End of rehash."],
+  ];
+  p.dispDel = [
+    ['            } else if (table[i] == DELETED) {', "Does the cell hold the DELETED marker?"],
+    ['                System.out.println(i + ": DEL");', "Print DEL so we can see the marker."],
+  ];
+  p.display = [
+    ['    void display() {', "Print the whole table, one cell per line."],
+    ['        for (int i = 0; i < size; i++) {', "Go through every cell."],
+    ['            if (table[i] == EMPTY) {', "Is the cell empty?"],
+    ['                System.out.println(i + ": --");', "Print two dashes for an empty cell."],
+    ...(o.del ? p.dispDel : []),
+    ['            } else {', "Otherwise there is a key here."],
+    ['                System.out.println(i + ": " + table[i]);', "Print the index and the key."],
+    ['            }', "End of the if / else."],
+    ['        }', "End of the loop."],
+    ['    }', "End of display."],
+  ];
+  p.close = [['}', "End of the HashTable class."]];
+  p.all = [...p.open, ...p.fields, ...BLANK, ...p.ctor, ...BLANK, ...p.hash,
+    ...(o.probe === 'dbl' ? [...BLANK, ...p.hash2] : []), ...BLANK,
+    ...(o.rehash ? [...p.rehash, ...BLANK] : []),
+    ...p.insert, ...BLANK, ...p.find, ...(o.del ? [...BLANK, ...p.del] : []), ...BLANK, ...p.display, ...p.close];
+  return p;
+}
+const mainLines = body => [...M_OPEN, ...body, ...M_CLOSE];
+const INS_LOOP = keys => [
+['        HashTable t = new HashTable(11);', "Create a hash table with 11 cells. 11 is a prime number, which helps spread the keys."],
+['        int[] keys = {' + keys + '};', "The keys to store, in this order."],
+['        for (int k : keys) {', "Go through the keys, one at a time."],
+['            t.insert(k);', "Insert this key."],
+['        }', "End of the loop."],
+];
+
+{ const p = HT({probe:'lin'});
+  B.P_linear = {title:'Main.java', run:true, focus:[...p.insert, ...p.find], lines:[...p.all, ...BLANK, ...mainLines([
+    ...INS_LOOP('22, 15, 26, 37, 9'),
+    ['        t.display();', "Print the table. 15, 26 and 37 all hash to 4, so they sit in cells 4, 5 and 6."],
+    ['        System.out.println("Find 37: " + t.find(37));', "37 hashes to 4. We probe cells 4, 5, 6 and find it: true."],
+    ['        System.out.println("Find 48: " + t.find(48));', "48 also hashes to 4. We probe 4, 5, 6, then reach the empty cell 7: false."],
+  ])]}; }
+
+/* ---------- deleting ---------- */
+const F_TOMB = [['        table[5] = -1;', "THE MISTAKE: we delete 26 by making its cell empty again."]];
+B.T_tomb = {title:'Main.java', run:true, focus:F_TOMB, lines:[...M_OPEN,
+['        int size = 11;', "A table with 11 cells."],
+['        int[] table = new int[size];', "Create the array."],
+['        for (int i = 0; i < size; i++) {', "Go through every cell."],
+['            table[i] = -1;', "Mark it empty (-1)."],
+['        }', "End of the loop."],
+['        table[4] = 15;', "15 % 11 = 4. It sits in its home cell."],
+['        table[5] = 26;', "26 % 11 = 4 too. Cell 4 was taken, so it was probed into cell 5."],
+['        table[6] = 37;', "37 % 11 = 4 too. Cells 4 and 5 were taken, so it was probed into cell 6."],
+['', ''],
+...F_TOMB,
+['', ''],
+['        int index = 37 % size;', "Now search for 37. Start at its home cell: 4."],
+['        boolean found = false;', "We have not found it yet."],
+['        while (table[index] != -1) {', "Keep probing until we reach an empty cell."],
+['            if (table[index] == 37) {', "Is this cell holding 37?"],
+['                found = true;', "Yes: remember that we found it."],
+['            }', "End of the check."],
+['            index = (index + 1) % size;', "Move to the next cell."],
+['        }', "The loop stops at cell 5, because we made it empty. It never reaches cell 6."],
+['        System.out.println("Found 37? " + found);', "Prints false, but 37 IS in the table! The empty cell cut the search short."],
+...M_CLOSE]};
+
+{ const p = HT({probe:'lin', del:true});
+  B.P_delete = {title:'Main.java', run:true, focus:[p.deletedField, p.insCond, ...p.del, ...p.dispDel], lines:[...p.all, ...BLANK, ...mainLines([
+    ...INS_LOOP('22, 15, 26, 37, 9'),
+    ['', ''],
+    ['        t.delete(26);', "Delete 26. Its cell (5) gets the DELETED marker."],
+    ['        System.out.println("Find 37 after deleting 26: " + t.find(37));', "The search passes over the DELETED marker in cell 5 and still reaches 37 in cell 6: true."],
+    ['        t.insert(48);', "48 hashes to 4. Cell 4 is taken, cell 5 holds DELETED, so 48 re-uses cell 5."],
+    ['        t.display();', "Print the table."],
+  ])]};
+  B.P_fullA = {title:'Main.java', run:true, lines:[...p.all, ...BLANK, ...mainLines([
+    ...INS_LOOP('22, 15, 26, 37, 9, 48'),
+    ['', ''],
+    ['        t.display();', "Print the table after the six inserts."],
+    ['        System.out.println("Find 48: " + t.find(48));', "48 hashes to 4 and was probed to cell 7. Prints true."],
+    ['        System.out.println("Find 59: " + t.find(59));', "59 also hashes to 4, but it was never inserted. Prints false."],
+    ['        System.out.println("Delete 26: " + t.delete(26));', "26 is in the table, so it is removed. Prints true."],
+    ['        System.out.println("Delete 26 again: " + t.delete(26));', "26 is gone now. Prints false."],
+    ['        System.out.println("Find 48: " + t.find(48));', "The search passes over the DELETED marker and still finds 48. Prints true."],
+  ])]}; }
+
+/* ---------- quadratic probing + double hashing ---------- */
+const F_QSEQ = [['            int index = (start + i * i) % size;', "Probe number i looks i * i cells after the start: +0, +1, +4, +9, +16."]];
+B.T_quad = {title:'Main.java', run:true, focus:F_QSEQ, lines:[...M_OPEN,
+['        int size = 11;', "A table with 11 cells."],
+['        int start = 4;', "Pretend the key hashes to cell 4."],
+['        for (int i = 0; i < 5; i++) {', "Show the first 5 probes."],
+...F_QSEQ,
+['            System.out.println("Probe " + i + " looks at cell " + index);', "Print which cell this probe checks."],
+['        }', "End of the loop."],
+...M_CLOSE]};
+const F_STEP = [['        int step = 5 - (key % 5);', "The second hash function. 26 % 5 = 1, so the step is 5 - 1 = 4."]];
+B.T_step = {title:'Main.java', run:true, focus:F_STEP, lines:[...M_OPEN,
+['        int size = 11;', "A table with 11 cells."],
+['        int key = 26;', "The key we want to store."],
+['        int start = key % size;', "The first hash function gives the home cell: 26 % 11 = 4."],
+...F_STEP,
+['        System.out.println("Step for " + key + " is " + step);', "Prints 4. This key jumps 4 cells at a time."],
+['        for (int i = 0; i < 5; i++) {', "Show the first 5 probes."],
+['            int index = (start + i * step) % size;', "Probe number i looks i * step cells after the home cell."],
+['            System.out.println("Probe " + i + " looks at cell " + index);', "Print which cell this probe checks."],
+['        }', "End of the loop."],
+...M_CLOSE]};
+{ const p = HT({probe:'quad'});
+  B.P_quad = {title:'Main.java', run:true, focus:[...p.probeIns, ...p.probeFind], lines:[...p.all, ...BLANK, ...mainLines([
+    ...INS_LOOP('22, 15, 26, 37, 48'),
+    ['        t.display();', "15, 26, 37 and 48 all hash to 4. They land in cells 4, 5, 8 and 2: spread out, not in one long row."],
+    ['        System.out.println("Find 48: " + t.find(48));', "The search follows the same jumps: 4, 5, 8, 2. Prints true."],
+  ])]}; }
+{ const p = HT({probe:'dbl'});
+  B.P_double = {title:'Main.java', run:true, focus:[...p.hash2, ...p.stepIns, ...p.probeIns, ...p.stepFind, ...p.probeFind], lines:[...p.all, ...BLANK, ...mainLines([
+    ...INS_LOOP('22, 15, 26, 37, 48'),
+    ['        t.display();', "15, 26, 37 and 48 all hash to 4, but each one has its own step (26 jumps 4, 37 jumps 3, 48 jumps 2), so they go different ways."],
+    ['        System.out.println("Find 48: " + t.find(48));', "The search uses the same step as the insert did. Prints true."],
+  ])]}; }
+
+/* ---------- separate chaining ---------- */
+const LINK = [
+['class Link {', "A blueprint for one item in a linked list. Same idea as in the Linked Lists lecture."],
+['    int key;', "The key stored in this link."],
+['    Link next;', "A reference to the next link in the list. `null` means this is the last one."],
+['', ''],
+['    Link(int key) {', "The constructor. It runs when we write `new Link(37)`."],
+['        this.key = key;', "Store the key. `next` starts as `null` automatically."],
+['    }', "End of the constructor."],
+['}', "End of the Link class."],
+];
+const F_FRONT = [
+['        b.next = table[7];', "The new link points to whatever was first in the list of cell 7 (that is 37)."],
+['        table[7] = b;', "The new link becomes the first link of the list. Nothing was thrown out."],
+];
+B.T_chain = {title:'Main.java', run:true, focus:F_FRONT, lines:[...LINK, ...BLANK, ...M_OPEN,
+['        Link[] table = new Link[10];', "An array of 10 references. Each cell is the start of a linked list. They all begin as `null` (empty lists)."],
+['', ''],
+['        Link a = new Link(37);', "Create a link for 37. It hashes to 7."],
+['        a.next = table[7];', "The list of cell 7 is empty, so `a.next` becomes `null`."],
+['        table[7] = a;', "37 is now the first link in the list of cell 7."],
+['', ''],
+['        Link b = new Link(47);', "Create a link for 47. It hashes to 7 as well: a collision."],
+...F_FRONT,
+['', ''],
+['        System.out.println("Cell 7: " + table[7].key + " -> " + table[7].next.key);', "Both keys live in cell 7, one behind the other. Prints 47 -> 37."],
+...M_CLOSE]};
+const CH = {
+  open: [['class HashTable {', "A hash table that solves collisions with separate chaining."]],
+  fields: [
+    ['    Link[] table;', "An array of linked lists. Each cell holds a reference to the first link of its list."],
+    ['    int size;', "How many cells (lists) the array has."],
+  ],
+  ctor: [
+    ['    HashTable(int size) {', "The constructor."],
+    ['        this.size = size;', "Remember the size."],
+    ['        table = new Link[size];', "Create the array. Every cell starts as `null`, which means an empty list. No EMPTY marker is needed."],
+    ['    }', "End of the constructor."],
+  ],
+  hash: [
+    ['    int hash(int key) {', "The hash function: turns a key into an index."],
+    ['        return key % size;', "The remainder is always between 0 and size - 1."],
+    ['    }', "End of hash."],
+  ],
+  insert: [
+    ['    void insert(int key) {', "Store a key. It can never fail: a list can always grow."],
+    ['        int index = hash(key);', "Find which list this key belongs to."],
+    ['        Link newLink = new Link(key);', "Build a new link for the key."],
+    ['        newLink.next = table[index];', "The new link points to the old first link of that list."],
+    ['        table[index] = newLink;', "The new link becomes the first link. No probing, no moving to another cell."],
+    ['    }', "End of insert."],
+  ],
+  find: [
+    ['    boolean find(int key) {', "Is this key in the table?"],
+    ['        Link current = table[hash(key)];', "Go straight to the right list. `current` starts on its first link."],
+    ['        while (current != null) {', "Walk along the list until it ends."],
+    ['            if (current.key == key) {', "Is this the key we want?"],
+    ['                return true;', "Yes: found it."],
+    ['            }', "End of the check."],
+    ['            current = current.next;', "Move to the next link."],
+    ['        }', "End of the loop."],
+    ['        return false;', "We reached the end of the list. The key is not here."],
+    ['    }', "End of find."],
+  ],
+  del: [
+    ['    boolean delete(int key) {', "Remove a key. This is ordinary linked-list deletion. No DELETED marker is needed."],
+    ['        int index = hash(key);', "Find which list the key is in."],
+    ['        Link current = table[index];', "`current` walks along the list."],
+    ['        Link previous = null;', "`previous` follows one link behind `current`."],
+    ['        while (current != null) {', "Walk along the list until it ends."],
+    ['            if (current.key == key) {', "Is this the link to remove?"],
+    ['                if (previous == null) {', "Is it the FIRST link of the list?"],
+    ['                    table[index] = current.next;', "Yes: the cell now points to the second link."],
+    ['                } else {', "Otherwise it is in the middle or at the end."],
+    ['                    previous.next = current.next;', "The link before it now points past it."],
+    ['                }', "End of the if / else."],
+    ['                return true;', "Done."],
+    ['            }', "End of the check."],
+    ['            previous = current;', "Move `previous` one step forward."],
+    ['            current = current.next;', "Move `current` one step forward."],
+    ['        }', "End of the loop."],
+    ['        return false;', "The key was not in the list."],
+    ['    }', "End of delete."],
+  ],
+  display: [
+    ['    void display() {', "Print every list."],
+    ['        for (int i = 0; i < size; i++) {', "Go through every cell."],
+    ['            System.out.print(i + ": ");', "Print the index. `print` stays on the same line."],
+    ['            Link current = table[i];', "Start on the first link of this cell's list."],
+    ['            while (current != null) {', "Walk along the list."],
+    ['                System.out.print(current.key + " -> ");', "Print the key and an arrow."],
+    ['                current = current.next;', "Move to the next link."],
+    ['            }', "End of the walk."],
+    ['            System.out.println("null");', "Print null to show the end of the list, then go to a new line."],
+    ['        }', "End of the loop."],
+    ['    }', "End of display."],
+  ],
+  close: [['}', "End of the HashTable class."]],
+};
+CH.all = [...CH.open, ...CH.fields, ...BLANK, ...CH.ctor, ...BLANK, ...CH.hash, ...BLANK, ...CH.insert, ...BLANK, ...CH.find, ...BLANK, ...CH.del, ...BLANK, ...CH.display, ...CH.close];
+const CH_BUILD = [
+['        HashTable t = new HashTable(5);', "Create a table with only 5 cells, so we get collisions quickly."],
+['        int[] keys = {10, 15, 7, 22, 3, 20};', "Six keys for five cells. With open addressing this table would be full. With chaining it is no problem."],
+['        for (int k : keys) {', "Go through the keys, one at a time."],
+['            t.insert(k);', "Insert this key at the front of its list."],
+['        }', "End of the loop."],
+];
+B.P_chain = {title:'Main.java', run:true, focus:[...CH.fields, ...CH.insert, ...CH.find], lines:[...LINK, ...BLANK, ...CH.all, ...BLANK, ...mainLines([
+  ...CH_BUILD,
+  ['        t.display();', "Print every list. 10, 15 and 20 all hash to 0, so they share one list."],
+  ['        System.out.println("Find 22: " + t.find(22));', "22 % 5 = 2. Walk the list of cell 2 and find it: true."],
+  ['        System.out.println("Find 12: " + t.find(12));', "12 % 5 = 2. Walk the list of cell 2: 22, 7, end. Prints false."],
+])]};
+B.P_fullB = {title:'Main.java', run:true, lines:[...LINK, ...BLANK, ...CH.all, ...BLANK, ...mainLines([
+  ...CH_BUILD,
+  ['', ''],
+  ['        t.display();', "Print every list."],
+  ['        System.out.println("Find 15: " + t.find(15));', "15 is in the list of cell 0. Prints true."],
+  ['        System.out.println("Delete 15: " + t.delete(15));', "15 is in the middle of its list. The link before it now points past it. Prints true."],
+  ['        System.out.println("Find 15: " + t.find(15));', "15 is gone. Prints false."],
+  ['        t.display();', "Print the lists again. The list of cell 0 is now 20 -> 10."],
+])]};
+
+/* ---------- efficiency ---------- */
+const F_LOAD = [['        double loadFactor = (double) items / size;', "Load factor = items divided by cells. `(double)` makes Java keep the decimals: 6 / 11 = 0.545..."]];
+B.T_load = {title:'Main.java', run:true, focus:F_LOAD, lines:[...M_OPEN,
+['        int items = 6;', "The table holds 6 keys."],
+['        int size = 11;', "The table has 11 cells."],
+...F_LOAD,
+['        System.out.println("Load factor: " + Math.round(loadFactor * 100) / 100.0);', "Round to 2 decimals and print: 0.55. The table is a bit more than half full."],
+...M_CLOSE]};
+const F_COUNT = [
+['                probes++;', "Count the first look, at the home cell."],
+['                while (table[index] != 0) {', "Is the cell taken? (In this program 0 means empty.)"],
+['                    index = (index + 1) % size;', "Linear probing: try the next cell."],
+['                    probes++;', "Count one more probe."],
+['                }', "End of the probing."],
+];
+B.P_probes = {title:'Main.java', run:true, focus:F_COUNT, lines:[
+['import java.util.Random;', "We use Java's Random class to make up keys."],
+['', ''],
+...M_OPEN,
+['        int size = 1009;', "A big table: 1009 cells (a prime number)."],
+['        double[] loads = {0.25, 0.50, 0.75, 0.90};', "We test four load factors: a quarter full, half full, three quarters full, and 90% full."],
+['        for (double load : loads) {', "Run the experiment once for each load factor."],
+['            int[] table = new int[size];', "A fresh, empty table. Java fills a new int array with 0, so here 0 means empty."],
+['            int items = (int) (load * size);', "How many keys we need to reach this load factor."],
+['            long probes = 0;', "Counts every cell we look at."],
+['            Random rand = new Random(1);', "A random number maker. The seed 1 makes it give the same numbers on every run."],
+['            for (int n = 0; n < items; n++) {', "Insert the keys, one at a time."],
+['                int key = rand.nextInt(100000) + 1;', "A random key from 1 to 100000."],
+['                int index = key % size;', "Hash it: the home cell."],
+...F_COUNT,
+['                table[index] = key;', "Store the key in the free cell."],
+['            }', "End of the insert loop."],
+['            double average = Math.round(100.0 * probes / items) / 100.0;', "Average = total probes divided by the number of keys, rounded to 2 decimals."],
+['            System.out.println("Load " + load + " -> " + average + " probes per insert");', "Print the result for this load factor."],
+['        }', "End of the experiment loop."],
+...M_CLOSE]};
+{ const p = HT({probe:'lin', rehash:true});
+  B.P_rehash = {title:'Main.java', run:true, focus:[p.countField, ...p.rehash, ...p.rehashCall, p.countInc], lines:[...p.all, ...BLANK, ...mainLines([
+    ['        HashTable t = new HashTable(5);', "Start with a tiny table: 5 cells."],
+    ['        t.insert(15);', "First key. The table is 1/5 full."],
+    ['        t.insert(26);', "Second key. The table is 2/5 full."],
+    ['        System.out.println("Size with 2 keys: " + t.size);', "Still 5 cells."],
+    ['        t.insert(37);', "A third key would make the table more than half full, so insert calls rehash first."],
+    ['        System.out.println("Size with 3 keys: " + t.size);', "The table grew: 5 * 2 + 1 = 11 cells."],
+    ['        t.display();', "All three keys were hashed again with the new size. 15, 26 and 37 all hash to 4 now."],
+  ])]}; }
+
+/* ---------- external storage ---------- */
+const F_BLOCK = [['            int block = key % numBlocks;', "The hash function gives a BLOCK number, not a single cell. Each block can hold several keys."]];
+B.P_blocks = {title:'Main.java', run:true, focus:F_BLOCK, lines:[...M_OPEN,
+['        int numBlocks = 4;', "Our pretend disk file has 4 blocks."],
+['        int perBlock = 3;', "Each block has room for 3 records."],
+['        int[][] disk = new int[numBlocks][perBlock];', "A 2D array stands in for the disk: 4 rows (blocks) of 3 slots. 0 means an empty slot."],
+['        int[] keys = {17, 8, 21, 30, 12, 5};', "Six records to store."],
+['', ''],
+['        for (int key : keys) {', "Store the records, one at a time."],
+...F_BLOCK,
+['            for (int slot = 0; slot < perBlock; slot++) {', "Look through the slots of that one block."],
+['                if (disk[block][slot] == 0) {', "Is this slot empty?"],
+['                    disk[block][slot] = key;', "Yes: store the record here."],
+['                    break;', "`break` leaves the slot loop. We are done with this record."],
+['                }', "End of the check."],
+['            }', "End of the slot loop."],
+['        }', "End of the insert loop."],
+['', ''],
+['        for (int b = 0; b < numBlocks; b++) {', "Print every block."],
+['            System.out.print("Block " + b + ":");', "Print the block number."],
+['            for (int slot = 0; slot < perBlock; slot++) {', "Go through its slots."],
+['                System.out.print(" " + disk[b][slot]);', "Print the record in this slot (0 = empty)."],
+['            }', "End of the slot loop."],
+['            System.out.println();', "New line."],
+['        }', "End of the printing."],
+['', ''],
+['        int wanted = 21;', "Now we want to find record 21."],
+['        System.out.println("Key " + wanted + " is in block " + (wanted % numBlocks) + ": only 1 disk read");', "One calculation tells us which block to read. We read ONE block from the disk and search inside it in memory."],
+...M_CLOSE]};
+
+/* =====================================================================
+   2.  CODE RENDERING, HOVER PANEL, COPY
+   ===================================================================== */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const KW = /^(class|public|static|final|void|int|long|double|boolean|new|return|if|else|while|for|break|import|true|false|null|this)$/;
+function hi(src){
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*")|\b([A-Za-z_]\w*)\b|\b(\d+)\b/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))){
+    out += esc(src.slice(last, m.index)); last = re.lastIndex;
+    if (m[1]) out += '<span class="c">'+esc(m[1])+'</span>';
+    else if (m[2]) out += '<span class="s">'+esc(m[2])+'</span>';
+    else if (m[3]) out += KW.test(m[3]) ? '<span class="k">'+m[3]+'</span>' : (/^[A-Z]/.test(m[3]) ? '<span class="t">'+m[3]+'</span>' : m[3]);
+    else out += '<span class="num">'+m[4]+'</span>';
+  }
+  return out + esc(src.slice(last));
+}
+const explain = s => esc(s).replace(/`([^`]+)`/g,'<code>$1</code>');
+const textOf = id => B[id].lines.map(l => l[0]).join('\n') + '\n';
+
+function renderCode(host){
+  const id = host.dataset.code, blk = B[id];
+  const foc = blk.focus ? new Set(blk.focus) : null;
+  let h = '<div class="codebox'+(foc?' hasfocus':'')+'"><div class="codebar"><span class="fname">'+esc(blk.title)+' · complete program'+(foc?' · <span class="star">★ new lines are highlighted</span>':'')+'</span><span>'+
+    (foc && blk.lines.length > 30 ? '<button data-jump="1">⤵ Jump to new lines</button> ' : '')+'<button data-copy="'+id+'">📋 Copy Main.java</button></span></div><div class="code">';
+  blk.lines.forEach((l,i) => {
+    h += '<div class="ln'+(l[0]===''?' blank':'')+(foc && foc.has(l)?' focus':'')+'" data-b="'+id+'" data-i="'+i+'"><span class="no">'+(i+1)+'</span><span class="src">'+(hi(l[0])||' ')+'</span></div>';
+  });
+  host.innerHTML = h + '</div></div>';
+}
+
+const panelBody = document.getElementById('panelBody');
+const HINT = '<p class="hint">👈 Move your mouse over any line of Java code.<br><br>The explanation of that line shows up here.</p>';
+let pinned = null;                       // the pinned .ln element
+function show(ln){
+  if (!ln){ panelBody.innerHTML = HINT; return; }
+  const blk = B[ln.dataset.b], i = +ln.dataset.i, l = blk.lines[i];
+  panelBody.innerHTML = '<div class="where">'+esc(blk.title)+' · line '+(i+1)+(ln===pinned?' · 📌 pinned':'')+'</div>'+
+    '<div class="pline">'+hi(l[0].trim())+'</div><div class="ptext">'+explain(l[1])+'</div>';
+}
+function setHot(ln){ document.querySelectorAll('.ln.hot').forEach(e => e.classList.remove('hot')); if (ln) ln.classList.add('hot'); }
+function setPin(ln){
+  if (pinned) pinned.classList.remove('pin');
+  pinned = ln; if (ln) ln.classList.add('pin');
+  show(ln);
+}
+document.addEventListener('mouseover', e => {
+  const ln = e.target.closest && e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')){ setHot(ln); show(ln); }
+  else if (!e.target.closest || !e.target.closest('.codebox')){ setHot(null); show(pinned); }
+});
+document.addEventListener('click', e => {
+  const jp = e.target.closest('[data-jump]');
+  if (jp){ const f = jp.closest('.codebox').querySelector('.ln.focus'); if (f) f.scrollIntoView({block:'center', behavior:'smooth'}); return; }
+  const cp = e.target.closest('[data-copy]');
+  if (cp){ copyText(textOf(cp.dataset.copy), cp); return; }
+  const ln = e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')) setPin(ln === pinned ? null : ln);
+});
+function copyText(text, btn){
+  const done = ok => { const old = btn.textContent; btn.textContent = ok ? '✅ Copied complete program!' : '⚠️ Select and copy manually'; setTimeout(() => btn.textContent = old, 1600); };
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok = document.execCommand('copy'); }catch(_){ } ta.remove(); done(ok); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true), fallback); else fallback();
+}
+
+/* =====================================================================
+   3.  TABS
+   ===================================================================== */
+const sections = [...document.querySelectorAll('section.tab')];
+const tabsNav = document.getElementById('tabs'), wrap = document.getElementById('wrap');
+let curTab = 0;
+function buildTabs(){
+  let h = '';
+  sections.forEach((s,i) => {
+    if (i === 0) h += '<span class="part">PART I</span>';
+    if (s.dataset.part === '2' && sections[i-1].dataset.part === '1') h += '<span class="part two">PART II</span>';
+    h += '<button data-go="'+i+'" data-part="'+s.dataset.part+'"><b>'+(i+1)+'</b>'+s.dataset.title+'</button>';
+    const nav = document.createElement('div'); nav.className = 'navrow';
+    nav.innerHTML = '<button data-go="'+(i-1)+'"'+(i===0?' disabled':'')+'>← '+(i?sections[i-1].dataset.title:'')+'</button>'+
+                    '<button class="next" data-go="'+(i+1)+'"'+(i===sections.length-1?' disabled':'')+'>'+(i<sections.length-1?sections[i+1].dataset.title:'')+' →</button>';
+    s.appendChild(nav);
+  });
+  tabsNav.innerHTML = h;
+  document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(+b.dataset.go, true); });
+}
+function go(i, scroll){
+  if (i < 0 || i >= sections.length) return;
+  curTab = i; setPin(null); setHot(null);
+  sections.forEach((s,j) => s.classList.toggle('on', j === i));
+  tabsNav.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.go === i));
+  wrap.classList.toggle('nopanel', !sections[i].querySelector('.codebox'));
+  const on = tabsNav.querySelector('button.on'); if (on && on.scrollIntoView) on.scrollIntoView({block:'nearest', inline:'center'});
+  try { history.replaceState(null, '', '#' + sections[i].id); } catch(_){}
+  if (scroll) window.scrollTo({top: tabsNav.offsetTop, behavior:'auto'});
+}
+document.addEventListener('keydown', e => {
+  if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowRight') go(curTab + 1, true);
+  else if (e.key === 'ArrowLeft') go(curTab - 1, true);
+  else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && pinned){
+    e.preventDefault();
+    let n = pinned; const dir = e.key === 'ArrowDown' ? 'nextElementSibling' : 'previousElementSibling';
+    do { n = n[dir]; } while (n && n.classList.contains('blank'));
+    if (n){ setPin(n); n.scrollIntoView({block:'nearest'}); }
+  } else if (e.key === 'Escape') setPin(null);
+});
+
+/* =====================================================================
+   4.  ANIMATED HASH TABLE WIDGET
+   ===================================================================== */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const LABEL = {insert:'Insert', find:'Find', delete:'Delete'};
+const MODES = {lin:'Linear probing', quad:'Quadratic probing', dbl:'Double hashing', chain:'Separate chaining'};
+const DEL = 'DEL';
+class HashViz {
+  constructor(el){
+    this.el = el; this.delay = 900; this.token = 0;
+    this.m0 = +el.dataset.size || 11; this.mode = el.dataset.mode || 'lin';
+    this.init = (el.dataset.keys || '').split(',').filter(Boolean).map(Number);
+    this.ops = (el.dataset.ops || '').split(',').filter(Boolean);
+    this.extras = (el.dataset.extras || '').split(',').filter(Boolean);
+    this.presets = (el.dataset.presets || '').split('|').filter(Boolean).map(p => p.split(':'));
+    this.marker = !!el.dataset.del;                 // does delete leave a DEL marker?
+    let h = '<div class="ctl">';
+    if (el.dataset.modes) Object.keys(MODES).forEach(k => h += '<button class="mode" data-mode="'+k+'">'+MODES[k]+'</button>');
+    h += '</div><div class="ctl"><input type="number" value="'+(el.dataset.val||'')+'" aria-label="key">';
+    this.ops.forEach(o => h += '<button data-op="'+o+'">'+LABEL[o]+'</button>');
+    this.presets.forEach(p => h += '<button class="pre" data-op="'+p[0]+'" data-v="'+p[1]+'">'+p[2]+'</button>');
+    if (this.extras.includes('random')) h += '<button class="alt" data-x="random">🎲 Add 4 random keys</button>';
+    if (this.extras.includes('clear')) h += '<button class="alt" data-x="clear">🗑 Clear</button>';
+    h += '<button class="alt" data-x="reset">↺ Reset</button></div><div class="formula"></div><div class="hrow"></div><div class="load"></div><div class="vlog"></div>';
+    el.innerHTML = h;
+    this.row = el.querySelector('.hrow'); this.log = el.querySelector('.vlog'); this.input = el.querySelector('input');
+    this.formula = el.querySelector('.formula'); this.loadEl = el.querySelector('.load');
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.mode){ this.mode = b.dataset.mode; return this.reset(); }
+      if (b.dataset.x) return this.extra(b.dataset.x);
+      if (b.dataset.op) this.run(b.dataset.op, b.dataset.v);
+    });
+    this.input.addEventListener('keydown', e => { if (e.key === 'Enter' && !this.busy) this.run(this.ops[0]); });
+    this.reset();
+  }
+  /* ----- data (same rules as the Java code) ----- */
+  get chain(){ return this.mode === 'chain'; }
+  step(k){ return 5 - (k % 5); }
+  probeIdx(k, i){ const s = k % this.m; return this.mode === 'quad' ? (s + i*i) % this.m : this.mode === 'dbl' ? (s + i*this.step(k)) % this.m : (s + i) % this.m; }
+  jump(k, i){ return this.mode === 'quad' ? '+'+i+'×'+i : this.mode === 'dbl' ? '+'+i+'×step '+this.step(k) : '+'+i; }
+  rawInsert(k){
+    if (this.chain){ this.lists[k % this.m].unshift(k); return true; }
+    for (let i = 0; i < this.m; i++){ const x = this.probeIdx(k, i); if (this.cells[x] === null || this.cells[x] === DEL){ this.cells[x] = k; return true; } }
+    return false;
+  }
+  has(k){
+    if (this.chain) return this.lists[k % this.m].includes(k);
+    for (let i = 0; i < this.m; i++){ const x = this.probeIdx(k, i); if (this.cells[x] === null) return false; if (this.cells[x] === k) return true; }
+    return false;
+  }
+  count(){ return this.chain ? this.lists.reduce((a, l) => a + l.length, 0) : this.cells.filter(c => typeof c === 'number').length; }
+  /* ----- display ----- */
+  draw(hi, lhi){            // hi: {cellIndex: class}   lhi: {"cell:position": class} for chain links
+    hi = hi || {}; lhi = lhi || {}; let h = '';
+    for (let i = 0; i < this.m; i++){
+      h += '<div class="hc '+(hi[i]||'')+'"><i>['+i+']</i>';
+      if (this.chain){
+        h += '<div class="v '+(this.lists[i].length?'':'empty')+'">'+(this.lists[i].length?'●':'null')+'</div>';
+        this.lists[i].forEach((k, j) => h += '<div class="dn">↓</div><div class="lk '+(lhi[i+':'+j]||'')+'">'+k+'</div>');
+        if (this.lists[i].length) h += '<div class="dn">↓</div><div class="nul">null</div>';
+      } else {
+        const c = this.cells[i];
+        h += '<div class="v '+(c===null?'empty':c===DEL?'del':'')+'">'+(c===null?'--':c)+'</div>';
+      }
+      h += '</div>';
+    }
+    this.row.innerHTML = h;
+    const n = this.count();
+    this.loadEl.innerHTML = MODES[this.mode]+' · '+n+' key'+(n===1?'':'s')+' / '+this.m+' cells · load factor <b>'+(n/this.m).toFixed(2)+'</b>';
+    this.el.querySelectorAll('button.mode').forEach(b => b.classList.toggle('on', b.dataset.mode === this.mode));
+  }
+  say(msg, kind, fresh){ if (fresh) this.log.innerHTML = ''; const d = document.createElement('div'); if (kind) d.className = kind; d.innerHTML = msg; this.log.appendChild(d); }
+  setBusy(b){ this.busy = b; this.el.querySelectorAll('button[data-op],button[data-x="random"]').forEach(x => x.disabled = b); }
+  blank(){ this.m = this.chain && this.el.dataset.modes ? 7 : this.m0; this.cells = Array(this.m).fill(null); this.lists = Array.from({length: this.m}, () => []); }
+  reset(){ this.token++; this.blank(); this.init.forEach(k => this.rawInsert(k)); this.formula.innerHTML = ''; this.draw(); this.say('Ready. Type a key and pick an operation.', '', true); this.setBusy(false); }
+  extra(x){
+    this.token++; this.setBusy(false); this.formula.innerHTML = '';
+    if (x === 'reset') return this.reset();
+    if (x === 'clear'){ this.blank(); this.draw(); return this.say('Table cleared. Every cell is empty.', 'info', true); }
+    if (x === 'random'){
+      let added = [], tries = 0;
+      while (added.length < 4 && tries++ < 200){ const k = 1 + Math.floor(Math.random()*98); if (this.has(k)) continue; if (!this.chain && this.count() >= this.m - 2) break; if (this.rawInsert(k)) added.push(k); }
+      this.draw(); return this.say(added.length ? 'Added '+added.join(', ')+'.' : 'The table is almost full. Clear it or delete some keys first.', 'info', true);
+    }
+  }
+  async play(steps){
+    const token = ++this.token; this.setBusy(true); let first = true;
+    for (const s of steps){
+      if (token !== this.token) return;
+      if (s.apply) s.apply();
+      this.draw(s.hi, s.lhi); this.say(s.msg, s.kind, first); first = false;
+      await sleep(this.delay);
+    }
+    if (token === this.token) this.setBusy(false);
+  }
+  run(op, v){
+    if (this.busy) return;
+    const k = v !== undefined ? +v : parseInt(this.input.value, 10);
+    if (isNaN(k) || k < 0 || k > 999){ this.formula.innerHTML = ''; return this.say('Type a whole number from 0 to 999 first.', 'bad', true); }
+    this.input.value = k;
+    const home = k % this.m;
+    this.formula.innerHTML = 'hash('+k+') = '+k+' % '+this.m+' = <b>'+home+'</b>'+(this.mode === 'dbl' ? ' &nbsp;·&nbsp; step = 5 - ('+k+' % 5) = <b>'+this.step(k)+'</b>' : '');
+    this.chain ? this['c_'+op](k, home) : this['o_'+op](k, home);
+  }
+  /* ----- open addressing ----- */
+  o_insert(k){
+    if (this.has(k)) return this.say(k+' is already in the table. (This demo skips duplicates.)', 'bad', true);
+    if (this.count() >= this.m - 1) return this.say('The demo keeps one cell empty so that searches can always stop. Delete a key or clear the table.', 'bad', true);
+    const steps = [], seen = {};
+    for (let i = 0; i < this.m; i++){
+      const x = this.probeIdx(k, i), c = this.cells[x], where = i === 0 ? 'Home cell '+x : 'Probe '+i+' ('+this.jump(k, i)+') → cell '+x;
+      if (c === null || c === DEL){
+        steps.push({apply: () => { this.cells[x] = k; }, hi: Object.assign({}, seen, {[x]: 'ok'}), msg: where+' is '+(c === DEL ? 'marked DEL, so it is free to re-use' : 'empty')+' → store '+k+' here. Probes needed: '+(i+1)+'.', kind: 'ok'});
+        return this.play(steps);
+      }
+      steps.push({hi: Object.assign({}, seen, {[x]: 'bad'}), msg: where+' is taken by '+c+' → collision, probe again.'});
+      seen[x] = 'dim';
+    }
+    steps.push({hi: seen, msg: 'Tried '+this.m+' probes and found no free cell on this path. insert returns false.', kind: 'bad'});
+    this.play(steps);
+  }
+  walk(k, steps, seen){       // shared by find and delete; returns the cell index or -1
+    for (let i = 0; i < this.m; i++){
+      const x = this.probeIdx(k, i), c = this.cells[x], where = i === 0 ? 'Home cell '+x : 'Probe '+i+' ('+this.jump(k, i)+') → cell '+x;
+      if (c === null){ steps.push({hi: Object.assign({}, seen, {[x]: 'bad'}), msg: where+' is EMPTY → '+k+' is not in the table.', kind: 'bad'}); return -1; }
+      if (c === k){ steps.push({hi: Object.assign({}, seen, {[x]: 'ok'}), msg: where+' holds '+k+' ✔ Found after '+(i+1)+' probe'+(i?'s':'')+'.', kind: 'ok'}); return x; }
+      steps.push({hi: Object.assign({}, seen, {[x]: 'a'}), msg: where+(c === DEL ? ' is marked DEL → not empty, so keep looking.' : ' holds '+c+', not '+k+' → keep looking.')});
+      seen[x] = 'dim';
+    }
+    steps.push({hi: seen, msg: 'Looked at every cell on the path. '+k+' is not in the table.', kind: 'bad'}); return -1;
+  }
+  o_find(k){ const steps = []; this.walk(k, steps, {}); this.play(steps); }
+  o_delete(k){
+    const steps = [], seen = {}, x = this.walk(k, steps, seen);
+    if (x >= 0) steps.push({apply: () => { this.cells[x] = DEL; }, hi: Object.assign({}, seen, {[x]: 'a'}), msg: 'Cell '+x+' is NOT emptied. It gets the DEL marker, so searches for the keys behind it still work.', kind: 'info'});
+    this.play(steps);
+  }
+  /* ----- separate chaining ----- */
+  c_insert(k, home){
+    if (this.has(k)) return this.say(k+' is already in the table. (This demo skips duplicates.)', 'bad', true);
+    if (this.lists[home].length >= 6) return this.say('That list is long enough for the demo. Try another key.', 'bad', true);
+    const n = this.lists[home].length;
+    this.play([
+      {hi: {[home]: 'a'}, msg: 'Go straight to cell '+home+'. '+(n ? 'Its list already has '+n+' link'+(n>1?'s':'')+': a collision, but no problem.' : 'Its list is empty.')},
+      {apply: () => this.lists[home].unshift(k), hi: {[home]: 'dim'}, lhi: {[home+':0']: 'ok'}, msg: 'Put '+k+' at the FRONT of the list of cell '+home+'. No probing.', kind: 'ok'},
+    ]);
+  }
+  cwalk(k, home, steps){
+    steps.push({hi: {[home]: 'a'}, msg: 'Go straight to cell '+home+' and walk its list.'});
+    const list = this.lists[home];
+    for (let j = 0; j < list.length; j++){
+      if (list[j] === k){ steps.push({hi: {[home]: 'dim'}, lhi: {[home+':'+j]: 'ok'}, msg: 'Link '+(j+1)+' holds '+k+' ✔ Found.', kind: 'ok'}); return j; }
+      steps.push({hi: {[home]: 'dim'}, lhi: {[home+':'+j]: 'a'}, msg: 'Link '+(j+1)+' holds '+list[j]+', not '+k+' → next link.'});
+    }
+    steps.push({hi: {[home]: 'bad'}, msg: 'Reached <code>null</code>, the end of the list → '+k+' is not in the table.', kind: 'bad'}); return -1;
+  }
+  c_find(k, home){ const steps = []; this.cwalk(k, home, steps); this.play(steps); }
+  c_delete(k, home){
+    const steps = [], j = this.cwalk(k, home, steps);
+    if (j >= 0) steps.push({apply: () => this.lists[home].splice(j, 1), hi: {[home]: 'dim'}, msg: 'Unlinked '+k+' from the list. Ordinary linked-list deletion: no marker needed.', kind: 'info'});
+    this.play(steps);
+  }
+}
+
+/* =====================================================================
+   5.  SMALL WIDGETS: vocabulary picture, hash calculator, load-factor slider
+   ===================================================================== */
+function initVocab(){
+  const diag = document.getElementById('hdiag'), cap = document.getElementById('vocabCap'), terms = document.getElementById('terms');
+  const showTerm = c => {
+    diag.querySelectorAll('.a').forEach(e => e.classList.remove('a'));
+    terms.querySelectorAll('.term').forEach(t => t.classList.toggle('on', t === c));
+    diag.querySelectorAll(c.dataset.hl).forEach(e => e.classList.add('a'));
+    cap.textContent = c.dataset.cap;
+  };
+  const h = e => { const c = e.target.closest('.term'); if (c) showTerm(c); };
+  terms.addEventListener('mouseover', h); terms.addEventListener('click', h);
+}
+function initCalc(){
+  const key = document.getElementById('cKey'), size = document.getElementById('cSize'), res = document.getElementById('cRes'), why = document.getElementById('cWhy');
+  const upd = () => {
+    const k = parseInt(key.value, 10), s = parseInt(size.value, 10);
+    if (isNaN(k) || isNaN(s) || k < 0 || s < 1){ res.textContent = '?'; why.textContent = 'Type a key (0 or more) and a size (1 or more).'; return; }
+    res.textContent = k % s;
+    why.innerHTML = k+' ÷ '+s+' = '+Math.floor(k / s)+' remainder <b>'+(k % s)+'</b> → the key goes in cell <b>'+(k % s)+'</b> of a table with cells 0 to '+(s - 1)+'.';
+  };
+  key.addEventListener('input', upd); size.addEventListener('input', upd); upd();
+}
+function initEff(){
+  const slider = document.getElementById('eLoad'), val = document.getElementById('eVal'), bars = document.getElementById('eBars');
+  const upd = () => {
+    const L = slider.value / 100;
+    const rows = [['Linear probing · hit', 0.5 * (1 + 1 / (1 - L))], ['Linear probing · miss', 0.5 * (1 + 1 / ((1 - L) * (1 - L)))], ['Chaining · hit', 1 + L / 2], ['Chaining · miss', 1 + L]];
+    val.textContent = L.toFixed(2);
+    bars.innerHTML = rows.map(r => '<div class="ebar"><span>'+r[0]+'</span><div class="track"><div class="fill'+(r[1] > 5 ? ' hot' : '')+'" style="width:'+Math.min(100, r[1] * 5)+'%"></div></div><b>'+r[1].toFixed(1)+'</b></div>').join('');
+  };
+  slider.addEventListener('input', upd); upd();
+}
+
+/* =====================================================================
+   6.  START
+   ===================================================================== */
+document.querySelectorAll('[data-code]').forEach(renderCode);
+document.querySelectorAll('.hv').forEach(el => new HashViz(el));
+initVocab(); initCalc(); initEff(); buildTabs(); show(null);
+go(Math.max(0, sections.findIndex(s => '#' + s.id === location.hash)), false);
+window.LECTURE = {B, textOf};
+</script>
+</body>
+</html>
