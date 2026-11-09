@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAC286 · Binary Trees I &amp; II</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b1020; --card:#151c30; --ink:#e6e9f5; --muted:#9aa4bf; --line:#2a3350;
+  --p1:#818cf8; --p1soft:#262b55; --p2:#f472b6; --p2soft:#4a1d3a;
+  --def:#60a5fa; --defbg:#12233f; --pic:#fbbf24; --picbg:#2e2410;
+  --rem:#34d399; --rembg:#0f2a22; --warn:#f87171; --warnbg:#321618;
+  --code:#060a14; --codeline:#1e293b; --dark:#0b1020;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:19px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+code,.mono{font-family:"JetBrains Mono","Fira Code",Consolas,Menlo,monospace}
+p code,li code,td code,.panel code,.vlog code{background:#e9ecf8;color:#3730a3;padding:1px 6px;border-radius:5px;font-size:.92em}
+
+/* ---------- header + tabs ---------- */
+header.top{background:linear-gradient(120deg,#312e81,#4f46e5 55%,#db2777);color:#fff;padding:22px 28px 20px}
+header.top h1{margin:0;font-size:2.1rem;letter-spacing:-.5px}
+header.top p{margin:4px 0 0;opacity:.92;font-size:1.05rem}
+nav.tabs{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;padding:9px 16px;overflow-x:auto;box-shadow:0 2px 10px rgba(30,40,90,.06)}
+nav.tabs .part{flex:none;font-size:.72rem;font-weight:800;letter-spacing:1px;padding:4px 9px;border-radius:6px;color:#fff;background:var(--p1);margin-right:2px}
+nav.tabs .part.two{background:var(--p2);margin-left:10px}
+nav.tabs button{flex:none;border:1px solid var(--line);background:#fff;color:var(--ink);font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav.tabs button b{display:inline-block;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;border-radius:50%;background:var(--p1soft);color:var(--p1);margin-right:6px;font-size:.85em}
+nav.tabs button[data-part="2"] b{background:var(--p2soft);color:var(--p2)}
+nav.tabs button:hover{border-color:var(--p1)}
+nav.tabs button.on{background:var(--p1);border-color:var(--p1);color:#fff}
+nav.tabs button.on[data-part="2"]{background:var(--p2);border-color:var(--p2)}
+nav.tabs button.on b{background:rgba(255,255,255,.25);color:#fff}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1560px;margin:0 auto;padding:22px 22px 60px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:22px;align-items:start}
+.wrap.nopanel{grid-template-columns:minmax(0,1fr)}
+.wrap.nopanel aside.panel{display:none}
+section.tab{display:none}
+section.tab.on{display:block}
+section.tab>h2{font-size:1.85rem;margin:0 0 4px;letter-spacing:-.4px}
+section.tab>.goal{color:var(--muted);margin:0 0 16px;font-size:1.08rem}
+h3{font-size:1.3rem;margin:26px 0 10px}
+h3 .step{display:inline-block;background:var(--ink);color:#fff;border-radius:7px;font-size:.78rem;padding:3px 9px;margin-right:8px;vertical-align:middle;letter-spacing:.5px}
+ul{margin:8px 0;padding-left:1.3em} li{margin:5px 0}
+.box{border-radius:12px;padding:14px 18px 14px 20px;margin:14px 0;border-left:6px solid;background:var(--card)}
+.box .tag{font-weight:800;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+.box ul{margin:4px 0}
+.def{border-color:var(--def);background:var(--defbg)} .def .tag{color:var(--def)}
+.pic{border-color:var(--pic);background:var(--picbg)} .pic .tag{color:var(--pic)}
+.rem{border-color:var(--rem);background:var(--rembg)} .rem .tag{color:var(--rem)}
+.warn{border-color:var(--warn);background:var(--warnbg)} .warn .tag{color:var(--warn)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+table.cmp{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(30,40,90,.08);margin:12px 0}
+table.cmp th,table.cmp td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:left}
+table.cmp th{background:var(--ink);color:#fff;font-size:.95rem}
+table.cmp tr:last-child td{border-bottom:0}
+.good{color:#047857;font-weight:700}.bad{color:#b91c1c;font-weight:700}
+.star td{background:#f0fdf4}
+.navrow{display:flex;justify-content:space-between;margin-top:34px;gap:12px}
+.navrow button{font:600 1rem inherit;font-family:inherit;padding:11px 20px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.navrow button.next{background:var(--ink);color:#fff;border-color:var(--ink)}
+.navrow button:disabled{visibility:hidden}
+
+/* ---------- code ---------- */
+.codebox{background:var(--code);border-radius:12px;margin:12px 0;overflow:hidden;box-shadow:0 3px 12px rgba(15,23,42,.18)}
+.codebar{display:flex;align-items:center;justify-content:space-between;background:#1e293b;color:#cbd5e1;padding:7px 12px;font-size:.85rem}
+.codebar .fname{font-family:Consolas,Menlo,monospace}
+.codebar button,.copyrun{font:600 .85rem inherit;font-family:inherit;border:0;border-radius:7px;padding:6px 12px;cursor:pointer;background:#334155;color:#fff}
+.codebar button:hover{background:#475569}
+.copyrun{background:var(--rem);font-size:.98rem;padding:10px 16px;margin:6px 0}
+.copyrun:hover{filter:brightness(1.08)}
+.code{padding:8px 0;overflow-x:auto;font:17px/1.6 "JetBrains Mono","Fira Code",Consolas,Menlo,monospace;color:#e2e8f0}
+.ln{display:flex;white-space:pre;padding:0 14px 0 0;border-left:4px solid transparent;cursor:pointer;min-width:max-content}
+.ln .no{flex:none;width:3em;text-align:right;padding-right:14px;color:#64748b;user-select:none}
+.ln.blank{cursor:default}
+.ln:not(.blank):hover{background:#27344d}
+.ln.hot{background:#33415f;border-left-color:#fbbf24}
+.ln.pin{background:#3b3a6e;border-left-color:#f472b6}
+.k{color:#c4b5fd}.t{color:#7dd3fc}.s{color:#86efac}.c{color:#94a3b8;font-style:italic}.num{color:#fdba74}
+.output{background:#111827;border-radius:12px;margin:10px 0;overflow:hidden}
+.output .outbar{background:#064e3b;color:#a7f3d0;font-size:.8rem;font-weight:700;letter-spacing:1px;padding:5px 12px}
+.output pre{margin:0;padding:10px 14px;color:#d1fae5;font:16px/1.5 Consolas,Menlo,monospace;overflow-x:auto}
+details.full{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:12px 0}
+details.full summary{cursor:pointer;font-weight:700}
+
+/* ---------- right panel ---------- */
+aside.panel{position:sticky;top:74px;background:#fff;border:2px solid var(--p1);border-radius:14px;padding:16px 18px;box-shadow:0 6px 20px rgba(79,70,229,.14);max-height:calc(100vh - 92px);overflow:auto}
+aside.panel h4{margin:0 0 8px;font-size:.8rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--p1)}
+aside.panel .where{font-size:.85rem;color:var(--muted);margin-bottom:8px}
+aside.panel .pline{background:var(--code);color:#e2e8f0;border-radius:8px;padding:9px 11px;font:15px/1.5 Consolas,Menlo,monospace;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
+aside.panel .ptext{font-size:1.22rem;line-height:1.5}
+aside.panel .hint{color:var(--muted);font-size:1.05rem}
+aside.panel .keys{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);font-size:.85rem;color:var(--muted)}
+kbd{background:#eef0f6;border:1px solid #cfd5e3;border-bottom-width:2px;border-radius:5px;padding:0 6px;font-size:.85em}
+
+/* ---------- tree drawings ---------- */
+svg.tree{display:block;max-width:100%;height:auto;margin:0 auto}
+svg.tree .e{stroke:#aab2c8;stroke-width:3}
+svg.tree .e.a{stroke:#f59e0b;stroke-width:6}
+svg.tree .n circle{fill:#fff;stroke:#4f46e5;stroke-width:3;transition:fill .2s}
+svg.tree .n text{font:700 19px "Segoe UI",system-ui,sans-serif;fill:#1c2333}
+svg.tree .n.a circle{fill:#fde68a;stroke:#d97706;stroke-width:5}
+svg.tree .n.b circle{fill:#bfdbfe;stroke:#2563eb}
+svg.tree .n.dim circle{fill:#e0e7ff}
+svg.tree .n.ok circle{fill:#86efac;stroke:#059669;stroke-width:5}
+svg.tree .n.new circle{fill:#86efac;stroke:#059669;stroke-width:5}
+svg.tree .n.del circle{fill:#fecaca;stroke:#dc2626;stroke-width:5}
+svg.tree .n.lo circle{fill:#99f6e4;stroke:#0d9488}
+svg.tree .n.hi circle{fill:#fbcfe8;stroke:#db2777}
+svg.tree .n.fade{opacity:.3}
+svg.tree .empty{font:italic 17px sans-serif;fill:#8089a0}
+svg.tree .lvl{font:700 14px sans-serif;fill:#8089a0}
+svg.tree .lvline{stroke:#dfe3ee;stroke-dasharray:5 6}
+svg.tree .badge{font:700 13px Consolas,monospace;fill:#db2777}
+
+.viz{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;box-shadow:0 1px 4px rgba(30,40,90,.06)}
+.viz .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.viz input{width:86px;font:700 1.05rem inherit;font-family:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:9px}
+.viz button{font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:9px;border:0;background:var(--p1);color:#fff;cursor:pointer}
+.viz button.alt{background:#e8eaf3;color:var(--ink)}
+.viz button.pre{background:var(--p2)}
+.viz button:disabled{opacity:.45;cursor:not-allowed}
+.viz .stage{min-height:230px;display:flex;align-items:center;justify-content:center;overflow-x:auto;padding:6px 0}
+.vlog{background:#f3f4fa;border-radius:10px;padding:9px 14px;min-height:54px;font-size:1.02rem}
+.vlog div{padding:1px 0}
+.vlog .ok{color:#047857;font-weight:700}.vlog .bad{color:#b91c1c;font-weight:700}.vlog .info{color:#3730a3;font-weight:700}
+.vout{font:700 1.05rem Consolas,monospace;color:#9d174d;min-height:1.4em;margin-top:4px}
+
+/* vocabulary */
+.vocab{display:grid;grid-template-columns:minmax(300px,480px) 1fr;gap:18px;align-items:start}
+.vocab .pict{position:sticky;top:74px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.vocab .pict .cap{text-align:center;font-weight:700;color:var(--p1);min-height:1.6em}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.term{background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 13px;cursor:pointer;transition:.15s}
+.term:hover,.term.on{border-color:#f59e0b;background:#fffbeb;transform:translateY(-2px)}
+.term b{display:block;font-size:1.12rem;color:var(--p1)}
+.term span{font-size:.98rem}
+.term em{display:block;font-style:normal;font-size:.86rem;color:var(--muted);margin-top:3px}
+
+/* arrays */
+.arr{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.arr .cell{width:68px;border:2px solid var(--line);border-radius:10px;background:#fff;text-align:center;cursor:pointer;padding:5px 0}
+.arr .cell i{display:block;font:700 .8rem Consolas,monospace;color:var(--p2);font-style:normal}
+.arr .cell b{font-size:1.25rem}
+.arr .cell.a{background:#fde68a;border-color:#d97706}
+.arr .cell.b{background:#bfdbfe;border-color:#2563eb}
+.arr .cell.hole b{color:#c0c6d6}
+.formula{text-align:center;font:600 1.05rem Consolas,monospace;min-height:3.2em;color:#3730a3}
+.bigf{font:700 1.2rem Consolas,monospace;background:#fff;border-radius:10px;padding:10px 14px;text-align:center;border:2px solid var(--line)}
+.bigf small{display:block;font:600 .8rem "Segoe UI",sans-serif;color:var(--muted)}
+
+.codebox.hasfocus .ln:not(.focus) .src{opacity:.72}
+.codebox.hasfocus .ln:not(.focus):hover .src,.codebox.hasfocus .ln.pin .src{opacity:1}
+.codebox.hasfocus .ln.focus{background:#141d38;border-left-color:#818cf8}
+.codebox.hasfocus .ln.focus:hover,.codebox.hasfocus .ln.focus.hot{background:#33415f;border-left-color:#fbbf24}
+.codebar .star{color:#a5b4fc}
+h3 small{font-weight:500;font-size:.8em;color:var(--muted)}
+
+/* ---------- dark mode surfaces ---------- */
+p code,li code,td code,.panel code,.vlog code{background:#262b55;color:#c7d2fe}
+nav.tabs{background:#10162a;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+nav.tabs .part,nav.tabs button.on,nav.tabs button.on[data-part="2"]{color:var(--dark)}
+nav.tabs button{background:var(--card)}
+nav.tabs button.on b{background:rgba(0,0,0,.2);color:var(--dark)}
+h3 .step{background:#312e81;color:#e0e7ff}
+table.cmp{background:var(--card);box-shadow:none;border:1px solid var(--line)}
+table.cmp th{background:#1e2440;color:#c7d2fe}
+.star td{background:#0f2a22}
+.good{color:#34d399}.bad{color:#f87171}
+.navrow button{background:var(--card);color:var(--ink)}
+.navrow button.next{background:var(--p1);border-color:var(--p1);color:var(--dark)}
+.codebox{border:1px solid var(--line);box-shadow:none}
+.copyrun{color:#06281c}
+details.full,aside.panel,.viz,.vocab .pict,.term,.bigf{background:var(--card)}
+aside.panel{box-shadow:0 6px 24px rgba(0,0,0,.5)}
+aside.panel .pline{border:1px solid var(--line)}
+kbd{background:#1e2440;border-color:#3a4468;color:var(--ink)}
+.viz{box-shadow:none}
+.viz input{background:var(--dark);color:var(--ink)}
+.viz button{color:var(--dark)}
+.viz button.alt{background:#262e4a;color:var(--ink)}
+.vlog{background:#0f1528}
+.vlog .ok{color:#34d399}.vlog .bad{color:#f87171}.vlog .info{color:#a5b4fc}
+.vout{color:#f9a8d4}
+.term:hover,.term.on{background:#2e2410;border-color:#fbbf24}
+.arr .cell{background:var(--card)}
+.arr .cell.a,.arr .cell.b{color:#1c2333}
+.arr .cell.a i,.arr .cell.b i{color:#9d174d}
+.arr .cell.hole b{color:#4b5674}
+.formula{color:#a5b4fc}
+svg.tree .e{stroke:#55607f}
+svg.tree .n circle{fill:#e8ebfa;stroke:#6366f1}
+svg.tree .empty,svg.tree .lvl{fill:#9aa4bf}
+svg.tree .lvline{stroke:#2a3350}
+svg.tree .badge{fill:#f472b6}
+
+@media (max-width:1050px){
+  body{font-size:18px}
+  .wrap{grid-template-columns:minmax(0,1fr);padding-bottom:42vh}
+  aside.panel{position:fixed;left:8px;right:8px;bottom:8px;top:auto;max-height:36vh;z-index:30}
+  .cols,.cols3,.vocab{grid-template-columns:1fr}
+  .vocab .pict{position:static}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🌳 Binary Trees I &amp; II</h1>
+  <p>MAC286 · Data Structures in Java — hover over any line of code to see what it does on the right.</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="wrap" id="wrap">
+<main>
+
+<!-- ====================== 1. WHY ====================== -->
+<section class="tab" id="why" data-title="Why Trees?" data-part="1">
+  <h2>Why do we need trees?</h2>
+  <p class="goal">Goal: see the problem that trees solve, before we learn any new words.</p>
+
+  <div class="box def"><span class="tag">The problem</span>
+    <ul>
+      <li>We already know two ways to store data: <b>arrays</b> and <b>linked lists</b>.</li>
+      <li>Each one is fast at one job and slow at another.</li>
+      <li>A <b>binary search tree</b> is fast at both jobs.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Structure</th><th>Search for a value</th><th>Insert a new value</th></tr>
+    <tr><td>Sorted array</td><td class="good">Fast · O(log n)</td><td class="bad">Slow · O(n) — must shift items</td></tr>
+    <tr><td>Linked list</td><td class="bad">Slow · O(n) — check one by one</td><td class="good">Fast · O(1) at the front</td></tr>
+    <tr class="star"><td><b>Binary search tree 🌳</b></td><td class="good">Fast · O(log n)</td><td class="good">Fast · O(log n)</td></tr>
+  </table>
+
+  <div class="cols">
+    <div class="box rem"><span class="tag">How fast is O(log n)?</span>
+      <ul>
+        <li>Each step throws away <b>half</b> of the remaining data.</li>
+        <li>1,000 items → about <b>10</b> steps.</li>
+        <li>1,000,000 items → about <b>20</b> steps.</li>
+      </ul>
+    </div>
+    <div class="box pic"><span class="tag">Picture it 🎯</span>
+      <ul>
+        <li>Imagine the <b>higher or lower</b> guessing game (guess my number from 1 to 100).</li>
+        <li>Each <b>guess</b> is one <b>node</b>.</li>
+        <li>"Lower!" means go <b>left</b>. "Higher!" means go <b>right</b>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Here is one. Try a search.</h3>
+  <div class="viz" data-keys="50,30,70,20,40,60,80" data-ops="find" data-val="60"></div>
+
+  <div class="box rem"><span class="tag">What we will learn</span>
+    <ul>
+      <li><b>Part I:</b> the vocabulary, the Java classes, finding, inserting, min and max.</li>
+      <li><b>Part II:</b> traversing, deleting, and storing a tree in an array.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 2. VOCABULARY ====================== -->
+<section class="tab" id="vocab" data-title="Vocabulary" data-part="1">
+  <h2>Tree vocabulary</h2>
+  <p class="goal">Goal: learn the words, one at a time. Hover over (or tap) a word to see it in the picture.</p>
+
+  <div class="vocab">
+    <div class="pict">
+      <svg class="tree" id="vocabSvg"></svg>
+      <div class="cap" id="vocabCap">👆 Pick a word</div>
+    </div>
+    <div>
+      <div class="terms" id="terms">
+        <div class="term" data-t="node"><b>Node</b><span>One item in the tree. It holds a key and links to its children.</span><em>Java: an object of class Node</em></div>
+        <div class="term" data-t="key"><b>Key</b><span>The value stored inside a node. We search by it.</span><em>Here: the number in each circle</em></div>
+        <div class="term" data-t="edge"><b>Edge</b><span>The link from one node down to another.</span><em>Java: a reference (left or right)</em></div>
+        <div class="term" data-t="root"><b>Root</b><span>The one node at the top. It has no parent.</span><em>Every tree has exactly one root</em></div>
+        <div class="term" data-t="parent"><b>Parent</b><span>The node directly above another node.</span><em>30 is the parent of 20 and 40</em></div>
+        <div class="term" data-t="child"><b>Child</b><span>A node directly below another node.</span><em>20 = left child of 30, 40 = right child</em></div>
+        <div class="term" data-t="leaf"><b>Leaf</b><span>A node with no children.</span><em>Both of its links are null</em></div>
+        <div class="term" data-t="subtree"><b>Subtree</b><span>A node plus everything below it.</span><em>A small tree inside the big tree</em></div>
+        <div class="term" data-t="path"><b>Path</b><span>The nodes you pass through, following edges, to get from one node to another.</span><em>50 → 30 → 20 → 10</em></div>
+        <div class="term" data-t="level"><b>Level</b><span>How many edges a node is away from the root.</span><em>The root is at level 0</em></div>
+        <div class="term" data-t="height"><b>Height</b><span>The largest level in the tree.</span><em>This tree has height 3</em></div>
+        <div class="term" data-t="binary"><b>Binary tree</b><span>A tree where every node has at most 2 children: a left one and a right one.</span><em>"Bi" means two</em></div>
+        <div class="term" data-t="bst"><b>Binary search tree (BST)</b><span>A binary tree with one rule: at every node, smaller keys are on the left and bigger keys are on the right.</span><em>This rule is what makes searching fast</em></div>
+      </div>
+
+      <div class="box pic"><span class="tag">Picture it 👵</span>
+        <ul>
+          <li>Imagine a <b>family tree</b> drawn upside down.</li>
+          <li>The <b>root</b> is the great-grandmother at the top.</li>
+          <li>Each <b>edge</b> is a parent-to-child line.</li>
+          <li>A <b>leaf</b> is a family member with no kids.</li>
+          <li>A <b>subtree</b> is one branch of the family.</li>
+        </ul>
+      </div>
+      <div class="box warn"><span class="tag">Watch out 🙃</span>
+        <ul>
+          <li>Computer science trees grow <b>down</b>. The root is at the <b>top</b>.</li>
+          <li>Not every binary tree is a binary <b>search</b> tree. The BST needs the smaller-left / bigger-right rule.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 3. NODE + TREE ====================== -->
+<section class="tab" id="classes" data-title="Node &amp; Tree in Java" data-part="1">
+  <h2>The Node and Tree classes</h2>
+  <p class="goal">Goal: turn the picture into Java. One node first, then a tiny tree. Every program here is complete and runs as it is.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>A tree <b>node</b> is an object with 3 fields: a <code>key</code>, a <code>left</code> reference and a <code>right</code> reference.</li>
+      <li>It is like a linked-list node, but with <b>two</b> next links instead of one.</li>
+      <li>A link that points to nothing is <code>null</code>.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 1</span>One node</h3>
+  <div data-code="T_node"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Key:   50
+Left:  null
+Right: null</pre></div>
+
+  <h3><span class="step">STEP 2</span>Connect two children</h3>
+  <div data-code="P_classes"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Root:        50
+Left child:  30
+Right child: 70
+Left of 30:  null</pre></div>
+  <div class="viz" data-keys="50,30,70" data-ops="" data-static="1"></div>
+
+  <h3><span class="step">STEP 3</span>The Tree class</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>The <b>Tree</b> object remembers only one thing: the <code>root</code>.</li>
+      <li>From the root we can reach every other node by following links.</li>
+      <li>Empty tree: <code>root == null</code>.</li>
+    </ul>
+  </div>
+  <div data-code="P_shell"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Is the tree empty? true</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Node = <code>key</code> + <code>left</code> + <code>right</code>.</li>
+      <li>Tree = just the <code>root</code>.</li>
+      <li>Building by hand is slow. Next we write <code>find</code> and <code>insert</code> to do the walking for us.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 4. FIND ====================== -->
+<section class="tab" id="find" data-title="Finding a Node" data-part="1">
+  <h2>Finding a node</h2>
+  <p class="goal">Goal: search the tree for a key by making one left-or-right decision per level.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Find</b> = look for the node that holds a given key.</li>
+      <li>Start at the <b>root</b>.</li>
+      <li>Key is <b>smaller</b> than the node → go <b>left</b>.</li>
+      <li>Key is <b>bigger</b> → go <b>right</b>.</li>
+      <li>Stop when the keys are <b>equal</b> (found) or when we reach <code>null</code> (not there).</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 📖</span>
+    <ul>
+      <li>Imagine looking up a word in a paper <b>dictionary</b>.</li>
+      <li>The <b>page you open</b> is the current node.</li>
+      <li>Your word comes earlier? Flip <b>left</b>. Later? Flip <b>right</b>.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="viz" data-keys="50,30,70,20,40,60,80" data-ops="find" data-val="40" data-presets="find:60:Find 60|find:65:Find 65 (not there)"></div>
+
+  <h3><span class="step">STEP 1</span>The one decision</h3>
+  <div data-code="T_find"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>We moved to: 70</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the new method is highlighted)</small></h3>
+  <div data-code="P_find"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Found 60
+Is 65 here? false</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>We never look at the whole tree. Only <b>one node per level</b>.</li>
+      <li>Steps needed = the level of the node. At most the <b>height</b> of the tree.</li>
+      <li>Balanced tree → <b>O(log n)</b>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 5. INSERT ====================== -->
+<section class="tab" id="insert" data-title="Inserting a Node" data-part="1">
+  <h2>Inserting a node</h2>
+  <p class="goal">Goal: add a new key in the right place, so the BST rule stays true.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Insert</b> = add a new node to the tree.</li>
+      <li>Walk down exactly like <b>find</b>.</li>
+      <li>When the next spot is <code>null</code>, attach the new node there.</li>
+      <li>A new node always becomes a <b>leaf</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🚗</span>
+    <ul>
+      <li>Imagine driving through a parking garage with signs.</li>
+      <li>Each <b>sign</b> is a node: "smaller numbers left, bigger numbers right".</li>
+      <li>The <b>first empty space</b> you reach is the <code>null</code> spot. Park there.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="viz" data-keys="50,30,70,20,60" data-ops="insert" data-val="40" data-presets="insert:65:Insert 65|insert:10:Insert 10"></div>
+
+  <h3><span class="step">STEP 1</span>Empty spot? Attach.</h3>
+  <div data-code="T_insert"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Left child of 50: 30</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the new method is highlighted)</small></h3>
+  <div data-code="P_insert"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Root:          50
+Left of root:  30
+Right of root: 70
+Left of 30:    20
+Right of 60:   65</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out: the order matters 📉</span>
+    <ul>
+      <li>Insert keys that are <b>already sorted</b> (10, 20, 30, 40, 50) and every node goes to the right.</li>
+      <li>The tree becomes a long stick. It behaves like a <b>linked list</b>.</li>
+      <li>Find and insert slow down to <b>O(n)</b>. Try it:</li>
+    </ul>
+  </div>
+  <div class="viz" data-keys="" data-ops="insert" data-val="10" data-extras="sorted,clear"></div>
+</section>
+
+<!-- ====================== 6. MIN / MAX ====================== -->
+<section class="tab" id="minmax" data-title="Min &amp; Max" data-part="1">
+  <h2>Finding the min and max values</h2>
+  <p class="goal">Goal: find the smallest and the biggest key without comparing any keys at all.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Minimum</b> = the smallest key. Start at the root and keep going <b>left</b> until there is no left child.</li>
+      <li><b>Maximum</b> = the biggest key. Start at the root and keep going <b>right</b> until there is no right child.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🛝</span>
+    <ul>
+      <li>Imagine the tree is a playground with slides.</li>
+      <li>Always take the <b>left slide</b>: you land on the minimum.</li>
+      <li>Always take the <b>right slide</b>: you land on the maximum.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="viz" data-keys="50,30,70,20,40,60,80,10,90" data-ops="min,max"></div>
+
+  <h3><span class="step">STEP 1</span>Keep going left</h3>
+  <div data-code="T_min"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Smallest key: 20</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the two new methods are highlighted)</small></h3>
+  <div data-code="P_minmax"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Min: 20
+Max: 80</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Min = far <b>left</b>. Max = far <b>right</b>.</li>
+      <li>Same cost as find: at most the height of the tree.</li>
+      <li>We will need "smallest key in a subtree" again when we <b>delete</b>.</li>
+    </ul>
+  </div>
+  <div class="box def"><span class="tag">End of Part I ✅</span>
+    <ul><li>You can now build a BST, search it, and find its min and max.</li></ul>
+  </div>
+</section>
+
+<!-- ====================== 7. TRAVERSAL ====================== -->
+<section class="tab" id="traverse" data-title="Traversing the Tree" data-part="2">
+  <h2>Traversing the tree</h2>
+  <p class="goal">Goal: visit every node exactly once, in a chosen order.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Traverse</b> = visit every node in the tree, one time each.</li>
+      <li><b>Visit</b> = do something with the node. Here: print its key.</li>
+      <li>There are 3 classic orders. The only difference is <b>when</b> we visit the node itself.</li>
+    </ul>
+  </div>
+
+  <div class="cols3">
+    <div class="bigf">Left → <span style="color:#f472b6">NODE</span> → Right<small>IN-order · gives sorted output</small></div>
+    <div class="bigf"><span style="color:#f472b6">NODE</span> → Left → Right<small>PRE-order · node first</small></div>
+    <div class="bigf">Left → Right → <span style="color:#f472b6">NODE</span><small>POST-order · node last</small></div>
+  </div>
+
+  <div class="box def"><span class="tag">New word: recursion</span>
+    <ul>
+      <li><b>Recursion</b> = a method that calls <b>itself</b> on a smaller piece of the problem.</li>
+      <li>Here the smaller piece is a <b>subtree</b>.</li>
+      <li>It must have a <b>stop rule</b>: when the node is <code>null</code>, do nothing.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🏠</span>
+    <ul>
+      <li>Imagine checking every room in a house with many hallways.</li>
+      <li>Each <b>room</b> is a node. Each <b>hallway</b> is a subtree.</li>
+      <li>In-order rule: finish the whole <b>left hallway</b>, then <b>this room</b>, then the whole <b>right hallway</b>.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="viz" data-keys="50,30,70,20,40,60,80" data-ops="in,pre,post"></div>
+
+  <h3><span class="step">STEP 1</span>In-order: just 3 lines of work</h3>
+  <div data-code="T_trav"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>30 50 70 </pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the three new methods are highlighted)</small></h3>
+  <div data-code="P_traverse"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>In-order:   20 30 40 50 60 70 80 
+Pre-order:  50 30 20 40 70 60 80 
+Post-order: 20 40 30 60 80 70 50 </pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li><b>In-order</b> on a BST prints the keys <b>sorted</b>, smallest to biggest.</li>
+      <li><b>Pre-order</b>: the root is printed <b>first</b>. Useful for copying a tree.</li>
+      <li><b>Post-order</b>: the root is printed <b>last</b>. Useful for deleting a whole tree.</li>
+      <li>Every traversal visits all n nodes → <b>O(n)</b>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 8. DELETE ====================== -->
+<section class="tab" id="delete" data-title="Deleting a Node" data-part="2">
+  <h2>Deleting a node</h2>
+  <p class="goal">Goal: remove a node and keep the BST rule true. There are 3 cases. We go from easy to hard.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Delete</b> = remove the node with a given key from the tree.</li>
+      <li>First <b>find</b> the node. Then look at <b>how many children</b> it has.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Case</th><th>The node has…</th><th>What we do</th></tr>
+    <tr><td><b>1</b></td><td>no children (a leaf)</td><td>Just remove it.</td></tr>
+    <tr><td><b>2</b></td><td>one child</td><td>Its child moves up and takes its place.</td></tr>
+    <tr><td><b>3</b></td><td>two children</td><td>Replace its key with its <b>successor</b>, then delete the successor.</td></tr>
+  </table>
+
+  <div class="box def"><span class="tag">New word: successor</span>
+    <ul>
+      <li>The <b>successor</b> of a node is the <b>next bigger key</b> in the tree.</li>
+      <li>How to find it: go <b>right once</b>, then go <b>left</b> as far as you can.</li>
+      <li>It is the <b>smallest key in the right subtree</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🏢</span>
+    <ul>
+      <li>Imagine a company org chart. Each <b>employee</b> is a node.</li>
+      <li><b>Case 1:</b> an employee with no team leaves. Nothing else changes.</li>
+      <li><b>Case 2:</b> a manager with one team member leaves. That person moves up.</li>
+      <li><b>Case 3:</b> a manager with two teams leaves. The <b>successor</b> (next in line) takes the chair.</li>
+    </ul>
+  </div>
+
+  <h3>Watch all 3 cases</h3>
+  <div class="viz" data-keys="50,30,70,20,40,60,80,35,45,65" data-ops="delete" data-val="80"
+       data-presets="delete:80:Case 1 · delete 80|delete:60:Case 2 · delete 60|delete:30:Case 3 · delete 30|delete:50:Delete the root (50)"></div>
+
+  <h3><span class="step">STEP 1</span>Each case as a tiny program</h3>
+  <p><b>Case 1 · a leaf</b></p>
+  <div data-code="T_del1"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Left child of 50: null</pre></div>
+  <p><b>Case 2 · one child</b></p>
+  <div data-code="T_del2"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Left child of 50: 40</pre></div>
+  <p><b>Case 3 · two children</b></p>
+  <div data-code="T_del3"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Root is now:    60
+Left child of 70: null</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the new method is highlighted)</small></h3>
+  <div class="box def"><span class="tag">The idea of this code</span>
+    <ul>
+      <li><code>delete(node, key)</code> removes the key from the subtree that starts at <code>node</code>.</li>
+      <li>It <b>returns the top of the repaired subtree</b>.</li>
+      <li>The parent stores that result in its <code>left</code> or <code>right</code> link. That is how the tree gets re-connected.</li>
+    </ul>
+  </div>
+  <div data-code="P_delete"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Start:                    20 30 35 40 45 50 60 65 70 80 
+Delete 80 (leaf):         20 30 35 40 45 50 60 65 70 
+Delete 60 (one child):    20 30 35 40 45 50 65 70 
+Delete 30 (two children): 20 35 40 45 50 65 70 
+Left child of root is now 35</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>0 children → remove. 1 child → child moves up. 2 children → use the <b>successor</b>.</li>
+      <li>The successor never has a left child, so deleting it is always Case 1 or Case 2.</li>
+      <li>Cost: at most the height of the tree. Balanced tree → <b>O(log n)</b>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 9. ARRAYS ====================== -->
+<section class="tab" id="arrays" data-title="Trees as Arrays" data-part="2">
+  <h2>Representing trees as arrays</h2>
+  <p class="goal">Goal: store a tree in a plain array with no references, using index math.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>We can store a binary tree in an <b>array</b> instead of linked nodes.</li>
+      <li>Fill the array <b>level by level</b>, left to right. The root goes in index <b>0</b>.</li>
+      <li>We find parents and children with <b>arithmetic</b> on the index. No <code>left</code> or <code>right</code> links.</li>
+    </ul>
+  </div>
+
+  <div class="cols3">
+    <div class="bigf">2 * i + 1<small>index of the LEFT child of i</small></div>
+    <div class="bigf">2 * i + 2<small>index of the RIGHT child of i</small></div>
+    <div class="bigf">(i - 1) / 2<small>index of the PARENT of i</small></div>
+  </div>
+
+  <div class="box pic"><span class="tag">Picture it 🎟️</span>
+    <ul>
+      <li>Imagine a theater where the tree sits in rows.</li>
+      <li>Each <b>seat number</b> is an array index. Row 1 is the root.</li>
+      <li>You do not need arrows to find someone's children. You <b>calculate</b> their seat numbers.</li>
+    </ul>
+  </div>
+
+  <h3>Hover over a cell</h3>
+  <div class="viz" id="arrViz">
+    <div class="arr" id="arrCells"></div>
+    <div class="formula" id="arrFormula">👆 Hover over (or tap) an array cell</div>
+    <div class="stage"><svg class="tree" id="arrSvg"></svg></div>
+  </div>
+
+  <h3><span class="step">STEP 1</span>One formula</h3>
+  <div data-code="T_arr"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Left child of 30 is 20</pre></div>
+
+  <h3><span class="step">RUN IT</span>All three formulas</h3>
+  <div data-code="P_arrays"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Node:        30
+Left child:  20
+Right child: 40
+Parent:      50</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out: holes 🕳️</span>
+    <ul>
+      <li>A missing node still <b>uses up its cell</b>. The cell stays empty.</li>
+      <li>This tree has no 20 and no 60, so indexes 3 and 5 are wasted:</li>
+    </ul>
+    <div class="arr" style="margin-top:10px">
+      <div class="cell"><i>[0]</i><b>50</b></div><div class="cell"><i>[1]</i><b>30</b></div><div class="cell"><i>[2]</i><b>70</b></div>
+      <div class="cell hole"><i>[3]</i><b>—</b></div><div class="cell"><i>[4]</i><b>40</b></div><div class="cell hole"><i>[5]</i><b>—</b></div><div class="cell"><i>[6]</i><b>80</b></div>
+    </div>
+    <ul>
+      <li>An unbalanced tree wastes a lot of memory this way.</li>
+    </ul>
+  </div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Left = <code>2*i + 1</code>, right = <code>2*i + 2</code>, parent = <code>(i - 1) / 2</code>.</li>
+      <li>Great when the tree is <b>full</b>, with no holes.</li>
+      <li>That is exactly how a <b>heap</b> is stored. We will use these formulas again in the Heaps lecture.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 10. FULL PROGRAM ====================== -->
+<section class="tab" id="full" data-title="Full Program" data-part="2">
+  <h2>The full program</h2>
+  <p class="goal">Goal: everything from Part I and Part II in one file you can run and change.</p>
+
+  <table class="cmp">
+    <tr><th>Operation</th><th>Balanced tree</th><th>Worst case (a stick)</th></tr>
+    <tr><td>find</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+    <tr><td>insert</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+    <tr><td>min / max</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+    <tr><td>delete</td><td class="good">O(log n)</td><td class="bad">O(n)</td></tr>
+    <tr><td>traverse</td><td>O(n)</td><td>O(n)</td></tr>
+  </table>
+
+  <button class="copyrun" data-copy="P_full">📋 Copy complete Main.java</button>
+  <div data-code="P_full"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Find 60: true
+Find 65: false
+Min: 20
+Max: 80
+In-order:   20 30 40 50 60 70 80 
+Pre-order:  50 30 20 40 70 60 80 
+Post-order: 20 40 30 60 80 70 50 
+After deleting 30: 20 40 50 60 70 80 </pre></div>
+
+  <div class="box rem"><span class="tag">Try this ✏️</span>
+    <ul>
+      <li>Change the keys to <code>{10, 20, 30, 40, 50}</code>. What does pre-order print? Why?</li>
+      <li>Delete the root (50). Which key takes its place?</li>
+      <li>Write a method <code>int count(Node node)</code> that returns how many nodes are in the tree.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 11. PLAYGROUND ====================== -->
+<section class="tab" id="play" data-title="Playground" data-part="2">
+  <h2>Playground</h2>
+  <p class="goal">Build any tree you like. Predict what will happen first, then press the button.</p>
+  <div class="viz" data-keys="50,30,70,20,40,60,80" data-ops="insert,find,delete,min,max,in,pre,post" data-val="45" data-extras="random,sorted,clear"></div>
+  <div class="box rem"><span class="tag">Challenges</span>
+    <ul>
+      <li>Clear the tree. Insert 7 keys so that the height is exactly 2.</li>
+      <li>Insert the same 7 keys in sorted order. What is the height now?</li>
+      <li>Find a node with two children. Predict its successor, then delete it.</li>
+      <li>Which traversal always prints the root first? Which prints it last?</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<aside class="panel" id="panel">
+  <h4>💡 Code explainer</h4>
+  <div id="panelBody"></div>
+  <div class="keys">Every code box is a complete, runnable Main.java · Hover = preview · Click = pin a line · <kbd>↑</kbd> <kbd>↓</kbd> = step through pinned code · <kbd>←</kbd> <kbd>→</kbd> = change tab</div>
+</aside>
+</div>
+
+<script>
+/* =====================================================================
+   1.  JAVA CODE  +  LINE-BY-LINE EXPLANATIONS
+   Each line is [ code , explanation ].  `backticks` become <code>.
+   ===================================================================== */
+const NODE = [
+['class Node {', "A blueprint for ONE node of the tree. Every node we create is built from this class."],
+['    int key;', "The value stored in this node. We call it the `key` because we search by it."],
+['    Node left;', "A reference to the LEFT child. It is `null` when there is no left child."],
+['    Node right;', "A reference to the RIGHT child. It is `null` when there is no right child."],
+['', ''],
+['    Node(int key) {', "The constructor. It runs when we write `new Node(50)`."],
+['        this.key = key;', "Store the number inside the new node. `left` and `right` start as `null` automatically."],
+['    }', "End of the constructor."],
+['}', "End of the Node class."],
+];
+const T_OPEN = [
+['class Tree {', "The Tree class holds the whole tree and all the methods that work on it."],
+['    Node root;', "The only field: a reference to the top node. It starts as `null`, which means the tree is empty."],
+];
+const T_CLOSE = [['}', "End of the Tree class."]];
+
+const INSERT = [
+['    void insert(int key) {', "Add a new key to the tree. `void` means the method gives nothing back."],
+['        Node newNode = new Node(key);', "Build the new node first. It is not connected to the tree yet."],
+['        if (root == null) {', "Is the tree empty?"],
+['            root = newNode;', "Yes, it is empty: the new node becomes the root."],
+['            return;', "Done. Leave the method."],
+['        }', "End of the empty-tree check."],
+['        Node current = root;', "`current` is our walker. It starts at the top, on the root."],
+['        while (true) {', "Keep walking down. We leave with `return` as soon as the new node is attached."],
+['            if (key < current.key) {', "Is the new key SMALLER than the node we are standing on? Then it belongs on the LEFT."],
+['                if (current.left == null) {', "Is the left spot empty?"],
+['                    current.left = newNode;', "Yes: attach the new node here as the left child."],
+['                    return;', "Done."],
+['                }', "End of the empty-spot check."],
+['                current = current.left;', "The left spot is taken. Step down to the left child and compare again."],
+['            } else {', "Otherwise the key is bigger (or equal), so it belongs on the RIGHT."],
+['                if (current.right == null) {', "Is the right spot empty?"],
+['                    current.right = newNode;', "Yes: attach the new node here as the right child."],
+['                    return;', "Done."],
+['                }', "End of the empty-spot check."],
+['                current = current.right;', "The right spot is taken. Step down to the right child and compare again."],
+['            }', "End of the if / else."],
+['        }', "End of the loop body. Go back up and compare with the new `current`."],
+['    }', "End of insert."],
+];
+const FIND = [
+['    Node find(int key) {', "Look for `key`. Returns the node that holds it, or `null` if it is not in the tree."],
+['        Node current = root;', "`current` is our walker. Start at the root."],
+['        while (current != null) {', "Keep going as long as we are standing on a real node."],
+['            if (key == current.key) {', "Is this the key we are looking for?"],
+['                return current;', "Yes! Give back this node and stop."],
+['            }', "End of the found check."],
+['            if (key < current.key) {', "Is our key SMALLER than this node's key?"],
+['                current = current.left;', "Then it can only be in the LEFT subtree. Step left."],
+['            } else {', "Otherwise our key is BIGGER."],
+['                current = current.right;', "Then it can only be in the RIGHT subtree. Step right."],
+['            }', "End of the if / else."],
+['        }', "End of the loop. Go back and test the new `current`."],
+['        return null;', "We walked off the bottom of the tree. The key is not here."],
+['    }', "End of find."],
+];
+const MINMAX = [
+['    int min() {', "Returns the smallest key. We assume the tree is not empty."],
+['        Node current = root;', "Start at the root."],
+['        while (current.left != null) {', "Is there still a left child?"],
+['            current = current.left;', "Yes: step left. Smaller keys are always on the left."],
+['        }', "End of the loop."],
+['        return current.key;', "No more left child. This node holds the smallest key."],
+['    }', "End of min."],
+['', ''],
+['    int max() {', "Returns the biggest key. Same idea, but we go right."],
+['        Node current = root;', "Start at the root."],
+['        while (current.right != null) {', "Is there still a right child?"],
+['            current = current.right;', "Yes: step right. Bigger keys are always on the right."],
+['        }', "End of the loop."],
+['        return current.key;', "No more right child. This node holds the biggest key."],
+['    }', "End of max."],
+];
+const TRAVERSE = [
+['    void inOrder(Node node) {', "Visit the subtree that starts at `node`, in the order Left, Node, Right."],
+['        if (node == null) {', "The stop rule: is there no node here?"],
+['            return;', "Nothing to visit. Go back to the caller."],
+['        }', "End of the stop rule."],
+['        inOrder(node.left);', "1) First visit EVERYTHING in the left subtree. The method calls itself."],
+['        System.out.print(node.key + " ");', "2) Then visit this node: print its key."],
+['        inOrder(node.right);', "3) Last, visit EVERYTHING in the right subtree."],
+['    }', "End of inOrder."],
+['', ''],
+['    void preOrder(Node node) {', "Same three steps, but the node is printed FIRST: Node, Left, Right."],
+['        if (node == null) {', "The stop rule."],
+['            return;', "Nothing to visit."],
+['        }', "End of the stop rule."],
+['        System.out.print(node.key + " ");', "1) Print this node first."],
+['        preOrder(node.left);', "2) Then the whole left subtree."],
+['        preOrder(node.right);', "3) Then the whole right subtree."],
+['    }', "End of preOrder."],
+['', ''],
+['    void postOrder(Node node) {', "Same three steps, but the node is printed LAST: Left, Right, Node."],
+['        if (node == null) {', "The stop rule."],
+['            return;', "Nothing to visit."],
+['        }', "End of the stop rule."],
+['        postOrder(node.left);', "1) The whole left subtree first."],
+['        postOrder(node.right);', "2) Then the whole right subtree."],
+['        System.out.print(node.key + " ");', "3) Print this node last."],
+['    }', "End of postOrder."],
+];
+const DELETE = [
+['    void delete(int key) {', "The method we call from main, for example `tree.delete(30)`."],
+['        root = delete(root, key);', "Start the real work at the root. We save the result in `root` because the root itself might be the node that gets deleted."],
+['    }', "End of the short delete."],
+['', ''],
+['    Node delete(Node node, int key) {', "The helper. It deletes `key` from the subtree that starts at `node`, and RETURNS the top of the repaired subtree."],
+['        if (node == null) {', "Did we walk off the tree?"],
+['            return null;', "The key is not here. Nothing to delete."],
+['        }', "End of the not-found check."],
+['        if (key < node.key) {', "Is the key smaller? Then it must be in the LEFT subtree."],
+['            node.left = delete(node.left, key);', "Delete it from the left subtree, and re-attach whatever comes back as our left child."],
+['        } else if (key > node.key) {', "Is the key bigger? Then it must be in the RIGHT subtree."],
+['            node.right = delete(node.right, key);', "Delete it from the right subtree, and re-attach whatever comes back as our right child."],
+['        } else {', "Not smaller and not bigger: we FOUND the node to delete."],
+['            if (node.left == null) {', "No left child? This covers Case 1 (a leaf) and Case 2 (only a right child)."],
+['                return node.right;', "Hand the right child up to the parent. For a leaf this is `null`, so the node simply disappears."],
+['            }', "End of the no-left-child check."],
+['            if (node.right == null) {', "No right child? This is Case 2 (only a left child)."],
+['                return node.left;', "Hand the left child up to the parent. The deleted node is skipped."],
+['            }', "End of the no-right-child check."],
+['            Node successor = minNode(node.right);', "Case 3: two children. Find the successor, the SMALLEST key in the right subtree."],
+['            node.key = successor.key;', "Copy the successor's key into this node. The old key is gone now."],
+['            node.right = delete(node.right, successor.key);', "The successor's key now appears twice. Remove the original from the right subtree. That is an easy Case 1 or Case 2."],
+['        }', "End of the three-way if."],
+['        return node;', "Give this node back to its parent, so the link above us stays in place."],
+['    }', "End of the delete helper."],
+['', ''],
+['    Node minNode(Node node) {', "Helper: returns the node with the smallest key in a subtree."],
+['        while (node.left != null) {', "As long as there is a left child..."],
+['            node = node.left;', "...keep stepping left."],
+['        }', "End of the loop."],
+['        return node;', "No more left child: this is the smallest node."],
+['    }', "End of minNode."],
+];
+
+const M_OPEN = [
+['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."],
+['    public static void main(String[] args) {', "The program starts running here."],
+];
+const M_CLOSE = [['    }', "End of main."], ['}', "End of the Main class."]];
+const M_BUILD = [
+['        Tree tree = new Tree();', "Create an empty tree. Its `root` is `null`."],
+['        int[] keys = {50, 30, 70, 20, 40, 60, 80};', "The keys we want to store, in the order we will insert them."],
+['        for (int k : keys) {', "Go through the array, one key at a time. `k` is the current key."],
+['            tree.insert(k);', "Insert that key into the tree."],
+['        }', "End of the loop. The tree now has 7 nodes."],
+];
+const BLANK = [['', '']];
+
+const B = {};  // every code block on the page
+/* ----- tiny complete programs (STEP 1 of each tab) ----- */
+const LINK3 = [
+['        Node root = new Node(50);', "Create the root node holding 50."],
+['        root.left = new Node(30);', "Create a second node (30) and hang it on the LEFT link of 50."],
+['        root.right = new Node(70);', "Create a third node (70) and hang it on the RIGHT link of 50."],
+];
+const prog = (focus, before, after) => ({title:'Main.java', run:true, focus, lines:[...NODE, ...BLANK, ...M_OPEN, ...before, ...focus, ...after, ...M_CLOSE]});
+B.T_node = {title:'Main.java', run:true, focus:NODE, lines:[...NODE, ...BLANK, ...M_OPEN,
+['        Node n = new Node(50);', "Create one node holding 50. The variable `n` refers to it."],
+['        System.out.println("Key:   " + n.key);', "Read the key stored inside the node: 50."],
+['        System.out.println("Left:  " + n.left);', "No left child yet, so this link is `null`."],
+['        System.out.println("Right: " + n.right);', "No right child yet, so this link is `null`."],
+...M_CLOSE]};
+B.T_find = prog([
+['        if (key < current.key) {', "Compare the key we want with the key of the node we are standing on."],
+['            current = current.left;', "Smaller: move to the left child."],
+['        } else {', "Otherwise it is bigger."],
+['            current = current.right;', "Bigger: move to the right child."],
+['        }', "After this, `current` is one level lower in the tree."],
+],[...LINK3,
+['        int key = 70;', "The key we are looking for."],
+['        Node current = root;', "`current` is our walker. It starts on the root (50)."],
+],[
+['        System.out.println("We moved to: " + current.key);', "70 is bigger than 50, so we went right. Prints 70."],
+]);
+B.T_insert = prog([
+['        if (current.left == null) {', "Is the left spot of this node empty?"],
+['            current.left = newNode;', "Yes: hang the new node there. It is now a leaf of the tree."],
+['        }', "If the spot was taken, we would step down and try again."],
+],[
+['        Node root = new Node(50);', "A tree with only one node: 50."],
+['        Node newNode = new Node(30);', "The node we want to add. It is not connected yet."],
+['        Node current = root;', "`current` is our walker. It starts on the root."],
+],[
+['        System.out.println("Left child of 50: " + root.left.key);', "30 is now attached on the left of 50. Prints 30."],
+]);
+B.T_min = prog([
+['        while (current.left != null) {', "Is there a left child?"],
+['            current = current.left;', "Yes: step left."],
+['        }', "When the loop ends, `current` is the node with the smallest key."],
+],[
+['        Node root = new Node(50);', "Create the root: 50."],
+['        root.left = new Node(30);', "30 goes on the left of 50."],
+['        root.left.left = new Node(20);', "20 goes on the left of 30."],
+['        Node current = root;', "`current` is our walker. It starts on the root."],
+],[
+['        System.out.println("Smallest key: " + current.key);', "We walked 50, 30, 20. Prints 20."],
+]);
+const T_INORDER = [
+['    static void inOrder(Node node) {', "Visit the subtree that starts at `node`. `static` lets `main` call it directly."],
+['        if (node == null) {', "The stop rule: is there no node here?"],
+['            return;', "Nothing to visit. Go back to the caller."],
+['        }', "End of the stop rule."],
+['        inOrder(node.left);', "1) Everything on the left first."],
+['        System.out.print(node.key + " ");', "2) Then this node."],
+['        inOrder(node.right);', "3) Then everything on the right."],
+['    }', "End of inOrder."],
+];
+B.T_trav = {title:'Main.java', run:true, focus:T_INORDER, lines:[...NODE, ...BLANK,
+['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."],
+...T_INORDER, ...BLANK,
+['    public static void main(String[] args) {', "The program starts running here."],
+...LINK3,
+['        inOrder(root);', "Start at the root. Prints the left node, then the root, then the right node."],
+['        System.out.println();', "Move to a new line."],
+...M_CLOSE]};
+B.T_del1 = prog([
+['        parent.left = null;', "Cut the link from the parent. The leaf (30) is no longer part of the tree."],
+],[...LINK3,
+['        Node parent = root;', "The parent of the leaf we want to delete (30) is the root."],
+],[
+['        System.out.println("Left child of 50: " + root.left);', "The link is `null` now, so Java prints the word null."],
+]);
+B.T_del2 = prog([
+['        parent.left = node.right;', "The parent now points past the deleted node, straight to its only child."],
+],[
+['        Node root = new Node(50);', "Create the root: 50."],
+['        root.left = new Node(30);', "30 goes on the left of 50."],
+['        root.left.right = new Node(40);', "40 goes on the right of 30. So 30 has exactly one child."],
+['        Node parent = root;', "The parent of the node we want to delete."],
+['        Node node = parent.left;', "The node we want to delete: 30."],
+],[
+['        System.out.println("Left child of 50: " + root.left.key);', "40 moved up and took the place of 30. Prints 40."],
+]);
+B.T_del3 = prog([
+['        node.key = successor.key;', "Overwrite the key with the successor's key. 50 becomes 60."],
+['        root.right.left = null;', "Remove the old successor node. It was a leaf, so this is Case 1."],
+],[...LINK3,
+['        root.right.left = new Node(60);', "60 goes on the left of 70."],
+['        Node node = root;', "The node we want to delete: 50. It has two children."],
+['        Node successor = root.right.left;', "Go right once (70), then left as far as possible (60). The successor is 60."],
+],[
+['        System.out.println("Root is now:    " + root.key);', "The root holds 60 now. Prints 60."],
+['        System.out.println("Left child of 70: " + root.right.left);', "The old 60 node is gone. Prints null."],
+]);
+const T_LEFT = [['        int left = 2 * i + 1;', "Its left child is in index 2 * 1 + 1 = 3."]];
+B.T_arr = {title:'Main.java', run:true, focus:T_LEFT, lines:[...M_OPEN,
+['        int[] tree = {50, 30, 70, 20, 40, 60, 80};', "The whole tree in one array, level by level."],
+['        int i = 1;', "We are looking at the node stored in index 1. That is 30."],
+...T_LEFT,
+['        System.out.println("Left child of " + tree[i] + " is " + tree[left]);', "tree[1] is 30 and tree[3] is 20."],
+...M_CLOSE]};
+B.P_shell = {title:'Main.java', run:true, focus:[...T_OPEN, ...T_CLOSE], lines:[
+...NODE, ...BLANK, ...T_OPEN, ...T_CLOSE, ...BLANK, ...M_OPEN,
+['        Tree tree = new Tree();', "Create an empty tree."],
+['        System.out.println("Is the tree empty? " + (tree.root == null));', "Nothing was inserted yet, so `root` is `null`. Prints true."],
+...M_CLOSE]};
+B.P_classes = {title:'Main.java', run:true, focus:LINK3, lines:[
+...NODE, ...BLANK, ...M_OPEN,
+...LINK3,
+['', ''],
+['        System.out.println("Root:        " + root.key);', "Print the key inside the root: 50."],
+['        System.out.println("Left child:  " + root.left.key);', "Follow the left link from the root, then read that node's key: 30."],
+['        System.out.println("Right child: " + root.right.key);', "Follow the right link from the root, then read that node's key: 70."],
+['        System.out.println("Left of 30:  " + root.left.left);', "30 has no left child, so this link is `null`. Java prints the word null."],
+...M_CLOSE]};
+
+B.P_find = {title:'Main.java', run:true, focus:FIND, lines:[
+...NODE, ...BLANK, ...T_OPEN, ...BLANK,
+['    // insert() builds the tree. It is explained in the next tab.', "A comment. For now, just trust that `insert` puts each key in the right place."],
+...INSERT, ...BLANK, ...FIND, ...T_CLOSE, ...BLANK, ...M_OPEN, ...M_BUILD, ...BLANK,
+['        Node found = tree.find(60);', "Search for 60. We get back the node, or `null`."],
+['        if (found != null) {', "Did we get a real node back?"],
+['            System.out.println("Found " + found.key);', "Yes: print the key of the node we found."],
+['        } else {', "Otherwise we got `null`."],
+['            System.out.println("Not found");', "The key is not in the tree."],
+['        }', "End of the if / else."],
+['        System.out.println("Is 65 here? " + (tree.find(65) != null));', "65 was never inserted, so `find` returns `null` and this prints false."],
+...M_CLOSE]};
+
+B.P_insert = {title:'Main.java', run:true, focus:INSERT, lines:[
+...NODE, ...BLANK, ...T_OPEN, ...BLANK, ...INSERT, ...T_CLOSE, ...BLANK, ...M_OPEN, ...M_BUILD, ...BLANK,
+['        System.out.println("Root:          " + tree.root.key);', "50 was inserted first, so it became the root."],
+['        System.out.println("Left of root:  " + tree.root.left.key);', "30 is smaller than 50, so it went left."],
+['        System.out.println("Right of root: " + tree.root.right.key);', "70 is bigger than 50, so it went right."],
+['        System.out.println("Left of 30:    " + tree.root.left.left.key);', "20 is smaller than 50 and smaller than 30: left, then left again."],
+['', ''],
+['        tree.insert(65);', "Insert one more key. 65 > 50 go right, 65 < 70 go left, 65 > 60 go right: empty spot!"],
+['        System.out.println("Right of 60:   " + tree.root.right.left.right.key);', "Follow the same path: right (70), left (60), right (65)."],
+...M_CLOSE]};
+
+B.P_minmax = {title:'Main.java', run:true, focus:MINMAX, lines:[
+...NODE, ...BLANK, ...T_OPEN, ...BLANK, ...INSERT, ...BLANK, ...MINMAX, ...T_CLOSE, ...BLANK, ...M_OPEN, ...M_BUILD, ...BLANK,
+['        System.out.println("Min: " + tree.min());', "Walk left from the root: 50, 30, 20. Prints 20."],
+['        System.out.println("Max: " + tree.max());', "Walk right from the root: 50, 70, 80. Prints 80."],
+...M_CLOSE]};
+
+const M_TRAV = [
+['        System.out.print("In-order:   ");', "Print a label. `print` (not `println`) stays on the same line."],
+['        tree.inOrder(tree.root);', "Start the in-order traversal at the root."],
+['        System.out.println();', "Move to a new line."],
+['        System.out.print("Pre-order:  ");', "Print a label."],
+['        tree.preOrder(tree.root);', "Start the pre-order traversal at the root."],
+['        System.out.println();', "Move to a new line."],
+['        System.out.print("Post-order: ");', "Print a label."],
+['        tree.postOrder(tree.root);', "Start the post-order traversal at the root."],
+['        System.out.println();', "Move to a new line."],
+];
+B.P_traverse = {title:'Main.java', run:true, focus:TRAVERSE, lines:[
+...NODE, ...BLANK, ...T_OPEN, ...BLANK, ...INSERT, ...BLANK, ...TRAVERSE, ...T_CLOSE, ...BLANK, ...M_OPEN, ...M_BUILD, ...BLANK, ...M_TRAV, ...M_CLOSE]};
+
+const INORDER_ONLY = TRAVERSE.slice(0, 8);
+B.P_delete = {title:'Main.java', run:true, focus:DELETE, lines:[
+...NODE, ...BLANK, ...T_OPEN, ...BLANK, ...INSERT, ...BLANK, ...INORDER_ONLY, ...BLANK, ...DELETE, ...T_CLOSE, ...BLANK, ...M_OPEN,
+['        Tree tree = new Tree();', "Create an empty tree."],
+['        int[] keys = {50, 30, 70, 20, 40, 60, 80, 35, 45, 65};', "Ten keys this time, so we have a leaf, a one-child node and a two-children node to delete."],
+['        for (int k : keys) {', "Go through the array, one key at a time."],
+['            tree.insert(k);', "Insert that key."],
+['        }', "End of the loop."],
+['', ''],
+['        System.out.print("Start:                    ");', "Print a label."],
+['        tree.inOrder(tree.root);', "Print all keys, sorted."],
+['        System.out.println();', "New line."],
+['', ''],
+['        tree.delete(80);', "Case 1: 80 is a leaf. It is simply removed."],
+['        System.out.print("Delete 80 (leaf):         ");', "Print a label."],
+['        tree.inOrder(tree.root);', "Print the keys again. 80 is gone."],
+['        System.out.println();', "New line."],
+['', ''],
+['        tree.delete(60);', "Case 2: 60 has one child (65). 65 moves up into its place."],
+['        System.out.print("Delete 60 (one child):    ");', "Print a label."],
+['        tree.inOrder(tree.root);', "Print the keys again. 60 is gone."],
+['        System.out.println();', "New line."],
+['', ''],
+['        tree.delete(30);', "Case 3: 30 has two children. Its successor is 35, the smallest key in its right subtree."],
+['        System.out.print("Delete 30 (two children): ");', "Print a label."],
+['        tree.inOrder(tree.root);', "Print the keys again. 30 is gone."],
+['        System.out.println();', "New line."],
+['        System.out.println("Left child of root is now " + tree.root.left.key);', "The node that held 30 now holds 35."],
+...M_CLOSE]};
+
+B.P_arrays = {title:'Main.java', run:true, lines:[
+...M_OPEN,
+['        int[] tree = {50, 30, 70, 20, 40, 60, 80};', "The whole tree in one array, level by level: 50 | 30 70 | 20 40 60 80."],
+['', ''],
+['        int i = 1;', "Pick the node in index 1. That is 30."],
+['        int left = 2 * i + 1;', "Index of its left child: 2 * 1 + 1 = 3."],
+['        int right = 2 * i + 2;', "Index of its right child: 2 * 1 + 2 = 4."],
+['        int parent = (i - 1) / 2;', "Index of its parent: (1 - 1) / 2 = 0. Integer division drops any remainder."],
+['', ''],
+['        System.out.println("Node:        " + tree[i]);', "tree[1] is 30."],
+['        System.out.println("Left child:  " + tree[left]);', "tree[3] is 20."],
+['        System.out.println("Right child: " + tree[right]);', "tree[4] is 40."],
+['        System.out.println("Parent:      " + tree[parent]);', "tree[0] is 50."],
+...M_CLOSE]};
+
+B.P_full = {title:'Main.java', run:true, lines:[
+...NODE, ...BLANK, ...T_OPEN, ...BLANK, ...INSERT, ...BLANK, ...FIND, ...BLANK, ...MINMAX, ...BLANK, ...TRAVERSE, ...BLANK, ...DELETE, ...T_CLOSE, ...BLANK,
+...M_OPEN, ...M_BUILD, ...BLANK,
+['        System.out.println("Find 60: " + (tree.find(60) != null));', "60 is in the tree, so `find` returns a node. Prints true."],
+['        System.out.println("Find 65: " + (tree.find(65) != null));', "65 is not in the tree, so `find` returns `null`. Prints false."],
+['        System.out.println("Min: " + tree.min());', "Far left: 20."],
+['        System.out.println("Max: " + tree.max());', "Far right: 80."],
+['', ''],
+...M_TRAV,
+['', ''],
+['        tree.delete(30);', "30 has two children. Its successor (40) takes its place."],
+['        System.out.print("After deleting 30: ");', "Print a label."],
+['        tree.inOrder(tree.root);', "Print the keys, sorted. 30 is gone."],
+['        System.out.println();', "New line."],
+...M_CLOSE]};
+
+/* =====================================================================
+   2.  CODE RENDERING, HOVER PANEL, COPY
+   ===================================================================== */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const KW = /^(class|public|static|void|int|new|return|if|else|while|for|true|false|null|this)$/;
+function hi(src){
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*")|\b([A-Za-z_]\w*)\b|\b(\d+)\b/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))){
+    out += esc(src.slice(last, m.index)); last = re.lastIndex;
+    if (m[1]) out += '<span class="c">'+esc(m[1])+'</span>';
+    else if (m[2]) out += '<span class="s">'+esc(m[2])+'</span>';
+    else if (m[3]) out += KW.test(m[3]) ? '<span class="k">'+m[3]+'</span>' : (/^[A-Z]/.test(m[3]) ? '<span class="t">'+m[3]+'</span>' : m[3]);
+    else out += '<span class="num">'+m[4]+'</span>';
+  }
+  return out + esc(src.slice(last));
+}
+const explain = s => esc(s).replace(/`([^`]+)`/g,'<code>$1</code>');
+const textOf = id => B[id].lines.map(l => l[0]).join('\n') + '\n';
+
+function renderCode(host){
+  const id = host.dataset.code, blk = B[id];
+  const foc = blk.focus ? new Set(blk.focus) : null;
+  let h = '<div class="codebox'+(foc?' hasfocus':'')+'"><div class="codebar"><span class="fname">'+esc(blk.title)+' · complete program'+(foc?' · <span class="star">★ new lines are highlighted</span>':'')+'</span><span>'+
+    (foc && blk.lines.length > 30 ? '<button data-jump="1">⤵ Jump to new lines</button> ' : '')+'<button data-copy="'+id+'">📋 Copy Main.java</button></span></div><div class="code">';
+  blk.lines.forEach((l,i) => {
+    h += '<div class="ln'+(l[0]===''?' blank':'')+(foc && foc.has(l)?' focus':'')+'" data-b="'+id+'" data-i="'+i+'"><span class="no">'+(i+1)+'</span><span class="src">'+(hi(l[0])||' ')+'</span></div>';
+  });
+  host.innerHTML = h + '</div></div>';
+}
+
+const panelBody = document.getElementById('panelBody');
+const HINT = '<p class="hint">👈 Move your mouse over any line of Java code.<br><br>The explanation of that line shows up here.</p>';
+let pinned = null;                       // the pinned .ln element
+function show(ln){
+  if (!ln){ panelBody.innerHTML = HINT; return; }
+  const blk = B[ln.dataset.b], i = +ln.dataset.i, l = blk.lines[i];
+  panelBody.innerHTML = '<div class="where">'+esc(blk.title)+' · line '+(i+1)+(ln===pinned?' · 📌 pinned':'')+'</div>'+
+    '<div class="pline">'+hi(l[0].trim())+'</div><div class="ptext">'+explain(l[1])+'</div>';
+}
+function setHot(ln){ document.querySelectorAll('.ln.hot').forEach(e => e.classList.remove('hot')); if (ln) ln.classList.add('hot'); }
+function setPin(ln){
+  if (pinned) pinned.classList.remove('pin');
+  pinned = ln; if (ln) ln.classList.add('pin');
+  show(ln);
+}
+document.addEventListener('mouseover', e => {
+  const ln = e.target.closest && e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')){ setHot(ln); show(ln); }
+  else if (!e.target.closest || !e.target.closest('.codebox')){ setHot(null); show(pinned); }
+});
+document.addEventListener('click', e => {
+  const jp = e.target.closest('[data-jump]');
+  if (jp){ const f = jp.closest('.codebox').querySelector('.ln.focus'); if (f) f.scrollIntoView({block:'center', behavior:'smooth'}); return; }
+  const cp = e.target.closest('[data-copy]');
+  if (cp){ copyText(textOf(cp.dataset.copy), cp); return; }
+  const ln = e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')) setPin(ln === pinned ? null : ln);
+});
+function copyText(text, btn){
+  const done = ok => { const old = btn.textContent; btn.textContent = ok ? '✅ Copied complete program!' : '⚠️ Select and copy manually'; setTimeout(() => btn.textContent = old, 1600); };
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok = document.execCommand('copy'); }catch(_){ } ta.remove(); done(ok); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true), fallback); else fallback();
+}
+
+/* =====================================================================
+   3.  TABS
+   ===================================================================== */
+const sections = [...document.querySelectorAll('section.tab')];
+const tabsNav = document.getElementById('tabs'), wrap = document.getElementById('wrap');
+let curTab = 0;
+function buildTabs(){
+  let h = '';
+  sections.forEach((s,i) => {
+    if (i === 0) h += '<span class="part">PART I</span>';
+    if (s.dataset.part === '2' && sections[i-1].dataset.part === '1') h += '<span class="part two">PART II</span>';
+    h += '<button data-go="'+i+'" data-part="'+s.dataset.part+'"><b>'+(i+1)+'</b>'+s.dataset.title+'</button>';
+    const nav = document.createElement('div'); nav.className = 'navrow';
+    nav.innerHTML = '<button data-go="'+(i-1)+'"'+(i===0?' disabled':'')+'>← '+(i?sections[i-1].dataset.title:'')+'</button>'+
+                    '<button class="next" data-go="'+(i+1)+'"'+(i===sections.length-1?' disabled':'')+'>'+(i<sections.length-1?sections[i+1].dataset.title:'')+' →</button>';
+    s.appendChild(nav);
+  });
+  tabsNav.innerHTML = h;
+  document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(+b.dataset.go, true); });
+}
+function go(i, scroll){
+  if (i < 0 || i >= sections.length) return;
+  curTab = i; setPin(null); setHot(null);
+  sections.forEach((s,j) => s.classList.toggle('on', j === i));
+  tabsNav.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.go === i));
+  wrap.classList.toggle('nopanel', !sections[i].querySelector('.codebox'));
+  const on = tabsNav.querySelector('button.on'); if (on && on.scrollIntoView) on.scrollIntoView({block:'nearest', inline:'center'});
+  try { history.replaceState(null, '', '#' + sections[i].id); } catch(_){}
+  if (scroll) window.scrollTo({top: tabsNav.offsetTop, behavior:'auto'});
+}
+document.addEventListener('keydown', e => {
+  if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowRight') go(curTab + 1, true);
+  else if (e.key === 'ArrowLeft') go(curTab - 1, true);
+  else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && pinned){
+    e.preventDefault();
+    let n = pinned; const dir = e.key === 'ArrowDown' ? 'nextElementSibling' : 'previousElementSibling';
+    do { n = n[dir]; } while (n && n.classList.contains('blank'));
+    if (n){ setPin(n); n.scrollIntoView({block:'nearest'}); }
+  } else if (e.key === 'Escape') setPin(null);
+});
+
+/* =====================================================================
+   4.  DRAWING A TREE  (SVG)
+   ===================================================================== */
+function drawTree(svg, root, opt){
+  opt = opt || {};
+  const XS = 60, YS = 76, R = 23, P = 34, LM = opt.levels ? 86 : 0;
+  const nodes = []; let i = 0, maxD = 0;
+  (function walk(n, d, p){ if (!n) return; walk(n.left, d+1, n); n._i = i++; n._d = d; n._p = p; if (d > maxD) maxD = d; nodes.push(n); walk(n.right, d+1, n); })(root, 0, null);
+  const natural = 2*P + Math.max(nodes.length-1, 0)*XS, W = LM + Math.max(natural, 300) + (opt.badge ? 26 : 0), off = LM + (Math.max(natural,300) - natural)/2;
+  const H = 2*P + maxD*YS;
+  nodes.forEach(n => { n._x = off + P + n._i*XS; n._y = P + n._d*YS; });
+  let s = '';
+  if (!nodes.length) s += '<text class="empty" x="'+(W/2)+'" y="'+(H/2+6)+'" text-anchor="middle">empty tree · root == null</text>';
+  if (opt.levels) for (let d = 0; d <= maxD; d++){
+    const y = P + d*YS, on = opt.levelOn === d || opt.levelOn === 'all';
+    s += '<line class="lvline" x1="'+(LM-6)+'" y1="'+y+'" x2="'+W+'" y2="'+y+'"/><text class="lvl" x="4" y="'+(y+5)+'"'+(on?' style="fill:#d97706"':'')+'>Level '+d+'</text>';
+  }
+  const nc = opt.nodeCls || {}, ec = opt.edgeCls || {};
+  nodes.forEach(n => { if (n._p) s += '<line class="e '+(ec[n.id]||'')+'" x1="'+n._p._x+'" y1="'+n._p._y+'" x2="'+n._x+'" y2="'+n._y+'"/>'; });
+  nodes.forEach(n => {
+    s += '<g class="n '+(nc[n.id]||'')+'"><circle cx="'+n._x+'" cy="'+n._y+'" r="'+R+'"/><text x="'+n._x+'" y="'+(n._y+7)+'" text-anchor="middle">'+n.key+'</text></g>';
+    if (opt.badge) s += '<text class="badge" x="'+(n._x+R-2)+'" y="'+(n._y-R+2)+'">'+opt.badge(n)+'</text>';
+  });
+  svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+  svg.style.width = Math.round(W*1.15) + 'px';
+  svg.innerHTML = s;
+}
+
+/* =====================================================================
+   5.  ANIMATED TREE WIDGET
+   ===================================================================== */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const LABEL = {insert:'Insert', find:'Find', delete:'Delete', min:'Min', max:'Max', in:'In-order', pre:'Pre-order', post:'Post-order'};
+class TreeViz {
+  constructor(el){
+    this.el = el; this.delay = 900; this.token = 0; this.nid = 0;
+    this.init = (el.dataset.keys || '').split(',').filter(Boolean).map(Number);
+    this.ops = (el.dataset.ops || '').split(',').filter(Boolean);
+    this.extras = (el.dataset.extras || '').split(',').filter(Boolean);
+    this.presets = (el.dataset.presets || '').split('|').filter(Boolean).map(p => p.split(':'));
+    this.isStatic = !!el.dataset.static;
+    const needIn = this.ops.some(o => /insert|find|delete/.test(o));
+    let h = '';
+    if (!this.isStatic){
+      h += '<div class="ctl">';
+      if (needIn) h += '<input type="number" value="'+(el.dataset.val||'')+'" aria-label="key">';
+      this.ops.forEach(o => h += '<button data-op="'+o+'">'+LABEL[o]+'</button>');
+      this.presets.forEach(p => h += '<button class="pre" data-op="'+p[0]+'" data-v="'+p[1]+'">'+p[2]+'</button>');
+      if (this.extras.includes('random')) h += '<button class="alt" data-x="random">🎲 Random tree</button>';
+      if (this.extras.includes('sorted')) h += '<button class="alt" data-x="sorted">📈 Insert 10,20,30,40,50</button>';
+      if (this.extras.includes('clear')) h += '<button class="alt" data-x="clear">🗑 Clear</button>';
+      h += '<button class="alt" data-x="reset">↺ Reset</button></div>';
+    }
+    h += '<div class="stage"><svg class="tree"></svg></div>';
+    if (!this.isStatic) h += '<div class="vlog"></div><div class="vout"></div>';
+    el.innerHTML = h;
+    this.svg = el.querySelector('svg'); this.log = el.querySelector('.vlog'); this.out = el.querySelector('.vout'); this.input = el.querySelector('input');
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.x) return this.extra(b.dataset.x);
+      if (b.dataset.op) this.run(b.dataset.op, b.dataset.v);
+    });
+    if (this.input) this.input.addEventListener('keydown', e => { if (e.key === 'Enter' && !this.busy){ const o = this.ops.find(x => /insert|find|delete/.test(x)); if (o) this.run(o); } });
+    this.reset();
+  }
+  /* ----- data ----- */
+  raw(k){
+    const n = {id: ++this.nid, key: k, left: null, right: null};
+    if (!this.root){ this.root = n; return n; }
+    let c = this.root;
+    for(;;){
+      if (k < c.key){ if (!c.left){ c.left = n; return n; } c = c.left; }
+      else { if (!c.right){ c.right = n; return n; } c = c.right; }
+    }
+  }
+  has(k){ let c = this.root; while (c){ if (k === c.key) return true; c = k < c.key ? c.left : c.right; } return false; }
+  size(n){ return n ? 1 + this.size(n.left) + this.size(n.right) : 0; }
+  remove(k){
+    const del = (n, k) => {
+      if (!n) return null;
+      if (k < n.key) n.left = del(n.left, k);
+      else if (k > n.key) n.right = del(n.right, k);
+      else {
+        if (!n.left) return n.right;
+        if (!n.right) return n.left;
+        let s = n.right; while (s.left) s = s.left;
+        n.key = s.key; n.right = del(n.right, s.key);
+      }
+      return n;
+    };
+    this.root = del(this.root, k);
+  }
+  /* ----- display ----- */
+  draw(cls){ drawTree(this.svg, this.root, {nodeCls: cls || {}}); }
+  say(msg, kind, fresh){ if (!this.log) return; if (fresh) this.log.innerHTML = ''; const d = document.createElement('div'); if (kind) d.className = kind; d.innerHTML = msg; this.log.appendChild(d); }
+  setBusy(b){ this.busy = b; this.el.querySelectorAll('button[data-op],button[data-x="sorted"],button[data-x="random"]').forEach(x => x.disabled = b); }
+  reset(){ this.token++; this.root = null; this.init.forEach(k => this.raw(k)); this.draw(); if (this.log){ this.log.innerHTML = ''; this.say('Ready. Pick an operation.'); this.out.textContent = ''; } this.setBusy(false); }
+  extra(x){
+    this.token++; this.setBusy(false); if (this.out) this.out.textContent = '';
+    if (x === 'reset') return this.reset();
+    this.root = null;
+    if (x === 'clear'){ this.draw(); return this.say('Tree cleared. It is empty: <code>root == null</code>.', 'info', true); }
+    if (x === 'sorted'){ [10,20,30,40,50].forEach(k => this.raw(k)); this.draw(); return this.say('Sorted input → every key went RIGHT. The tree is a stick, just like a linked list. Searching is now O(n).', 'bad', true); }
+    if (x === 'random'){ const set = new Set(); while (set.size < 9) set.add(5 + Math.floor(Math.random()*94)); [...set].forEach(k => this.raw(k)); this.draw(); return this.say('New random tree with 9 keys.', 'info', true); }
+  }
+  async play(steps){
+    const token = ++this.token; this.setBusy(true); let first = true;
+    for (const s of steps){
+      if (token !== this.token) return;
+      if (s.apply) s.apply();
+      this.draw(typeof s.cls === 'function' ? s.cls() : s.cls);
+      if (s.out !== undefined) this.out.textContent = s.out;
+      this.say(s.msg, s.kind, first); first = false;
+      await sleep(this.delay);
+    }
+    if (token === this.token) this.setBusy(false);
+  }
+  run(op, v){
+    if (this.busy) return;
+    if (this.out) this.out.textContent = '';
+    if (/insert|find|delete/.test(op)){
+      const k = v !== undefined ? +v : parseInt(this.input.value, 10);
+      if (isNaN(k) || k < -99 || k > 999) return this.say('Type a whole number between -99 and 999 first.', 'bad', true);
+      if (this.input) this.input.value = k;
+      return this['op_' + op](k);
+    }
+    if (op === 'min' || op === 'max') return this.op_edge(op);
+    return this.op_trav(op);
+  }
+  /* ----- operations ----- */
+  walk(k, steps, seen){            // shared descent; returns the node found (or null) and the last parent
+    let c = this.root, parent = null;
+    while (c){
+      if (k === c.key) return {node: c, parent};
+      const left = k < c.key;
+      steps.push({cls: Object.assign({}, seen, {[c.id]: 'a'}), msg: '<code>'+k+' '+(left?'&lt;':'&gt;')+' '+c.key+'</code> → go '+(left?'LEFT':'RIGHT')});
+      seen[c.id] = 'dim'; parent = c; c = left ? c.left : c.right;
+    }
+    return {node: null, parent};
+  }
+  op_find(k){
+    if (!this.root) return this.say('The tree is empty, so '+k+' cannot be here.', 'bad', true);
+    const steps = [], seen = {}, r = this.walk(k, steps, seen);
+    if (r.node) steps.push({cls: Object.assign({}, seen, {[r.node.id]: 'ok'}), msg: '<code>'+k+' == '+r.node.key+'</code> ✔ Found it in '+(steps.length+1)+' comparison'+(steps.length?'s':'')+'.', kind: 'ok'});
+    else steps.push({cls: seen, msg: 'Reached <code>null</code> → '+k+' is NOT in the tree.', kind: 'bad'});
+    this.play(steps);
+  }
+  op_insert(k){
+    if (this.has(k)) return this.say(k+' is already in the tree. (This demo skips duplicates. Our Java code would send a duplicate to the right.)', 'bad', true);
+    if (this.size(this.root) >= 24) return this.say('The demo tree is full. Press Reset or Clear.', 'bad', true);
+    const steps = [], seen = {};
+    if (!this.root){ let n; steps.push({apply: () => n = this.raw(k), cls: () => ({[n.id]: 'new'}), msg: 'The tree is empty → '+k+' becomes the ROOT.', kind: 'ok'}); return this.play(steps); }
+    const r = this.walk(k, steps, seen); let n;
+    const side = k < r.parent.key ? 'LEFT' : 'RIGHT';
+    steps.push({apply: () => n = this.raw(k), cls: () => Object.assign({}, seen, {[n.id]: 'new'}), msg: 'The '+side+' spot of '+r.parent.key+' is <code>null</code> → attach '+k+' there.', kind: 'ok'});
+    this.play(steps);
+  }
+  op_edge(op){
+    if (!this.root) return this.say('The tree is empty.', 'bad', true);
+    const dir = op === 'min' ? 'left' : 'right', steps = [], seen = {}; let c = this.root;
+    while (c[dir]){ steps.push({cls: Object.assign({}, seen, {[c.id]: 'a'}), msg: c.key+' has a '+dir+' child → go '+dir.toUpperCase()}); seen[c.id] = 'dim'; c = c[dir]; }
+    steps.push({cls: Object.assign({}, seen, {[c.id]: 'ok'}), msg: c.key+' has no '+dir+' child → the '+(op==='min'?'MINIMUM':'MAXIMUM')+' is '+c.key+'.', kind: 'ok'});
+    this.play(steps);
+  }
+  op_trav(op){
+    if (!this.root) return this.say('The tree is empty. Nothing to visit.', 'bad', true);
+    const order = [];
+    (function t(n){ if (!n) return; if (op === 'pre') order.push(n); t(n.left); if (op === 'in') order.push(n); t(n.right); if (op === 'post') order.push(n); })(this.root);
+    const rule = {in: 'Left → NODE → Right', pre: 'NODE → Left → Right', post: 'Left → Right → NODE'}[op];
+    const steps = [{cls: {}, msg: LABEL[op]+' rule: <b>'+rule+'</b>', kind: 'info', out: 'Output: '}], seen = {}; let txt = 'Output: ';
+    order.forEach(n => { txt += n.key + ' '; steps.push({cls: Object.assign({}, seen, {[n.id]: 'a'}), msg: 'Visit '+n.key, out: txt}); seen[n.id] = 'dim'; });
+    steps.push({cls: seen, msg: 'Done. All '+order.length+' nodes visited once.'+(op==='in'?' Notice: the output is SORTED.':op==='pre'?' Notice: the root came FIRST.':' Notice: the root came LAST.'), kind: 'ok', out: txt});
+    this.play(steps);
+  }
+  op_delete(k){
+    if (!this.root) return this.say('The tree is empty.', 'bad', true);
+    const steps = [], seen = {}, r = this.walk(k, steps, seen), n = r.node;
+    if (!n){ steps.push({cls: seen, msg: 'Reached <code>null</code> → '+k+' is not in the tree. Nothing to delete.', kind: 'bad'}); return this.play(steps); }
+    const base = Object.assign({}, seen, {[n.id]: 'del'});
+    if (!n.left && !n.right){
+      steps.push({cls: base, msg: 'Found '+k+'. It has NO children → <b>Case 1</b>: just remove it.', kind: 'info'});
+      steps.push({apply: () => this.remove(k), cls: {}, msg: k+' is gone. Its parent\'s link is now <code>null</code>.', kind: 'ok'});
+    } else if (!n.left || !n.right){
+      const ch = n.left || n.right;
+      steps.push({cls: Object.assign({}, base, {[ch.id]: 'b'}), msg: 'Found '+k+'. It has ONE child ('+ch.key+') → <b>Case 2</b>: the child moves up.', kind: 'info'});
+      steps.push({apply: () => this.remove(k), cls: {[ch.id]: 'new'}, msg: k+' is gone. '+ch.key+' took its place.', kind: 'ok'});
+    } else {
+      steps.push({cls: base, msg: 'Found '+k+'. It has TWO children → <b>Case 3</b>: we need its successor.', kind: 'info'});
+      let s = n.right; const sseen = Object.assign({}, base);
+      steps.push({cls: Object.assign({}, sseen, {[s.id]: 'a'}), msg: 'Go RIGHT once → '+s.key});
+      while (s.left){ sseen[s.id] = 'dim'; s = s.left; steps.push({cls: Object.assign({}, sseen, {[s.id]: 'a'}), msg: 'Then keep going LEFT → '+s.key}); }
+      const sk = s.key;
+      steps.push({cls: Object.assign({}, base, {[s.id]: 'ok'}), msg: 'No more left child → the successor is <b>'+sk+'</b>.', kind: 'info'});
+      steps.push({apply: () => this.remove(k), cls: {[n.id]: 'new'}, msg: 'Copied '+sk+' into the node that held '+k+', then removed the old '+sk+'. The BST rule still holds.', kind: 'ok'});
+    }
+    this.play(steps);
+  }
+}
+
+/* =====================================================================
+   6.  VOCABULARY TAB
+   ===================================================================== */
+function mk(keys){            // build a plain tree whose node ids are the keys
+  let root = null;
+  keys.forEach(k => { const n = {id: k, key: k, left: null, right: null};
+    if (!root){ root = n; return; } let c = root;
+    for(;;){ if (k < c.key){ if (!c.left){ c.left = n; break; } c = c.left; } else { if (!c.right){ c.right = n; break; } c = c.right; } } });
+  return root;
+}
+const VK = [50,30,70,20,40,60,80,10], vroot = mk(VK), vsvg = document.getElementById('vocabSvg'), vcap = document.getElementById('vocabCap');
+const set = (ks, c) => Object.fromEntries(ks.map(k => [k, c]));
+const fadeRest = (ks, o) => { VK.forEach(k => { if (!ks.includes(k)) o[k] = 'fade'; }); return o; };
+const VOC = {
+  node:   {n: set(VK,'a'), cap: 'Every circle is a node (8 nodes)'},
+  key:    {n: set(VK,'b'), cap: 'The number inside each node is its key'},
+  edge:   {e: set(VK,'a'), cap: 'Every line is an edge (7 edges)'},
+  root:   {n: fadeRest([50], {50:'a'}), cap: '50 is the root'},
+  parent: {n: fadeRest([30,20,40], {30:'a',20:'b',40:'b'}), e: {20:'a',40:'a'}, cap: '30 is the parent of 20 and 40'},
+  child:  {n: fadeRest([30,20,40], {30:'b',20:'a',40:'a'}), e: {20:'a',40:'a'}, cap: '20 and 40 are the children of 30'},
+  leaf:   {n: fadeRest([10,40,60,80], set([10,40,60,80],'a')), cap: '10, 40, 60 and 80 are leaves'},
+  subtree:{n: fadeRest([30,20,40,10], set([30,20,40,10],'a')), e: {20:'a',40:'a',10:'a'}, cap: 'The subtree that starts at 30'},
+  path:   {n: fadeRest([50,30,20,10], set([50,30,20,10],'a')), e: {30:'a',20:'a',10:'a'}, cap: 'The path from 50 down to 10'},
+  level:  {n: fadeRest([20,40,60,80], set([20,40,60,80],'a')), lv: 2, cap: 'These four nodes are at level 2'},
+  height: {n: fadeRest([50,30,20,10], set([50,30,20,10],'b')), e: {30:'a',20:'a',10:'a'}, lv: 3, cap: 'The deepest level is 3 → height = 3'},
+  binary: {n: set(VK,'b'), cap: 'No node has more than 2 children'},
+  bst:    {n: Object.assign({50:'a'}, set([30,20,40,10],'lo'), set([70,60,80],'hi')), cap: 'Left of 50: all smaller · Right of 50: all bigger'},
+};
+function vocabShow(t){
+  const v = VOC[t] || {};
+  drawTree(vsvg, vroot, {levels: true, levelOn: v.lv, nodeCls: v.n, edgeCls: v.e});
+  vcap.textContent = v.cap || '👆 Pick a word';
+  document.querySelectorAll('.term').forEach(c => c.classList.toggle('on', c.dataset.t === t));
+}
+function initVocab(){
+  vocabShow(null);
+  const terms = document.getElementById('terms');
+  terms.addEventListener('mouseover', e => { const c = e.target.closest('.term'); if (c) vocabShow(c.dataset.t); });
+  terms.addEventListener('click', e => { const c = e.target.closest('.term'); if (c) vocabShow(c.dataset.t); });
+}
+
+/* =====================================================================
+   7.  TREES-AS-ARRAYS TAB
+   ===================================================================== */
+function initArrays(){
+  const A = [50,30,70,20,40,60,80], cells = document.getElementById('arrCells'), svg = document.getElementById('arrSvg'), f = document.getElementById('arrFormula');
+  const nodes = A.map((k,i) => ({id: i, key: k, left: null, right: null}));
+  nodes.forEach((n,i) => { n.left = nodes[2*i+1] || null; n.right = nodes[2*i+2] || null; });
+  cells.innerHTML = A.map((k,i) => '<div class="cell" data-i="'+i+'"><i>['+i+']</i><b>'+k+'</b></div>').join('');
+  const showIdx = i => {
+    const cls = {}, L = 2*i+1, R = 2*i+2, P = Math.floor((i-1)/2);
+    cells.querySelectorAll('.cell').forEach(c => c.className = 'cell');
+    if (i !== null){
+      cls[i] = 'a'; cells.children[i].classList.add('a');
+      [L, R, i > 0 ? P : -1].forEach(j => { if (j >= 0 && j < A.length){ cls[j] = 'b'; cells.children[j].classList.add('b'); } });
+      f.innerHTML = 'i = '+i+' (key '+A[i]+')<br>left = 2*'+i+'+1 = '+L+(L<A.length?' → '+A[L]:' → no child')+
+        ' &nbsp;·&nbsp; right = 2*'+i+'+2 = '+R+(R<A.length?' → '+A[R]:' → no child')+
+        ' &nbsp;·&nbsp; '+(i>0?'parent = ('+i+'-1)/2 = '+P+' → '+A[P]:'the root has no parent');
+    }
+    drawTree(svg, nodes[0], {nodeCls: cls, badge: n => '['+n.id+']'});
+  };
+  showIdx(null);
+  const h = e => { const c = e.target.closest('.cell'); if (c) showIdx(+c.dataset.i); };
+  cells.addEventListener('mouseover', h); cells.addEventListener('click', h);
+}
+
+/* =====================================================================
+   8.  START
+   ===================================================================== */
+document.querySelectorAll('[data-code]').forEach(renderCode);
+document.querySelectorAll('.viz[data-ops]').forEach(el => new TreeViz(el));
+initVocab(); initArrays(); buildTabs(); show(null);
+go(Math.max(0, sections.findIndex(s => '#' + s.id === location.hash)), false);
+window.LECTURE = {B, textOf};
+</script>
+</body>
+</html>
