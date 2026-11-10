@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAC286 · Heaps &amp; HeapSort</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b1020; --card:#151c30; --ink:#e6e9f5; --muted:#9aa4bf; --line:#2a3350;
+  --p1:#818cf8; --p1soft:#262b55; --p2:#f472b6; --p2soft:#4a1d3a;
+  --def:#60a5fa; --defbg:#12233f; --pic:#fbbf24; --picbg:#2e2410;
+  --rem:#34d399; --rembg:#0f2a22; --warn:#f87171; --warnbg:#321618;
+  --code:#060a14; --codeline:#1e293b; --dark:#0b1020;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:19px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+code,.mono{font-family:"JetBrains Mono","Fira Code",Consolas,Menlo,monospace}
+p code,li code,td code,.panel code,.vlog code{background:#e9ecf8;color:#3730a3;padding:1px 6px;border-radius:5px;font-size:.92em}
+
+/* ---------- header + tabs ---------- */
+header.top{background:linear-gradient(120deg,#312e81,#4f46e5 55%,#db2777);color:#fff;padding:22px 28px 20px}
+header.top h1{margin:0;font-size:2.1rem;letter-spacing:-.5px}
+header.top p{margin:4px 0 0;opacity:.92;font-size:1.05rem}
+nav.tabs{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;padding:9px 16px;overflow-x:auto;box-shadow:0 2px 10px rgba(30,40,90,.06)}
+nav.tabs .part{flex:none;font-size:.72rem;font-weight:800;letter-spacing:1px;padding:4px 9px;border-radius:6px;color:#fff;background:var(--p1);margin-right:2px}
+nav.tabs .part.two{background:var(--p2);margin-left:10px}
+nav.tabs button{flex:none;border:1px solid var(--line);background:#fff;color:var(--ink);font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav.tabs button b{display:inline-block;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;border-radius:50%;background:var(--p1soft);color:var(--p1);margin-right:6px;font-size:.85em}
+nav.tabs button[data-part="2"] b{background:var(--p2soft);color:var(--p2)}
+nav.tabs button:hover{border-color:var(--p1)}
+nav.tabs button.on{background:var(--p1);border-color:var(--p1);color:#fff}
+nav.tabs button.on[data-part="2"]{background:var(--p2);border-color:var(--p2)}
+nav.tabs button.on b{background:rgba(255,255,255,.25);color:#fff}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1560px;margin:0 auto;padding:22px 22px 60px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:22px;align-items:start}
+.wrap.nopanel{grid-template-columns:minmax(0,1fr)}
+.wrap.nopanel aside.panel{display:none}
+section.tab{display:none}
+section.tab.on{display:block}
+section.tab>h2{font-size:1.85rem;margin:0 0 4px;letter-spacing:-.4px}
+section.tab>.goal{color:var(--muted);margin:0 0 16px;font-size:1.08rem}
+h3{font-size:1.3rem;margin:26px 0 10px}
+h3 .step{display:inline-block;background:var(--ink);color:#fff;border-radius:7px;font-size:.78rem;padding:3px 9px;margin-right:8px;vertical-align:middle;letter-spacing:.5px}
+ul{margin:8px 0;padding-left:1.3em} li{margin:5px 0}
+.box{border-radius:12px;padding:14px 18px 14px 20px;margin:14px 0;border-left:6px solid;background:var(--card)}
+.box .tag{font-weight:800;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+.box ul{margin:4px 0}
+.def{border-color:var(--def);background:var(--defbg)} .def .tag{color:var(--def)}
+.pic{border-color:var(--pic);background:var(--picbg)} .pic .tag{color:var(--pic)}
+.rem{border-color:var(--rem);background:var(--rembg)} .rem .tag{color:var(--rem)}
+.warn{border-color:var(--warn);background:var(--warnbg)} .warn .tag{color:var(--warn)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+table.cmp{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(30,40,90,.08);margin:12px 0}
+table.cmp th,table.cmp td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:left}
+table.cmp th{background:var(--ink);color:#fff;font-size:.95rem}
+table.cmp tr:last-child td{border-bottom:0}
+.good{color:#047857;font-weight:700}.bad{color:#b91c1c;font-weight:700}
+.star td{background:#f0fdf4}
+.navrow{display:flex;justify-content:space-between;margin-top:34px;gap:12px}
+.navrow button{font:600 1rem inherit;font-family:inherit;padding:11px 20px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.navrow button.next{background:var(--ink);color:#fff;border-color:var(--ink)}
+.navrow button:disabled{visibility:hidden}
+
+/* ---------- code ---------- */
+.codebox{background:var(--code);border-radius:12px;margin:12px 0;overflow:hidden;box-shadow:0 3px 12px rgba(15,23,42,.18)}
+.codebar{display:flex;align-items:center;justify-content:space-between;background:#1e293b;color:#cbd5e1;padding:7px 12px;font-size:.85rem}
+.codebar .fname{font-family:Consolas,Menlo,monospace}
+.codebar button,.copyrun{font:600 .85rem inherit;font-family:inherit;border:0;border-radius:7px;padding:6px 12px;cursor:pointer;background:#334155;color:#fff}
+.codebar button:hover{background:#475569}
+.copyrun{background:var(--rem);font-size:.98rem;padding:10px 16px;margin:6px 0}
+.copyrun:hover{filter:brightness(1.08)}
+.code{padding:8px 0;overflow-x:auto;font:17px/1.6 "JetBrains Mono","Fira Code",Consolas,Menlo,monospace;color:#e2e8f0}
+.ln{display:flex;white-space:pre;padding:0 14px 0 0;border-left:4px solid transparent;cursor:pointer;min-width:max-content}
+.ln .no{flex:none;width:3em;text-align:right;padding-right:14px;color:#64748b;user-select:none}
+.ln.blank{cursor:default}
+.ln:not(.blank):hover{background:#27344d}
+.ln.hot{background:#33415f;border-left-color:#fbbf24}
+.ln.pin{background:#3b3a6e;border-left-color:#f472b6}
+.k{color:#c4b5fd}.t{color:#7dd3fc}.s{color:#86efac}.c{color:#94a3b8;font-style:italic}.num{color:#fdba74}
+.output{background:#111827;border-radius:12px;margin:10px 0;overflow:hidden}
+.output .outbar{background:#064e3b;color:#a7f3d0;font-size:.8rem;font-weight:700;letter-spacing:1px;padding:5px 12px}
+.output pre{margin:0;padding:10px 14px;color:#d1fae5;font:16px/1.5 Consolas,Menlo,monospace;overflow-x:auto}
+details.full{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:12px 0}
+details.full summary{cursor:pointer;font-weight:700}
+
+/* ---------- right panel ---------- */
+aside.panel{position:sticky;top:74px;background:#fff;border:2px solid var(--p1);border-radius:14px;padding:16px 18px;box-shadow:0 6px 20px rgba(79,70,229,.14);max-height:calc(100vh - 92px);overflow:auto}
+aside.panel h4{margin:0 0 8px;font-size:.8rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--p1)}
+aside.panel .where{font-size:.85rem;color:var(--muted);margin-bottom:8px}
+aside.panel .pline{background:var(--code);color:#e2e8f0;border-radius:8px;padding:9px 11px;font:15px/1.5 Consolas,Menlo,monospace;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
+aside.panel .ptext{font-size:1.22rem;line-height:1.5}
+aside.panel .hint{color:var(--muted);font-size:1.05rem}
+aside.panel .keys{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);font-size:.85rem;color:var(--muted)}
+kbd{background:#eef0f6;border:1px solid #cfd5e3;border-bottom-width:2px;border-radius:5px;padding:0 6px;font-size:.85em}
+
+/* ---------- tree drawings ---------- */
+svg.tree{display:block;max-width:100%;height:auto;margin:0 auto}
+svg.tree .e{stroke:#aab2c8;stroke-width:3}
+svg.tree .e.a{stroke:#f59e0b;stroke-width:6}
+svg.tree .n circle{fill:#fff;stroke:#4f46e5;stroke-width:3;transition:fill .2s}
+svg.tree .n text{font:700 19px "Segoe UI",system-ui,sans-serif;fill:#1c2333}
+svg.tree .n.a circle{fill:#fde68a;stroke:#d97706;stroke-width:5}
+svg.tree .n.b circle{fill:#bfdbfe;stroke:#2563eb}
+svg.tree .n.dim circle{fill:#e0e7ff}
+svg.tree .n.ok circle{fill:#86efac;stroke:#059669;stroke-width:5}
+svg.tree .n.new circle{fill:#86efac;stroke:#059669;stroke-width:5}
+svg.tree .n.del circle{fill:#fecaca;stroke:#dc2626;stroke-width:5}
+svg.tree .n.lo circle{fill:#99f6e4;stroke:#0d9488}
+svg.tree .n.hi circle{fill:#fbcfe8;stroke:#db2777}
+svg.tree .n.fade{opacity:.3}
+svg.tree .empty{font:italic 17px sans-serif;fill:#8089a0}
+svg.tree .lvl{font:700 14px sans-serif;fill:#8089a0}
+svg.tree .lvline{stroke:#dfe3ee;stroke-dasharray:5 6}
+svg.tree .badge{font:700 13px Consolas,monospace;fill:#db2777}
+
+.viz{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;box-shadow:0 1px 4px rgba(30,40,90,.06)}
+.viz .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.viz input{width:86px;font:700 1.05rem inherit;font-family:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:9px}
+.viz button{font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:9px;border:0;background:var(--p1);color:#fff;cursor:pointer}
+.viz button.alt{background:#e8eaf3;color:var(--ink)}
+.viz button.pre{background:var(--p2)}
+.viz button:disabled{opacity:.45;cursor:not-allowed}
+.viz .stage{min-height:230px;display:flex;align-items:center;justify-content:center;overflow-x:auto;padding:6px 0}
+.vlog{background:#f3f4fa;border-radius:10px;padding:9px 14px;min-height:54px;font-size:1.02rem}
+.vlog div{padding:1px 0}
+.vlog .ok{color:#047857;font-weight:700}.vlog .bad{color:#b91c1c;font-weight:700}.vlog .info{color:#3730a3;font-weight:700}
+.vout{font:700 1.05rem Consolas,monospace;color:#9d174d;min-height:1.4em;margin-top:4px}
+
+/* vocabulary */
+.vocab{display:grid;grid-template-columns:minmax(300px,480px) 1fr;gap:18px;align-items:start}
+.vocab .pict{position:sticky;top:74px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.vocab .pict .cap{text-align:center;font-weight:700;color:var(--p1);min-height:1.6em}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.term{background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 13px;cursor:pointer;transition:.15s}
+.term:hover,.term.on{border-color:#f59e0b;background:#fffbeb;transform:translateY(-2px)}
+.term b{display:block;font-size:1.12rem;color:var(--p1)}
+.term span{font-size:.98rem}
+.term em{display:block;font-style:normal;font-size:.86rem;color:var(--muted);margin-top:3px}
+
+/* arrays */
+.arr{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.arr .cell{width:68px;border:2px solid var(--line);border-radius:10px;background:#fff;text-align:center;cursor:pointer;padding:5px 0}
+.arr .cell i{display:block;font:700 .8rem Consolas,monospace;color:var(--p2);font-style:normal}
+.arr .cell b{font-size:1.25rem}
+.arr .cell.a{background:#fde68a;border-color:#d97706}
+.arr .cell.b{background:#bfdbfe;border-color:#2563eb}
+.arr .cell.hole b{color:#c0c6d6}
+.formula{text-align:center;font:600 1.05rem Consolas,monospace;min-height:3.2em;color:#3730a3}
+.bigf{font:700 1.2rem Consolas,monospace;background:#fff;border-radius:10px;padding:10px 14px;text-align:center;border:2px solid var(--line)}
+.bigf small{display:block;font:600 .8rem "Segoe UI",sans-serif;color:var(--muted)}
+
+.codebox.hasfocus .ln:not(.focus) .src{opacity:.72}
+.codebox.hasfocus .ln:not(.focus):hover .src,.codebox.hasfocus .ln.pin .src{opacity:1}
+.codebox.hasfocus .ln.focus{background:#141d38;border-left-color:#818cf8}
+.codebox.hasfocus .ln.focus:hover,.codebox.hasfocus .ln.focus.hot{background:#33415f;border-left-color:#fbbf24}
+.codebar .star{color:#a5b4fc}
+h3 small{font-weight:500;font-size:.8em;color:var(--muted)}
+
+/* ---------- dark mode surfaces ---------- */
+p code,li code,td code,.panel code,.vlog code{background:#262b55;color:#c7d2fe}
+nav.tabs{background:#10162a;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+nav.tabs .part,nav.tabs button.on,nav.tabs button.on[data-part="2"]{color:var(--dark)}
+nav.tabs button{background:var(--card)}
+nav.tabs button.on b{background:rgba(0,0,0,.2);color:var(--dark)}
+h3 .step{background:#312e81;color:#e0e7ff}
+table.cmp{background:var(--card);box-shadow:none;border:1px solid var(--line)}
+table.cmp th{background:#1e2440;color:#c7d2fe}
+.star td{background:#0f2a22}
+.good{color:#34d399}.bad{color:#f87171}
+.navrow button{background:var(--card);color:var(--ink)}
+.navrow button.next{background:var(--p1);border-color:var(--p1);color:var(--dark)}
+.codebox{border:1px solid var(--line);box-shadow:none}
+.copyrun{color:#06281c}
+details.full,aside.panel,.viz,.vocab .pict,.term,.bigf{background:var(--card)}
+aside.panel{box-shadow:0 6px 24px rgba(0,0,0,.5)}
+aside.panel .pline{border:1px solid var(--line)}
+kbd{background:#1e2440;border-color:#3a4468;color:var(--ink)}
+.viz{box-shadow:none}
+.viz input{background:var(--dark);color:var(--ink)}
+.viz button{color:var(--dark)}
+.viz button.alt{background:#262e4a;color:var(--ink)}
+.vlog{background:#0f1528}
+.vlog .ok{color:#34d399}.vlog .bad{color:#f87171}.vlog .info{color:#a5b4fc}
+.vout{color:#f9a8d4}
+.term:hover,.term.on{background:#2e2410;border-color:#fbbf24}
+.arr .cell{background:var(--card)}
+.arr .cell.a,.arr .cell.b{color:#1c2333}
+.arr .cell.a i,.arr .cell.b i{color:#9d174d}
+.arr .cell.hole b{color:#4b5674}
+.formula{color:#a5b4fc}
+svg.tree .e{stroke:#55607f}
+svg.tree .n circle{fill:#e8ebfa;stroke:#6366f1}
+svg.tree .empty,svg.tree .lvl{fill:#9aa4bf}
+svg.tree .lvline{stroke:#2a3350}
+svg.tree .badge{fill:#f472b6}
+
+@media (max-width:1050px){
+  body{font-size:18px}
+  .wrap{grid-template-columns:minmax(0,1fr);padding-bottom:42vh}
+  aside.panel{position:fixed;left:8px;right:8px;bottom:8px;top:auto;max-height:36vh;z-index:30}
+  .cols,.cols3,.vocab{grid-template-columns:1fr}
+  .vocab .pict{position:static}
+}
+
+/* ---------- heap widgets ---------- */
+.hpv{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+.hpv .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.hpv input{width:96px;font:700 1.05rem inherit;font-family:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:9px;background:var(--dark);color:var(--ink)}
+.hpv button{font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:9px;border:0;background:var(--p1);color:var(--dark);cursor:pointer}
+.hpv button.alt{background:#262e4a;color:var(--ink)}
+.hpv button.pre{background:var(--p2)}
+.hpv button:disabled{opacity:.45;cursor:not-allowed}
+.hpv .stage{min-height:200px;display:flex;align-items:center;justify-content:center;overflow-x:auto;padding:6px 0}
+.hpv .status{text-align:center;color:var(--muted);font-size:.95rem;margin:2px 0 8px}
+.arr .cell{cursor:default}
+#arrCells .cell{cursor:pointer}
+.arr .cell.ok,.arr .cell.new{background:#86efac;border-color:#059669;color:#1c2333}
+.arr .cell.del{background:#fecaca;border-color:#dc2626;color:#1c2333}
+.arr .cell.done{background:#0f2a22;border-color:#34d399;border-style:dashed;color:#6ee7b7}
+.arr .cell.ok i,.arr .cell.new i,.arr .cell.del i{color:#9d174d}
+.arr.small .cell{width:50px}.arr.small .cell b{font-size:1.05rem}
+svg.tree .n.done circle{fill:#0f2a22;stroke:#34d399;stroke-dasharray:5 4}
+svg.tree .n.done text{fill:#6ee7b7}
+svg.tree .e.done{stroke:#2a3350;stroke-dasharray:4 6}
+.hpv .vlog{max-height:200px;overflow:auto}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>⛰️ Heaps &amp; HeapSort</h1>
+  <p>MAC286 · Data Structures in Java — hover over any line of code to see what it does on the right.</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="wrap" id="wrap">
+<main>
+
+<!-- ====================== 1. WHY ====================== -->
+<section class="tab" id="why" data-title="Why Heaps?" data-part="1">
+  <h2>Why do we need heaps?</h2>
+  <p class="goal">Goal: see the problem that a heap solves, before we learn any new words.</p>
+
+  <div class="box def"><span class="tag">The problem</span>
+    <ul>
+      <li>A <b>priority queue</b> must always hand us the <b>most important</b> item next (here: the biggest number).</li>
+      <li>We met it in the Stacks &amp; Queues lecture. With an array, one of its two jobs was always slow.</li>
+      <li>A <b>heap</b> makes <b>both</b> jobs fast.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Priority queue built with…</th><th>Insert</th><th>Remove the biggest</th></tr>
+    <tr><td>Unsorted array</td><td class="good">Fast · O(1)</td><td class="bad">Slow · O(n) — search for the biggest</td></tr>
+    <tr><td>Sorted array</td><td class="bad">Slow · O(n) — shift items</td><td class="good">Fast · O(1)</td></tr>
+    <tr class="star"><td><b>Heap ⛰️</b></td><td class="good">Fast · O(log n)</td><td class="good">Fast · O(log n)</td></tr>
+  </table>
+
+  <div class="cols">
+    <div class="box rem"><span class="tag">The trick</span>
+      <ul>
+        <li>A heap is only <b>partly</b> sorted. Just enough to keep the biggest value on top.</li>
+        <li>Less sorting work on every insert means faster inserts.</li>
+      </ul>
+    </div>
+    <div class="box pic"><span class="tag">Picture it 🏥</span>
+      <ul>
+        <li>Imagine an emergency room. Each <b>patient</b> is a value, the <b>urgency</b> is the number.</li>
+        <li>The nurse does not line up all patients in perfect order.</li>
+        <li>She only needs to know who is <b>most urgent right now</b>: that patient is the root.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Here is one. Remove the biggest value.</h3>
+  <div class="hpv" data-keys="90,70,80,30,50,60,40" data-ops="remove"></div>
+
+  <div class="box rem"><span class="tag">What we will learn</span>
+    <ul>
+      <li><b>Part I · Heaps:</b> the vocabulary, the heap as an array, insertion, removal, array size and expanding.</li>
+      <li><b>Part II · HeapSort:</b> sorting with a heap, and why it is fast.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 2. VOCABULARY ====================== -->
+<section class="tab" id="vocab" data-title="Vocabulary" data-part="1">
+  <h2>Heap vocabulary</h2>
+  <p class="goal">Goal: learn the words, one at a time. Hover over (or tap) a word to see it in the picture.</p>
+
+  <div class="vocab">
+    <div class="pict">
+      <div class="arr" id="vArr"></div>
+      <svg class="tree" id="vSvg"></svg>
+      <div class="cap" id="vocabCap">👆 Pick a word</div>
+    </div>
+    <div>
+      <div class="terms" id="terms">
+        <div class="term" data-t="heap"><b>Heap</b><span>A binary tree that is complete and obeys the heap condition.</span><em>We store it in an array</em></div>
+        <div class="term" data-t="complete"><b>Complete tree</b><span>Every level is full, except maybe the last one, which fills from left to right with no gaps.</span><em>So the array has no holes</em></div>
+        <div class="term" data-t="cond"><b>Heap condition</b><span>Every node is bigger than or equal to its children.</span><em>70 ≥ 30 and 70 ≥ 50</em></div>
+        <div class="term" data-t="max"><b>Max-heap</b><span>A heap where the biggest value is at the root.</span><em>A min-heap keeps the smallest on top instead</em></div>
+        <div class="term" data-t="root"><b>Root</b><span>The top node. In a max-heap it always holds the biggest value.</span><em>Array index 0</em></div>
+        <div class="term" data-t="family"><b>Parent and children</b><span>Found by arithmetic on the index. No references needed.</span><em>parent (i-1)/2 · left 2i+1 · right 2i+2</em></div>
+        <div class="term" data-t="last"><b>Last node</b><span>The rightmost node on the bottom level.</span><em>Array index size - 1</em></div>
+        <div class="term" data-t="up"><b>Trickle up</b><span>Move a value up, swapping with its parent, until the parent is bigger.</span><em>Used by insert</em></div>
+        <div class="term" data-t="down"><b>Trickle down</b><span>Move a value down, swapping with its larger child, until both children are smaller.</span><em>Used by remove</em></div>
+        <div class="term" data-t="weak"><b>Partly ordered</b><span>A heap is NOT sorted. Brothers and sisters can be in any order.</span><em>70 is left of 80, and that is fine</em></div>
+        <div class="term" data-t="pq"><b>Priority queue</b><span>A structure that always removes the highest-priority item first.</span><em>A heap is the best way to build one</em></div>
+        <div class="term" data-t="sort"><b>HeapSort</b><span>A sorting method: build a heap, then remove the biggest value again and again.</span><em>Part II</em></div>
+      </div>
+
+      <div class="box pic"><span class="tag">Picture it 🏢</span>
+        <ul>
+          <li>Imagine a company org chart. Each <b>employee</b> is a node, the <b>salary</b> is the value.</li>
+          <li>The rule: every <b>boss</b> earns at least as much as the people directly under them. That is the heap condition.</li>
+          <li>So the <b>CEO</b> (the root) earns the most.</li>
+          <li>Two people on the same level can earn anything. The chart is only <b>partly ordered</b>.</li>
+        </ul>
+      </div>
+      <div class="box warn"><span class="tag">Watch out 🙃</span>
+        <ul>
+          <li>A heap is <b>not</b> a binary search tree. There is no "smaller left, bigger right" rule.</li>
+          <li>You cannot search a heap quickly. It is built for one thing: giving you the <b>biggest</b>.</li>
+          <li>This "heap" has nothing to do with the heap memory where Java keeps objects. Same word, different thing.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 3. ARRAY ====================== -->
+<section class="tab" id="array" data-title="Heap as an Array" data-part="1">
+  <h2>The heap as an array</h2>
+  <p class="goal">Goal: store the tree in a plain array and find parents and children with index math.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>A heap is a <b>complete</b> tree, so it fits in an array with <b>no holes</b>.</li>
+      <li>We fill the array <b>level by level</b>, left to right. The root goes in index <b>0</b>.</li>
+      <li>We never store references. We <b>calculate</b> where the parent and children are.</li>
+    </ul>
+  </div>
+
+  <div class="cols3">
+    <div class="bigf">(i - 1) / 2<small>index of the PARENT of i</small></div>
+    <div class="bigf">2 * i + 1<small>index of the LEFT child of i</small></div>
+    <div class="bigf">2 * i + 2<small>index of the RIGHT child of i</small></div>
+  </div>
+
+  <div class="box pic"><span class="tag">Picture it 🎟️</span>
+    <ul>
+      <li>Imagine a theater where the tree sits in rows. Each <b>seat number</b> is an array index.</li>
+      <li>Row 1 has 1 seat, row 2 has 2, row 3 has 4. Seats are numbered straight through.</li>
+      <li>You find someone's children by <b>calculating</b> their seat numbers.</li>
+    </ul>
+  </div>
+
+  <h3>Hover over a cell</h3>
+  <div class="viz" id="arrViz">
+    <div class="arr" id="arrCells"></div>
+    <div class="formula" id="arrFormula">👆 Hover over (or tap) an array cell</div>
+    <div class="stage"><svg class="tree" id="arrSvg"></svg></div>
+  </div>
+
+  <h3><span class="step">STEP 1</span>The three formulas</h3>
+  <div data-code="T_index"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Node:        70
+Parent:      90
+Left child:  30
+Right child: 50</pre></div>
+
+  <h3><span class="step">STEP 2</span>Is this array a heap?</h3>
+  <div data-code="P_check"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>good is a heap:   true
+bad is a heap:    false
+sorted is a heap: false</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Parent = <code>(i - 1) / 2</code>, left = <code>2*i + 1</code>, right = <code>2*i + 2</code>.</li>
+      <li>The tree is only a picture in our heads. The computer sees <b>just the array</b>.</li>
+      <li>A sorted array (biggest first) is always a heap. A heap is usually not a sorted array.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 4. INSERT ====================== -->
+<section class="tab" id="insert" data-title="Insertion" data-part="1">
+  <h2>Insertion: trickle up</h2>
+  <p class="goal">Goal: add a value at the bottom, then let it climb to where it belongs.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Insert</b> = add a new value and keep the heap a heap.</li>
+      <li>Step 1: put the value in the <b>first free cell</b> of the array (the next spot on the bottom level).</li>
+      <li>Step 2: <b>trickle up</b>. While the value is bigger than its parent, swap them.</li>
+      <li>It stops when the parent is bigger, or when the value reaches the root.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🏢</span>
+    <ul>
+      <li>Imagine a new employee who starts at the <b>bottom</b> of the org chart.</li>
+      <li>The <b>employee</b> is the new value. Each <b>boss</b> above is a parent.</li>
+      <li>Whenever the employee earns more than the boss, they <b>trade places</b>. This repeats up the chart.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="hpv" data-keys="90,70,80,30,50,60,40" data-ops="insert" data-val="95" data-presets="insert:95:Insert 95|insert:75:Insert 75|insert:10:Insert 10"></div>
+
+  <h3><span class="step">STEP 1</span>One swap</h3>
+  <div data-code="T_up"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Index 3 now holds 95
+Index 7 now holds 30</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(insert and trickleUp are highlighted)</small></h3>
+  <div data-code="P_insert"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>30 
+50 30 
+50 30 40 
+90 50 40 30 
+90 70 40 30 50 </pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>New values always start at the <b>bottom</b> and move <b>up</b>.</li>
+      <li>At most one swap per level. The tree has about log₂ n levels → <b>O(log n)</b>.</li>
+      <li>1,000,000 values: at most about <b>20</b> swaps.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 5. REMOVE ====================== -->
+<section class="tab" id="remove" data-title="Removal" data-part="1">
+  <h2>Removal: trickle down</h2>
+  <p class="goal">Goal: take out the biggest value and repair the heap from the top.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Remove</b> = take out the <b>biggest</b> value. It is always the root, index 0.</li>
+      <li>Step 1: save the root.</li>
+      <li>Step 2: move the <b>last</b> value into the root. (The tree stays complete.)</li>
+      <li>Step 3: <b>trickle down</b>. While the value is smaller than a child, swap it with the <b>larger</b> child.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🏢</span>
+    <ul>
+      <li>Imagine the <b>CEO</b> (the root) retires.</li>
+      <li>The <b>newest hire</b> (the last node) is put in the CEO's chair for a moment.</li>
+      <li>That person keeps trading places with the <b>higher-paid</b> of the two people below, until everyone under them earns less.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="hpv" data-keys="90,70,80,30,50,60,40" data-ops="remove,insert" data-val="65"></div>
+
+  <h3><span class="step">STEP 1</span>Pick the larger child, then swap</h3>
+  <div data-code="T_down"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Root is now 80
+Index 2 now holds 40</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out: always the LARGER child ⚠️</span>
+    <ul>
+      <li>If we swapped 40 with the smaller child (70), then 70 would sit above 80.</li>
+      <li>That breaks the heap condition. The larger child is the only one fit to be the parent of the other.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(remove and trickleDown are highlighted)</small></h3>
+  <div data-code="P_remove"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>90 70 80 30 50 40 60 
+Removed: 90
+80 70 60 30 50 40 
+Removed: 80
+70 50 60 30 40 </pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Remove always takes the <b>root</b>. You cannot remove from the middle.</li>
+      <li>The last value goes to the top, then moves <b>down</b>.</li>
+      <li>At most one swap per level → <b>O(log n)</b>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 6. ARRAY SIZE ====================== -->
+<section class="tab" id="size" data-title="Array Size &amp; Expanding" data-part="1">
+  <h2>Array size and expanding the heap</h2>
+  <p class="goal">Goal: know the difference between how much the heap holds and how much it can hold, and grow it when it is full.</p>
+
+  <div class="box def"><span class="tag">Definitions</span>
+    <ul>
+      <li><b>Capacity</b> = the length of the array: how many values the heap <b>can</b> hold. In Java: <code>data.length</code>.</li>
+      <li><b>Size</b> = how many values the heap holds <b>right now</b>. In Java: our <code>size</code> field.</li>
+      <li>The heap lives in cells <b>0 to size - 1</b>. The cells after that are unused.</li>
+      <li><code>size</code> is also the index of the <b>next free cell</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🥚</span>
+    <ul>
+      <li>Imagine an egg carton. The <b>carton</b> is the array.</li>
+      <li>The <b>number of cups</b> is the capacity. The <b>number of eggs</b> is the size.</li>
+      <li>12 cups, 7 eggs: capacity 12, size 7. The next egg goes in cup number 7 (counting from 0).</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 1</span>A full heap refuses new values</h3>
+  <div data-code="T_full"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Insert 50: true
+Insert 70: true
+Insert 60: true
+Insert 90: false
+70 50 60 </pre></div>
+
+  <h3><span class="step">STEP 2</span>Expanding the heap</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>An array cannot grow. To <b>expand</b> a heap we create a <b>new array, twice as long</b>.</li>
+      <li>We copy every value to the <b>same index</b> in the new array.</li>
+      <li>The tree shape depends only on the indexes, so the heap is still a heap. Nothing has to be re-arranged.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🥚</span>
+    <ul>
+      <li>The carton is full, so we buy a carton <b>twice as big</b> (the new array).</li>
+      <li>Each egg moves to the cup with the <b>same number</b> as before.</li>
+      <li>The extra cups at the end are the new free space.</li>
+    </ul>
+  </div>
+  <div data-code="P_expand"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Inserted 30: size 1, capacity 2
+Inserted 50: size 2, capacity 2
+Inserted 40: size 3, capacity 4
+Inserted 90: size 4, capacity 4
+Inserted 70: size 5, capacity 8
+90 70 40 30 50 </pre></div>
+
+  <div class="cols">
+    <div class="box rem"><span class="tag">Compare with hash tables</span>
+      <ul>
+        <li>A hash table must <b>rehash</b> every key when it grows, because the index depends on the table size.</li>
+        <li>A heap just <b>copies</b>. Index 5 stays index 5.</li>
+      </ul>
+    </div>
+    <div class="box rem"><span class="tag">Remember</span>
+      <ul>
+        <li>Capacity = <code>data.length</code>. Size = values stored.</li>
+        <li>Full means <code>size == data.length</code>.</li>
+        <li>Expanding costs O(n), but doubling makes it rare.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box def"><span class="tag">End of Part I ✅</span>
+    <ul><li>You can now build a heap, insert, remove the biggest value, and grow the array.</li></ul>
+  </div>
+</section>
+
+<!-- ====================== 7. HEAPSORT ====================== -->
+<section class="tab" id="sort" data-title="HeapSort" data-part="2">
+  <h2>HeapSort</h2>
+  <p class="goal">Goal: use a heap to sort an array.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>HeapSort</b> = a sorting method that uses a heap.</li>
+      <li>The idea: a heap always gives us the <b>biggest</b> value that is left.</li>
+      <li>Remove the biggest, then the next biggest, then the next… and the values come out <b>in order</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🃏</span>
+    <ul>
+      <li>Imagine sorting a hand of cards. The <b>cards</b> are the values.</li>
+      <li>Pull out the <b>highest</b> card and lay it at the far right of the table.</li>
+      <li>Pull out the highest of what is left and lay it just to the left. Repeat until your hand is empty.</li>
+      <li>The <b>heap</b> is the helper that finds the highest card instantly each time.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">VERSION 1</span>The simple way: insert everything, remove everything</h3>
+  <div data-code="P_sort1"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>30 40 50 60 70 80 90 </pre></div>
+  <div class="box warn"><span class="tag">It works, but… 💾</span>
+    <ul>
+      <li>Version 1 needs a <b>second array</b> (inside the Heap object), as big as the first.</li>
+      <li>Version 2 sorts <b>inside the original array</b>. No extra memory.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">VERSION 2</span>The real HeapSort: two phases, one array</h3>
+  <div class="cols">
+    <div class="box def"><span class="tag">Phase 1 · Heapify</span>
+      <ul>
+        <li><b>Heapify</b> = turn any array into a heap, in place.</li>
+        <li>Start at the <b>last node that has a child</b>: index <code>n / 2 - 1</code>.</li>
+        <li>Trickle it down. Then do the node before it, and so on, back to the root.</li>
+      </ul>
+    </div>
+    <div class="box def"><span class="tag">Phase 2 · Sort</span>
+      <ul>
+        <li><b>Swap</b> the root (the biggest) with the <b>last cell of the heap</b>.</li>
+        <li>That cell is now finished. The heap <b>shrinks</b> by one.</li>
+        <li><b>Trickle down</b> the new root. Repeat until the heap has one value.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="hpv" data-keys="30,80,50,90,40,70,60" data-raw="1" data-ops="heapify,sort" data-extras="randomarr"></div>
+
+  <h3><span class="step">STEP 1</span>One move of phase 2</h3>
+  <div data-code="T_last"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Last cell now holds 90
+Root now holds 40</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(heapSort is highlighted)</small></h3>
+  <div data-code="P_heapsort"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Before: 30 80 50 90 40 70 60 
+After:  30 40 50 60 70 80 90 </pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Phase 1: make the array a heap. Phase 2: swap the root to the end, shrink, trickle down.</li>
+      <li>The array is split in two: the <b>heap part</b> at the front, the <b>sorted part</b> at the back.</li>
+      <li>A <b>max</b>-heap gives an array sorted from <b>smallest to biggest</b>, because the biggest values are placed at the end first.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 8. EFFICIENCY ====================== -->
+<section class="tab" id="eff" data-title="HeapSort Efficiency" data-part="2">
+  <h2>HeapSort efficiency</h2>
+  <p class="goal">Goal: understand why HeapSort is so much faster than the simple sorts.</p>
+
+  <div class="box def"><span class="tag">Where the speed comes from</span>
+    <ul>
+      <li>One trickle down costs at most the <b>height</b> of the tree: about <b>log₂ n</b> steps.</li>
+      <li>HeapSort does about <b>n</b> trickle downs.</li>
+      <li>n × log n → HeapSort is <b>O(n log n)</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🏆</span>
+    <ul>
+      <li>Imagine finding the best of 1,000 tennis players.</li>
+      <li><b>Selection sort</b> is like checking every player one by one: about 1,000 looks per winner.</li>
+      <li>A <b>heap</b> is like a tournament bracket. A player only climbs about 10 <b>rounds</b> (the levels of the tree) to reach the top.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>n (items)</th><th>n² (bubble, selection, insertion)</th><th>n × log₂ n (HeapSort)</th></tr>
+    <tr><td>10</td><td>100</td><td>about 33</td></tr>
+    <tr><td>100</td><td>10,000</td><td>about 664</td></tr>
+    <tr><td>1,000</td><td class="bad">1,000,000</td><td class="good">about 10,000</td></tr>
+    <tr><td>1,000,000</td><td class="bad">1,000,000,000,000</td><td class="good">about 20,000,000</td></tr>
+  </table>
+
+  <h3><span class="step">MEASURE IT</span>Count the steps yourself</h3>
+  <div data-code="P_count"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>n = 1000: selection sort 499500 steps, HeapSort 8445 steps
+n = 2000: selection sort 1999000 steps, HeapSort 18880 steps
+n = 4000: selection sort 7998000 steps, HeapSort 41751 steps</pre></div>
+  <div class="box rem"><span class="tag">Read the output</span>
+    <ul>
+      <li>Each time n <b>doubles</b>, selection sort does about <b>4 times</b> the work. That is n².</li>
+      <li>HeapSort does only a little more than <b>2 times</b> the work. That is n log n.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Operation</th><th>Cost</th><th>Why</th></tr>
+    <tr><td>Heap insert</td><td class="good">O(log n)</td><td>Trickle up: one swap per level at most</td></tr>
+    <tr><td>Heap remove</td><td class="good">O(log n)</td><td>Trickle down: one swap per level at most</td></tr>
+    <tr><td>Peek at the biggest</td><td class="good">O(1)</td><td>It is always in index 0</td></tr>
+    <tr><td>Heapify (phase 1)</td><td class="good">O(n)</td><td>Most nodes are near the bottom and barely move</td></tr>
+    <tr class="star"><td><b>HeapSort</b></td><td class="good">O(n log n)</td><td>n removals × log n each</td></tr>
+  </table>
+
+  <div class="cols">
+    <div class="box rem"><span class="tag">HeapSort strengths 💪</span>
+      <ul>
+        <li><b>Always</b> O(n log n). Sorted, reversed or random input: no bad case.</li>
+        <li>Sorts <b>in place</b>. No second array.</li>
+      </ul>
+    </div>
+    <div class="box warn"><span class="tag">HeapSort weaknesses</span>
+      <ul>
+        <li>Equal values may come out in a <b>different order</b> than they went in.</li>
+        <li>It jumps around the array a lot, so in practice some other O(n log n) sorts run a bit faster.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 9. FULL PROGRAM ====================== -->
+<section class="tab" id="full" data-title="Full Program" data-part="2">
+  <h2>The full program</h2>
+  <p class="goal">Goal: the complete Heap class, used as a priority queue, in one file you can run and change.</p>
+
+  <div data-code="P_full"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>90 80 70 30 40 50 60 
+Capacity: 8
+Biggest:  90
+Removed in order: 90 80 70 60 50 40 30 </pre></div>
+
+  <div class="box rem"><span class="tag">Try this ✏️</span>
+    <ul>
+      <li>Change two comparisons (one in <code>trickleUp</code>, one pair in <code>trickleDown</code>) to turn this into a <b>min-heap</b>. What does "Removed in order" print now?</li>
+      <li>Start with <code>new Heap(1)</code>. How many times does the array double for 7 values?</li>
+      <li>Write a method <code>boolean isFull()</code>. When would it ever return true in this version?</li>
+      <li>Insert the same value twice. Does the heap accept duplicates?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 10. PLAYGROUND ====================== -->
+<section class="tab" id="play" data-title="Playground" data-part="2">
+  <h2>Playground</h2>
+  <p class="goal">Build any heap you like. Predict what will happen first, then press the button.</p>
+  <div class="hpv" data-keys="90,70,80,30,50,60,40" data-ops="insert,remove,heapify,sort" data-val="85" data-extras="randomarr,clear"></div>
+  <div class="box rem"><span class="tag">Challenges</span>
+    <ul>
+      <li>Clear the heap. Insert 10, 20, 30, 40, 50 in that order. Where does each new value end up?</li>
+      <li>Insert a value that is smaller than everything. How many swaps does it need?</li>
+      <li>Press "Random array", then predict the first swap that Heapify will make.</li>
+      <li>After HeapSort, is the array still a heap? Try Insert and see what the page says.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<aside class="panel" id="panel">
+  <h4>💡 Code explainer</h4>
+  <div id="panelBody"></div>
+  <div class="keys">Every code box is a complete, runnable Main.java · Hover = preview · Click = pin a line · <kbd>↑</kbd> <kbd>↓</kbd> = step through pinned code · <kbd>←</kbd> <kbd>→</kbd> = change tab</div>
+</aside>
+</div>
+
+<script>
+/* =====================================================================
+   1.  JAVA CODE  +  LINE-BY-LINE EXPLANATIONS
+   Each line is [ code , explanation ].  `backticks` become <code>.
+   Every block on the page is a COMPLETE program (class Main + main).
+   ===================================================================== */
+const BLANK = [['', '']];
+const M_OPEN = [
+['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."],
+['    public static void main(String[] args) {', "The program starts running here."],
+];
+const M_HEAD = [['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."]];
+const M_MAIN = [['    public static void main(String[] args) {', "The program starts running here."]];
+const M_CLOSE = [['    }', "End of main."], ['}', "End of the Main class."]];
+const mainLines = body => [...M_OPEN, ...body, ...M_CLOSE];
+const B = {};
+
+/* ---------- the heap as an array ---------- */
+const F_IDX = [
+['        int parent = (i - 1) / 2;', "The parent of index 1 is (1 - 1) / 2 = 0. Integer division throws away any remainder."],
+['        int left = 2 * i + 1;', "The left child of index 1 is 2 * 1 + 1 = 3."],
+['        int right = 2 * i + 2;', "The right child of index 1 is 2 * 1 + 2 = 4."],
+];
+B.T_index = {title:'Main.java', run:true, focus:F_IDX, lines:mainLines([
+['        int[] heap = {90, 70, 80, 30, 50, 60, 40};', "A heap stored in an array, level by level: 90 | 70 80 | 30 50 60 40."],
+['        int i = 1;', "Look at the node in index 1. That is 70."],
+...F_IDX,
+['        System.out.println("Node:        " + heap[i]);', "heap[1] is 70."],
+['        System.out.println("Parent:      " + heap[parent]);', "heap[0] is 90. The parent is bigger: good."],
+['        System.out.println("Left child:  " + heap[left]);', "heap[3] is 30. Smaller than 70: good."],
+['        System.out.println("Right child: " + heap[right]);', "heap[4] is 50. Smaller than 70: good."],
+])};
+const F_ISHEAP = [
+['    static boolean isHeap(int[] a) {', "Checks the heap condition for a whole array. Returns true or false."],
+['        for (int i = 1; i < a.length; i++) {', "Visit every node except the root (the root has no parent)."],
+['            int parent = (i - 1) / 2;', "Find this node's parent."],
+['            if (a[i] > a[parent]) {', "Is this node BIGGER than its parent?"],
+['                return false;', "Then the heap condition is broken. Not a heap."],
+['            }', "End of the check."],
+['        }', "End of the loop."],
+['        return true;', "No node was bigger than its parent. It is a heap."],
+['    }', "End of isHeap."],
+];
+B.P_check = {title:'Main.java', run:true, focus:F_ISHEAP, lines:[...M_HEAD, ...F_ISHEAP, ...BLANK, ...M_MAIN,
+['        int[] good = {90, 70, 80, 30, 50, 60, 40};', "Every parent is bigger than its children."],
+['        int[] bad = {90, 70, 80, 95, 50, 60, 40};', "95 sits in index 3. Its parent is index 1, which holds 70. 95 > 70 breaks the rule."],
+['        int[] sorted = {10, 20, 30, 40, 50};', "A sorted array, smallest first. Every child is bigger than its parent."],
+['        System.out.println("good is a heap:   " + isHeap(good));', "Prints true."],
+['        System.out.println("bad is a heap:    " + isHeap(bad));', "Prints false."],
+['        System.out.println("sorted is a heap: " + isHeap(sorted));', "Prints false. Sorted smallest-first is the opposite of a max-heap."],
+...M_CLOSE]};
+
+/* ---------- trickle down, shared by the class version and the static (HeapSort) version ---------- */
+function TD(o){            // o.st: static version working on array `a`    o.count: count the steps
+  const A = o.st ? 'a' : 'data';
+  const swapLines = o.st ? [
+    ['            int temp = ' + A + '[index];', "Swap, step 1: save the node's value."],
+    ['            ' + A + '[index] = ' + A + '[larger];', "Swap, step 2: the larger child moves up."],
+    ['            ' + A + '[larger] = temp;', "Swap, step 3: the saved value moves down."],
+  ] : [['            swap(index, larger);', "The node is smaller than its larger child: swap them. The node moves DOWN one level."]];
+  return [
+    [o.st ? '    static void trickleDown(int[] a, int index, int size) {' : '    void trickleDown(int index) {',
+      o.st ? "Moves the value at `index` DOWN until the heap condition holds again. `size` says how many cells belong to the heap." : "Moves the value at `index` DOWN the tree until the heap condition holds again."],
+    ['        while (2 * index + 1 < size) {', "Keep going while this node has at least a left child. (`2 * index + 1` is the left child's index.)"],
+    ...(o.count ? [['            steps++;', "Count one step of work."]] : []),
+    ['            int left = 2 * index + 1;', "Index of the left child."],
+    ['            int right = 2 * index + 2;', "Index of the right child. It may not exist."],
+    ['            int larger = left;', "Start by assuming the left child is the larger one."],
+    ['            if (right < size && ' + A + '[right] > ' + A + '[left]) {', "Is there a right child, AND is it bigger than the left one? `&&` means and."],
+    ['                larger = right;', "Then the right child is the larger one."],
+    ['            }', "Now `larger` is the index of the bigger child."],
+    ['            if (' + A + '[index] >= ' + A + '[larger]) {', "Is the node already at least as big as its bigger child?"],
+    ['                break;', "Then the heap condition holds. `break` leaves the loop."],
+    ['            }', "End of the check."],
+    ...swapLines,
+    ['            index = larger;', "Follow the value down, and repeat from its new position."],
+    ['        }', "End of the loop."],
+    ['    }', "End of trickleDown."],
+  ];
+}
+
+/* ---------- the Heap class, in several versions ---------- */
+function HP(o){            // o.remove  o.expand  o.extras (peek + isEmpty)
+  o = o || {}; const p = {};
+  p.open = [['class Heap {', "A blueprint for a max-heap of whole numbers."]];
+  p.fields = [
+    ['    int[] data;', "The array that stores the heap, level by level."],
+    ['    int size;', "How many values are in the heap right now. It is also the index of the next free cell."],
+  ];
+  p.ctor = [
+    ['    Heap(int capacity) {', "The constructor. `capacity` is how many values the array can hold."],
+    ['        data = new int[capacity];', "Create the array. Its length never changes" + (o.expand ? " (but we can replace it with a bigger one)." : ".")],
+    ['        size = 0;', "The heap starts empty."],
+    ['    }', "End of the constructor."],
+  ];
+  p.fullCheck = o.expand ? [
+    ['        if (size == data.length) {', "Is the array full?"],
+    ['            expand();', "Yes: get a bigger array first. Then carry on as normal."],
+    ['        }', "End of the check."],
+  ] : [
+    ['        if (size == data.length) {', "Is the array full? `data.length` is the capacity."],
+    ['            return false;', "No room: refuse the value."],
+    ['        }', "End of the check."],
+  ];
+  p.insert = [
+    [o.expand ? '    void insert(int value) {' : '    boolean insert(int value) {', o.expand ? "Add a value to the heap. It can no longer fail, because the array grows when needed." : "Add a value to the heap. Returns true if it worked, false if the array is full."],
+    ...p.fullCheck,
+    ['        data[size] = value;', "Put the new value in the first free cell. That is the next spot on the bottom level of the tree."],
+    ['        trickleUp(size);', "The new value may be bigger than its parent. Move it up until the heap condition holds."],
+    ['        size++;', "The heap has one more value."],
+    ...(o.expand ? [] : [['        return true;', "Done."]]),
+    ['    }', "End of insert."],
+  ];
+  p.up = [
+    ['    void trickleUp(int index) {', "Moves the value at `index` UP the tree until its parent is at least as big."],
+    ['        while (index > 0) {', "Keep going until we reach the root (index 0). The root has no parent."],
+    ['            int parent = (index - 1) / 2;', "Find the parent's index."],
+    ['            if (data[index] <= data[parent]) {', "Is the value NOT bigger than its parent?"],
+    ['                break;', "Then the heap condition holds. `break` leaves the loop."],
+    ['            }', "End of the check."],
+    ['            swap(index, parent);', "The value is bigger than its parent: swap them. The value moves UP one level."],
+    ['            index = parent;', "Follow the value up, and repeat from its new position."],
+    ['        }', "End of the loop."],
+    ['    }', "End of trickleUp."],
+  ];
+  p.remove = [
+    ['    int remove() {', "Removes and returns the biggest value. We assume the heap is not empty."],
+    ['        int max = data[0];', "The biggest value is always at the root. Save it."],
+    ['        size--;', "The heap has one value less. `size` is now the index of the LAST value."],
+    ['        data[0] = data[size];', "Move the last value to the root. The tree stays complete, but the root is probably too small now."],
+    ['        trickleDown(0);', "Move that value down until the heap condition holds again."],
+    ['        return max;', "Give back the biggest value."],
+    ['    }', "End of remove."],
+  ];
+  p.down = TD({});
+  p.swap = [
+    ['    void swap(int a, int b) {', "Swaps the values in cells `a` and `b`."],
+    ['        int temp = data[a];', "Save the first value."],
+    ['        data[a] = data[b];', "Copy the second value into the first cell."],
+    ['        data[b] = temp;', "Put the saved value into the second cell."],
+    ['    }', "End of swap."],
+  ];
+  p.expand = [
+    ['    void expand() {', "Replaces the array with one that is twice as long."],
+    ['        int[] bigger = new int[data.length * 2];', "Create a new array with double the capacity."],
+    ['        for (int i = 0; i < size; i++) {', "Go through every value in the heap."],
+    ['            bigger[i] = data[i];', "Copy it to the SAME index. The tree shape does not change, so nothing needs to move."],
+    ['        }', "End of the loop."],
+    ['        data = bigger;', "From now on the heap uses the bigger array. Java throws the old one away."],
+    ['    }', "End of expand."],
+  ];
+  p.extras = [
+    ['    int peek() {', "Looks at the biggest value WITHOUT removing it."],
+    ['        return data[0];', "It is always at the root."],
+    ['    }', "End of peek."],
+    ['', ''],
+    ['    boolean isEmpty() {', "Is the heap empty?"],
+    ['        return size == 0;', "True when there are no values."],
+    ['    }', "End of isEmpty."],
+  ];
+  p.display = [
+    ['    void display() {', "Prints the heap array on one line."],
+    ['        for (int i = 0; i < size; i++) {', "Go through the cells that are in use."],
+    ['            System.out.print(data[i] + " ");', "Print the value and a space."],
+    ['        }', "End of the loop."],
+    ['        System.out.println();', "Move to a new line."],
+    ['    }', "End of display."],
+  ];
+  p.close = [['}', "End of the Heap class."]];
+  p.all = [...p.open, ...p.fields, ...BLANK, ...p.ctor, ...BLANK, ...p.insert, ...BLANK, ...p.up,
+    ...(o.remove ? [...BLANK, ...p.remove, ...BLANK, ...p.down] : []), ...BLANK, ...p.swap,
+    ...(o.expand ? [...BLANK, ...p.expand] : []), ...(o.extras ? [...BLANK, ...p.extras] : []), ...BLANK, ...p.display, ...p.close];
+  return p;
+}
+
+/* ---------- insertion ---------- */
+const F_UP1 = [
+['        if (data[index] > data[parent]) {', "Is the new value bigger than its parent? 95 > 30, so yes."],
+['            int temp = data[index];', "Swap, step 1: save the new value."],
+['            data[index] = data[parent];', "Swap, step 2: the parent moves down."],
+['            data[parent] = temp;', "Swap, step 3: the new value moves up."],
+['        }', "One swap done. The real method repeats this until the parent is bigger."],
+];
+B.T_up = {title:'Main.java', run:true, focus:F_UP1, lines:mainLines([
+['        int[] data = {90, 70, 80, 30, 50, 60, 40, 95};', "A heap of 7 values, plus the new value 95 placed in the first free cell (index 7)."],
+['        int index = 7;', "Where the new value sits."],
+['        int parent = (index - 1) / 2;', "Its parent: (7 - 1) / 2 = 3. Cell 3 holds 30."],
+...F_UP1,
+['        System.out.println("Index 3 now holds " + data[3]);', "95 moved up one level. Prints 95."],
+['        System.out.println("Index 7 now holds " + data[7]);', "30 moved down. Prints 30."],
+])};
+{ const p = HP({});
+  B.P_insert = {title:'Main.java', run:true, focus:[...p.insert, ...p.up], lines:[...p.all, ...BLANK, ...mainLines([
+    ['        Heap h = new Heap(10);', "Create a heap with room for 10 values."],
+    ['        int[] values = {30, 50, 40, 90, 70};', "The values to insert, in this order."],
+    ['        for (int v : values) {', "Go through the values, one at a time."],
+    ['            h.insert(v);', "Insert this value. It trickles up to where it belongs."],
+    ['            h.display();', "Print the heap array after each insert. Watch the biggest value stay in front."],
+    ['        }', "End of the loop."],
+  ])]};
+  const F_FULL = p.fullCheck;
+  B.T_full = {title:'Main.java', run:true, focus:F_FULL, lines:[...p.all, ...BLANK, ...mainLines([
+    ['        Heap h = new Heap(3);', "A tiny heap: room for only 3 values."],
+    ['        System.out.println("Insert 50: " + h.insert(50));', "There is room. Prints true."],
+    ['        System.out.println("Insert 70: " + h.insert(70));', "There is room. Prints true."],
+    ['        System.out.println("Insert 60: " + h.insert(60));', "The last free cell. Prints true."],
+    ['        System.out.println("Insert 90: " + h.insert(90));', "The array is full, so insert refuses. Prints false."],
+    ['        h.display();', "90 is not in the heap."],
+  ])]}; }
+
+/* ---------- removal ---------- */
+const F_LARGER = [
+['        int larger = left;', "Start by assuming the left child (70) is the larger one."],
+['        if (data[right] > data[left]) {', "Is the right child bigger? 80 > 70, so yes."],
+['            larger = right;', "The right child is the larger one."],
+['        }', "Now `larger` is the index of the bigger child: 2."],
+];
+B.T_down = {title:'Main.java', run:true, focus:F_LARGER, lines:mainLines([
+['        int[] data = {40, 70, 80, 30, 50, 60};', "The root was just removed and the last value (40) was moved to the top. 40 is too small to be the root."],
+['        int index = 0;', "We look at the root."],
+['        int left = 2 * index + 1;', "Its left child is index 1 (70)."],
+['        int right = 2 * index + 2;', "Its right child is index 2 (80)."],
+...F_LARGER,
+['        int temp = data[index];', "Swap, step 1: save 40."],
+['        data[index] = data[larger];', "Swap, step 2: the larger child (80) moves up to the root."],
+['        data[larger] = temp;', "Swap, step 3: 40 moves down."],
+['        System.out.println("Root is now " + data[0]);', "Prints 80. We swapped with the LARGER child, so the new root is bigger than both children."],
+['        System.out.println("Index 2 now holds " + data[2]);', "Prints 40."],
+])};
+{ const p = HP({remove:true});
+  const fill = [
+    ['        Heap h = new Heap(10);', "Create a heap with room for 10 values."],
+    ['        int[] values = {30, 50, 40, 90, 70, 60, 80};', "Seven values, in no special order."],
+    ['        for (int v : values) {', "Go through the values."],
+    ['            h.insert(v);', "Insert each one."],
+    ['        }', "End of the loop."],
+  ];
+  B.P_remove = {title:'Main.java', run:true, focus:[...p.remove, ...p.down], lines:[...p.all, ...BLANK, ...mainLines([
+    ...fill,
+    ['        h.display();', "Print the heap. The biggest value (90) is first."],
+    ['        System.out.println("Removed: " + h.remove());', "Take out the biggest value. Prints 90."],
+    ['        h.display();', "The next biggest (80) is the root now."],
+    ['        System.out.println("Removed: " + h.remove());', "Prints 80."],
+    ['        h.display();', "70 is the root now."],
+  ])]};
+  B.P_sort1 = {title:'Main.java', run:true, lines:[...p.all, ...BLANK, ...mainLines([
+    ['        int[] a = {30, 80, 50, 90, 40, 70, 60};', "The array we want to sort."],
+    ['        Heap h = new Heap(a.length);', "A heap with exactly enough room."],
+    ['        for (int v : a) {', "Step 1: go through the array."],
+    ['            h.insert(v);', "Put every value into the heap."],
+    ['        }', "End of step 1."],
+    ['        for (int i = a.length - 1; i >= 0; i--) {', "Step 2: fill the array from the BACK to the front."],
+    ['            a[i] = h.remove();', "remove gives the biggest value that is left. It goes in the last free cell."],
+    ['        }', "End of step 2. The array is sorted."],
+    ['        for (int v : a) {', "Go through the sorted array."],
+    ['            System.out.print(v + " ");', "Print each value."],
+    ['        }', "End of the loop."],
+    ['        System.out.println();', "New line."],
+  ])]};
+  B.P_sort1.focus = B.P_sort1.lines.slice(-14, -2); }
+
+/* ---------- expanding ---------- */
+{ const p = HP({expand:true});
+  B.P_expand = {title:'Main.java', run:true, focus:[...p.fullCheck, ...p.expand], lines:[...p.all, ...BLANK, ...mainLines([
+    ['        Heap h = new Heap(2);', "Start with room for only 2 values."],
+    ['        int[] values = {30, 50, 40, 90, 70};', "Five values: more than the heap can hold at first."],
+    ['        for (int v : values) {', "Go through the values."],
+    ['            h.insert(v);', "Insert the value. The array doubles whenever it is full."],
+    ['            System.out.println("Inserted " + v + ": size " + h.size + ", capacity " + h.data.length);', "Print how many values are stored and how long the array is."],
+    ['        }', "End of the loop."],
+    ['        h.display();', "All five values are in the heap."],
+  ])]}; }
+
+/* ---------- HeapSort, in place ---------- */
+const F_LAST = [
+['        int temp = a[0];', "Swap, step 1: save the root. It is the biggest value: 90."],
+['        a[0] = a[last];', "Swap, step 2: the last value moves to the root."],
+['        a[last] = temp;', "Swap, step 3: the biggest value goes into the LAST cell. That is its final, sorted position."],
+];
+B.T_last = {title:'Main.java', run:true, focus:F_LAST, lines:mainLines([
+['        int[] a = {90, 70, 80, 30, 50, 60, 40};', "An array that is already a heap."],
+['        int last = a.length - 1;', "Index of the last cell: 6."],
+...F_LAST,
+['        System.out.println("Last cell now holds " + a[last]);', "Prints 90. One value is in its sorted place."],
+['        System.out.println("Root now holds " + a[0]);', "Prints 40. The root is too small now, so the next step is to trickle it down."],
+])};
+const TD_S = TD({st:true});
+const HS = [
+['    static void heapSort(int[] a) {', "Sorts the array from smallest to biggest, using no second array."],
+['        int n = a.length;', "How many values there are."],
+['        for (int i = n / 2 - 1; i >= 0; i--) {', "PHASE 1 (heapify). Start at the last node that has a child, and go back to the root."],
+['            trickleDown(a, i, n);', "Trickle this node down. When the loop ends, the whole array is a heap."],
+['        }', "End of phase 1."],
+['        for (int end = n - 1; end > 0; end--) {', "PHASE 2. `end` is the last cell of the heap part. It shrinks by one each time."],
+['            int temp = a[0];', "Swap, step 1: save the root (the biggest value left)."],
+['            a[0] = a[end];', "Swap, step 2: the last heap value moves to the root."],
+['            a[end] = temp;', "Swap, step 3: the biggest value goes to cell `end`. It is in its final place."],
+['            trickleDown(a, 0, end);', "Repair the heap. It now has only `end` values, so the sorted cells are left alone."],
+['        }', "End of phase 2. The array is sorted."],
+['    }', "End of heapSort."],
+];
+B.P_heapsort = {title:'Main.java', run:true, focus:HS, lines:[...M_HEAD, ...TD_S, ...BLANK, ...HS, ...BLANK, ...M_MAIN,
+['        int[] a = {30, 80, 50, 90, 40, 70, 60};', "The array we want to sort."],
+['        System.out.print("Before: ");', "Print a label."],
+['        for (int v : a) {', "Go through the array."],
+['            System.out.print(v + " ");', "Print each value."],
+['        }', "End of the loop."],
+['        System.out.println();', "New line."],
+['', ''],
+['        heapSort(a);', "Sort the array in place."],
+['', ''],
+['        System.out.print("After:  ");', "Print a label."],
+['        for (int v : a) {', "Go through the array again."],
+['            System.out.print(v + " ");', "Print each value. They are in order now."],
+['        }', "End of the loop."],
+['        System.out.println();', "New line."],
+...M_CLOSE]};
+
+/* ---------- efficiency: count the steps ---------- */
+{ const td = TD({st:true, count:true});
+  const stepsField = [['    static long steps;', "A counter that both sorting methods add to. `long` can hold very big numbers."]];
+  const hs = HS.map(l => l.slice());
+  const sel = [
+    ['    static void selectionSort(int[] a) {', "Selection sort from earlier in the course, for comparison."],
+    ['        for (int i = 0; i < a.length - 1; i++) {', "For every position in the array..."],
+    ['            int min = i;', "Assume the smallest remaining value is here."],
+    ['            for (int j = i + 1; j < a.length; j++) {', "...look at ALL the values after it."],
+    ['                steps++;', "Count one step of work."],
+    ['                if (a[j] < a[min]) {', "Found a smaller value?"],
+    ['                    min = j;', "Remember where it is."],
+    ['                }', "End of the check."],
+    ['            }', "End of the inner loop."],
+    ['            int temp = a[i];', "Swap, step 1."],
+    ['            a[i] = a[min];', "Swap, step 2: the smallest value moves into position i."],
+    ['            a[min] = temp;', "Swap, step 3."],
+    ['        }', "End of the outer loop."],
+    ['    }', "End of selectionSort."],
+  ];
+  B.P_count = {title:'Main.java', run:true, focus:[...stepsField, td[2], sel[4]], lines:[
+    ['import java.util.Random;', "We use Java's Random class to make up the numbers to sort."],
+    ['', ''],
+    ...M_HEAD, ...stepsField, ...BLANK, ...td, ...BLANK, ...hs, ...BLANK, ...sel, ...BLANK, ...M_MAIN,
+    ['        int[] sizes = {1000, 2000, 4000};', "Three array sizes. Each one is double the one before."],
+    ['        Random rand = new Random(1);', "A random number maker. The seed 1 makes it give the same numbers on every run."],
+    ['        for (int n : sizes) {', "Run the experiment once for each size."],
+    ['            int[] a = new int[n];', "An array of n numbers."],
+    ['            for (int i = 0; i < n; i++) {', "Fill it..."],
+    ['                a[i] = rand.nextInt(100000);', "...with random numbers from 0 to 99999."],
+    ['            }', "End of the filling."],
+    ['            int[] b = a.clone();', "An exact copy, so both methods sort the same numbers."],
+    ['', ''],
+    ['            steps = 0;', "Reset the counter."],
+    ['            selectionSort(a);', "Sort the first copy with selection sort."],
+    ['            long selectionSteps = steps;', "Remember how many steps it took."],
+    ['', ''],
+    ['            steps = 0;', "Reset the counter."],
+    ['            heapSort(b);', "Sort the second copy with HeapSort."],
+    ['            long heapSteps = steps;', "Remember how many steps it took."],
+    ['', ''],
+    ['            System.out.println("n = " + n + ": selection sort " + selectionSteps + " steps, HeapSort " + heapSteps + " steps");', "Print both counts side by side."],
+    ['        }', "End of the experiment loop."],
+    ...M_CLOSE]}; }
+
+/* ---------- full program ---------- */
+{ const p = HP({remove:true, expand:true, extras:true});
+  B.P_full = {title:'Main.java', run:true, lines:[...p.all, ...BLANK, ...mainLines([
+    ['        Heap h = new Heap(4);', "Start small on purpose: room for 4 values. The heap will grow."],
+    ['        int[] values = {30, 80, 50, 90, 40, 70, 60};', "Seven values."],
+    ['        for (int v : values) {', "Go through the values."],
+    ['            h.insert(v);', "Insert each one. The array doubles from 4 to 8 on the fifth insert."],
+    ['        }', "End of the loop."],
+    ['', ''],
+    ['        h.display();', "Print the heap array."],
+    ['        System.out.println("Capacity: " + h.data.length);', "The array grew from 4 to 8."],
+    ['        System.out.println("Biggest:  " + h.peek());', "Look at the root without removing it: 90."],
+    ['', ''],
+    ['        System.out.print("Removed in order: ");', "Print a label."],
+    ['        while (!h.isEmpty()) {', "Keep going until the heap is empty. `!` means not."],
+    ['            System.out.print(h.remove() + " ");', "Remove the biggest value that is left and print it."],
+    ['        }', "End of the loop. The values came out from biggest to smallest."],
+    ['        System.out.println();', "New line."],
+  ])]}; }
+
+/* =====================================================================
+   2.  CODE RENDERING, HOVER PANEL, COPY
+   ===================================================================== */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const KW = /^(class|public|static|final|void|int|long|double|boolean|new|return|if|else|while|for|break|import|true|false|null|this)$/;
+function hi(src){
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*")|\b([A-Za-z_]\w*)\b|\b(\d+)\b/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))){
+    out += esc(src.slice(last, m.index)); last = re.lastIndex;
+    if (m[1]) out += '<span class="c">'+esc(m[1])+'</span>';
+    else if (m[2]) out += '<span class="s">'+esc(m[2])+'</span>';
+    else if (m[3]) out += KW.test(m[3]) ? '<span class="k">'+m[3]+'</span>' : (/^[A-Z]/.test(m[3]) ? '<span class="t">'+m[3]+'</span>' : m[3]);
+    else out += '<span class="num">'+m[4]+'</span>';
+  }
+  return out + esc(src.slice(last));
+}
+const explain = s => esc(s).replace(/`([^`]+)`/g,'<code>$1</code>');
+const textOf = id => B[id].lines.map(l => l[0]).join('\n') + '\n';
+
+function renderCode(host){
+  const id = host.dataset.code, blk = B[id];
+  const foc = blk.focus ? new Set(blk.focus) : null;
+  let h = '<div class="codebox'+(foc?' hasfocus':'')+'"><div class="codebar"><span class="fname">'+esc(blk.title)+' · complete program'+(foc?' · <span class="star">★ new lines are highlighted</span>':'')+'</span><span>'+
+    (foc && blk.lines.length > 30 ? '<button data-jump="1">⤵ Jump to new lines</button> ' : '')+'<button data-copy="'+id+'">📋 Copy Main.java</button></span></div><div class="code">';
+  blk.lines.forEach((l,i) => {
+    h += '<div class="ln'+(l[0]===''?' blank':'')+(foc && foc.has(l)?' focus':'')+'" data-b="'+id+'" data-i="'+i+'"><span class="no">'+(i+1)+'</span><span class="src">'+(hi(l[0])||' ')+'</span></div>';
+  });
+  host.innerHTML = h + '</div></div>';
+}
+
+const panelBody = document.getElementById('panelBody');
+const HINT = '<p class="hint">👈 Move your mouse over any line of Java code.<br><br>The explanation of that line shows up here.</p>';
+let pinned = null;                       // the pinned .ln element
+function show(ln){
+  if (!ln){ panelBody.innerHTML = HINT; return; }
+  const blk = B[ln.dataset.b], i = +ln.dataset.i, l = blk.lines[i];
+  panelBody.innerHTML = '<div class="where">'+esc(blk.title)+' · line '+(i+1)+(ln===pinned?' · 📌 pinned':'')+'</div>'+
+    '<div class="pline">'+hi(l[0].trim())+'</div><div class="ptext">'+explain(l[1])+'</div>';
+}
+function setHot(ln){ document.querySelectorAll('.ln.hot').forEach(e => e.classList.remove('hot')); if (ln) ln.classList.add('hot'); }
+function setPin(ln){
+  if (pinned) pinned.classList.remove('pin');
+  pinned = ln; if (ln) ln.classList.add('pin');
+  show(ln);
+}
+document.addEventListener('mouseover', e => {
+  const ln = e.target.closest && e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')){ setHot(ln); show(ln); }
+  else if (!e.target.closest || !e.target.closest('.codebox')){ setHot(null); show(pinned); }
+});
+document.addEventListener('click', e => {
+  const jp = e.target.closest('[data-jump]');
+  if (jp){ const f = jp.closest('.codebox').querySelector('.ln.focus'); if (f) f.scrollIntoView({block:'center', behavior:'smooth'}); return; }
+  const cp = e.target.closest('[data-copy]');
+  if (cp){ copyText(textOf(cp.dataset.copy), cp); return; }
+  const ln = e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')) setPin(ln === pinned ? null : ln);
+});
+function copyText(text, btn){
+  const done = ok => { const old = btn.textContent; btn.textContent = ok ? '✅ Copied complete program!' : '⚠️ Select and copy manually'; setTimeout(() => btn.textContent = old, 1600); };
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok = document.execCommand('copy'); }catch(_){ } ta.remove(); done(ok); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true), fallback); else fallback();
+}
+
+/* =====================================================================
+   3.  TABS
+   ===================================================================== */
+const sections = [...document.querySelectorAll('section.tab')];
+const tabsNav = document.getElementById('tabs'), wrap = document.getElementById('wrap');
+let curTab = 0;
+function buildTabs(){
+  let h = '';
+  sections.forEach((s,i) => {
+    if (i === 0) h += '<span class="part">PART I</span>';
+    if (s.dataset.part === '2' && sections[i-1].dataset.part === '1') h += '<span class="part two">PART II</span>';
+    h += '<button data-go="'+i+'" data-part="'+s.dataset.part+'"><b>'+(i+1)+'</b>'+s.dataset.title+'</button>';
+    const nav = document.createElement('div'); nav.className = 'navrow';
+    nav.innerHTML = '<button data-go="'+(i-1)+'"'+(i===0?' disabled':'')+'>← '+(i?sections[i-1].dataset.title:'')+'</button>'+
+                    '<button class="next" data-go="'+(i+1)+'"'+(i===sections.length-1?' disabled':'')+'>'+(i<sections.length-1?sections[i+1].dataset.title:'')+' →</button>';
+    s.appendChild(nav);
+  });
+  tabsNav.innerHTML = h;
+  document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(+b.dataset.go, true); });
+}
+function go(i, scroll){
+  if (i < 0 || i >= sections.length) return;
+  curTab = i; setPin(null); setHot(null);
+  sections.forEach((s,j) => s.classList.toggle('on', j === i));
+  tabsNav.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.go === i));
+  wrap.classList.toggle('nopanel', !sections[i].querySelector('.codebox'));
+  const on = tabsNav.querySelector('button.on'); if (on && on.scrollIntoView) on.scrollIntoView({block:'nearest', inline:'center'});
+  try { history.replaceState(null, '', '#' + sections[i].id); } catch(_){}
+  if (scroll) window.scrollTo({top: tabsNav.offsetTop, behavior:'auto'});
+}
+document.addEventListener('keydown', e => {
+  if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowRight') go(curTab + 1, true);
+  else if (e.key === 'ArrowLeft') go(curTab - 1, true);
+  else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && pinned){
+    e.preventDefault();
+    let n = pinned; const dir = e.key === 'ArrowDown' ? 'nextElementSibling' : 'previousElementSibling';
+    do { n = n[dir]; } while (n && n.classList.contains('blank'));
+    if (n){ setPin(n); n.scrollIntoView({block:'nearest'}); }
+  } else if (e.key === 'Escape') setPin(null);
+});
+
+/* =====================================================================
+   4.  DRAWING A HEAP  (array on top, the same values as a tree below)
+   ===================================================================== */
+function drawHeap(svg, a, heapN, cls, edgeCls){        // cells from heapN on are the finished, sorted part
+  cls = cls || {}; edgeCls = edgeCls || {};
+  const W = 680, YS = 74, P = 34, R = 22;
+  const depth = i => Math.floor(Math.log2(i + 1));
+  const maxD = a.length ? depth(a.length - 1) : 0, H = 2*P + maxD*YS;
+  const pos = i => { const d = depth(i), slots = 2 ** d, k = i - (slots - 1); return {x: W * (k + 0.5) / slots, y: P + d*YS}; };
+  let s = '';
+  if (!a.length) s += '<text class="empty" x="'+(W/2)+'" y="'+(H/2+6)+'" text-anchor="middle">empty heap · size == 0</text>';
+  for (let i = 1; i < a.length; i++){ const c = pos(i), p = pos(Math.floor((i-1)/2)); s += '<line class="e '+(i >= heapN ? 'done' : (edgeCls[i]||''))+'" x1="'+p.x+'" y1="'+p.y+'" x2="'+c.x+'" y2="'+c.y+'"/>'; }
+  for (let i = 0; i < a.length; i++){ const c = pos(i);
+    s += '<g class="n '+(cls[i] || (i >= heapN ? 'done' : ''))+'"><circle cx="'+c.x+'" cy="'+c.y+'" r="'+R+'"/><text x="'+c.x+'" y="'+(c.y+7)+'" text-anchor="middle">'+a[i]+'</text></g>'+
+         '<text class="badge" x="'+(c.x+R-2)+'" y="'+(c.y-R+3)+'">['+i+']</text>'; }
+  svg.setAttribute('viewBox', '0 0 '+W+' '+H); svg.style.width = W + 'px'; svg.innerHTML = s;
+}
+function cellsHtml(a, heapN, cls){
+  cls = cls || {};
+  return a.map((v, i) => '<div class="cell '+(cls[i] || (i >= heapN ? 'done' : ''))+'" data-i="'+i+'"><i>['+i+']</i><b>'+v+'</b></div>').join('');
+}
+
+/* =====================================================================
+   5.  ANIMATED HEAP WIDGET  (same rules as the Java code)
+   ===================================================================== */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const LABEL = {insert:'Insert', remove:'Remove max', heapify:'Heapify (phase 1)', sort:'HeapSort'};
+const MAXN = 15;
+class HeapViz {
+  constructor(el){
+    this.el = el; this.token = 0;
+    this.init = (el.dataset.keys || '').split(',').filter(Boolean).map(Number);
+    this.ops = (el.dataset.ops || '').split(',').filter(Boolean);
+    this.extras = (el.dataset.extras || '').split(',').filter(Boolean);
+    this.presets = (el.dataset.presets || '').split('|').filter(Boolean).map(p => p.split(':'));
+    let h = '<div class="ctl">';
+    if (this.ops.includes('insert')) h += '<input type="number" value="'+(el.dataset.val||'')+'" aria-label="value">';
+    this.ops.forEach(o => h += '<button data-op="'+o+'">'+LABEL[o]+'</button>');
+    this.presets.forEach(p => h += '<button class="pre" data-op="'+p[0]+'" data-v="'+p[1]+'">'+p[2]+'</button>');
+    if (this.extras.includes('randomarr')) h += '<button class="alt" data-x="randomarr">🎲 Random array</button>';
+    if (this.extras.includes('clear')) h += '<button class="alt" data-x="clear">🗑 Clear</button>';
+    h += '<button class="alt" data-x="reset">↺ Reset</button></div><div class="arr small"></div><div class="status"></div><div class="stage"><svg class="tree"></svg></div><div class="vlog"></div>';
+    el.innerHTML = h;
+    this.cells = el.querySelector('.arr'); this.svg = el.querySelector('svg'); this.log = el.querySelector('.vlog'); this.status = el.querySelector('.status'); this.input = el.querySelector('input');
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.x) return this.extra(b.dataset.x);
+      if (b.dataset.op) this.run(b.dataset.op, b.dataset.v);
+    });
+    if (this.input) this.input.addEventListener('keydown', e => { if (e.key === 'Enter' && !this.busy) this.run('insert'); });
+    this.reset();
+  }
+  isHeap(a){ a = a || this.a; for (let i = 1; i < a.length; i++) if (a[i] > a[Math.floor((i-1)/2)]) return false; return true; }
+  draw(a, heapN, cls){
+    a = a || this.a; if (heapN === undefined) heapN = a.length;
+    this.cells.innerHTML = cellsHtml(a, heapN, cls); drawHeap(this.svg, a, heapN, cls);
+    const sorted = a.length - heapN;
+    this.status.innerHTML = a.length && heapN === 0 ? '<span style="color:#6ee7b7">sorted ✔ all '+a.length+' cells are in order</span>' : sorted ? 'heap part: cells 0 to '+(heapN-1)+' &nbsp;·&nbsp; <span style="color:#6ee7b7">sorted part: '+sorted+' cell'+(sorted>1?'s':'')+' (dashed)</span>'
+      : a.length+' value'+(a.length===1?'':'s')+' &nbsp;·&nbsp; '+(a.length < 2 || this.isHeap(a) ? 'this array IS a heap ✔' : '<span style="color:#f87171">this array is NOT a heap yet</span>');
+  }
+  say(msg, kind, fresh){ if (fresh) this.log.innerHTML = ''; const d = document.createElement('div'); if (kind) d.className = kind; d.innerHTML = msg; this.log.appendChild(d); this.log.scrollTop = this.log.scrollHeight; }
+  setBusy(b){ this.busy = b; this.el.querySelectorAll('button[data-op],button[data-x="randomarr"]').forEach(x => x.disabled = b); }
+  reset(){ this.token++; this.a = this.init.slice(); this.draw(); this.say('Ready. Pick an operation.', '', true); this.setBusy(false); }
+  extra(x){
+    this.token++; this.setBusy(false);
+    if (x === 'reset') return this.reset();
+    if (x === 'clear'){ this.a = []; this.draw(); return this.say('Heap cleared. <code>size == 0</code>.', 'info', true); }
+    if (x === 'randomarr'){ const s = new Set(); while (s.size < 7) s.add(10 + Math.floor(Math.random()*89)); this.a = [...s]; this.draw(); return this.say('A new array of 7 random values. It is probably not a heap. Press Heapify or HeapSort.', 'info', true); }
+  }
+  async play(steps, final, delay){
+    const token = ++this.token; this.setBusy(true); this.a = final; let first = true;
+    for (const s of steps){
+      if (token !== this.token) return;
+      this.draw(s.a, s.n, s.hi); this.say(s.msg, s.kind, first); first = false;
+      await sleep(delay || 900);
+    }
+    if (token === this.token) this.setBusy(false);
+  }
+  run(op, v){
+    if (this.busy) return;
+    if (op === 'insert'){
+      const k = v !== undefined ? +v : parseInt(this.input.value, 10);
+      if (isNaN(k) || k < 0 || k > 99) return this.say('Type a whole number from 0 to 99 first.', 'bad', true);
+      this.input.value = k; return this.op_insert(k);
+    }
+    this['op_'+op]();
+  }
+  needHeap(){ if (this.isHeap()) return true; this.say('This array is not a heap right now, so insert and remove would not work correctly. Press Heapify first, or Reset.', 'bad', true); return false; }
+  /* trickle the value at index i down inside the first `size` cells; adds one step per swap */
+  down(a, i, size, steps, heapN){
+    for (;;){
+      const l = 2*i + 1, r = 2*i + 2;
+      if (l >= size){ steps.push({a: a.slice(), n: heapN, hi: {[i]: 'ok'}, msg: a[i]+' has no children here → stop.'}); return; }
+      let big = l; if (r < size && a[r] > a[l]) big = r;
+      if (a[i] >= a[big]){ steps.push({a: a.slice(), n: heapN, hi: {[i]: 'ok', [big]: 'b'}, msg: a[i]+' ≥ its larger child '+a[big]+' → stop. The heap condition holds.'}); return; }
+      const msg = 'Larger child of '+a[i]+' is '+a[big]+' (index '+big+'). '+a[i]+' &lt; '+a[big]+' → swap down.';
+      [a[i], a[big]] = [a[big], a[i]];
+      steps.push({a: a.slice(), n: heapN, hi: {[big]: 'a', [i]: 'b'}, msg}); i = big;
+    }
+  }
+  op_insert(k){
+    if (!this.needHeap()) return;
+    if (this.a.length >= MAXN) return this.say('The picture only has room for '+MAXN+' values. (In Java we would expand the array.) Remove a value or press Reset.', 'bad', true);
+    const a = this.a.concat(k), steps = []; let i = a.length - 1;
+    steps.push({a: a.slice(), hi: {[i]: 'new'}, msg: 'Put '+k+' in the first free cell: index '+i+', the next spot on the bottom level.', kind: 'info'});
+    while (i > 0){
+      const p = Math.floor((i-1)/2);
+      if (a[i] <= a[p]){ steps.push({a: a.slice(), hi: {[i]: 'ok', [p]: 'b'}, msg: k+' ≤ its parent '+a[p]+' → stop. The heap condition holds.', kind: 'ok'}); break; }
+      const msg = k+' &gt; its parent '+a[p]+' → swap up to index '+p+'.';
+      [a[i], a[p]] = [a[p], a[i]]; steps.push({a: a.slice(), hi: {[p]: 'a', [i]: 'b'}, msg}); i = p;
+    }
+    if (i === 0) steps.push({a: a.slice(), hi: {0: 'ok'}, msg: k+' reached the root. It is the new biggest value.', kind: 'ok'});
+    this.play(steps, a);
+  }
+  op_remove(){
+    if (!this.a.length) return this.say('The heap is empty. Nothing to remove.', 'bad', true);
+    if (!this.needHeap()) return;
+    const a = this.a.slice(), steps = [], max = a[0];
+    steps.push({a: a.slice(), hi: {0: 'del'}, msg: 'The biggest value is always at the root: '+max+'. Save it.', kind: 'info'});
+    const last = a.pop();
+    if (a.length){
+      a[0] = last;
+      steps.push({a: a.slice(), hi: {0: 'a'}, msg: 'Move the LAST value ('+last+') to the root. The tree is still complete, but '+last+' may be too small to be on top.'});
+      this.down(a, 0, a.length, steps);
+    }
+    steps.push({a: a.slice(), hi: {}, msg: 'remove() returns '+max+'.', kind: 'ok'});
+    this.play(steps, a);
+  }
+  heapifySteps(a, steps){
+    const n = a.length;
+    steps.push({a: a.slice(), hi: {}, msg: 'PHASE 1 · Heapify. Start at index n / 2 - 1 = '+(Math.floor(n/2)-1)+', the last node that has a child, and work back to the root.', kind: 'info'});
+    for (let i = Math.floor(n/2) - 1; i >= 0; i--){
+      steps.push({a: a.slice(), hi: {[i]: 'a'}, msg: 'Trickle down from index '+i+' ('+a[i]+').'});
+      this.down(a, i, n, steps);
+    }
+    steps.push({a: a.slice(), hi: {0: 'ok'}, msg: 'The array is a heap now. The biggest value ('+a[0]+') is at the root.', kind: 'ok'});
+  }
+  op_heapify(){
+    if (this.a.length < 2 || this.isHeap()) return this.say('This array is already a heap. Press "Random array" (or Reset) to get one that is not.', 'info', true);
+    const a = this.a.slice(), steps = []; this.heapifySteps(a, steps); this.play(steps, a, 800);
+  }
+  op_sort(){
+    if (this.a.length < 2) return this.say('Nothing to sort.', 'bad', true);
+    const a = this.a.slice(), steps = [];
+    if (!this.isHeap(a)) this.heapifySteps(a, steps);
+    steps.push({a: a.slice(), hi: {}, msg: 'PHASE 2 · Swap the root with the last heap cell, shrink the heap, trickle down. Repeat.', kind: 'info'});
+    for (let end = a.length - 1; end > 0; end--){
+      const msg = 'Swap the root ('+a[0]+') with the last heap cell (index '+end+'). '+a[0]+' is now in its final place.';
+      [a[0], a[end]] = [a[end], a[0]];
+      steps.push({a: a.slice(), n: end, hi: {0: 'a'}, msg});
+      this.down(a, 0, end, steps, end);
+    }
+    steps.push({a: a.slice(), n: 0, hi: {}, msg: 'Sorted! Smallest to biggest: '+a.join(' '), kind: 'ok'});
+    this.play(steps, a, 700);
+  }
+}
+
+/* =====================================================================
+   6.  SMALL WIDGETS: vocabulary picture, index-formula explorer
+   ===================================================================== */
+const DEMO = [90, 70, 80, 30, 50, 60, 40];
+function initVocab(){
+  const svg = document.getElementById('vSvg'), arr = document.getElementById('vArr'), cap = document.getElementById('vocabCap'), terms = document.getElementById('terms');
+  const all = c => Object.fromEntries(DEMO.map((_, i) => [i, c]));
+  const fade = keep => { const o = {}; DEMO.forEach((_, i) => { if (!(i in keep)) o[i] = 'fade'; }); return Object.assign(o, keep); };
+  const V = {
+    heap: {n: all('b'), cap: 'The whole thing is a heap: a tree AND an array'},
+    complete: {n: all('b'), cap: 'Levels 0, 1 and 2 are full. No gaps anywhere.'},
+    cond: {n: fade({1: 'a', 3: 'b', 4: 'b'}), e: {3: 'a', 4: 'a'}, cap: '70 ≥ 30 and 70 ≥ 50'},
+    max: {n: fade({0: 'a'}), cap: '90 is the biggest value, so it is on top'},
+    root: {n: fade({0: 'a'}), cap: 'The root is array index 0'},
+    family: {n: fade({1: 'a', 0: 'b', 3: 'b', 4: 'b'}), e: {1: 'a', 3: 'a', 4: 'a'}, cap: 'Index 1: parent is 0, children are 3 and 4'},
+    last: {n: fade({6: 'a'}), cap: 'The last node is index size - 1 = 6'},
+    up: {n: fade({6: 'a', 2: 'b', 0: 'b'}), e: {6: 'a', 2: 'a'}, cap: 'A new value would climb: index 6 → 2 → 0'},
+    down: {n: fade({0: 'a', 2: 'b', 6: 'b'}), e: {2: 'a', 6: 'a'}, cap: 'A small root would sink: index 0 → 2 → 6'},
+    weak: {n: fade({1: 'a', 2: 'a'}), cap: '70 and 80 are siblings. Their order does not matter.'},
+    pq: {n: fade({0: 'ok'}), cap: 'The next item to leave is always the root'},
+    sort: {n: all('b'), cap: 'Remove 90, then 80, then 70… and you get a sorted list'},
+  };
+  const showTerm = t => {
+    const v = V[t] || {};
+    arr.innerHTML = cellsHtml(DEMO, DEMO.length, v.n); drawHeap(svg, DEMO, DEMO.length, v.n, v.e);
+    cap.textContent = v.cap || '👆 Pick a word';
+    terms.querySelectorAll('.term').forEach(c => c.classList.toggle('on', c.dataset.t === t));
+  };
+  arr.classList.add('small'); showTerm(null);
+  const h = e => { const c = e.target.closest('.term'); if (c) showTerm(c.dataset.t); };
+  terms.addEventListener('mouseover', h); terms.addEventListener('click', h);
+}
+function initArrays(){
+  const cells = document.getElementById('arrCells'), svg = document.getElementById('arrSvg'), f = document.getElementById('arrFormula'), A = DEMO;
+  const showIdx = i => {
+    const cls = {}, L = 2*i + 1, R = 2*i + 2, P = Math.floor((i-1)/2);
+    if (i !== null){
+      cls[i] = 'a'; [L, R, i > 0 ? P : -1].forEach(j => { if (j >= 0 && j < A.length) cls[j] = 'b'; });
+      f.innerHTML = 'i = '+i+' (value '+A[i]+')<br>'+(i > 0 ? 'parent = ('+i+'-1)/2 = '+P+' → '+A[P] : 'the root has no parent')+
+        ' &nbsp;·&nbsp; left = 2*'+i+'+1 = '+L+(L < A.length ? ' → '+A[L] : ' → no child')+
+        ' &nbsp;·&nbsp; right = 2*'+i+'+2 = '+R+(R < A.length ? ' → '+A[R] : ' → no child');
+    }
+    [...cells.children].forEach((c, j) => c.className = 'cell ' + (cls[j] || ''));      // only change classes: the cell under the mouse must not be rebuilt
+    drawHeap(svg, A, A.length, cls);
+  };
+  cells.innerHTML = cellsHtml(A, A.length, {}); showIdx(null);
+  const h = e => { const c = e.target.closest('.cell'); if (c) showIdx(+c.dataset.i); };
+  cells.addEventListener('mouseover', h); cells.addEventListener('click', h);
+}
+
+/* =====================================================================
+   7.  START
+   ===================================================================== */
+document.querySelectorAll('[data-code]').forEach(renderCode);
+document.querySelectorAll('.hpv').forEach(el => new HeapViz(el));
+initVocab(); initArrays(); buildTabs(); show(null);
+go(Math.max(0, sections.findIndex(s => '#' + s.id === location.hash)), false);
+window.LECTURE = {B, textOf};
+</script>
+</body>
+</html>
