@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAC286 · Graphs I &amp; II</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b1020; --card:#151c30; --ink:#e6e9f5; --muted:#9aa4bf; --line:#2a3350;
+  --p1:#818cf8; --p1soft:#262b55; --p2:#f472b6; --p2soft:#4a1d3a;
+  --def:#60a5fa; --defbg:#12233f; --pic:#fbbf24; --picbg:#2e2410;
+  --rem:#34d399; --rembg:#0f2a22; --warn:#f87171; --warnbg:#321618;
+  --code:#060a14; --codeline:#1e293b; --dark:#0b1020;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:19px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+code,.mono{font-family:"JetBrains Mono","Fira Code",Consolas,Menlo,monospace}
+p code,li code,td code,.panel code,.vlog code{background:#e9ecf8;color:#3730a3;padding:1px 6px;border-radius:5px;font-size:.92em}
+
+/* ---------- header + tabs ---------- */
+header.top{background:linear-gradient(120deg,#312e81,#4f46e5 55%,#db2777);color:#fff;padding:22px 28px 20px}
+header.top h1{margin:0;font-size:2.1rem;letter-spacing:-.5px}
+header.top p{margin:4px 0 0;opacity:.92;font-size:1.05rem}
+nav.tabs{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;padding:9px 16px;overflow-x:auto;box-shadow:0 2px 10px rgba(30,40,90,.06)}
+nav.tabs .part{flex:none;font-size:.72rem;font-weight:800;letter-spacing:1px;padding:4px 9px;border-radius:6px;color:#fff;background:var(--p1);margin-right:2px}
+nav.tabs .part.two{background:var(--p2);margin-left:10px}
+nav.tabs button{flex:none;border:1px solid var(--line);background:#fff;color:var(--ink);font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav.tabs button b{display:inline-block;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;border-radius:50%;background:var(--p1soft);color:var(--p1);margin-right:6px;font-size:.85em}
+nav.tabs button[data-part="2"] b{background:var(--p2soft);color:var(--p2)}
+nav.tabs button:hover{border-color:var(--p1)}
+nav.tabs button.on{background:var(--p1);border-color:var(--p1);color:#fff}
+nav.tabs button.on[data-part="2"]{background:var(--p2);border-color:var(--p2)}
+nav.tabs button.on b{background:rgba(255,255,255,.25);color:#fff}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1560px;margin:0 auto;padding:22px 22px 60px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:22px;align-items:start}
+.wrap.nopanel{grid-template-columns:minmax(0,1fr)}
+.wrap.nopanel aside.panel{display:none}
+section.tab{display:none}
+section.tab.on{display:block}
+section.tab>h2{font-size:1.85rem;margin:0 0 4px;letter-spacing:-.4px}
+section.tab>.goal{color:var(--muted);margin:0 0 16px;font-size:1.08rem}
+h3{font-size:1.3rem;margin:26px 0 10px}
+h3 .step{display:inline-block;background:var(--ink);color:#fff;border-radius:7px;font-size:.78rem;padding:3px 9px;margin-right:8px;vertical-align:middle;letter-spacing:.5px}
+ul{margin:8px 0;padding-left:1.3em} li{margin:5px 0}
+.box{border-radius:12px;padding:14px 18px 14px 20px;margin:14px 0;border-left:6px solid;background:var(--card)}
+.box .tag{font-weight:800;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+.box ul{margin:4px 0}
+.def{border-color:var(--def);background:var(--defbg)} .def .tag{color:var(--def)}
+.pic{border-color:var(--pic);background:var(--picbg)} .pic .tag{color:var(--pic)}
+.rem{border-color:var(--rem);background:var(--rembg)} .rem .tag{color:var(--rem)}
+.warn{border-color:var(--warn);background:var(--warnbg)} .warn .tag{color:var(--warn)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+table.cmp{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(30,40,90,.08);margin:12px 0}
+table.cmp th,table.cmp td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:left}
+table.cmp th{background:var(--ink);color:#fff;font-size:.95rem}
+table.cmp tr:last-child td{border-bottom:0}
+.good{color:#047857;font-weight:700}.bad{color:#b91c1c;font-weight:700}
+.star td{background:#f0fdf4}
+.navrow{display:flex;justify-content:space-between;margin-top:34px;gap:12px}
+.navrow button{font:600 1rem inherit;font-family:inherit;padding:11px 20px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.navrow button.next{background:var(--ink);color:#fff;border-color:var(--ink)}
+.navrow button:disabled{visibility:hidden}
+
+/* ---------- code ---------- */
+.codebox{background:var(--code);border-radius:12px;margin:12px 0;overflow:hidden;box-shadow:0 3px 12px rgba(15,23,42,.18)}
+.codebar{display:flex;align-items:center;justify-content:space-between;background:#1e293b;color:#cbd5e1;padding:7px 12px;font-size:.85rem}
+.codebar .fname{font-family:Consolas,Menlo,monospace}
+.codebar button,.copyrun{font:600 .85rem inherit;font-family:inherit;border:0;border-radius:7px;padding:6px 12px;cursor:pointer;background:#334155;color:#fff}
+.codebar button:hover{background:#475569}
+.copyrun{background:var(--rem);font-size:.98rem;padding:10px 16px;margin:6px 0}
+.copyrun:hover{filter:brightness(1.08)}
+.code{padding:8px 0;overflow-x:auto;font:17px/1.6 "JetBrains Mono","Fira Code",Consolas,Menlo,monospace;color:#e2e8f0}
+.ln{display:flex;white-space:pre;padding:0 14px 0 0;border-left:4px solid transparent;cursor:pointer;min-width:max-content}
+.ln .no{flex:none;width:3em;text-align:right;padding-right:14px;color:#64748b;user-select:none}
+.ln.blank{cursor:default}
+.ln:not(.blank):hover{background:#27344d}
+.ln.hot{background:#33415f;border-left-color:#fbbf24}
+.ln.pin{background:#3b3a6e;border-left-color:#f472b6}
+.k{color:#c4b5fd}.t{color:#7dd3fc}.s{color:#86efac}.c{color:#94a3b8;font-style:italic}.num{color:#fdba74}
+.output{background:#111827;border-radius:12px;margin:10px 0;overflow:hidden}
+.output .outbar{background:#064e3b;color:#a7f3d0;font-size:.8rem;font-weight:700;letter-spacing:1px;padding:5px 12px}
+.output pre{margin:0;padding:10px 14px;color:#d1fae5;font:16px/1.5 Consolas,Menlo,monospace;overflow-x:auto}
+details.full{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:12px 0}
+details.full summary{cursor:pointer;font-weight:700}
+
+/* ---------- right panel ---------- */
+aside.panel{position:sticky;top:74px;background:#fff;border:2px solid var(--p1);border-radius:14px;padding:16px 18px;box-shadow:0 6px 20px rgba(79,70,229,.14);max-height:calc(100vh - 92px);overflow:auto}
+aside.panel h4{margin:0 0 8px;font-size:.8rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--p1)}
+aside.panel .where{font-size:.85rem;color:var(--muted);margin-bottom:8px}
+aside.panel .pline{background:var(--code);color:#e2e8f0;border-radius:8px;padding:9px 11px;font:15px/1.5 Consolas,Menlo,monospace;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
+aside.panel .ptext{font-size:1.22rem;line-height:1.5}
+aside.panel .hint{color:var(--muted);font-size:1.05rem}
+aside.panel .keys{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);font-size:.85rem;color:var(--muted)}
+kbd{background:#eef0f6;border:1px solid #cfd5e3;border-bottom-width:2px;border-radius:5px;padding:0 6px;font-size:.85em}
+
+/* ---------- tree drawings ---------- */
+svg.tree{display:block;max-width:100%;height:auto;margin:0 auto}
+svg.tree .e{stroke:#aab2c8;stroke-width:3}
+svg.tree .e.a{stroke:#f59e0b;stroke-width:6}
+svg.tree .n circle{fill:#fff;stroke:#4f46e5;stroke-width:3;transition:fill .2s}
+svg.tree .n text{font:700 19px "Segoe UI",system-ui,sans-serif;fill:#1c2333}
+svg.tree .n.a circle{fill:#fde68a;stroke:#d97706;stroke-width:5}
+svg.tree .n.b circle{fill:#bfdbfe;stroke:#2563eb}
+svg.tree .n.dim circle{fill:#e0e7ff}
+svg.tree .n.ok circle{fill:#86efac;stroke:#059669;stroke-width:5}
+svg.tree .n.new circle{fill:#86efac;stroke:#059669;stroke-width:5}
+svg.tree .n.del circle{fill:#fecaca;stroke:#dc2626;stroke-width:5}
+svg.tree .n.lo circle{fill:#99f6e4;stroke:#0d9488}
+svg.tree .n.hi circle{fill:#fbcfe8;stroke:#db2777}
+svg.tree .n.fade{opacity:.3}
+svg.tree .empty{font:italic 17px sans-serif;fill:#8089a0}
+svg.tree .lvl{font:700 14px sans-serif;fill:#8089a0}
+svg.tree .lvline{stroke:#dfe3ee;stroke-dasharray:5 6}
+svg.tree .badge{font:700 13px Consolas,monospace;fill:#db2777}
+
+.viz{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0;box-shadow:0 1px 4px rgba(30,40,90,.06)}
+.viz .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.viz input{width:86px;font:700 1.05rem inherit;font-family:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:9px}
+.viz button{font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:9px;border:0;background:var(--p1);color:#fff;cursor:pointer}
+.viz button.alt{background:#e8eaf3;color:var(--ink)}
+.viz button.pre{background:var(--p2)}
+.viz button:disabled{opacity:.45;cursor:not-allowed}
+.viz .stage{min-height:230px;display:flex;align-items:center;justify-content:center;overflow-x:auto;padding:6px 0}
+.vlog{background:#f3f4fa;border-radius:10px;padding:9px 14px;min-height:54px;font-size:1.02rem}
+.vlog div{padding:1px 0}
+.vlog .ok{color:#047857;font-weight:700}.vlog .bad{color:#b91c1c;font-weight:700}.vlog .info{color:#3730a3;font-weight:700}
+.vout{font:700 1.05rem Consolas,monospace;color:#9d174d;min-height:1.4em;margin-top:4px}
+
+/* vocabulary */
+.vocab{display:grid;grid-template-columns:minmax(300px,480px) 1fr;gap:18px;align-items:start}
+.vocab .pict{position:sticky;top:74px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.vocab .pict .cap{text-align:center;font-weight:700;color:var(--p1);min-height:1.6em}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.term{background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 13px;cursor:pointer;transition:.15s}
+.term:hover,.term.on{border-color:#f59e0b;background:#fffbeb;transform:translateY(-2px)}
+.term b{display:block;font-size:1.12rem;color:var(--p1)}
+.term span{font-size:.98rem}
+.term em{display:block;font-style:normal;font-size:.86rem;color:var(--muted);margin-top:3px}
+
+/* arrays */
+.arr{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.arr .cell{width:68px;border:2px solid var(--line);border-radius:10px;background:#fff;text-align:center;cursor:pointer;padding:5px 0}
+.arr .cell i{display:block;font:700 .8rem Consolas,monospace;color:var(--p2);font-style:normal}
+.arr .cell b{font-size:1.25rem}
+.arr .cell.a{background:#fde68a;border-color:#d97706}
+.arr .cell.b{background:#bfdbfe;border-color:#2563eb}
+.arr .cell.hole b{color:#c0c6d6}
+.formula{text-align:center;font:600 1.05rem Consolas,monospace;min-height:3.2em;color:#3730a3}
+.bigf{font:700 1.2rem Consolas,monospace;background:#fff;border-radius:10px;padding:10px 14px;text-align:center;border:2px solid var(--line)}
+.bigf small{display:block;font:600 .8rem "Segoe UI",sans-serif;color:var(--muted)}
+
+.codebox.hasfocus .ln:not(.focus) .src{opacity:.72}
+.codebox.hasfocus .ln:not(.focus):hover .src,.codebox.hasfocus .ln.pin .src{opacity:1}
+.codebox.hasfocus .ln.focus{background:#141d38;border-left-color:#818cf8}
+.codebox.hasfocus .ln.focus:hover,.codebox.hasfocus .ln.focus.hot{background:#33415f;border-left-color:#fbbf24}
+.codebar .star{color:#a5b4fc}
+h3 small{font-weight:500;font-size:.8em;color:var(--muted)}
+
+/* ---------- dark mode surfaces ---------- */
+p code,li code,td code,.panel code,.vlog code{background:#262b55;color:#c7d2fe}
+nav.tabs{background:#10162a;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+nav.tabs .part,nav.tabs button.on,nav.tabs button.on[data-part="2"]{color:var(--dark)}
+nav.tabs button{background:var(--card)}
+nav.tabs button.on b{background:rgba(0,0,0,.2);color:var(--dark)}
+h3 .step{background:#312e81;color:#e0e7ff}
+table.cmp{background:var(--card);box-shadow:none;border:1px solid var(--line)}
+table.cmp th{background:#1e2440;color:#c7d2fe}
+.star td{background:#0f2a22}
+.good{color:#34d399}.bad{color:#f87171}
+.navrow button{background:var(--card);color:var(--ink)}
+.navrow button.next{background:var(--p1);border-color:var(--p1);color:var(--dark)}
+.codebox{border:1px solid var(--line);box-shadow:none}
+.copyrun{color:#06281c}
+details.full,aside.panel,.viz,.vocab .pict,.term,.bigf{background:var(--card)}
+aside.panel{box-shadow:0 6px 24px rgba(0,0,0,.5)}
+aside.panel .pline{border:1px solid var(--line)}
+kbd{background:#1e2440;border-color:#3a4468;color:var(--ink)}
+.viz{box-shadow:none}
+.viz input{background:var(--dark);color:var(--ink)}
+.viz button{color:var(--dark)}
+.viz button.alt{background:#262e4a;color:var(--ink)}
+.vlog{background:#0f1528}
+.vlog .ok{color:#34d399}.vlog .bad{color:#f87171}.vlog .info{color:#a5b4fc}
+.vout{color:#f9a8d4}
+.term:hover,.term.on{background:#2e2410;border-color:#fbbf24}
+.arr .cell{background:var(--card)}
+.arr .cell.a,.arr .cell.b{color:#1c2333}
+.arr .cell.a i,.arr .cell.b i{color:#9d174d}
+.arr .cell.hole b{color:#4b5674}
+.formula{color:#a5b4fc}
+svg.tree .e{stroke:#55607f}
+svg.tree .n circle{fill:#e8ebfa;stroke:#6366f1}
+svg.tree .empty,svg.tree .lvl{fill:#9aa4bf}
+svg.tree .lvline{stroke:#2a3350}
+svg.tree .badge{fill:#f472b6}
+
+@media (max-width:1050px){
+  body{font-size:18px}
+  .wrap{grid-template-columns:minmax(0,1fr);padding-bottom:42vh}
+  aside.panel{position:fixed;left:8px;right:8px;bottom:8px;top:auto;max-height:36vh;z-index:30}
+  .cols,.cols3,.vocab{grid-template-columns:1fr}
+  .vocab .pict{position:static}
+}
+
+/* ---------- graph widgets ---------- */
+.gv{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+.gv .ctl,.viz .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.gv button,#kn button{font:600 .95rem inherit;font-family:inherit;padding:8px 13px;border-radius:9px;border:0;background:var(--p1);color:var(--dark);cursor:pointer}
+.gv button.alt,#kn button.alt{background:#262e4a;color:var(--ink)}
+.gv button.pick{background:#262e4a;color:var(--ink);border:2px solid transparent}
+.gv button.pick.on{border-color:var(--pic);color:var(--pic)}
+.gv button:disabled,#kn button:disabled{opacity:.45;cursor:not-allowed}
+.gv .start{color:var(--muted);font-size:.95rem}
+.gv .start b{color:var(--pic)}
+.gv .stage{display:flex;justify-content:center;overflow-x:auto}
+.gv > .info{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;min-height:2.2em;margin:6px 0 10px;font-size:1rem}
+.gv > .info span b{font-family:Consolas,monospace;color:#a5b4fc}
+.gv .vlog{max-height:210px;overflow:auto}
+table.dt{border-collapse:collapse;font:600 .95rem Consolas,monospace}
+table.dt td,table.dt th{border:1px solid var(--line);padding:3px 10px;text-align:center}
+table.dt th{color:var(--muted);font-weight:600}
+table.dt td.fin{background:#0f2a22;color:#6ee7b7}
+table.dt td.upd{background:#3a2f0d;color:#fbbf24}
+svg.graph{display:block;max-width:100%;height:auto;margin:0 auto}
+svg.graph .e{stroke:#55607f;stroke-width:3}
+svg.graph .ah{fill:#55607f}
+svg.graph .e.a{stroke:#f59e0b;stroke-width:6}
+svg.graph .ah.a{fill:#f59e0b}
+svg.graph .e.tree{stroke:#34d399;stroke-width:6}
+svg.graph .ah.tree{fill:#34d399}
+svg.graph .e.fade,svg.graph .ah.fade{opacity:.18}
+svg.graph .wt rect{fill:#151c30;stroke:#3a4468}
+svg.graph .wt text{font:700 14px Consolas,monospace;fill:#f9a8d4}
+svg.graph .wt.a rect{stroke:#f59e0b}
+svg.graph .wt.tree rect{stroke:#34d399}
+svg.graph .wt.fade{opacity:.25}
+svg.graph .n{cursor:pointer}
+svg.graph .n circle{fill:#e8ebfa;stroke:#6366f1;stroke-width:3;transition:fill .2s}
+svg.graph .n text{font:700 16px "Segoe UI",system-ui,sans-serif;fill:#1c2333}
+svg.graph .n.cur circle{fill:#fde68a;stroke:#d97706;stroke-width:5}
+svg.graph .n.vis circle{fill:#bfdbfe;stroke:#2563eb}
+svg.graph .n.wait circle{fill:#fbcfe8;stroke:#db2777}
+svg.graph .n.done circle{fill:#86efac;stroke:#059669;stroke-width:4}
+svg.graph .n.start circle{stroke:#fbbf24;stroke-width:5;stroke-dasharray:6 4}
+svg.graph .n.fade{opacity:.3}
+svg.graph .tag{font:700 13px Consolas,monospace;fill:#fbbf24}
+.matwrap{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+table.mat{border-collapse:collapse;font:700 1rem Consolas,monospace;margin:0 auto}
+table.mat th{color:var(--p2);padding:4px 9px}
+table.mat td{border:1px solid var(--line);width:38px;height:36px;text-align:center;cursor:pointer;color:#4b5674}
+table.mat td.one{color:var(--ink);background:#1e2440}
+table.mat td.a{background:#fde68a;color:#1c2333}
+table.mat td.b{background:#bfdbfe;color:#1c2333}
+.board{display:grid;grid-template-columns:repeat(5,64px);gap:4px;justify-content:center;margin:8px 0 12px}
+.board .sq{height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 1.25rem Consolas,monospace;cursor:pointer;background:#1e2440;color:#c7d2fe;position:relative}
+.board .sq.dk{background:#262e4a}
+.board .sq.k{background:#fde68a;color:#1c2333;font-size:1.9rem}
+.board .sq.mv{outline:3px solid #34d399;outline-offset:-3px}
+.board .sq.seen{background:#12233f;color:#93c5fd}
+.board .sq small{position:absolute;right:5px;bottom:2px;font-size:.7rem;color:#7c2d12}
+@media (max-width:1050px){.matwrap{grid-template-columns:1fr}.board{grid-template-columns:repeat(5,52px)}.board .sq{height:52px}}
+svg.graph .tagbg{fill:#0b1020;stroke:#3a2f0d}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🕸️ Graphs I &amp; II</h1>
+  <p>MAC286 · Data Structures in Java — hover over any line of code to see what it does on the right.</p>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="wrap" id="wrap">
+<main>
+
+<!-- ====================== 1. WHY ====================== -->
+<section class="tab" id="why" data-title="Why Graphs?" data-part="1">
+  <h2>Why do we need graphs?</h2>
+  <p class="goal">Goal: see what kind of problem a graph describes, before we learn any new words.</p>
+
+  <div class="box def"><span class="tag">The problem</span>
+    <ul>
+      <li>Arrays, lists, trees and hash tables are for <b>storing</b> data and finding it again.</li>
+      <li>A <b>graph</b> is for describing how things are <b>connected</b>.</li>
+      <li>Things + connections between them = a graph.</li>
+    </ul>
+  </div>
+
+  <table class="cmp">
+    <tr><th>Real-world situation</th><th>The things (vertices)</th><th>The connections (edges)</th></tr>
+    <tr><td>🗺️ Road map</td><td>Cities</td><td>Roads</td></tr>
+    <tr><td>🚇 Subway map</td><td>Stations</td><td>Tracks</td></tr>
+    <tr><td>👥 Social network</td><td>People</td><td>Friendships</td></tr>
+    <tr><td>🎓 Degree plan</td><td>Courses</td><td>Prerequisites</td></tr>
+    <tr><td>🌐 The internet</td><td>Computers</td><td>Cables</td></tr>
+  </table>
+
+  <div class="cols">
+    <div class="box rem"><span class="tag">Graph or tree?</span>
+      <ul>
+        <li>A tree is a graph with <b>extra rules</b>: one root, and only one way to reach each node.</li>
+        <li>A graph has <b>no root</b> and <b>no levels</b>. Any vertex can connect to any other.</li>
+        <li>A graph can have <b>cycles</b>: you can walk around and come back to where you started.</li>
+      </ul>
+    </div>
+    <div class="box pic"><span class="tag">Picture it 🚇</span>
+      <ul>
+        <li>Imagine a subway map. Each <b>station</b> is a vertex. Each <b>track between two stations</b> is an edge.</li>
+        <li>The map does not care where the stations really are. It only shows <b>what connects to what</b>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Here is one. Click a vertex to choose where to start, then search.</h3>
+  <div class="gv" data-graph="g1" data-ops="dfs,bfs"></div>
+
+  <div class="box rem"><span class="tag">What we will learn</span>
+    <ul>
+      <li><b>Part I · Graphs I:</b> vocabulary, storing a graph, depth-first search, breadth-first search, directed graphs and topological sorting.</li>
+      <li><b>Part II · Graphs II:</b> weighted graphs and the minimum spanning tree, the shortest-path problem, the Knight's Tour.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 2. VOCABULARY ====================== -->
+<section class="tab" id="vocab" data-title="Vocabulary" data-part="1">
+  <h2>Graph vocabulary</h2>
+  <p class="goal">Goal: learn the words, one at a time. Hover over (or tap) a word to see it in the picture.</p>
+
+  <div class="vocab">
+    <div class="pict">
+      <svg class="graph" id="vSvg"></svg>
+      <div class="cap" id="vocabCap">👆 Pick a word</div>
+    </div>
+    <div>
+      <div class="terms" id="terms">
+        <div class="term" data-t="graph"><b>Graph</b><span>A set of vertices plus a set of edges that connect them.</span><em>Things and their connections</em></div>
+        <div class="term" data-t="vertex"><b>Vertex</b><span>One item in the graph. Also called a node.</span><em>Plural: vertices. Here: A to G</em></div>
+        <div class="term" data-t="edge"><b>Edge</b><span>A connection between two vertices.</span><em>Here: 7 edges</em></div>
+        <div class="term" data-t="adjacent"><b>Adjacent (neighbors)</b><span>Two vertices are adjacent when one edge connects them directly.</span><em>B and C are the neighbors of A</em></div>
+        <div class="term" data-t="degree"><b>Degree</b><span>The number of edges that touch a vertex.</span><em>B has degree 3</em></div>
+        <div class="term" data-t="path"><b>Path</b><span>A sequence of vertices where each one is joined to the next by an edge.</span><em>A → B → E → F → G</em></div>
+        <div class="term" data-t="cycle"><b>Cycle</b><span>A path that ends at the vertex where it started.</span><em>A → B → E → F → C → A</em></div>
+        <div class="term" data-t="connected"><b>Connected graph</b><span>There is a path from every vertex to every other vertex.</span><em>Nobody is cut off</em></div>
+        <div class="term" data-t="directed"><b>Directed graph</b><span>Each edge has a direction: it can be followed one way only.</span><em>Drawn with arrows</em></div>
+        <div class="term" data-t="weighted"><b>Weighted graph</b><span>Each edge carries a number: its weight.</span><em>Distance, cost or time</em></div>
+        <div class="term" data-t="matrix"><b>Adjacency matrix</b><span>A 2D array. Cell [a][b] says whether an edge joins a and b.</span><em>How our programs store a graph</em></div>
+        <div class="term" data-t="list"><b>Adjacency list</b><span>For each vertex, a list of just its neighbors.</span><em>The other common way to store a graph</em></div>
+      </div>
+
+      <div class="box pic"><span class="tag">Picture it 👥</span>
+        <ul>
+          <li>Imagine a group of friends. Each <b>person</b> is a vertex. Each <b>friendship</b> is an edge.</li>
+          <li>Your <b>neighbors</b> are your direct friends. Your <b>degree</b> is how many friends you have.</li>
+          <li>A <b>path</b> is a chain: a friend of a friend of a friend.</li>
+          <li>The group is <b>connected</b> if everyone can reach everyone through such chains.</li>
+        </ul>
+      </div>
+      <div class="box warn"><span class="tag">Watch out 🙃</span>
+        <ul>
+          <li>Where a vertex is <b>drawn</b> means nothing. Only the connections matter.</li>
+          <li>This "graph" is not a chart with x and y axes from math class. Same word, different thing.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 3. REPRESENTING ====================== -->
+<section class="tab" id="rep" data-title="Storing a Graph" data-part="1">
+  <h2>Storing a graph in Java</h2>
+  <p class="goal">Goal: turn the picture into something a program can use.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>Give every vertex a <b>number</b>: A = 0, B = 1, C = 2…</li>
+      <li>An <b>adjacency matrix</b> is a 2D array with one row and one column per vertex.</li>
+      <li><code>adj[a][b] = 1</code> means there is an edge between a and b. <code>0</code> means there is none.</li>
+      <li>An ordinary edge works both ways, so we set <b>two</b> cells: <code>adj[a][b]</code> and <code>adj[b][a]</code>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🚌</span>
+    <ul>
+      <li>Imagine a table of bus connections. The <b>row</b> is the city you leave, the <b>column</b> is the city you want to reach.</li>
+      <li>A <b>1</b> in the cell means "there is a direct bus". A <b>0</b> means "no direct bus".</li>
+    </ul>
+  </div>
+
+  <h3>Hover over a cell of the matrix</h3>
+  <div class="viz" id="matViz">
+    <div class="matwrap">
+      <table class="mat" id="mat"></table>
+      <svg class="graph" id="matSvg"></svg>
+    </div>
+    <div class="formula" id="matCap">👆 Hover over (or tap) a cell</div>
+  </div>
+
+  <h3><span class="step">STEP 1</span>One edge</h3>
+  <div data-code="T_matrix"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A - B connected? true
+A - C connected? false</pre></div>
+
+  <h3><span class="step">STEP 2</span>The Graph class</h3>
+  <div data-code="P_graph"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A: B C 
+B: A D E 
+C: A F 
+D: B 
+E: B F 
+F: C E G 
+G: F </pre></div>
+
+  <h3><span class="step">STEP 3</span>The other way: an adjacency list</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>An <b>adjacency list</b> keeps, for each vertex, a list of <b>only its neighbors</b>.</li>
+      <li>No cells are wasted on edges that do not exist.</li>
+    </ul>
+  </div>
+  <div data-code="P_list"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A: B C 
+B: A D 
+C: A 
+D: B </pre></div>
+
+  <table class="cmp">
+    <tr><th></th><th>Adjacency matrix</th><th>Adjacency list</th></tr>
+    <tr><td>Is there an edge a – b?</td><td class="good">O(1): look at one cell</td><td>Walk a's list</td></tr>
+    <tr><td>List all neighbors of a</td><td>Scan a whole row: V cells</td><td class="good">Only the real neighbors</td></tr>
+    <tr><td>Memory</td><td class="bad">V × V cells, even if there are few edges</td><td class="good">One entry per edge end</td></tr>
+    <tr><td>Best when</td><td>Small graphs, or many edges</td><td>Big graphs with few edges</td></tr>
+  </table>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>Vertices are numbers. The names live in a separate array.</li>
+      <li>Matrix: <code>adj[a][b]</code>. Simple, and what we use in this lecture.</li>
+      <li>V = number of vertices. E = number of edges.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 4. DFS ====================== -->
+<section class="tab" id="dfs" data-title="Depth-First Search" data-part="1">
+  <h2>Searches: depth-first search (DFS)</h2>
+  <p class="goal">Goal: visit every vertex we can reach, by going as far as possible before turning back.</p>
+
+  <div class="box def"><span class="tag">Definitions</span>
+    <ul>
+      <li>A <b>search</b> (or traversal) visits every vertex that can be reached from a starting vertex, <b>once each</b>.</li>
+      <li><b>Depth-first search</b> = go to an unvisited neighbor, then to one of <b>its</b> unvisited neighbors, and so on, as <b>deep</b> as possible.</li>
+      <li>Stuck (no unvisited neighbor)? <b>Go back</b> one step and try another way.</li>
+      <li>We <b>mark</b> each vertex as visited so a cycle cannot send us round and round forever.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🧵</span>
+    <ul>
+      <li>Imagine exploring a maze with a ball of string. Each <b>junction</b> is a vertex, each <b>corridor</b> is an edge.</li>
+      <li>You always take a corridor you have <b>not tried yet</b>, and you chalk an X at every junction (the <b>visited</b> mark).</li>
+      <li>At a dead end you follow your <b>string back</b> to the last junction with an untried corridor.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="gv" data-graph="g1" data-ops="dfs"></div>
+
+  <h3><span class="step">STEP 1</span>Three vertices in a row</h3>
+  <div data-code="T_dfs"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Visit 0
+Visit 1
+Visit 2</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the search is highlighted)</small></h3>
+  <div data-code="P_dfs"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A B D E F C G </pre></div>
+
+  <div class="box rem"><span class="tag">Where is the "string"? 🧵</span>
+    <ul>
+      <li>Our <code>dfs</code> calls itself. Java remembers the way back for us on its <b>call stack</b>.</li>
+      <li>DFS can also be written with a loop and your own <b>stack</b>: push a vertex when you arrive, pop when you are stuck. Same idea, same order.</li>
+    </ul>
+  </div>
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>DFS = <b>deep first</b>, then back up.</li>
+      <li>It needs a <b>visited</b> array and a <b>stack</b> (ours is hidden in the recursion).</li>
+      <li>With a matrix it costs O(V²): for each vertex we scan one row.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 5. BFS ====================== -->
+<section class="tab" id="bfs" data-title="Breadth-First Search" data-part="1">
+  <h2>Searches: breadth-first search (BFS)</h2>
+  <p class="goal">Goal: visit the vertices closest to the start first, then the next ring, then the next.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li><b>Breadth-first search</b> = visit <b>all</b> the neighbors of the start, then all of <b>their</b> neighbors, and so on.</li>
+      <li>It works outward in <b>layers</b>: 1 edge away, then 2 edges away, then 3.</li>
+      <li>It uses a <b>queue</b>: a newly found vertex waits at the back until its turn comes.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🌊</span>
+    <ul>
+      <li>Imagine dropping a stone in a pond. The <b>splash</b> is the start vertex.</li>
+      <li>The <b>first ring</b> of the ripple is every vertex 1 edge away. The <b>second ring</b> is 2 edges away.</li>
+      <li>The ripple reaches everything at the same distance at the same time. That is breadth-first.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="gv" data-graph="g1" data-ops="bfs,dfs"></div>
+
+  <h3><span class="step">STEP 1</span>Reminder: a queue is first in, first out</h3>
+  <div data-code="T_queue"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>First out: 10
+Next in line: 20</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the search is highlighted)</small></h3>
+  <div data-code="P_bfs"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A B C D E F G </pre></div>
+
+  <table class="cmp">
+    <tr><th></th><th>Depth-first</th><th>Breadth-first</th></tr>
+    <tr><td>Helper structure</td><td>Stack (or recursion)</td><td>Queue</td></tr>
+    <tr><td>Order</td><td>One route to the end, then back up</td><td>Layer by layer</td></tr>
+    <tr><td>Our graph from A</td><td>A B D E F C G</td><td>A B C D E F G</td></tr>
+    <tr><td>Special talent</td><td>Simple; good for "explore everything" and backtracking</td><td class="good">Finds the route with the <b>fewest edges</b></td></tr>
+  </table>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>BFS = <b>wide first</b>. Stack → DFS, queue → BFS.</li>
+      <li>Both visit every reachable vertex exactly once. Only the <b>order</b> differs.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 6. DIRECTED + TOPO ====================== -->
+<section class="tab" id="dir" data-title="Directed Graphs" data-part="1">
+  <h2>Directed graphs and topological sorting</h2>
+  <p class="goal">Goal: handle one-way connections, and put tasks in an order that respects "this before that".</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>In a <b>directed graph</b> every edge has a <b>direction</b>. It is drawn as an arrow.</li>
+      <li>The arrow A → B can be followed from A to B, but <b>not</b> back.</li>
+      <li>In the matrix we set <b>one</b> cell only: <code>adj[a][b] = 1</code>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🚗</span>
+    <ul>
+      <li>Imagine a city with <b>one-way streets</b>. Each <b>corner</b> is a vertex, each <b>street</b> is an edge.</li>
+      <li>You may drive from A to B. Driving back from B to A needs a different street, if there is one.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 1</span>A one-way edge</h3>
+  <div data-code="T_dir"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A to B? true
+B to A? false</pre></div>
+
+  <h3>Topological sorting</h3>
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>A <b>topological sort</b> puts the vertices of a directed graph in a line so that <b>every arrow points forward</b>.</li>
+      <li>If there is an arrow A → B, then A comes <b>before</b> B in the line.</li>
+      <li>It only works when the graph has <b>no cycles</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🎓</span>
+    <ul>
+      <li>Imagine planning your degree. Each <b>course</b> is a vertex.</li>
+      <li>Each <b>arrow</b> is a prerequisite: Java 1 → Java 2 means "Java 1 first".</li>
+      <li>A topological sort is a <b>legal order to take the courses</b>.</li>
+    </ul>
+  </div>
+  <div class="box def"><span class="tag">How it works</span>
+    <ul>
+      <li>Count the <b>incoming arrows</b> of every vertex.</li>
+      <li>Pick a vertex with <b>0 incoming arrows</b>: nothing has to come before it. Output it.</li>
+      <li><b>Remove its outgoing arrows</b>: the vertices it pointed to wait for one thing less.</li>
+      <li>Repeat until every vertex is output.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="gv" data-graph="dag" data-ops="topo"></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the new parts are highlighted)</small></h3>
+  <div data-code="P_topo"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>1. Java 1
+2. Java 2
+3. Math
+4. Discrete
+5. DataStruct
+6. Capstone</pre></div>
+
+  <div class="box warn"><span class="tag">Watch out: cycles 🔁</span>
+    <ul>
+      <li>If course X needs Y and Y needs X, <b>no order</b> can work. That is a cycle.</li>
+      <li>The program notices: at some point no vertex has 0 incoming arrows.</li>
+      <li>There is often <b>more than one</b> correct order. Math could also come first here.</li>
+    </ul>
+  </div>
+  <div class="box def"><span class="tag">End of Part I ✅</span>
+    <ul><li>You can now store a graph, search it two ways, and sort a directed graph.</li></ul>
+  </div>
+</section>
+
+<!-- ====================== 7. WEIGHTED + MST ====================== -->
+<section class="tab" id="mst" data-title="Weighted Graphs &amp; MST" data-part="2">
+  <h2>Weighted graphs and the minimum spanning tree</h2>
+  <p class="goal">Goal: put a number on every edge, then connect everything as cheaply as possible.</p>
+
+  <div class="box def"><span class="tag">Definition</span>
+    <ul>
+      <li>In a <b>weighted graph</b> every edge has a number, its <b>weight</b>: a distance, a cost or a time.</li>
+      <li>In the matrix we store the <b>weight</b> instead of 1. <code>0</code> still means "no edge".</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 1</span>An edge with a weight</h3>
+  <div data-code="T_weight"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Weight of A - B: 4
+Weight of A - C: 0</pre></div>
+
+  <h3>The minimum spanning tree (MST)</h3>
+  <div class="box def"><span class="tag">Definitions</span>
+    <ul>
+      <li>A <b>spanning tree</b> is a set of edges that connects <b>all</b> the vertices and has <b>no cycle</b>.</li>
+      <li>It always has exactly <b>V − 1</b> edges.</li>
+      <li>The <b>minimum</b> spanning tree is the spanning tree with the <b>smallest total weight</b>.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🔌</span>
+    <ul>
+      <li>Imagine wiring six houses to the power grid. Each <b>house</b> is a vertex.</li>
+      <li>Each <b>possible cable</b> is an edge, and its <b>cost</b> is the weight.</li>
+      <li>Every house must be connected, using the <b>least cable money</b>. No house needs two routes. The answer is the MST.</li>
+    </ul>
+  </div>
+  <div class="box def"><span class="tag">How it works (Prim's algorithm)</span>
+    <ul>
+      <li>Start a tree with <b>one</b> vertex.</li>
+      <li>Look at every edge that goes from <b>inside</b> the tree to a vertex <b>outside</b> it.</li>
+      <li>Add the <b>cheapest</b> one. The tree grows by one vertex.</li>
+      <li>Repeat until every vertex is in the tree.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="gv" data-graph="w1" data-ops="mst"></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the new parts are highlighted)</small></h3>
+  <div data-code="P_mst"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A - C (2)
+C - B (1)
+B - D (5)
+D - E (2)
+E - F (5)
+Total weight: 15</pre></div>
+
+  <div class="box rem"><span class="tag">Remember</span>
+    <ul>
+      <li>MST = connect everything, cheapest total, no cycles, V − 1 edges.</li>
+      <li>Always take the cheapest edge that <b>leaves the tree</b>. That simple greedy rule gives the best answer.</li>
+      <li>A faster version keeps the candidate edges in a <b>priority queue (heap)</b> instead of scanning the matrix each round.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 8. SHORTEST PATH ====================== -->
+<section class="tab" id="sp" data-title="Shortest Path" data-part="2">
+  <h2>The shortest-path problem</h2>
+  <p class="goal">Goal: find the cheapest route from one vertex to every other vertex.</p>
+
+  <div class="box def"><span class="tag">Definitions</span>
+    <ul>
+      <li>The <b>length of a path</b> in a weighted graph is the <b>sum of its edge weights</b>.</li>
+      <li>The <b>shortest path</b> from A to X is the path with the <b>smallest sum</b>.</li>
+      <li>It is not always the path with the fewest edges. A detour over cheap edges can win.</li>
+      <li><b>Dijkstra's algorithm</b> finds the shortest path from one start vertex to <b>all</b> the others.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🗺️</span>
+    <ul>
+      <li>Imagine a GPS. Each <b>intersection</b> is a vertex, each <b>road</b> is an edge, the <b>minutes</b> to drive it are the weight.</li>
+      <li>The GPS keeps a <b>notepad</b>: the best time found so far to every place.</li>
+      <li>Whenever it discovers a quicker way, it <b>crosses out</b> the old time and writes the better one.</li>
+    </ul>
+  </div>
+
+  <h3><span class="step">STEP 1</span>The key idea: is the detour cheaper?</h3>
+  <div data-code="T_relax"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Best distance to B: 3</pre></div>
+
+  <div class="box def"><span class="tag">How Dijkstra's algorithm works</span>
+    <ul>
+      <li>Write distance <b>0</b> for the start and <b>∞</b> (no route yet) for everything else.</li>
+      <li>Pick the <b>closest vertex that is not finished</b>. Its distance is now final.</li>
+      <li>For each of its neighbors, ask the Step 1 question: is going <b>through this vertex</b> cheaper? If yes, update.</li>
+      <li>Repeat until every vertex is finished.</li>
+    </ul>
+  </div>
+
+  <h3>Watch it</h3>
+  <div class="gv" data-graph="w1" data-ops="sp"></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(the new parts are highlighted)</small></h3>
+  <div data-code="P_dijkstra"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A to B: 3 (arrive from C)
+A to C: 2 (arrive from A)
+A to D: 8 (arrive from B)
+A to E: 10 (arrive from D)
+A to F: 14 (arrive from D)</pre></div>
+
+  <div class="cols">
+    <div class="box warn"><span class="tag">MST ≠ shortest paths ⚠️</span>
+      <ul>
+        <li>The MST used E – F (5) to reach F. Total cable: 15.</li>
+        <li>The shortest path to F uses D – F (6): A, C, B, D, F = 14.</li>
+        <li>Different questions, different edges.</li>
+      </ul>
+    </div>
+    <div class="box rem"><span class="tag">Remember</span>
+      <ul>
+        <li>Always finish the <b>closest unfinished</b> vertex next.</li>
+        <li>The weights must <b>not be negative</b>.</li>
+        <li>Our version costs O(V²). With a heap it is faster on big graphs.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 9. KNIGHT'S TOUR ====================== -->
+<section class="tab" id="knight" data-title="The Knight's Tour" data-part="2">
+  <h2>The Knight's Tour</h2>
+  <p class="goal">Goal: solve a famous puzzle by treating a chessboard as a graph.</p>
+
+  <div class="box def"><span class="tag">Definitions</span>
+    <ul>
+      <li>A chess <b>knight</b> moves in an <b>L shape</b>: 2 squares one way, then 1 square sideways. Up to 8 possible moves.</li>
+      <li>The <b>Knight's Tour</b>: move the knight so that it lands on <b>every square exactly once</b>.</li>
+      <li>As a graph: each <b>square</b> is a vertex. Two squares are joined by an <b>edge</b> when a knight can jump between them.</li>
+      <li>So the puzzle asks for a <b>path that visits every vertex once</b>.</li>
+    </ul>
+  </div>
+  <div class="box def"><span class="tag">New word: backtracking</span>
+    <ul>
+      <li><b>Backtracking</b> = try a choice. If it leads to a dead end, <b>undo it</b> and try the next choice.</li>
+      <li>It is depth-first search with one extra step: when we go back, we <b>un-mark</b> the square, so another route may use it.</li>
+    </ul>
+  </div>
+  <div class="box pic"><span class="tag">Picture it 🧩</span>
+    <ul>
+      <li>Imagine solving a maze in pencil. Each <b>square</b> you enter gets a pencil number (the move number).</li>
+      <li>At a dead end you <b>erase</b> your last number and step back.</li>
+      <li>Then you try the next direction from there. Erasing is the backtracking.</li>
+    </ul>
+  </div>
+
+  <h3>Try it: click a square to see where a knight can jump from there</h3>
+  <div class="viz" id="kn">
+    <div class="ctl"><button id="knPlay">▶ Play the tour</button><button class="alt" id="knReset">↺ Reset</button></div>
+    <div class="board" id="knBoard"></div>
+    <div class="vlog" id="knLog"></div>
+  </div>
+
+  <h3><span class="step">STEP 1</span>The 8 knight moves</h3>
+  <div data-code="T_moves"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Can jump to row 2, column 1
+Can jump to row 1, column 2</pre></div>
+
+  <h3><span class="step">STEP 2</span>The full program <small>(solve is highlighted)</small></h3>
+  <div data-code="P_knight"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre> 1  6 15 10 21 
+14  9 20  5 16 
+19  2  7 22 11 
+ 8 13 24 17  4 
+25 18  3 12 23 </pre></div>
+  <div class="box rem"><span class="tag">Read the output</span>
+    <ul>
+      <li>Each number is the <b>move</b> on which the knight landed on that square. Follow 1, 2, 3… to 25.</li>
+      <li>The program tried and erased many wrong routes before it found this one.</li>
+    </ul>
+  </div>
+
+  <div class="box warn"><span class="tag">Watch out: it gets slow fast 🐢</span>
+    <ul>
+      <li>A 5 × 5 board is solved in a blink.</li>
+      <li>A full 8 × 8 board has so many possible routes that this simple version can run for a <b>very</b> long time.</li>
+      <li>Backtracking tries choices one by one. When the number of choices explodes, so does the time.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 10. FULL PROGRAMS ====================== -->
+<section class="tab" id="full" data-title="Full Programs" data-part="2">
+  <h2>The full programs</h2>
+  <p class="goal">Goal: pick the right algorithm for the question, and have everything in two files you can run and change.</p>
+
+  <table class="cmp">
+    <tr><th>The question</th><th>The algorithm</th><th>Kind of graph</th></tr>
+    <tr><td>Can I get from X to Y? Visit everything.</td><td>DFS or BFS</td><td>Any</td></tr>
+    <tr><td>Which route has the fewest edges?</td><td>BFS</td><td>Unweighted</td></tr>
+    <tr><td>In what order should I do tasks with prerequisites?</td><td>Topological sort</td><td>Directed, no cycles</td></tr>
+    <tr><td>What is the cheapest way to connect everything?</td><td>Minimum spanning tree</td><td>Weighted</td></tr>
+    <tr><td>What is the cheapest route from one place?</td><td>Dijkstra's shortest path</td><td>Weighted, no negative weights</td></tr>
+    <tr><td>Is there a route that visits every vertex once?</td><td>Backtracking</td><td>Any (slow on big graphs)</td></tr>
+  </table>
+
+  <h3>Program A · Unweighted graph: display, DFS, BFS</h3>
+  <div data-code="P_fullA"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>A: B C 
+B: A D E 
+C: A F 
+D: B 
+E: B F 
+F: C E G 
+G: F 
+Depth-first from A:   A B D E F C G 
+Breadth-first from A: A B C D E F G 
+Depth-first from G:   G F C A B D E </pre></div>
+
+  <h3>Program B · Weighted graph: MST and shortest paths</h3>
+  <div data-code="P_fullB"></div>
+  <div class="output"><div class="outbar">OUTPUT</div><pre>Minimum spanning tree:
+A - C (2)
+C - B (1)
+B - D (5)
+D - E (2)
+E - F (5)
+Total weight: 15
+Shortest paths from A:
+A to B: 3 (arrive from C)
+A to C: 2 (arrive from A)
+A to D: 8 (arrive from B)
+A to E: 10 (arrive from D)
+A to F: 14 (arrive from D)</pre></div>
+
+  <div class="box rem"><span class="tag">Try this ✏️</span>
+    <ul>
+      <li>In Program A, remove the edge E – F. What do DFS and BFS print from A now?</li>
+      <li>In Program A, add an eighth vertex H with no edges. Does either search print it? Why not?</li>
+      <li>In Program B, change the weight of A – B from 4 to 1. Which outputs change?</li>
+      <li>In Program B, call <code>g.shortestPaths(5)</code>. What is the distance from F to A?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== 11. PLAYGROUND ====================== -->
+<section class="tab" id="play" data-title="Playground" data-part="2">
+  <h2>Playground</h2>
+  <p class="goal">Pick a graph, click a vertex to choose the start, then run an algorithm. Predict the result first.</p>
+  <div class="gv" data-graph="g1" data-play="1"></div>
+  <div class="box rem"><span class="tag">Challenges</span>
+    <ul>
+      <li>On the unweighted graph, start at G. Write down the DFS and BFS orders before you press the buttons.</li>
+      <li>On the weighted graph, find the shortest path from F to A by hand, then check it.</li>
+      <li>Does the minimum spanning tree change when you choose a different start vertex?</li>
+      <li>On the directed graph, run DFS from Math. Which courses are never reached, and why?</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<aside class="panel" id="panel">
+  <h4>💡 Code explainer</h4>
+  <div id="panelBody"></div>
+  <div class="keys">Every code box is a complete, runnable Main.java · Hover = preview · Click = pin a line · <kbd>↑</kbd> <kbd>↓</kbd> = step through pinned code · <kbd>←</kbd> <kbd>→</kbd> = change tab</div>
+</aside>
+</div>
+
+<script>
+/* =====================================================================
+   1.  JAVA CODE  +  LINE-BY-LINE EXPLANATIONS
+   Each line is [ code , explanation ].  `backticks` become <code>.
+   Every block on the page is a COMPLETE program (class Main + main).
+   ===================================================================== */
+const BLANK = [['', '']];
+const M_HEAD = [['public class Main {', "The class that holds `main`. Online Java compilers expect it to be called `Main`."]];
+const M_MAIN = [['    public static void main(String[] args) {', "The program starts running here."]];
+const M_OPEN = [...M_HEAD, ...M_MAIN];
+const M_CLOSE = [['    }', "End of main."], ['}', "End of the Main class."]];
+const mainLines = body => [...M_OPEN, ...body, ...M_CLOSE];
+const B = {};
+
+/* ---------- representing a graph ---------- */
+const F_EDGE = [
+['        adj[0][1] = 1;', "Row 0, column 1: there is an edge from vertex 0 (A) to vertex 1 (B)."],
+['        adj[1][0] = 1;', "Row 1, column 0: the same edge seen from B. An ordinary edge works in both directions, so we always set both cells."],
+];
+B.T_matrix = {title:'Main.java', run:true, focus:F_EDGE, lines:mainLines([
+['        int[][] adj = new int[3][3];', "The adjacency matrix for 3 vertices: A = 0, B = 1, C = 2. Java fills it with 0, which means no edges yet."],
+...F_EDGE,
+['        System.out.println("A - B connected? " + (adj[0][1] == 1));', "Look in row 0, column 1. It holds 1, so this prints true."],
+['        System.out.println("A - C connected? " + (adj[0][2] == 1));', "Row 0, column 2 still holds 0. Prints false."],
+])};
+B.P_list = {title:'Main.java', run:true, lines:[
+['import java.util.ArrayList;', "ArrayList is a ready-made Java list that can grow. We must import it before using it."],
+['', ''],
+...M_OPEN,
+['        String[] names = {"A", "B", "C", "D"};', "Four vertices. A = 0, B = 1, C = 2, D = 3."],
+['        ArrayList<ArrayList<Integer>> list = new ArrayList<>();', "A list of lists: one small list of neighbors for each vertex."],
+['        for (int i = 0; i < names.length; i++) {', "For every vertex..."],
+['            list.add(new ArrayList<>());', "...add an empty neighbor list."],
+['        }', "End of the loop."],
+['', ''],
+['        list.get(0).add(1);', "Edge A - B: B joins the neighbor list of A."],
+['        list.get(1).add(0);', "The same edge seen from B: A joins the neighbor list of B."],
+['        list.get(0).add(2);', "Edge A - C."],
+['        list.get(2).add(0);', "The same edge seen from C."],
+['        list.get(1).add(3);', "Edge B - D."],
+['        list.get(3).add(1);', "The same edge seen from D."],
+['', ''],
+['        for (int i = 0; i < names.length; i++) {', "Go through the vertices."],
+['            System.out.print(names[i] + ": ");', "Print the vertex name."],
+['            for (int neighbor : list.get(i)) {', "Go through ONLY the neighbors of this vertex. No wasted looks at empty cells."],
+['                System.out.print(names[neighbor] + " ");', "Print the neighbor's name."],
+['            }', "End of the neighbor loop."],
+['            System.out.println();', "New line."],
+['        }', "End of the vertex loop."],
+...M_CLOSE]};
+B.P_list.focus = B.P_list.lines.slice(5, 16);
+
+/* ---------- the Graph class, in several versions ---------- */
+function GR(o){            // o.dir: one-way edges   o.w: edges have weights   o.m: which methods to include
+  const p = {}, has = k => o.m.includes(k);
+  p.open = [['class Graph {', "A blueprint for a graph stored as an adjacency matrix."]];
+  p.fields = [
+    ['    String[] names;', "The name of each vertex. Vertex number 0 is `names[0]`, and so on."],
+    ['    int[][] adj;', o.w ? "The adjacency matrix. `adj[a][b]` holds the WEIGHT of the edge from a to b, or 0 if there is no edge." : "The adjacency matrix. `adj[a][b]` is 1 if there is an edge from a to b, and 0 if there is none."],
+    ['    int n;', "How many vertices the graph has."],
+    ...(has('dfs') ? [['    boolean[] visited;', "One true/false per vertex: have we been here already? Used by the depth-first search."]] : []),
+    ...(o.w && has('sp') ? [['    static final int INF = 1000000;', "A huge number that stands for: no route known yet (infinity)."]] : []),
+  ];
+  p.ctor = [
+    ['    Graph(String[] names) {', "The constructor. We hand it the vertex names."],
+    ['        this.names = names;', "Remember the names."],
+    ['        n = names.length;', "The number of vertices is the number of names."],
+    ['        adj = new int[n][n];', "Create the matrix: n rows and n columns, all 0. No edges yet."],
+    ['    }', "End of the constructor."],
+  ];
+  p.addEdge = o.w ? [
+    ['    void addEdge(int a, int b, int weight) {', "Connect vertex a and vertex b with an edge that has a weight."],
+    ['        adj[a][b] = weight;', "Store the weight in row a, column b."],
+    ['        adj[b][a] = weight;', "The edge works both ways, so store it in row b, column a too."],
+    ['    }', "End of addEdge."],
+  ] : o.dir ? [
+    ['    void addEdge(int from, int to) {', "Add a ONE-WAY edge: from → to."],
+    ['        adj[from][to] = 1;', "Set only one cell. We do NOT set adj[to][from], so the edge cannot be used backwards."],
+    ['    }', "End of addEdge."],
+  ] : [
+    ['    void addEdge(int a, int b) {', "Connect vertex a and vertex b."],
+    ['        adj[a][b] = 1;', "Mark the edge in row a, column b."],
+    ['        adj[b][a] = 1;', "The edge works both ways, so mark row b, column a too."],
+    ['    }', "End of addEdge."],
+  ];
+  p.display = [
+    ['    void display() {', "Print every vertex followed by its neighbors."],
+    ['        for (int i = 0; i < n; i++) {', "Go through the vertices (the rows of the matrix)."],
+    ['            System.out.print(names[i] + ": ");', "Print the vertex name."],
+    ['            for (int j = 0; j < n; j++) {', "Go along the row."],
+    ['                if (adj[i][j] != 0) {', "Is there an edge from i to j? (0 means no edge.)"],
+    ['                    System.out.print(names[j] + " ");', "Yes: j is a neighbor. Print its name."],
+    ['                }', "End of the check."],
+    ['            }', "End of the row."],
+    ['            System.out.println();', "New line."],
+    ['        }', "End of the loop."],
+    ['    }', "End of display."],
+  ];
+  p.dfs = [
+    ['    void depthFirst(int start) {', "Starts a depth-first search at vertex `start`."],
+    ['        visited = new boolean[n];', "A fresh array, all false: nothing is visited yet."],
+    ['        dfs(start);', "Begin the real search."],
+    ['        System.out.println();', "New line after the last vertex."],
+    ['    }', "End of depthFirst."],
+    ['', ''],
+    ['    void dfs(int v) {', "Visit vertex v, then go as DEEP as possible from it."],
+    ['        visited[v] = true;', "Mark v as visited, so we never come back to it."],
+    ['        System.out.print(names[v] + " ");', "Visit v: print its name."],
+    ['        for (int next = 0; next < n; next++) {', "Look at every other vertex, in order."],
+    ['            if (adj[v][next] != 0 && !visited[next]) {', "Is `next` a neighbor of v, AND not visited yet? `!` means not."],
+    ['                dfs(next);', "Go there RIGHT NOW, before looking at v's other neighbors. The method calls itself (recursion). When it comes back, the loop continues."],
+    ['            }', "End of the check."],
+    ['        }', "No unvisited neighbors left. The method ends, which takes us back to the vertex we came from."],
+    ['    }', "End of dfs."],
+  ];
+  p.bfs = [
+    ['    void breadthFirst(int start) {', "Visits the vertices level by level, starting from `start`."],
+    ['        boolean[] seen = new boolean[n];', "One true/false per vertex: has it been put in the queue already?"],
+    ['        int[] queue = new int[n];', "A queue made from an array. Each vertex enters it at most once, so n cells are enough."],
+    ['        int front = 0;', "Index of the next vertex to take out."],
+    ['        int rear = 0;', "Index of the next free cell at the back."],
+    ['        seen[start] = true;', "Mark the start vertex."],
+    ['        queue[rear] = start;', "Put the start vertex in the queue."],
+    ['        rear++;', "The back of the queue moves one cell."],
+    ['        while (front < rear) {', "Keep going while the queue is not empty."],
+    ['            int v = queue[front];', "Take the vertex at the FRONT of the queue."],
+    ['            front++;', "The front moves one cell: that vertex has left the queue."],
+    ['            System.out.print(names[v] + " ");', "Visit v: print its name."],
+    ['            for (int next = 0; next < n; next++) {', "Look at every other vertex, in order."],
+    ['                if (adj[v][next] != 0 && !seen[next]) {', "Is `next` a neighbor of v that we have not seen yet?"],
+    ['                    seen[next] = true;', "Mark it now, so it is never added twice."],
+    ['                    queue[rear] = next;', "Put it at the BACK of the queue. It waits its turn."],
+    ['                    rear++;', "The back moves one cell."],
+    ['                }', "End of the check."],
+    ['            }', "All neighbors of v are in line."],
+    ['        }', "The queue is empty: everything reachable was visited."],
+    ['        System.out.println();', "New line."],
+    ['    }', "End of breadthFirst."],
+  ];
+  p.topo = [
+    ['    void topologicalSort() {', "Prints the vertices in an order where every arrow points forward."],
+    ['        int[] incoming = new int[n];', "For each vertex: how many arrows point INTO it (how many things must come before it)."],
+    ['        for (int i = 0; i < n; i++) {', "Go through every row..."],
+    ['            for (int j = 0; j < n; j++) {', "...and every column."],
+    ['                if (adj[i][j] != 0) {', "Is there an arrow i → j?"],
+    ['                    incoming[j]++;', "Then j has one more incoming arrow."],
+    ['                }', "End of the check."],
+    ['            }', "End of the row."],
+    ['        }', "All incoming arrows are counted."],
+    ['        boolean[] done = new boolean[n];', "Which vertices have been printed already."],
+    ['        for (int count = 0; count < n; count++) {', "We must print n vertices, one per round."],
+    ['            int pick = -1;', "The vertex we choose this round. -1 means none found yet."],
+    ['            for (int v = 0; v < n; v++) {', "Search the vertices."],
+    ['                if (!done[v] && incoming[v] == 0) {', "Not printed yet, AND nothing left that must come before it?"],
+    ['                    pick = v;', "This vertex is ready. Choose it."],
+    ['                    break;', "Stop searching."],
+    ['                }', "End of the check."],
+    ['            }', "End of the search."],
+    ['            if (pick == -1) {', "Did we find no ready vertex at all?"],
+    ['                System.out.println("The graph has a cycle. No order is possible.");', "Every remaining vertex is waiting for another one. That only happens when there is a cycle."],
+    ['                return;', "Give up."],
+    ['            }', "End of the cycle check."],
+    ['            done[pick] = true;', "Mark the chosen vertex as printed."],
+    ['            System.out.println((count + 1) + ". " + names[pick]);', "Print its position in the order, and its name."],
+    ['            for (int j = 0; j < n; j++) {', "Go along the chosen vertex's row."],
+    ['                if (adj[pick][j] != 0) {', "Is there an arrow pick → j?"],
+    ['                    incoming[j]--;', "That requirement is now met: j waits for one thing less."],
+    ['                }', "End of the check."],
+    ['            }', "End of the row."],
+    ['        }', "End of the rounds."],
+    ['    }', "End of topologicalSort."],
+  ];
+  p.mst = [
+    ['    void mst() {', "Prints a minimum spanning tree: the cheapest set of edges that connects every vertex."],
+    ['        boolean[] inTree = new boolean[n];', "Which vertices are already connected to the tree."],
+    ['        inTree[0] = true;', "Start the tree with vertex 0 alone."],
+    ['        int total = 0;', "Adds up the weights of the chosen edges."],
+    ['        for (int count = 1; count < n; count++) {', "A tree with n vertices needs n - 1 edges. Each round adds one."],
+    ['            int bestFrom = -1;', "The tree end of the best edge found this round."],
+    ['            int bestTo = -1;', "The outside end of the best edge found this round."],
+    ['            int bestWeight = Integer.MAX_VALUE;', "The cheapest weight found so far. It starts as the biggest possible int, so any real edge beats it."],
+    ['            for (int u = 0; u < n; u++) {', "Try every vertex u..."],
+    ['                for (int v = 0; v < n; v++) {', "...with every vertex v."],
+    ['                    if (inTree[u] && !inTree[v] && adj[u][v] != 0) {', "Is u inside the tree, v outside it, and is there an edge between them?"],
+    ['                        if (adj[u][v] < bestWeight) {', "Is this edge cheaper than the best one so far?"],
+    ['                            bestFrom = u;', "Remember where it starts."],
+    ['                            bestTo = v;', "Remember where it ends."],
+    ['                            bestWeight = adj[u][v];', "Remember its weight."],
+    ['                        }', "End of the cheaper check."],
+    ['                    }', "End of the edge check."],
+    ['                }', "End of the v loop."],
+    ['            }', "End of the u loop. We now know the cheapest edge leaving the tree."],
+    ['            inTree[bestTo] = true;', "The outside vertex joins the tree."],
+    ['            total += bestWeight;', "Add the edge's weight to the total."],
+    ['            System.out.println(names[bestFrom] + " - " + names[bestTo] + " (" + bestWeight + ")");', "Print the chosen edge and its weight."],
+    ['        }', "End of the rounds."],
+    ['        System.out.println("Total weight: " + total);', "Print the cost of the whole tree."],
+    ['    }', "End of mst."],
+  ];
+  p.sp = [
+    ['    void shortestPaths(int start) {', "Dijkstra's algorithm: finds the cheapest route from `start` to every other vertex."],
+    ['        int[] dist = new int[n];', "The best distance found SO FAR from the start to each vertex."],
+    ['        int[] from = new int[n];', "For each vertex: which vertex we arrive from on the best route."],
+    ['        boolean[] done = new boolean[n];', "Which vertices have their FINAL distance."],
+    ['        for (int i = 0; i < n; i++) {', "Go through every vertex."],
+    ['            dist[i] = INF;', "No route known yet."],
+    ['            from[i] = -1;', "No previous vertex known yet."],
+    ['        }', "End of the set-up."],
+    ['        dist[start] = 0;', "Getting from the start to itself costs nothing."],
+    ['        for (int count = 0; count < n; count++) {', "Each round finishes one vertex."],
+    ['            int u = -1;', "The vertex we will finish this round."],
+    ['            for (int v = 0; v < n; v++) {', "Search the vertices."],
+    ['                if (!done[v] && (u == -1 || dist[v] < dist[u])) {', "Not finished yet, AND closer than the best candidate so far? `||` means or."],
+    ['                    u = v;', "This is the closest unfinished vertex so far."],
+    ['                }', "End of the check."],
+    ['            }', "End of the search. `u` is the closest unfinished vertex."],
+    ['            done[u] = true;', "Its distance is final. No cheaper route to it can exist."],
+    ['            for (int v = 0; v < n; v++) {', "Look at every vertex v."],
+    ['                if (adj[u][v] != 0 && dist[u] + adj[u][v] < dist[v]) {', "Is v a neighbor of u, AND is going THROUGH u cheaper than the best route to v so far?"],
+    ['                    dist[v] = dist[u] + adj[u][v];', "Yes: write down the better distance."],
+    ['                    from[v] = u;', "Remember that the better route arrives from u."],
+    ['                }', "End of the check."],
+    ['            }', "End of the update."],
+    ['        }', "End of the rounds. Every distance is final."],
+    ['        for (int i = 0; i < n; i++) {', "Go through every vertex."],
+    ['            if (i != start) {', "Skip the start vertex itself."],
+    ['                System.out.println(names[start] + " to " + names[i] + ": " + dist[i] + " (arrive from " + names[from[i]] + ")");', "Print the cheapest distance, and the last vertex before i on that route."],
+    ['            }', "End of the check."],
+    ['        }', "End of the printing."],
+    ['    }', "End of shortestPaths."],
+  ];
+  p.close = [['}', "End of the Graph class."]];
+  p.all = [...p.open, ...p.fields, ...BLANK, ...p.ctor, ...BLANK, ...p.addEdge];
+  o.m.forEach(k => p.all.push(...BLANK, ...p[k]));
+  p.all.push(...p.close);
+  return p;
+}
+const G1_BUILD = [
+['        String[] names = {"A", "B", "C", "D", "E", "F", "G"};', "Seven vertices. A is number 0, B is 1, C is 2, and so on."],
+['        Graph g = new Graph(names);', "Create the graph. It has 7 vertices and no edges yet."],
+['        g.addEdge(0, 1);   // A - B', "Connect A and B."],
+['        g.addEdge(0, 2);   // A - C', "Connect A and C."],
+['        g.addEdge(1, 3);   // B - D', "Connect B and D."],
+['        g.addEdge(1, 4);   // B - E', "Connect B and E."],
+['        g.addEdge(2, 5);   // C - F', "Connect C and F."],
+['        g.addEdge(4, 5);   // E - F', "Connect E and F. This edge closes a cycle: A, B, E, F, C, A."],
+['        g.addEdge(5, 6);   // F - G', "Connect F and G."],
+];
+const W1_BUILD = [
+['        String[] names = {"A", "B", "C", "D", "E", "F"};', "Six vertices. A is number 0, B is 1, and so on."],
+['        Graph g = new Graph(names);', "Create the graph."],
+['        g.addEdge(0, 1, 4);    // A - B costs 4', "Connect A and B with weight 4."],
+['        g.addEdge(0, 2, 2);    // A - C costs 2', "Connect A and C with weight 2."],
+['        g.addEdge(1, 2, 1);    // B - C costs 1', "Connect B and C with weight 1."],
+['        g.addEdge(1, 3, 5);    // B - D costs 5', "Connect B and D with weight 5."],
+['        g.addEdge(2, 3, 8);    // C - D costs 8', "Connect C and D with weight 8."],
+['        g.addEdge(2, 4, 10);   // C - E costs 10', "Connect C and E with weight 10."],
+['        g.addEdge(3, 4, 2);    // D - E costs 2', "Connect D and E with weight 2."],
+['        g.addEdge(3, 5, 6);    // D - F costs 6', "Connect D and F with weight 6."],
+['        g.addEdge(4, 5, 5);    // E - F costs 5', "Connect E and F with weight 5."],
+];
+
+{ const p = GR({m:['display']});
+  B.P_graph = {title:'Main.java', run:true, focus:[...p.fields, ...p.ctor, ...p.addEdge], lines:[...p.all, ...BLANK, ...mainLines([
+    ...G1_BUILD,
+    ['        g.display();', "Print every vertex with its neighbors."],
+  ])]}; }
+
+/* ---------- depth-first search ---------- */
+const F_TDFS = [
+['    static void dfs(int v) {', "Visit vertex v, then keep going deeper."],
+['        visited[v] = true;', "Mark v as visited."],
+['        System.out.println("Visit " + v);', "Visit it: print its number."],
+['        for (int next = 0; next < 3; next++) {', "Look at all 3 vertices."],
+['            if (adj[v][next] == 1 && !visited[next]) {', "Is `next` a neighbor that we have not visited?"],
+['                dfs(next);', "Go there immediately."],
+['            }', "End of the check."],
+['        }', "End of the loop."],
+['    }', "End of dfs."],
+];
+B.T_dfs = {title:'Main.java', run:true, focus:F_TDFS, lines:[...M_HEAD,
+['    static int[][] adj = {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}};', "A tiny graph written directly as a matrix: 0 - 1 - 2, three vertices in a row."],
+['    static boolean[] visited = new boolean[3];', "One true/false per vertex. All false at the start."],
+['', ''],
+...F_TDFS, ...BLANK, ...M_MAIN,
+['        dfs(0);', "Start at vertex 0. The search goes 0, then 1, then 2."],
+...M_CLOSE]};
+{ const p = GR({m:['dfs']});
+  B.P_dfs = {title:'Main.java', run:true, focus:[p.fields[3], ...p.dfs], lines:[...p.all, ...BLANK, ...mainLines([
+    ...G1_BUILD,
+    ['        g.depthFirst(0);', "Search from A. The order is A B D E F C G: it runs deep down one route before trying another."],
+  ])]}; }
+
+/* ---------- breadth-first search ---------- */
+const F_TQ = [
+['        int first = queue[front];', "Take the value at the FRONT. That is the one that has waited longest."],
+['        front++;', "The front moves on."],
+];
+B.T_queue = {title:'Main.java', run:true, focus:F_TQ, lines:mainLines([
+['        int[] queue = new int[5];', "A queue made from an array."],
+['        int front = 0;', "Where we take values out."],
+['        int rear = 0;', "Where we put values in."],
+['        queue[rear] = 10;', "10 joins the line."],
+['        rear++;', "The back moves on."],
+['        queue[rear] = 20;', "20 joins behind 10."],
+['        rear++;', "The back moves on."],
+['        queue[rear] = 30;', "30 joins behind 20."],
+['        rear++;', "The back moves on."],
+...F_TQ,
+['        System.out.println("First out: " + first);', "Prints 10. First in, first out."],
+['        System.out.println("Next in line: " + queue[front]);', "Prints 20."],
+])};
+{ const p = GR({m:['bfs']});
+  B.P_bfs = {title:'Main.java', run:true, focus:p.bfs, lines:[...p.all, ...BLANK, ...mainLines([
+    ...G1_BUILD,
+    ['        g.breadthFirst(0);', "Search from A. The order is A B C D E F G: first A, then everything 1 edge away, then 2 edges away, then 3."],
+  ])]}; }
+
+/* ---------- directed graphs + topological sort ---------- */
+const F_DIR = [['        adj[0][1] = 1;', "An arrow from A (0) to B (1). We set ONE cell only."]];
+B.T_dir = {title:'Main.java', run:true, focus:F_DIR, lines:mainLines([
+['        int[][] adj = new int[2][2];', "A matrix for 2 vertices: A = 0, B = 1."],
+...F_DIR,
+['        System.out.println("A to B? " + (adj[0][1] == 1));', "Row 0, column 1 holds 1. Prints true."],
+['        System.out.println("B to A? " + (adj[1][0] == 1));', "Row 1, column 0 holds 0. Prints false: it is a one-way street."],
+])};
+{ const p = GR({dir:true, m:['topo']});
+  B.P_topo = {title:'Main.java', run:true, focus:[...p.addEdge, ...p.topo], lines:[...p.all, ...BLANK, ...mainLines([
+    ['        String[] names = {"Capstone", "DataStruct", "Discrete", "Java 2", "Java 1", "Math"};', "Six courses, listed in a jumbled order on purpose. Capstone is 0, DataStruct is 1, and so on."],
+    ['        Graph g = new Graph(names);', "Create the graph."],
+    ['        g.addEdge(4, 3);   // Java 1 -> Java 2', "Java 1 must come before Java 2."],
+    ['        g.addEdge(3, 1);   // Java 2 -> DataStruct', "Java 2 must come before DataStruct."],
+    ['        g.addEdge(5, 2);   // Math -> Discrete', "Math must come before Discrete."],
+    ['        g.addEdge(2, 1);   // Discrete -> DataStruct', "Discrete must come before DataStruct."],
+    ['        g.addEdge(1, 0);   // DataStruct -> Capstone', "DataStruct must come before Capstone."],
+    ['        g.topologicalSort();', "Print an order in which the courses can be taken."],
+  ])]}; }
+
+/* ---------- weighted graphs + minimum spanning tree ---------- */
+const F_W = [
+['        adj[0][1] = 4;', "The edge A - B has weight 4. Instead of 1 we store the weight itself."],
+['        adj[1][0] = 4;', "Same edge, seen from B."],
+];
+B.T_weight = {title:'Main.java', run:true, focus:F_W, lines:mainLines([
+['        int[][] adj = new int[3][3];', "A matrix for 3 vertices: A = 0, B = 1, C = 2. All 0: no edges."],
+...F_W,
+['        System.out.println("Weight of A - B: " + adj[0][1]);', "Prints 4."],
+['        System.out.println("Weight of A - C: " + adj[0][2]);', "Prints 0. In our matrix, 0 means there is no edge."],
+])};
+{ const p = GR({w:true, m:['mst']});
+  B.P_mst = {title:'Main.java', run:true, focus:[...p.addEdge, ...p.mst], lines:[...p.all, ...BLANK, ...mainLines([
+    ...W1_BUILD,
+    ['        g.mst();', "Print the 5 edges of the minimum spanning tree and their total weight."],
+  ])]}; }
+
+/* ---------- shortest path ---------- */
+const F_RELAX = [
+['        if (toC + cToB < toB) {', "Is going to C first, then on to B, cheaper than what we have? 2 + 1 = 3, and 3 < 4."],
+['            toB = toC + cToB;', "Yes: the best distance to B becomes 3."],
+['        }', "This one small test is the heart of Dijkstra's algorithm."],
+];
+B.T_relax = {title:'Main.java', run:true, focus:F_RELAX, lines:mainLines([
+['        int toB = 4;', "Best distance from A to B so far: the direct road costs 4."],
+['        int toC = 2;', "Best distance from A to C: 2."],
+['        int cToB = 1;', "There is also a road from C to B that costs 1."],
+...F_RELAX,
+['        System.out.println("Best distance to B: " + toB);', "Prints 3. The detour through C beats the direct road."],
+])};
+{ const p = GR({w:true, m:['sp']});
+  B.P_dijkstra = {title:'Main.java', run:true, focus:[p.fields[3], ...p.sp], lines:[...p.all, ...BLANK, ...mainLines([
+    ...W1_BUILD,
+    ['        g.shortestPaths(0);', "Find the cheapest route from A to every other vertex."],
+  ])]}; }
+
+/* ---------- the knight's tour ---------- */
+const F_MOVES = [
+['        int[] rowMove = {2, 1, -1, -2, -2, -1, 1, 2};', "How many rows each of the 8 knight moves changes."],
+['        int[] colMove = {1, 2, 2, 1, -1, -2, -2, -1};', "How many columns each of the 8 knight moves changes. Move number i is rowMove[i] together with colMove[i]: always 2 one way and 1 the other."],
+];
+B.T_moves = {title:'Main.java', run:true, focus:F_MOVES, lines:mainLines([
+['        int size = 5;', "A 5 by 5 board. Rows and columns are numbered 0 to 4."],
+...F_MOVES,
+['        int row = 0;', "The knight stands in row 0..."],
+['        int col = 0;', "...column 0: the top-left corner."],
+['        for (int i = 0; i < 8; i++) {', "Try all 8 moves."],
+['            int nextRow = row + rowMove[i];', "The row this move lands on."],
+['            int nextCol = col + colMove[i];', "The column this move lands on."],
+['            if (nextRow >= 0 && nextRow < size && nextCol >= 0 && nextCol < size) {', "Is the landing square still on the board?"],
+['                System.out.println("Can jump to row " + nextRow + ", column " + nextCol);', "Yes: print it. From a corner only 2 of the 8 moves stay on the board."],
+['            }', "End of the check."],
+['        }', "End of the loop."],
+])};
+const KN_SOLVE = [
+['    static boolean solve(int row, int col, int moveNumber) {', "Tries to finish the tour from this square. Returns true if it worked."],
+['        board[row][col] = moveNumber;', "Step onto the square and write the move number in it."],
+['        if (moveNumber == size * size) {', "Was that the last square? (5 × 5 = 25.)"],
+['            return true;', "Every square is visited. The tour is complete!"],
+['        }', "End of the finished check."],
+['        for (int i = 0; i < 8; i++) {', "Try each of the 8 knight moves from here."],
+['            int nextRow = row + rowMove[i];', "The row this move lands on."],
+['            int nextCol = col + colMove[i];', "The column this move lands on."],
+['            if (isFree(nextRow, nextCol)) {', "Is that square on the board and not visited yet?"],
+['                if (solve(nextRow, nextCol, moveNumber + 1)) {', "Jump there and try to finish the tour from it. The method calls itself."],
+['                    return true;', "It worked! Pass the good news back."],
+['                }', "It did not work from that square. Try the next move."],
+['            }', "End of the check."],
+['        }', "End of the loop."],
+['        board[row][col] = 0;', "BACKTRACK: none of the 8 moves led to a full tour. Erase our number and step back off this square."],
+['        return false;', "Tell the previous square: this way was a dead end."],
+['    }', "End of solve."],
+];
+B.P_knight = {title:'Main.java', run:true, focus:KN_SOLVE, lines:[...M_HEAD,
+['    static int size = 5;', "The board is 5 by 5."],
+['    static int[][] board = new int[size][size];', "The board. 0 means not visited. Any other number is the move that landed there."],
+['    static int[] rowMove = {2, 1, -1, -2, -2, -1, 1, 2};', "The row change of each of the 8 knight moves."],
+['    static int[] colMove = {1, 2, 2, 1, -1, -2, -2, -1};', "The column change of each of the 8 knight moves."],
+['', ''],
+['    static boolean isFree(int row, int col) {', "Can the knight land on this square?"],
+['        if (row < 0 || row >= size || col < 0 || col >= size) {', "Is the square off the board? `||` means or."],
+['            return false;', "Off the board: not allowed."],
+['        }', "End of the board check."],
+['        return board[row][col] == 0;', "On the board. It is free only if it has not been visited."],
+['    }', "End of isFree."],
+['', ''],
+...KN_SOLVE, ...BLANK, ...M_MAIN,
+['        if (solve(0, 0, 1)) {', "Start in the top-left corner with move number 1."],
+['            for (int r = 0; r < size; r++) {', "A tour was found. Print the board row by row."],
+['                for (int c = 0; c < size; c++) {', "Go along the row."],
+['                    if (board[r][c] < 10) {', "One-digit number?"],
+['                        System.out.print(" ");', "Print an extra space so the columns line up."],
+['                    }', "End of the check."],
+['                    System.out.print(board[r][c] + " ");', "Print the move number of this square."],
+['                }', "End of the row."],
+['                System.out.println();', "New line."],
+['            }', "End of the board."],
+['        } else {', "Otherwise no tour exists from that corner."],
+['            System.out.println("No tour found.");', "Say so."],
+['        }', "End of the if / else."],
+...M_CLOSE]};
+
+/* ---------- full programs ---------- */
+{ const p = GR({m:['display', 'dfs', 'bfs']});
+  B.P_fullA = {title:'Main.java', run:true, lines:[...p.all, ...BLANK, ...mainLines([
+    ...G1_BUILD,
+    ['', ''],
+    ['        g.display();', "Print every vertex with its neighbors."],
+    ['        System.out.print("Depth-first from A:   ");', "Print a label."],
+    ['        g.depthFirst(0);', "A B D E F C G."],
+    ['        System.out.print("Breadth-first from A: ");', "Print a label."],
+    ['        g.breadthFirst(0);', "A B C D E F G."],
+    ['        System.out.print("Depth-first from G:   ");', "Print a label."],
+    ['        g.depthFirst(6);', "The same graph, searched from the other end."],
+  ])]}; }
+{ const p = GR({w:true, m:['mst', 'sp']});
+  B.P_fullB = {title:'Main.java', run:true, lines:[...p.all, ...BLANK, ...mainLines([
+    ...W1_BUILD,
+    ['', ''],
+    ['        System.out.println("Minimum spanning tree:");', "Print a label."],
+    ['        g.mst();', "The cheapest way to connect all six vertices."],
+    ['        System.out.println("Shortest paths from A:");', "Print a label."],
+    ['        g.shortestPaths(0);', "The cheapest route from A to each vertex."],
+  ])]}; }
+
+/* =====================================================================
+   2.  CODE RENDERING, HOVER PANEL, COPY
+   ===================================================================== */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const KW = /^(class|public|static|final|void|int|long|double|boolean|new|return|if|else|while|for|break|import|true|false|null|this)$/;
+function hi(src){
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*")|\b([A-Za-z_]\w*)\b|\b(\d+)\b/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))){
+    out += esc(src.slice(last, m.index)); last = re.lastIndex;
+    if (m[1]) out += '<span class="c">'+esc(m[1])+'</span>';
+    else if (m[2]) out += '<span class="s">'+esc(m[2])+'</span>';
+    else if (m[3]) out += KW.test(m[3]) ? '<span class="k">'+m[3]+'</span>' : (/^[A-Z]/.test(m[3]) ? '<span class="t">'+m[3]+'</span>' : m[3]);
+    else out += '<span class="num">'+m[4]+'</span>';
+  }
+  return out + esc(src.slice(last));
+}
+const explain = s => esc(s).replace(/`([^`]+)`/g,'<code>$1</code>');
+const textOf = id => B[id].lines.map(l => l[0]).join('\n') + '\n';
+
+function renderCode(host){
+  const id = host.dataset.code, blk = B[id];
+  const foc = blk.focus ? new Set(blk.focus) : null;
+  let h = '<div class="codebox'+(foc?' hasfocus':'')+'"><div class="codebar"><span class="fname">'+esc(blk.title)+' · complete program'+(foc?' · <span class="star">★ new lines are highlighted</span>':'')+'</span><span>'+
+    (foc && blk.lines.length > 30 ? '<button data-jump="1">⤵ Jump to new lines</button> ' : '')+'<button data-copy="'+id+'">📋 Copy Main.java</button></span></div><div class="code">';
+  blk.lines.forEach((l,i) => {
+    h += '<div class="ln'+(l[0]===''?' blank':'')+(foc && foc.has(l)?' focus':'')+'" data-b="'+id+'" data-i="'+i+'"><span class="no">'+(i+1)+'</span><span class="src">'+(hi(l[0])||' ')+'</span></div>';
+  });
+  host.innerHTML = h + '</div></div>';
+}
+
+const panelBody = document.getElementById('panelBody');
+const HINT = '<p class="hint">👈 Move your mouse over any line of Java code.<br><br>The explanation of that line shows up here.</p>';
+let pinned = null;                       // the pinned .ln element
+function show(ln){
+  if (!ln){ panelBody.innerHTML = HINT; return; }
+  const blk = B[ln.dataset.b], i = +ln.dataset.i, l = blk.lines[i];
+  panelBody.innerHTML = '<div class="where">'+esc(blk.title)+' · line '+(i+1)+(ln===pinned?' · 📌 pinned':'')+'</div>'+
+    '<div class="pline">'+hi(l[0].trim())+'</div><div class="ptext">'+explain(l[1])+'</div>';
+}
+function setHot(ln){ document.querySelectorAll('.ln.hot').forEach(e => e.classList.remove('hot')); if (ln) ln.classList.add('hot'); }
+function setPin(ln){
+  if (pinned) pinned.classList.remove('pin');
+  pinned = ln; if (ln) ln.classList.add('pin');
+  show(ln);
+}
+document.addEventListener('mouseover', e => {
+  const ln = e.target.closest && e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')){ setHot(ln); show(ln); }
+  else if (!e.target.closest || !e.target.closest('.codebox')){ setHot(null); show(pinned); }
+});
+document.addEventListener('click', e => {
+  const jp = e.target.closest('[data-jump]');
+  if (jp){ const f = jp.closest('.codebox').querySelector('.ln.focus'); if (f) f.scrollIntoView({block:'center', behavior:'smooth'}); return; }
+  const cp = e.target.closest('[data-copy]');
+  if (cp){ copyText(textOf(cp.dataset.copy), cp); return; }
+  const ln = e.target.closest('.ln');
+  if (ln && !ln.classList.contains('blank')) setPin(ln === pinned ? null : ln);
+});
+function copyText(text, btn){
+  const done = ok => { const old = btn.textContent; btn.textContent = ok ? '✅ Copied complete program!' : '⚠️ Select and copy manually'; setTimeout(() => btn.textContent = old, 1600); };
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok = document.execCommand('copy'); }catch(_){ } ta.remove(); done(ok); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(true), fallback); else fallback();
+}
+
+/* =====================================================================
+   3.  TABS
+   ===================================================================== */
+const sections = [...document.querySelectorAll('section.tab')];
+const tabsNav = document.getElementById('tabs'), wrap = document.getElementById('wrap');
+let curTab = 0;
+function buildTabs(){
+  let h = '';
+  sections.forEach((s,i) => {
+    if (i === 0) h += '<span class="part">PART I</span>';
+    if (s.dataset.part === '2' && sections[i-1].dataset.part === '1') h += '<span class="part two">PART II</span>';
+    h += '<button data-go="'+i+'" data-part="'+s.dataset.part+'"><b>'+(i+1)+'</b>'+s.dataset.title+'</button>';
+    const nav = document.createElement('div'); nav.className = 'navrow';
+    nav.innerHTML = '<button data-go="'+(i-1)+'"'+(i===0?' disabled':'')+'>← '+(i?sections[i-1].dataset.title:'')+'</button>'+
+                    '<button class="next" data-go="'+(i+1)+'"'+(i===sections.length-1?' disabled':'')+'>'+(i<sections.length-1?sections[i+1].dataset.title:'')+' →</button>';
+    s.appendChild(nav);
+  });
+  tabsNav.innerHTML = h;
+  document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(+b.dataset.go, true); });
+}
+function go(i, scroll){
+  if (i < 0 || i >= sections.length) return;
+  curTab = i; setPin(null); setHot(null);
+  sections.forEach((s,j) => s.classList.toggle('on', j === i));
+  tabsNav.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.go === i));
+  wrap.classList.toggle('nopanel', !sections[i].querySelector('.codebox'));
+  const on = tabsNav.querySelector('button.on'); if (on && on.scrollIntoView) on.scrollIntoView({block:'nearest', inline:'center'});
+  try { history.replaceState(null, '', '#' + sections[i].id); } catch(_){}
+  if (scroll) window.scrollTo({top: tabsNav.offsetTop, behavior:'auto'});
+}
+document.addEventListener('keydown', e => {
+  if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowRight') go(curTab + 1, true);
+  else if (e.key === 'ArrowLeft') go(curTab - 1, true);
+  else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && pinned){
+    e.preventDefault();
+    let n = pinned; const dir = e.key === 'ArrowDown' ? 'nextElementSibling' : 'previousElementSibling';
+    do { n = n[dir]; } while (n && n.classList.contains('blank'));
+    if (n){ setPin(n); n.scrollIntoView({block:'nearest'}); }
+  } else if (e.key === 'Escape') setPin(null);
+});
+
+/* =====================================================================
+   4.  THE EXAMPLE GRAPHS  (the same ones the Java programs build)
+   ===================================================================== */
+const GRAPHS = {
+  g1: {title: 'Unweighted graph', h: 370, names: ['A','B','C','D','E','F','G'],
+       pos: [[340,40],[180,130],[500,130],[90,240],[270,240],[500,240],[600,330]],
+       edges: [[0,1],[0,2],[1,3],[1,4],[2,5],[4,5],[5,6]], ops: ['dfs','bfs']},
+  w1: {title: 'Weighted graph', h: 340, weighted: true, names: ['A','B','C','D','E','F'],
+       pos: [[80,170],[230,60],[230,280],[410,60],[410,280],[580,170]],
+       edges: [[0,1,4],[0,2,2],[1,2,1],[1,3,5],[2,3,8],[2,4,10],[3,4,2],[3,5,6],[4,5,5]], ops: ['mst','sp','dfs','bfs']},
+  dag: {title: 'Directed graph (courses)', h: 340, directed: true, names: ['Cap','DS','Disc','J2','J1','Math'],
+        full: ['Capstone','DataStruct','Discrete','Java 2','Java 1','Math'],
+        pos: [[600,170],[430,170],[260,260],[260,80],[90,80],[90,260]],
+        edges: [[4,3],[3,1],[5,2],[2,1],[1,0]], ops: ['topo','dfs','bfs']},
+};
+Object.values(GRAPHS).forEach(G => {
+  G.n = G.names.length; G.adj = G.names.map(() => G.names.map(() => 0));
+  G.key = (a, b) => G.directed ? a+'>'+b : Math.min(a,b)+'-'+Math.max(a,b);
+  G.edges.forEach(e => { G.adj[e[0]][e[1]] = e[2] || 1; if (!G.directed) G.adj[e[1]][e[0]] = e[2] || 1; });
+  G.name = i => (G.full || G.names)[i];
+});
+function drawGraph(svg, G, nc, ec, tags){            // nc: {vertex: class}   ec: {edgeKey: class}   tags: {vertex: small label}
+  nc = nc || {}; ec = ec || {}; tags = tags || {};
+  const W = 680, R = 24; let s = '';
+  G.edges.forEach(e => {
+    const [a, b] = e, c = ec[G.key(a, b)] || '', [x1, y1] = G.pos[a], [x2, y2] = G.pos[b];
+    const len = Math.hypot(x2-x1, y2-y1), ux = (x2-x1)/len, uy = (y2-y1)/len;
+    if (G.directed){
+      const tx = x2 - ux*(R+3), ty = y2 - uy*(R+3), bx = tx - ux*14, by = ty - uy*14;
+      s += '<line class="e '+c+'" x1="'+x1+'" y1="'+y1+'" x2="'+bx+'" y2="'+by+'"/>'+
+           '<polygon class="ah '+c+'" points="'+tx+','+ty+' '+(bx - uy*7)+','+(by + ux*7)+' '+(bx + uy*7)+','+(by - ux*7)+'"/>';
+    } else s += '<line class="e '+c+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';
+    if (G.weighted){ const mx = (x1+x2)/2, my = (y1+y2)/2; s += '<g class="wt '+c+'"><rect x="'+(mx-14)+'" y="'+(my-11)+'" width="28" height="22" rx="6"/><text x="'+mx+'" y="'+(my+5)+'" text-anchor="middle">'+e[2]+'</text></g>'; }
+  });
+  G.names.forEach((nm, i) => { const [x, y] = G.pos[i];
+    s += '<g class="n '+(nc[i]||'')+'" data-i="'+i+'"><circle cx="'+x+'" cy="'+y+'" r="'+R+'"/><text x="'+x+'" y="'+(y+6)+'" text-anchor="middle">'+nm+'</text></g>';
+    if (tags[i] !== undefined){ const w = String(tags[i]).length * 9 + 12;            // small label above the vertex, on a dark pill so edges do not hide it
+      s += '<rect class="tagbg" x="'+(x - w/2)+'" y="'+(y-R-21)+'" width="'+w+'" height="19" rx="6"/><text class="tag" x="'+x+'" y="'+(y-R-7)+'" text-anchor="middle">'+tags[i]+'</text>'; } });
+  svg.setAttribute('viewBox', '0 0 '+W+' '+G.h); svg.style.width = W + 'px'; svg.innerHTML = s;
+}
+
+/* =====================================================================
+   5.  ANIMATED GRAPH WIDGET  (same rules and same visiting order as the Java code)
+   ===================================================================== */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const LABEL = {dfs:'Depth-first search', bfs:'Breadth-first search', topo:'Topological sort', mst:'Minimum spanning tree', sp:'Shortest paths (Dijkstra)'};
+const INF = 1000000, fmtD = d => d >= INF ? '∞' : d;
+class GraphViz {
+  constructor(el){
+    this.el = el; this.token = 0; this.play = !!el.dataset.play;
+    el.innerHTML = '<div class="ctl picks"></div><div class="ctl ops"></div><div class="start"></div><div class="stage"><svg class="graph"></svg></div><div class="info"></div><div class="vlog"></div>';
+    this.svg = el.querySelector('svg'); this.log = el.querySelector('.vlog'); this.info = el.querySelector('.info'); this.startEl = el.querySelector('.start');
+    if (this.play) el.querySelector('.picks').innerHTML = Object.keys(GRAPHS).map(k => '<button class="pick" data-g="'+k+'">'+GRAPHS[k].title+'</button>').join('');
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'), nd = e.target.closest('.n');
+      if (b && b.dataset.g) return this.setGraph(b.dataset.g);
+      if (b && b.dataset.x) return this.reset();
+      if (b && b.dataset.op && !this.busy) return this.run(b.dataset.op);
+      if (nd && !this.busy && this.usesStart){ this.start = +nd.dataset.i; this.reset(); }
+    });
+    this.setGraph(el.dataset.graph);
+  }
+  setGraph(id){
+    this.gid = id; this.G = GRAPHS[id]; this.start = id === 'dag' ? 4 : 0;
+    this.ops = this.play ? this.G.ops : this.el.dataset.ops.split(',');
+    this.usesStart = this.ops.some(o => o !== 'topo');
+    this.el.querySelector('.ops').innerHTML = this.ops.map(o => '<button data-op="'+o+'">'+LABEL[o]+'</button>').join('') + '<button class="alt" data-x="reset">↺ Reset</button>';
+    this.el.querySelectorAll('button.pick').forEach(b => b.classList.toggle('on', b.dataset.g === id));
+    this.reset();
+  }
+  draw(s){ s = s || {}; const nc = Object.assign({}, s.nc); if (!s.nc && this.usesStart) nc[this.start] = 'start'; drawGraph(this.svg, this.G, nc, s.ec, s.tags); this.info.innerHTML = s.info || ''; }
+  say(msg, kind, fresh){ if (fresh) this.log.innerHTML = ''; const d = document.createElement('div'); if (kind) d.className = kind; d.innerHTML = msg; this.log.appendChild(d); this.log.scrollTop = this.log.scrollHeight; }
+  setBusy(b){ this.busy = b; this.el.querySelectorAll('button[data-op],button.pick').forEach(x => x.disabled = b); }
+  reset(){
+    this.token++; this.setBusy(false); this.draw();
+    this.startEl.innerHTML = this.usesStart ? 'Start vertex: <b>'+this.G.name(this.start)+'</b> · click any vertex to change it' : (this.G.full ? this.G.names.map((n, i) => n+' = '+this.G.full[i]).join(' · ') : '');
+    this.say('Ready. Pick an algorithm.', '', true);
+  }
+  async run(op){
+    const steps = this['a_'+op](), token = ++this.token; this.setBusy(true); let first = true;
+    for (const s of steps){
+      if (token !== this.token) return;
+      this.draw(s); this.say(s.msg, s.kind, first); first = false;
+      await sleep(op === 'sp' || op === 'mst' ? 1200 : 950);
+    }
+    if (token === this.token) this.setBusy(false);
+  }
+  names(list){ return list.map(i => this.G.names[i]).join(' '); }
+  /* ----- depth-first search ----- */
+  a_dfs(){
+    const G = this.G, steps = [], visited = [], order = [], stack = [], tree = {};
+    const snap = (cur, msg, kind) => { const nc = {}; order.forEach(v => nc[v] = 'vis'); if (cur !== null) nc[cur] = 'cur';
+      steps.push({nc, ec: Object.assign({}, tree), msg, kind, info: '<span>Visited: <b>'+this.names(order)+'</b></span><span>Stack (the way back): <b>'+(this.names(stack) || 'empty')+'</b></span>'}); };
+    const rec = (v, parent) => {
+      visited[v] = true; order.push(v); stack.push(v);
+      snap(v, parent === null ? 'Start at '+G.name(v)+'. Mark it visited.' : 'From '+G.name(parent)+' go deeper to '+G.name(v)+'. Mark it visited.');
+      for (let next = 0; next < G.n; next++) if (G.adj[v][next] !== 0 && !visited[next]){ tree[G.key(v, next)] = 'tree'; rec(next, v); }
+      stack.pop();
+      if (parent !== null) snap(parent, G.name(v)+' has no unvisited neighbors → go back to '+G.name(parent)+'.');
+    };
+    rec(this.start, null);
+    snap(null, 'Done. Depth-first order: '+order.map(G.name).join(', ')+'.'+(order.length < G.n ? ' Only '+order.length+' of '+G.n+' vertices can be reached from here.' : ''), 'ok');
+    return steps;
+  }
+  /* ----- breadth-first search ----- */
+  a_bfs(){
+    const G = this.G, steps = [], seen = [], order = [], queue = [this.start], tree = {};
+    seen[this.start] = true;
+    const snap = (cur, msg, kind) => { const nc = {}; queue.forEach(v => nc[v] = 'wait'); order.forEach(v => nc[v] = 'vis'); if (cur !== null) nc[cur] = 'cur';
+      steps.push({nc, ec: Object.assign({}, tree), msg, kind, info: '<span>Visited: <b>'+(this.names(order) || 'none yet')+'</b></span><span>Queue (front → back): <b>'+(this.names(queue) || 'empty')+'</b></span>'}); };
+    snap(null, 'Put the start vertex '+G.name(this.start)+' in the queue.');
+    while (queue.length){
+      const v = queue.shift(), added = []; order.push(v);
+      for (let next = 0; next < G.n; next++) if (G.adj[v][next] !== 0 && !seen[next]){ seen[next] = true; queue.push(next); added.push(next); tree[G.key(v, next)] = 'tree'; }
+      snap(v, 'Take '+G.name(v)+' from the FRONT of the queue and visit it. '+(added.length ? 'Its unseen neighbors join the BACK: '+added.map(G.name).join(', ')+'.' : 'It has no unseen neighbors.'));
+    }
+    snap(null, 'The queue is empty. Breadth-first order: '+order.map(G.name).join(', ')+'.'+(order.length < G.n ? ' Only '+order.length+' of '+G.n+' vertices can be reached from here.' : ''), 'ok');
+    return steps;
+  }
+  /* ----- topological sort ----- */
+  a_topo(){
+    const G = this.G, steps = [], incoming = G.names.map(() => 0), done = [], order = [], gone = {};
+    for (let i = 0; i < G.n; i++) for (let j = 0; j < G.n; j++) if (G.adj[i][j] !== 0) incoming[j]++;
+    const snap = (cur, msg, kind) => { const nc = {}, tags = {}; order.forEach(v => nc[v] = 'done'); if (cur !== null) nc[cur] = 'cur';
+      G.names.forEach((_, i) => { if (!done[i] || i === cur) tags[i] = 'in: '+incoming[i]; });
+      steps.push({nc, ec: Object.assign({}, gone), tags, msg, kind, info: '<span>Order so far: <b>'+(order.map(G.name).join(' → ') || 'nothing yet')+'</b></span>'}); };
+    snap(null, 'Count the incoming arrows of every vertex ("in").', 'info');
+    for (let count = 0; count < G.n; count++){
+      let pick = -1; for (let v = 0; v < G.n; v++) if (!done[v] && incoming[v] === 0){ pick = v; break; }
+      if (pick === -1){ snap(null, 'No vertex has 0 incoming arrows: the graph has a cycle.', 'bad'); return steps; }
+      done[pick] = true; order.push(pick); const freed = [];
+      for (let j = 0; j < G.n; j++) if (G.adj[pick][j] !== 0){ incoming[j]--; gone[G.key(pick, j)] = 'fade'; freed.push(G.name(j)+' now waits for '+incoming[j]); }
+      snap(pick, G.name(pick)+' has 0 incoming arrows → nothing must come before it. Output it as number '+(count+1)+'.'+(freed.length ? ' Remove its arrows: '+freed.join(', ')+'.' : ''));
+    }
+    snap(null, 'Done. One legal order: '+order.map(G.name).join(' → ')+'.', 'ok');
+    return steps;
+  }
+  /* ----- minimum spanning tree (Prim) ----- */
+  a_mst(){
+    const G = this.G, steps = [], inTree = [], tree = {}; let total = 0;
+    inTree[this.start] = true;
+    const ncNow = () => { const nc = {}; G.names.forEach((_, i) => { if (inTree[i]) nc[i] = 'done'; }); return nc; };
+    steps.push({nc: ncNow(), ec: {}, msg: 'Start the tree with '+G.name(this.start)+' alone.', kind: 'info', info: '<span>Tree weight: <b>0</b></span>'});
+    for (let count = 1; count < G.n; count++){
+      let bu = -1, bv = -1, bw = Infinity; const cand = {}, list = [];
+      for (let u = 0; u < G.n; u++) for (let v = 0; v < G.n; v++) if (inTree[u] && !inTree[v] && G.adj[u][v] !== 0){
+        cand[G.key(u, v)] = 'a'; list.push(G.name(u)+'–'+G.name(v)+' ('+G.adj[u][v]+')');
+        if (G.adj[u][v] < bw){ bu = u; bv = v; bw = G.adj[u][v]; } }
+      steps.push({nc: ncNow(), ec: Object.assign({}, cand, tree), msg: 'Edges leaving the tree: '+list.join(', ')+'. Cheapest: <b>'+G.name(bu)+'–'+G.name(bv)+' ('+bw+')</b>.', info: '<span>Tree weight: <b>'+total+'</b></span>'});
+      inTree[bv] = true; total += bw; tree[G.key(bu, bv)] = 'tree';
+      const nc = ncNow(); nc[bv] = 'cur';
+      steps.push({nc, ec: Object.assign({}, tree), msg: 'Add '+G.name(bu)+'–'+G.name(bv)+'. '+G.name(bv)+' joins the tree.', info: '<span>Tree weight: <b>'+total+'</b></span>'});
+    }
+    steps.push({nc: ncNow(), ec: Object.assign({}, tree), msg: 'Done. '+(G.n - 1)+' edges connect all '+G.n+' vertices. Total weight: '+total+'.', kind: 'ok', info: '<span>Tree weight: <b>'+total+'</b></span>'});
+    return steps;
+  }
+  /* ----- shortest paths (Dijkstra) ----- */
+  a_sp(){
+    const G = this.G, steps = [], dist = G.names.map(() => INF), from = G.names.map(() => -1), done = [];
+    dist[this.start] = 0;
+    const snap = (cur, upd, active, msg, kind) => {
+      const nc = {}, ec = {}, tags = {};
+      G.names.forEach((_, i) => { if (done[i]) nc[i] = 'done'; tags[i] = fmtD(dist[i]); if (from[i] >= 0) ec[G.key(from[i], i)] = 'tree'; });
+      if (cur !== null) nc[cur] = 'cur'; Object.assign(ec, active);
+      let t = '<table class="dt"><tr><th>vertex</th>'+G.names.map(n => '<th>'+n+'</th>').join('')+'</tr><tr><th>distance</th>'+
+        G.names.map((_, i) => '<td class="'+(upd.includes(i) ? 'upd' : done[i] ? 'fin' : '')+'">'+fmtD(dist[i])+'</td>').join('')+'</tr><tr><th>arrive from</th>'+
+        G.names.map((_, i) => '<td>'+(from[i] >= 0 ? G.names[from[i]] : '–')+'</td>').join('')+'</tr></table>';
+      steps.push({nc, ec, tags, msg, kind, info: t});
+    };
+    snap(null, [], {}, 'Distance 0 for the start ('+G.name(this.start)+'), ∞ for all the others. Green = final, amber = just improved.', 'info');
+    for (let count = 0; count < G.n; count++){
+      let u = -1; for (let v = 0; v < G.n; v++) if (!done[v] && (u === -1 || dist[v] < dist[u])) u = v;
+      done[u] = true;
+      snap(u, [], {}, 'Closest unfinished vertex: <b>'+G.name(u)+'</b> (distance '+fmtD(dist[u])+'). Its distance is final.');
+      const upd = [], active = {}, notes = [];
+      for (let v = 0; v < G.n; v++) if (G.adj[u][v] !== 0 && dist[u] + G.adj[u][v] < dist[v]){
+        notes.push(G.name(v)+': '+fmtD(dist[v])+' → '+dist[u]+' + '+G.adj[u][v]+' = '+(dist[u] + G.adj[u][v]));
+        dist[v] = dist[u] + G.adj[u][v]; from[v] = u; upd.push(v); active[G.key(u, v)] = 'a'; }
+      if (count < G.n - 1) snap(u, upd, active, notes.length ? 'Going through '+G.name(u)+' is cheaper for → '+notes.join(' · ') : 'Going through '+G.name(u)+' does not make any route cheaper.');
+    }
+    snap(null, [], {}, 'Done. The green edges show the cheapest route from '+G.name(this.start)+' to every vertex.', 'ok');
+    return steps;
+  }
+}
+
+/* =====================================================================
+   6.  SMALL WIDGETS: vocabulary picture, matrix explorer, knight's tour board
+   ===================================================================== */
+function initVocab(){
+  const svg = document.getElementById('vSvg'), cap = document.getElementById('vocabCap'), terms = document.getElementById('terms');
+  const all = (G, c) => Object.fromEntries(G.names.map((_, i) => [i, c])), alle = (G, c) => Object.fromEntries(G.edges.map(e => [G.key(e[0], e[1]), c]));
+  const g = GRAPHS.g1, set = (ks, c) => Object.fromEntries(ks.map(k => [k, c]));
+  const V = {
+    graph: {n: all(g, 'vis'), e: alle(g, 'a'), cap: '7 vertices + 7 edges = one graph'},
+    vertex: {n: all(g, 'cur'), cap: 'Every circle is a vertex'},
+    edge: {e: alle(g, 'a'), cap: 'Every line is an edge'},
+    adjacent: {n: {0: 'cur', 1: 'vis', 2: 'vis'}, e: set(['0-1', '0-2'], 'a'), cap: 'B and C are adjacent to A. D is not.'},
+    degree: {n: {1: 'cur'}, e: set(['0-1', '1-3', '1-4'], 'a'), cap: 'Three edges touch B → degree 3'},
+    path: {n: set([0, 1, 4, 5, 6], 'vis'), e: set(['0-1', '1-4', '4-5', '5-6'], 'a'), cap: 'A path from A to G: A → B → E → F → G'},
+    cycle: {n: set([0, 1, 4, 5, 2], 'vis'), e: set(['0-1', '1-4', '4-5', '2-5', '0-2'], 'a'), cap: 'A cycle: A → B → E → F → C → back to A'},
+    connected: {n: all(g, 'done'), cap: 'Every vertex can reach every other vertex'},
+    directed: {g: 'dag', cap: 'Arrows: Java 1 → Java 2 means Java 1 comes first'},
+    weighted: {g: 'w1', cap: 'The number on each edge is its weight'},
+    matrix: {n: {0: 'cur', 1: 'cur'}, e: {'0-1': 'a'}, cap: 'adj[0][1] = 1 because A and B are connected'},
+    list: {n: {0: 'cur', 1: 'vis', 2: 'vis'}, e: set(['0-1', '0-2'], 'a'), cap: 'The list for A holds just: B, C'},
+  };
+  const showTerm = t => { const v = V[t] || {}; drawGraph(svg, GRAPHS[v.g || 'g1'], v.n, v.e); cap.textContent = v.cap || '👆 Pick a word';
+    terms.querySelectorAll('.term').forEach(c => c.classList.toggle('on', c.dataset.t === t)); };
+  showTerm(null);
+  const h = e => { const c = e.target.closest('.term'); if (c) showTerm(c.dataset.t); };
+  terms.addEventListener('mouseover', h); terms.addEventListener('click', h);
+}
+function initMatrix(){
+  const G = GRAPHS.g1, mat = document.getElementById('mat'), svg = document.getElementById('matSvg'), cap = document.getElementById('matCap');
+  mat.innerHTML = '<tr><th></th>'+G.names.map((n, j) => '<th>'+n+'<br><small>'+j+'</small></th>').join('')+'</tr>'+
+    G.names.map((n, i) => '<tr><th>'+n+' '+i+'</th>'+G.names.map((_, j) => '<td data-i="'+i+'" data-j="'+j+'" class="'+(G.adj[i][j] ? 'one' : '')+'">'+G.adj[i][j]+'</td>').join('')+'</tr>').join('');
+  drawGraph(svg, G);
+  const h = e => { const td = e.target.closest('td'); if (!td) return; const i = +td.dataset.i, j = +td.dataset.j, on = G.adj[i][j] !== 0;
+    mat.querySelectorAll('td').forEach(c => { c.classList.remove('a', 'b'); if (+c.dataset.i === i && +c.dataset.j === j) c.classList.add('a'); else if (+c.dataset.i === j && +c.dataset.j === i) c.classList.add('b'); });
+    drawGraph(svg, G, {[i]: 'cur', [j]: 'cur'}, on ? {[G.key(i, j)]: 'a'} : {});
+    cap.innerHTML = i === j ? 'adj['+i+']['+j+'] = 0 → a vertex is not connected to itself.'
+      : on ? 'adj['+i+']['+j+'] = 1 → '+G.names[i]+' and '+G.names[j]+' are connected. The mirror cell adj['+j+']['+i+'] is 1 too.'
+           : 'adj['+i+']['+j+'] = 0 → no edge between '+G.names[i]+' and '+G.names[j]+'.'; };
+  mat.addEventListener('mouseover', h); mat.addEventListener('click', h);
+}
+function initKnight(){
+  const N = 5, RM = [2, 1, -1, -2, -2, -1, 1, 2], CM = [1, 2, 2, 1, -1, -2, -2, -1];
+  const board = document.getElementById('knBoard'), log = document.getElementById('knLog'), playBtn = document.getElementById('knPlay');
+  let token = 0;
+  board.innerHTML = Array.from({length: N*N}, (_, k) => '<div class="sq '+(((Math.floor(k/N) + k%N) % 2) ? 'dk' : '')+'" data-r="'+Math.floor(k/N)+'" data-c="'+(k%N)+'"></div>').join('');
+  const sq = (r, c) => board.children[r*N + c];
+  const clear = () => [...board.children].forEach(s => { s.classList.remove('k', 'mv', 'seen'); s.textContent = ''; });
+  const legal = (r, c) => RM.map((d, i) => [r + d, c + CM[i]]).filter(p => p[0] >= 0 && p[0] < N && p[1] >= 0 && p[1] < N);
+  const reset = () => { token++; clear(); playBtn.disabled = false; log.textContent = 'Click a square to see the knight’s moves, or play the tour that the Java program finds.'; };
+  board.addEventListener('click', e => { const s = e.target.closest('.sq'); if (!s || playBtn.disabled) return; clear();
+    const r = +s.dataset.r, c = +s.dataset.c, mv = legal(r, c); s.classList.add('k'); s.textContent = '♞'; mv.forEach(p => sq(p[0], p[1]).classList.add('mv'));
+    log.innerHTML = 'From row '+r+', column '+c+' the knight has <b>'+mv.length+'</b> legal move'+(mv.length === 1 ? '' : 's')+' (green outline). In graph words: this vertex has degree '+mv.length+'.'; });
+  function solveTour(){                       // the same backtracking as the Java program, with the same move order
+    const b = Array.from({length: N}, () => Array(N).fill(0)), order = [];
+    const solve = (r, c, m) => { b[r][c] = m; order.push([r, c]); if (m === N*N) return true;
+      for (let i = 0; i < 8; i++){ const nr = r + RM[i], nc = c + CM[i]; if (nr >= 0 && nr < N && nc >= 0 && nc < N && b[nr][nc] === 0 && solve(nr, nc, m + 1)) return true; }
+      b[r][c] = 0; order.pop(); return false; };
+    solve(0, 0, 1); return order;
+  }
+  playBtn.addEventListener('click', async () => {
+    const mine = ++token; clear(); playBtn.disabled = true; const order = solveTour();
+    for (let k = 0; k < order.length; k++){
+      if (mine !== token) return;
+      const [r, c] = order[k];
+      if (k){ const p = sq(order[k-1][0], order[k-1][1]); p.classList.remove('k'); p.classList.add('seen'); p.textContent = k; }
+      const s = sq(r, c); s.classList.add('k'); s.innerHTML = '♞<small>'+(k+1)+'</small>';
+      log.innerHTML = 'Move '+(k+1)+' of '+(N*N)+': row '+r+', column '+c+'.';
+      await sleep(430);
+    }
+    if (mine !== token) return;
+    const last = order[order.length-1], s = sq(last[0], last[1]); s.classList.remove('k'); s.classList.add('seen'); s.textContent = N*N;
+    log.innerHTML = '<span class="ok">Tour complete: all 25 squares visited exactly once.</span> The numbers match the output of the Java program below.'; playBtn.disabled = false;
+  });
+  document.getElementById('knReset').addEventListener('click', reset); reset();
+}
+
+/* =====================================================================
+   7.  START
+   ===================================================================== */
+document.querySelectorAll('[data-code]').forEach(renderCode);
+document.querySelectorAll('.gv').forEach(el => new GraphViz(el));
+initVocab(); initMatrix(); initKnight(); buildTabs(); show(null);
+go(Math.max(0, sections.findIndex(s => '#' + s.id === location.hash)), false);
+window.LECTURE = {B, textOf};
+</script>
+</body>
+</html>
